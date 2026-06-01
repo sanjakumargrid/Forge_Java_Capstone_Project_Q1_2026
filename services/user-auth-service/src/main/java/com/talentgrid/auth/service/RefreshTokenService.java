@@ -46,11 +46,6 @@ public class RefreshTokenService {
                         new RuntimeException("Invalid refresh token")
                 );
 
-//        if (Boolean.TRUE.equals(refreshToken.getRevoked())) {
-//
-//            throw new RuntimeException("Refresh token revoked");
-//        }
-
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
 
             throw new RuntimeException("Refresh token expired");
@@ -59,14 +54,6 @@ public class RefreshTokenService {
         return refreshToken;
     }
 
-//    public void revokeRefreshToken(User user) {
-//
-//        refreshTokenRepository.findByUser(user)
-//                .ifPresent(token -> {
-//                    token.setRevoked(true);
-//                    refreshTokenRepository.save(token);
-//                });
-//    }
 
     public void revokeRefreshToken(User user) {
 

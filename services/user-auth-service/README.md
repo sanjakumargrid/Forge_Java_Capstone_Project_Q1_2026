@@ -30,7 +30,6 @@ This service is the security foundation of the platform — it handles all ident
 | Database | PostgreSQL 15 (via Spring Data JPA) |
 | Token blacklist | Redis (Spring Data Redis) |
 | Password hashing | BCrypt |
-| Validation | Jakarta Validation |
 | Boilerplate | Lombok |
 
 ---
@@ -93,8 +92,7 @@ The platform supports the following roles. Each role is stored in the `roles` ta
 | Role | Description |
 |---|---|
 | `ADMIN` | Full platform access — manages users, roles, and system configuration |
-| `RECRUITING_MANAGER` | Oversees the recruitment process and manages recruiters |
-| `RESOURCE_MANAGER` | Manages bench engineers and handles internal allocation (RMG) |
+| `HIRING_MANAGER` | Creates demands and oversees the status and progress of those demands || `RESOURCE_MANAGER` | Manages bench engineers and handles internal allocation (RMG) |
 | `RECRUITER` | Manages candidate pipeline, interviews, and offers |
 | `CANDIDATE` | External applicant — can apply for jobs and track their own application |
 | `EMPLOYEE` | Internal employee — can update their own profile and availability |
@@ -355,9 +353,3 @@ curl -X POST http://localhost:8081/api/auth/register \
 | `GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret | Only if using OAuth2 |
 
 ---
-
-## Integration with other services
-
-Other TalentGrid services validate JWTs by importing the shared `talentgrid-clients/auth-client` library (Feign client pointing to this service). They do not access this service's database directly.
-
-The API Gateway enforces RBAC at the platform ingress level using the `roles` and `scopes` claims embedded in the JWT. This service issues the tokens; the gateway and downstream services enforce them.
