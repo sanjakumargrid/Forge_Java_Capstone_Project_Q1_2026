@@ -16,7 +16,7 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    
+
     public void sendEvent(String topic, BaseEvent<?> event) {
         log.info("[KAFKA-PRODUCER] Sending event | type={} | eventId={} | topic={} | source={}",
                 event.getEventType(), event.getEventId(), topic, event.getSource());
