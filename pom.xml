@@ -11,9 +11,14 @@
 	<groupId>com.talentgrid</groupId>
 	<artifactId>talentgrid-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
+	<packaging>pom</packaging>
+	<name>talentgrid-parent</name>
+	<description>Talentgrid Parent Project</description>
 	<url/>
+
+	<modules>
+		<module>talentgrid-api-gateway-service</module>
+	</modules>
 	<licenses>
 		<license/>
 	</licenses>
@@ -28,6 +33,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<spring-cloud.version>2023.0.3</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
