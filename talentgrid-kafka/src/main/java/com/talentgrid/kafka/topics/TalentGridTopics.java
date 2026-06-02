@@ -1,20 +1,5 @@
 package com.talentgrid.kafka.topics;
 
-/**
- * Central registry of all Kafka topic names used across TalentGrid microservices.
- *
- * <p><strong>Ownership:</strong></p>
- * <ul>
- *   <li>Team 1 (Chennai) — {@code DEMAND_EVENTS}, {@code NOTIFICATION_EVENTS}, {@code SYSTEM_EVENTS}</li>
- *   <li>Team 2 (Chennai) — {@code CANDIDATE_EVENTS}, {@code APPLICATION_EVENTS},
- *       {@code INTERVIEW_EVENTS}, {@code OFFER_EVENTS}</li>
- *   <li>Team 3 (Bangalore) — {@code JOB_EVENTS}</li>
- *   <li>Team 5 (Hyderabad) — {@code WORKFORCE_EVENTS}</li>
- * </ul>
- *
- * <p>All services must reference topic names from this class instead of using
- * raw string literals. This prevents typos and makes refactoring safe.</p>
- */
 public final class TalentGridTopics {
 
     private TalentGridTopics() {
