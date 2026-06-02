@@ -33,3 +33,7 @@ build/
 .vscode/
 
 .env
+
+# Kafka persistent data
+kafka_data/*
+!kafka_data/.gitkeep
