@@ -7,13 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Payload for demand lifecycle events.
- *
- * <p>This DTO is serialized as the {@code payload} field inside a
- * {@link com.talentgrid.shared.event.BaseEvent} and published to the
- * {@code demand-events} Kafka topic by demand-service.</p>
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
