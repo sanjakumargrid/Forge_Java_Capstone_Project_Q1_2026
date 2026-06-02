@@ -6,22 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
-/**
- * Central Kafka topic configuration for TalentGrid.
- *
- * <p>All topics are created here so services don't need to define them individually.
- * Spring Kafka's {@code KafkaAdmin} will auto-create these topics on startup if
- * they don't already exist (controlled by {@code spring.kafka.admin.auto-create}
- * which defaults to {@code true}).</p>
- *
- * <p>Partition and replication settings:
- * <ul>
- *   <li>Partitions set to 3 for most topics — allows parallel consumption across 3 consumer instances.</li>
- *   <li>Replicas set to 1 for local/dev. <strong>Must be changed to 3 for staging/production.</strong></li>
- *   <li>{@code system-events} uses 1 partition (low volume, order important).</li>
- * </ul>
- * </p>
- */
 @Configuration
 public class TalentGridTopicConfig {
 
