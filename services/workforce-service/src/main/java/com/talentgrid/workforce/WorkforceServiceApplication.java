@@ -3,7 +3,7 @@ package com.talentgrid.workforce;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.talentgrid")
 public class WorkforceServiceApplication {
 
     public static void main(String[] args) {
