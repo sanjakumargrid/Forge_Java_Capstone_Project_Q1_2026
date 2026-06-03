@@ -1,0 +1,100 @@
+services/demand-service/
+├── pom.xml                          # Maven build file
+├── Dockerfile                       # Container image build instructions
+├── README.md                        # Project overview and setup guide
+└── src/
+    ├── main/
+    │   ├── java/
+    │   │   └── com/talentgrid/demand/
+    │   │       ├── DemandServiceApplication.java   # Spring Boot entry point
+    │   │       │
+    │   │       ├── config/
+    │   │       │   ├── SecurityConfig.java         # Security and auth configuration
+    │   │       │   ├── KafkaConfig.java            # Kafka producer/consumer settings
+    │   │       │   ├── FeignConfig.java            # Feign client customization
+    │   │       │
+    │   │       ├── controller/
+    │   │       │   ├── DemandController.java       # Core demand CRUD APIs
+    │   │       │   ├── DemandLifecycleController.java  # Workflow/lifecycle APIs
+    │   │       │
+    │   │       ├── security/
+    │   │       │   └── DemandPermissionEvaluator.java  # Domain-specific RBAC (e.g., Own BU checks) using shared security JAR
+    │   │       │
+    │   │       ├── domain/
+    │   │       │   ├── entity/
+    │   │       │   │   ├── Demand.java                # Main demand entity
+    │   │       │   │   ├── DemandSkillRequirement.java# Skill requirement entity
+    │   │       │   │   └── DemandStatusHistory.java   # Status history entity
+    │   │       │   │
+    │   │       │   ├── enums/
+    │   │       │   │   ├── DemandStatus.java         # Demand states
+    │   │       │   │   ├── DemandPriority.java       # Priority levels
+    │   │       │   │   └── SeniorityLevel.java       # Seniority levels
+    │   │       │   │
+    │   │       │   └── statemachine/
+    │   │       │       ├── DemandStateMachine.java   # State transition orchestration
+    │   │       │       ├── DemandTransition.java     # Allowed transitions definition
+    │   │       │       └── TransitionValidator.java  # Transition validation rules
+    │   │       │
+    │   │       ├── repository/
+    │   │       │   ├── DemandRepository.java         # Main demand persistence
+    │   │       │   ├── DemandSkillRepository.java    # Skill mapping persistence
+    │   │       │   └── DemandStatusHistoryRepository.java # History persistence
+    │   │       │
+    │   │       ├── dto/
+    │   │       │   ├── request/
+    │   │       │   │   ├── CreateDemandRequest.java   # Create request payload
+    │   │       │   │   ├── UpdateDemandRequest.java   # Update request payload
+    │   │       │   │   ├── SubmitDemandRequest.java  # Submit action payload
+    │   │       │   │   ├── ApproveDemandRequest.java  # Approve action payload
+    │   │       │   │   ├── HoldDemandRequest.java     # Hold action payload
+    │   │       │   │   └── CancelDemandRequest.java   # Cancel action payload
+    │   │       │   │
+    │   │       │   └── response/
+    │   │       │       ├── DemandResponse.java        # Full demand response
+    │   │       │       ├── DemandSummaryResponse.java # Lightweight summary response
+    │   │       │       ├── DemandStatusHistoryResponse.java # History response
+    │   │       │       └── DemandAnalyticsResponse.java     # Analytics response
+    │   │       │
+    │   │       ├── kafka/
+    │   │       │   ├── producer/
+    │   │       │   │   └── (producer classes)         # Kafka event publishers
+    │   │       │   ├── consumer/
+    │   │       │   │   └── (consumer classes)         # Kafka event listeners
+    │   │       │   └── events/
+    │   │       │       └── (event models)             # Kafka event payload definitions
+    │   │       │
+    │   │       ├── client/
+    │   │       │   ├── WorkforceServiceClient.java    # Feign client for workforce service
+    │   │       │   ├── MatchingServiceClient.java     # Feign client for matching service
+    │   │       │   └── NotificationClient.java        # Feign client for notifications
+    │   │       │
+    │   │       ├── exception/
+    │   │       │   ├── DemandNotFoundException.java
+    │   │       │   ├── InvalidDemandStateException.java
+    │   │       │   ├── IllegalDemandTransitionException.java
+    │   │       │   ├── DemandAlreadyExistsException.java
+    │   │       │   └── DemandExceptionHandler.java    # Central exception handling
+    │   │       │
+    │   │       └── mapper/
+    │   │           └── DemandMapper.java              # Entity ↔ DTO mapping
+    │   │
+    │   └── resources/
+    │       └── application.yml            # Base application config
+    │
+    └── test/
+        └── java/
+            └── com/forge/demand/
+                └── (test classes)        # Unit/integration tests
+
+Quick layer summary:
+- config      -> application setup and infrastructure wiring
+- controller  -> REST API entry points
+- service     -> business logic and orchestration
+- domain      -> core models, enums, and state machine
+- repository  -> database access layer
+- dto         -> API request/response models
+- kafka       -> async event publishing and listening
+- client      -> external service integrations
+- exception   -> custom errors and handlers
+- mapper      -> data conversion between layers

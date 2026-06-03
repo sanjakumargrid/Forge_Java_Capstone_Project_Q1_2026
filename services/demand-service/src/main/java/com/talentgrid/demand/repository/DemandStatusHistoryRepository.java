@@ -1,0 +1,9 @@
+package com.talentgrid.demand.repository;
+
+import com.talentgrid.demand.domain.entity.DemandStatusHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DemandStatusHistoryRepository extends JpaRepository<DemandStatusHistory, Long> {
+}
