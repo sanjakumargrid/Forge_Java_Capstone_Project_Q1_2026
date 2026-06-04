@@ -58,6 +58,12 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
 
+        <!-- OpenAPI / Swagger UI -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -77,6 +83,12 @@
             <groupId>com.talentgrid</groupId>
             <artifactId>talentgrid-kafka</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+<!--        PG vector dependency   -->
+        <dependency>
+            <groupId>com.pgvector</groupId>
+            <artifactId>pgvector</artifactId>
         </dependency>
     </dependencies>
 
