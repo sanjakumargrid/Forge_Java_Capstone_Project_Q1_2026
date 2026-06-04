@@ -5,11 +5,13 @@ import com.talentgrid.kafka.topics.TalentGridTopics;
 import com.talentgrid.shared.event.BaseEvent;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/test")
 @Tag(name = "Kafka Test", description = "Kafka test endpoints for Workforce Service")
@@ -31,6 +33,7 @@ public class KafkaTestController {
                 .build();
 
         producerService.sendEvent(TalentGridTopics.WORKFORCE_EVENTS, event);
+        log.info("the message is  : {}",payload);
         return ResponseEntity.ok("event-sent");
     }
 }
