@@ -1,9 +1,9 @@
 package com.talentgrid.demand.kafka;
 
-import com.talentgrid.demand.dto.DemandPayload;
+import com.talentgrid.kafka.events.demand.DemandPayload;
+import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.producer.KafkaProducerService;
 import com.talentgrid.kafka.topics.TalentGridTopics;
-import com.talentgrid.shared.event.BaseEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

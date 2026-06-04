@@ -96,4 +96,21 @@ public class TalentGridTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    // ────────────────────────────────────────────────────
+    // PLAT-05 — Notification Send
+    // ────────────────────────────────────────────────────
+
+    /**
+     * notification.send — the single inbound topic for all notification dispatch requests.
+     * <p>3 partitions keyed by recipientUserId to preserve per-user ordering.
+     * Retention: 7 days (default). Replication factor: 1 for local dev, 3 for staging/prod.</p>
+     */
+    @Bean
+    public NewTopic notificationSendTopic() {
+        return TopicBuilder.name(TalentGridTopics.NOTIFICATION_SEND)
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }

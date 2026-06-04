@@ -1,6 +1,7 @@
 package com.talentgrid.demand.controller;
+import com.talentgrid.demand.kafka.DemandKafkaProducer;
+import com.talentgrid.kafka.events.demand.DemandPayload;
 
-import com.talentgrid.demand.dto.DemandPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ public class DemandController {
                 .skills(request.getSkills() != null ? request.getSkills() : List.of("Java", "Spring Boot", "Kafka"))
                 .status("OPEN")
                 .raisedBy(request.getRaisedBy())
+                .recipientEmail(request.getRecipientEmail())
                 .build();
 
         demandKafkaProducer.publishDemandCreated(payload, requestId);

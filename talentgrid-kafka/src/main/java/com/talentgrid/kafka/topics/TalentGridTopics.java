@@ -48,4 +48,6 @@ public final class TalentGridTopics {
 
     /** Workforce and bench management events: EMPLOYEE_BENCHED, ALLOCATION_CHANGED, etc. */
     public static final String WORKFORCE_EVENTS = "workforce-events";
+
+    public static final String NOTIFICATION_SEND = "notification.send";
 }

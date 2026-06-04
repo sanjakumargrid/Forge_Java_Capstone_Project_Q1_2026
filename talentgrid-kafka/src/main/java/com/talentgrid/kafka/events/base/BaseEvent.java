@@ -1,10 +1,10 @@
-package com.talentgrid.shared.event;
+package com.talentgrid.kafka.events.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class BaseEvent<T> {
     private String eventType;
 
     @Builder.Default
-    private String timestamp = LocalDateTime.now().toString();
+    private Instant timestamp = Instant.now();
 
     private String source;
 
