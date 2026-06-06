@@ -2,11 +2,15 @@ package com.talentgrid.workforce.engineerprofilemanagement.service.impl;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
+import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.exception.ResourceNotFoundException;
+import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,5 +51,37 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         response.setIsDeleted(Boolean.TRUE.equals(employee.getIsDeleted()));
         response.setDeletedAt(employee.getDeletedAt());
         return response;
+    }
+
+
+    @Override
+    @Transactional
+    public InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto) {
+        if (userDto == null || userDto.getEmployeeId() == null) {
+            throw new IllegalArgumentException("Kafka user payload must contain employeeId");
+        }
+
+        String employeeId = String.valueOf(userDto.getEmployeeId());
+        LocalDateTime now = LocalDateTime.now();
+
+        InternalEmployee employee = repository.findByEmployeeIdAndIsDeletedFalse(employeeId)
+                .orElseGet(InternalEmployee::new);
+
+        employee.setEmployeeId(employeeId);
+        employee.setName(userDto.getName());
+        employee.setEmail(userDto.getEmail());
+        employee.setLocation(userDto.getLocation());
+        employee.setAvailabilityDate(userDto.getAvailableFrom() != null ? userDto.getAvailableFrom().toLocalDate() : null);
+        employee.setHrisSyncStatus(HrisSyncStatus.SYNCED);
+        employee.setIsDeleted(Boolean.FALSE);
+        employee.setDeletedAt(null);
+
+        if (employee.getCreatedAt() == null) {
+            employee.setCreatedAt(now);
+        }
+        employee.setUpdatedAt(now);
+
+        InternalEmployee savedEmployee = repository.save(employee);
+        return mapToResponse(savedEmployee);
     }
 }

@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -41,7 +42,7 @@ public class InternalEmployee {
     @Column(name = "skills", columnDefinition = "text[]")
     private String[] skills;
 
-    @Column(name = "skills_vector", columnDefinition = "vector")
+    @Transient
     private String skillsVector;
 
     @Column(name = "current_project", length = 150)

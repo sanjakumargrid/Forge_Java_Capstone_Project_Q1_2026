@@ -85,11 +85,6 @@
             <version>${project.version}</version>
         </dependency>
 
-<!--        PG vector dependency   -->
-        <dependency>
-            <groupId>com.pgvector</groupId>
-            <artifactId>pgvector</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
