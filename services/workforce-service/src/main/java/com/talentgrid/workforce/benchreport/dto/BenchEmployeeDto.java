@@ -21,4 +21,5 @@ public class BenchEmployeeDto {
     private Integer utilisationPct;
     private Long managerId;
     private HrisSyncStatus hrisSyncStatus;
+    private String[] skills;
 }

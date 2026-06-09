@@ -82,6 +82,7 @@ public class BenchReportServiceImpl implements BenchReportService {
         dto.setUtilisationPct(employee.getUtilisationPct());
         dto.setManagerId(employee.getManagerId());
         dto.setHrisSyncStatus(employee.getHrisSyncStatus());
+        dto.setSkills(employee.getSkills());
         return dto;
     }
 }
