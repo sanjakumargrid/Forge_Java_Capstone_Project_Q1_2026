@@ -1,25 +1,35 @@
 package com.talentgrid.workforce.engineerprofilemanagement.service.impl;
 
+import com.talentgrid.workforce.engineerprofilemanagement.dto.EmployeeProfileUpdatedPayload;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.exception.ResourceNotFoundException;
 import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
+import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.WorkforceKafkaProducer;
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
 public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
     private final InternalEmployeeRepository repository;
+    private final WorkforceKafkaProducer workforceKafkaProducer;
 
-    public InternalEmployeeServiceImpl(InternalEmployeeRepository repository) {
+    public InternalEmployeeServiceImpl(InternalEmployeeRepository repository,
+                                       WorkforceKafkaProducer workforceKafkaProducer) {
         this.repository = repository;
+        this.workforceKafkaProducer = workforceKafkaProducer;
     }
 
     @Override
@@ -28,6 +38,79 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Internal employee not found for id: " + employeeId));
 
         return mapToResponse(employee);
+    }
+
+    @Override
+    @Transactional
+    public InternalEmployeeResponse updateOwnProfile(String employeeId,
+                                                     UpdateEngineerProfileRequest request,
+                                                     String requestId) {
+
+        InternalEmployee employee = repository.findByEmployeeIdAndIsDeletedFalse(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Internal employee not found for id: " + employeeId));
+
+        //Reject empty PATCH
+        if (request.getSkills() == null && request.getAvailabilityDate() == null) {
+            throw new IllegalArgumentException("At least one field must be updated");
+        }
+
+        boolean skillsChanged = false;
+        boolean availabilityChanged = false;
+
+        // Handle skills update safely
+        if (request.getSkills() != null) {
+            String[] newSkills = request.getSkills().toArray(new String[0]);
+            skillsChanged = !Arrays.equals(employee.getSkills(), newSkills);
+
+            if (skillsChanged) {
+                employee.setSkills(newSkills);
+                employee.setSkillsVector(null);
+                employee.setLastEmbeddedAt(null);
+            }
+        }
+
+        // Handle availability update safely
+        if (request.getAvailabilityDate() != null) {
+            availabilityChanged = !Objects.equals(
+                    employee.getAvailabilityDate(),
+                    request.getAvailabilityDate()
+            );
+
+            if (availabilityChanged) {
+                employee.setAvailabilityDate(request.getAvailabilityDate());
+            }
+        }
+
+        // No actual changes
+        if (!skillsChanged && !availabilityChanged) {
+            return mapToResponse(employee);
+        }
+
+        employee.setUpdatedAt(LocalDateTime.now());
+
+        InternalEmployee saved = repository.save(employee);
+
+        List<String> updatedFields = new ArrayList<>();
+
+        if (skillsChanged) {
+            updatedFields.add("skills");
+        }
+        if (availabilityChanged) {
+            updatedFields.add("availabilityDate");
+        }
+
+        workforceKafkaProducer.publishEmployeeProfileUpdated(
+                EmployeeProfileUpdatedPayload.builder()
+                        .employeeId(saved.getEmployeeId())
+                        .updatedFields(updatedFields)
+                        .skills(skillsChanged ? List.of(saved.getSkills()) : null)
+                        .availabilityDate(availabilityChanged ? saved.getAvailabilityDate() : null)
+                        .build(),
+                requestId
+        );
+
+        return mapToResponse(saved);
     }
 
     private InternalEmployeeResponse mapToResponse(InternalEmployee employee) {
