@@ -29,6 +29,7 @@
 
 	<properties>
         <java.version>17</java.version>
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <talentgrid.version>0.0.1-SNAPSHOT</talentgrid.version>
         <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
@@ -48,7 +49,13 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <!-- MapStruct -->
             <dependency>
                 <groupId>org.mapstruct</groupId>
