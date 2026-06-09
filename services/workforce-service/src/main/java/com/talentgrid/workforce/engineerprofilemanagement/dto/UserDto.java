@@ -1,5 +1,4 @@
-package com.talentgrid.workforce.engineerprofilemanagement.kafka.producer;
-
+package com.talentgrid.workforce.engineerprofilemanagement.dto;
 
 
 import jakarta.validation.constraints.*;

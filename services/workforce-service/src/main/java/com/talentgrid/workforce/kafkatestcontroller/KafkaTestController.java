@@ -1,10 +1,6 @@
 package com.talentgrid.workforce.kafkatestcontroller;
 
-import com.talentgrid.kafka.producer.KafkaProducerService;
-import com.talentgrid.kafka.topics.TalentGridTopics;
-import com.talentgrid.shared.event.BaseEvent;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserCreatedProducerMock;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
+import com.talentgrid.workforce.kafka.producer.UserCreatedProducerMock;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

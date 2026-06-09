@@ -2,7 +2,7 @@ package com.talentgrid.workforce.engineerprofilemanagement.service;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import org.springframework.stereotype.Service;
 
 @Service

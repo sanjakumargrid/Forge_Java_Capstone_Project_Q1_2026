@@ -31,6 +31,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+        <!-- Apache HttpClient 5 for OpenFeign (needed for PATCH requests) -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-hc5</artifactId>
+        </dependency>
         <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

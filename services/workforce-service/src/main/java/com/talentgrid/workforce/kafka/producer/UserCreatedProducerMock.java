@@ -1,15 +1,14 @@
-package com.talentgrid.workforce.engineerprofilemanagement.kafka.producer;
+package com.talentgrid.workforce.kafka.producer;
 
 import com.talentgrid.kafka.producer.KafkaProducerService;
 import com.talentgrid.kafka.topics.TalentGridTopics;
 import com.talentgrid.shared.event.BaseEvent;
-import org.hibernate.annotations.Array;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
-import java.util.WeakHashMap;
 
 /**
  * this is mock kafka producer at the time of the merging we have to remove it

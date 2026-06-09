@@ -6,8 +6,8 @@ import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProf
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.exception.ResourceNotFoundException;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.WorkforceKafkaProducer;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
+import com.talentgrid.workforce.kafka.producer.WorkforceKafkaProducer;
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import org.springframework.stereotype.Service;

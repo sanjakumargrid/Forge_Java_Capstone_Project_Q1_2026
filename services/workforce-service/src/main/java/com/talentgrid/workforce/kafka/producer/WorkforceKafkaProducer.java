@@ -1,4 +1,4 @@
-package com.talentgrid.workforce.engineerprofilemanagement.kafka.producer;
+package com.talentgrid.workforce.kafka.producer;
 
 import com.talentgrid.kafka.producer.KafkaProducerService;
 import com.talentgrid.kafka.topics.TalentGridTopics;

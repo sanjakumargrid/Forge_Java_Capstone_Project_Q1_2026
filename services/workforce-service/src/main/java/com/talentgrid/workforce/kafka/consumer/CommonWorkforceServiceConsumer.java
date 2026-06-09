@@ -1,11 +1,11 @@
-package com.talentgrid.workforce.engineerprofilemanagement.kafka.consumer;
+package com.talentgrid.workforce.kafka.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.talentgrid.kafka.consumer.BaseKafkaConsumer;
 import com.talentgrid.kafka.topics.TalentGridTopics;
 import com.talentgrid.shared.event.BaseEvent;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
-import com.talentgrid.workforce.engineerprofilemanagement.kafka.producer.UserDto;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,6 +2,7 @@ package com.talentgrid.workforce.rmgdashboard.service;
 
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
+import com.talentgrid.workforce.rmgdashboard.dto.StatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,24 +20,31 @@ public class RmgService {
 
     private final DemandClient demandClient;
 
-    public Page<DemandDto> getPendingApprovalDemands(Pageable pageable) {
-        log.info("Fetching pending approval demands from demand-service, page={}, size={}", 
-                pageable.getPageNumber(), pageable.getPageSize());
-        
-        List<DemandDto> allDemands = demandClient.getDemandsByStatus("PENDING_APPROVAL");
-        log.info("Received {} demands with status PENDING_APPROVAL from demand-service", allDemands.size());
-        
-        // Filter demands with PENDING_APPROVAL status
-        List<DemandDto> pendingDemands = allDemands.stream()
-                .filter(demand -> "PENDING_APPROVAL".equalsIgnoreCase(demand.getStatus()))
+    public Page<DemandDto> getDemandsByStatus(String status, Pageable pageable) {
+        log.info("Fetching demands from demand-service with status={}, page={}, size={}",
+                status, pageable.getPageNumber(), pageable.getPageSize());
+
+        List<DemandDto> allDemands = demandClient.getDemandsByStatus(status);
+        List<DemandDto> filteredDemands = allDemands.stream()
+                .filter(demand -> status.equalsIgnoreCase(demand.getStatus()))
                 .collect(Collectors.toList());
-        
-        // Apply pagination
+
         int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), pendingDemands.size());
-        
-        List<DemandDto> pageContent = pendingDemands.subList(start, end);
-        
-        return new PageImpl<>(pageContent, pageable, pendingDemands.size());
+        int end = Math.min(start + pageable.getPageSize(), filteredDemands.size());
+
+        if (start >= filteredDemands.size()) {
+            return new PageImpl<>(List.of(), pageable, filteredDemands.size());
+        }
+
+        List<DemandDto> pageContent = filteredDemands.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, filteredDemands.size());
+    }
+
+    public DemandDto updateDemandStatus(Long demandId, String status) {
+        StatusUpdateRequest statusUpdateRequest = StatusUpdateRequest.builder()
+                .status(status)
+                .build();
+
+        return demandClient.updateDemandStatus(demandId, statusUpdateRequest);
     }
 }
