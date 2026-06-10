@@ -1,0 +1,5 @@
+/Users/astephanas/Downloads/Forge_Java_Capstone_Project_Q1_2026_Services 2/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/AuditServiceApplication.java
+/Users/astephanas/Downloads/Forge_Java_Capstone_Project_Q1_2026_Services 2/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/audit/AuditLogEntity.java
+/Users/astephanas/Downloads/Forge_Java_Capstone_Project_Q1_2026_Services 2/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/audit/AuditLogRepository.java
+/Users/astephanas/Downloads/Forge_Java_Capstone_Project_Q1_2026_Services 2/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/audit/AuditLogService.java
+/Users/astephanas/Downloads/Forge_Java_Capstone_Project_Q1_2026_Services 2/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/kafka/AuditLogConsumer.java

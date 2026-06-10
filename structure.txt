@@ -1,0 +1,96 @@
+As of now, we have pushed the base directory structure for this project.
+Please pull the latest changes and create your own subfolders and business
+logic files within your respective services during implementation.
+
+
+talentgrid/
+├── .env
+│   (Local infrastructure environment variables)
+├── README.md
+│   (System documentation and getting started guide)
+├── pom.xml
+│   (Root BOM — dependency versions locked centrally)
+├── docker-compose.yml
+│   (Local infra: PostgreSQL · Redis · Kafka)
+├── kubernetes/
+├── github-actions/
+├── observability/
+│   ├── grafana/
+│   ├── loki/
+│   └── tempo/
+│       (Tracing + logging dashboards)
+├── scripts/
+
+├────────────────────────────────────────────
+│ SHARED LIBRARIES (Imported by all teams)
+├────────────────────────────────────────────
+├── talentgrid-shared/
+│   (Common reusable utilities)
+│   ├── dto/
+│   ├── enums/
+│   ├── exception/
+│   └── util/
+├── talentgrid-kafka/
+│   (Shared Kafka abstraction)
+│   ├── producer/
+│   ├── consumer/
+│   └── topics/
+├── talentgrid-observability/
+│   (Shared tracing + monitoring)
+│   ├── logging/
+│   │   └── MdcFilter (traceId · teamId · requestId)
+│   ├── tracing/
+│   │   (OpenTelemetry config)
+│   └── metrics/
+│       (Micrometer custom core infrastructure metrics)
+├── talentgrid-clients/
+│   (Shared external service clients)
+│   ├── notification-client/
+│   │   (Feign client → notification-service)
+│   └── auth-client/
+│       (Feign client → user-auth-service)
+
+├────────────────────────────────────────────
+│ INFRASTRUCTURE SERVICES
+├────────────────────────────────────────────
+├── talentgrid-api-gateway-service/      ← TEAM 1 (Chennai)
+│   (Central API gateway)
+├── talentgrid-notification-service/     ← TEAM 1 (Chennai)
+│   (Multi-channel notification service)
+├── talentgrid-audit-service/            ← TEAM 1 (Chennai)
+│   (Central audit tracking service)
+
+├────────────────────────────────────────────
+│ DOMAIN SERVICES
+├────────────────────────────────────────────
+├── services/
+│   ├── demand-service/                  ← TEAM 1 (Chennai)
+│   │   (Demand lifecycle management)
+│   ├── user-auth-service/              ← TEAM 1 (Chennai)
+│   │   (Authentication + authorization)
+│   ├── candidate-service/              ← TEAM 2 (Chennai)
+│   │   (Candidate management platform)
+│   ├── application-service/            ← TEAM 2 (Chennai)
+│   │   (Hiring pipeline management)
+│   ├── interview-service/              ← TEAM 2 (Chennai)
+│   │   (Interview scheduling + scorecards)
+│   ├── offer-service/                  ← TEAM 2 (Chennai)
+│   │   (Offer management system)
+│   ├── job-service/                    ← TEAM 3 (Bangalore)
+│   │   (Job publishing + careers portal)
+│   └── workforce-service/              ← TEAM 5 (Hyderabad)
+│       (Workforce + bench management)
+
+├────────────────────────────────────────────
+│ DATABASE MIGRATIONS (Flyway)
+├────────────────────────────────────────────
+└── db-changes/
+    ├── demand-service/                  ← TEAM 1
+    ├── user-auth-service/              ← TEAM 1
+    ├── candidate-service/              ← TEAM 2
+    ├── application-service/            ← TEAM 2
+    ├── interview-service/              ← TEAM 2
+    ├── offer-service/                  ← TEAM 2
+    ├── job-service/                    ← TEAM 3
+    └── workforce-service/              ← TEAM 5
+

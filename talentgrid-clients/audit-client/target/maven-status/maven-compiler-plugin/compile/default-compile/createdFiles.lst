@@ -1,0 +1,4 @@
+com/talentgrid/audit/dto/AuditLogPayload.class
+com/talentgrid/audit/dto/AuditLogPayload$AuditLogPayloadBuilder.class
+com/talentgrid/audit/dto/AuditAction.class
+com/talentgrid/audit/client/AuditLogClient.class
