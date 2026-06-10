@@ -64,7 +64,7 @@ class RmgSearchServiceImplTest {
         dto.setContractType(contractType);
         dto.setLocation(location);
         dto.setAvailabilityDate(availabilityDate);
-        dto.setSkills(skills);
+        dto.setSkills(List.of(skills));
         return dto;
     }
 
@@ -170,8 +170,8 @@ class RmgSearchServiceImplTest {
         }
 
         @Test
-        @DisplayName("excludes employees whose skills array is null")
-        void excludesEmployeesWithNullSkillsArray() {
+        @DisplayName("excludes employees whose skills list is null")
+        void excludesEmployeesWithNullSkillsList() {
             BenchEmployeeDto noSkills = buildEmployee("E099", "Eve", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
             noSkills.setSkills(null);
@@ -186,11 +186,11 @@ class RmgSearchServiceImplTest {
         }
 
         @Test
-        @DisplayName("excludes employees whose skills array is empty")
-        void excludesEmployeesWithEmptySkillsArray() {
+        @DisplayName("excludes employees whose skills list is empty")
+        void excludesEmployeesWithEmptySkillsList() {
             BenchEmployeeDto emptySkills = buildEmployee("E098", "Fay", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
-            emptySkills.setSkills(new String[0]);
+            emptySkills.setSkills(List.of());
 
             when(benchReportService.getBenchReport())
                     .thenReturn(reportWith(List.of(emptySkills), List.of(), List.of()));

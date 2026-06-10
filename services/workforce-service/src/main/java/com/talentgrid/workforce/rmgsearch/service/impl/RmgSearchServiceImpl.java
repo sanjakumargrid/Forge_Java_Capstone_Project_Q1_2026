@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,11 +52,11 @@ public class RmgSearchServiceImpl implements RmgSearchService {
         if (request.getSkill() == null || request.getSkill().isBlank()) {
             return true;
         }
-        if (employee.getSkills() == null || employee.getSkills().length == 0) {
+        if (employee.getSkills() == null || employee.getSkills().isEmpty()) {
             return false;
         }
         String skillFilter = request.getSkill().trim().toLowerCase();
-        return Arrays.stream(employee.getSkills())
+        return employee.getSkills().stream()
                 .anyMatch(s -> s != null && s.trim().toLowerCase().equals(skillFilter));
     }
 

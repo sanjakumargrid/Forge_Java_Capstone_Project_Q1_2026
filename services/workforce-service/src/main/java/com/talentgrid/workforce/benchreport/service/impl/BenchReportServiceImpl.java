@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class BenchReportServiceImpl implements BenchReportService {
         dto.setUtilisationPct(employee.getUtilisationPct());
         dto.setManagerId(employee.getManagerId());
         dto.setHrisSyncStatus(employee.getHrisSyncStatus());
-        dto.setSkills(employee.getSkills());
+        dto.setSkills(employee.getSkills() != null ? Arrays.asList(employee.getSkills()) : null);
         return dto;
     }
 }

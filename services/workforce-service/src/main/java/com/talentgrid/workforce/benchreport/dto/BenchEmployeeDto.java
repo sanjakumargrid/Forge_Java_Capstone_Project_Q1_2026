@@ -6,6 +6,7 @@ import com.talentgrid.workforce.engineerprofilemanagement.enums.Level;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class BenchEmployeeDto {
@@ -21,5 +22,5 @@ public class BenchEmployeeDto {
     private Integer utilisationPct;
     private Long managerId;
     private HrisSyncStatus hrisSyncStatus;
-    private String[] skills;
+    private List<String> skills;
 }
