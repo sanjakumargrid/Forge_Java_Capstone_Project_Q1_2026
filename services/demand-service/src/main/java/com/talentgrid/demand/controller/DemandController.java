@@ -1,12 +1,8 @@
 package com.talentgrid.demand.controller;
 
-import com.talentgrid.demand.dto.request.CreateDemandRequest;
-import com.talentgrid.demand.dto.request.UpdateDemandRequest;
-import com.talentgrid.demand.dto.response.DemandResponse;
-import com.talentgrid.demand.dto.response.DemandSummaryResponse;
 import com.talentgrid.demand.service.DemandService;
-import com.talentgrid.demand.service.DemandQueryService;
-import org.springframework.http.ResponseEntity;
+import com.talentgrid.kafka.events.demand.DemandPayload;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +18,7 @@ public class DemandController {
         this.demandService = demandService;
         this.demandQueryService = demandQueryService;
     }
+    private final DemandService demandService;
 
     @PostMapping
     public ResponseEntity<DemandResponse> createDemand(@RequestBody CreateDemandRequest request) {
@@ -32,6 +29,10 @@ public class DemandController {
     public ResponseEntity<DemandResponse> updateDemand(@PathVariable Long id, @RequestBody UpdateDemandRequest request) {
         return ResponseEntity.ok(demandService.updateDemand(id, request));
     }
+    public String createDemand(
+            @RequestBody DemandPayload request,
+            @RequestHeader(value = "X-Request-Id", required = false)
+            String requestId) {
 
     @GetMapping("/{id}")
     public ResponseEntity<DemandResponse> getDemandById(@PathVariable Long id) {
@@ -41,5 +42,9 @@ public class DemandController {
     @GetMapping
     public ResponseEntity<List<DemandSummaryResponse>> getAllDemands() {
         return ResponseEntity.ok(demandQueryService.getAllDemands());
+        return demandService.createDemand(
+                request,
+                requestId
+        );
     }
 }

@@ -16,7 +16,11 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendEvent(String topic, String key, BaseEvent<?> event) {
+    public void sendEvent(
+            String topic,
+            String key,
+            BaseEvent<?> event
+    ) {
 
         CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(topic, key, event);
@@ -26,18 +30,17 @@ public class KafkaProducerService {
             if (ex != null) {
 
                 log.error(
-                        "[KAFKA-PRODUCER] Failed | topic={} | key={} | eventType={} | error={}",
+                        "Failed to publish event | topic={} | key={} | eventType={}",
                         topic,
                         key,
                         event.getEventType(),
-                        ex.getMessage(),
                         ex
                 );
 
             } else {
 
                 log.info(
-                        "[KAFKA-PRODUCER] Success | topic={} | partition={} | offset={} | eventType={}",
+                        "Event published successfully | topic={} | partition={} | offset={} | eventType={}",
                         topic,
                         result.getRecordMetadata().partition(),
                         result.getRecordMetadata().offset(),
@@ -45,9 +48,5 @@ public class KafkaProducerService {
                 );
             }
         });
-    }
-
-    public void sendEvent(String topic, BaseEvent<?> event) {
-        sendEvent(topic, event.getEventType(), event);
     }
 }

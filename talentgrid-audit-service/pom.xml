@@ -2,40 +2,55 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- FIX #5: This file did not exist. demand-service cannot be built without it. -->
     <parent>
         <groupId>com.talentgrid</groupId>
         <artifactId>talentgrid-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>demand-service</artifactId>
-    <name>TalentGrid Demand Service</name>
-    <description>Demand lifecycle management service for TalentGrid</description>
-    <packaging>jar</packaging>
+    <artifactId>talentgrid-audit-service</artifactId>
+
+    <name>TalentGrid Audit Service</name>
+
+    <description>
+        Centralized audit logging service.
+        Consumes audit events from Kafka and persists them to PostgreSQL.
+    </description>
 
     <dependencies>
-        <!-- Web layer -->
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- REST APIs -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- TalentGrid Shared (BaseEvent, DTOs) -->
+        <!-- JPA -->
         <dependency>
-            <groupId>com.talentgrid</groupId>
-            <artifactId>talentgrid-shared</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- TalentGrid Kafka (KafkaProducerService, TalentGridTopics, auto-config) -->
+        <!-- PostgreSQL -->
         <dependency>
-            <groupId>com.talentgrid</groupId>
-            <artifactId>talentgrid-kafka</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+
+        <!-- Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
 
         <!-- Lombok -->
@@ -45,42 +60,44 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Dev tools -->
+        <!-- Shared Kafka Library -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <scope>runtime</scope>
-            <optional>true</optional>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>talentgrid-kafka</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <!-- Test -->
+        <!-- Audit Client -->
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>audit-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Jackson -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
         <plugins>
-            <!-- This IS a runnable service — spring-boot-maven-plugin belongs here -->
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -93,6 +110,12 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
         </plugins>
     </build>
 
