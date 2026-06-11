@@ -1,9 +1,7 @@
 package com.talentgrid.candidate.externalCandidate.dto;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import com.talentgrid.candidate.externalCandidate.enums.Source;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -15,6 +13,8 @@ import java.util.List;
 @Getter
 @Setter
 public class ExternalCandidateDto {
+
+    private Long demandId;
 
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 100, message = "First name must be between 1 and 100 characters")
@@ -80,8 +80,6 @@ public class ExternalCandidateDto {
     @Size(max = 1000, message = "Free notes must not exceed 1000 characters")
     private String freeNotes;
 
-    @NotNull(message = "Source is required")
-    private Source source;
 
     @NotEmpty(message = "At least one education detail is required")
     private List<@Valid EducationDetailDto> educationDetails;
