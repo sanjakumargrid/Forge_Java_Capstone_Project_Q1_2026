@@ -31,15 +31,13 @@ public class Application {
     @Column(name = "application_id")
     private Long id;
 
-    @NotNull(message = "Candidate is required")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "candidate_id", nullable = false )
-    private ExternalCanidate candidate;
+    @NotNull(message = "Candidate ID is required")
+    @Column(name = "candidate_id", nullable = false)
+    private Long candidateId;
 
-//    @NotNull(message = "Demand is required")
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "demand_id", nullable = false)
-//    private Demand demand;
+    @NotNull(message = "Demand ID is required")
+    @Column(name = "demand_id", nullable = false)
+    private Long demandId;
 
     @NotNull(message = "Source is required")
     @Enumerated(EnumType.STRING)

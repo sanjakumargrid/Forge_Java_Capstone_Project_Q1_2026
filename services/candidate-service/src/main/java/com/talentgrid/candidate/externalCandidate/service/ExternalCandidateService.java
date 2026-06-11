@@ -8,8 +8,6 @@ import com.talentgrid.candidate.externalCandidate.entity.ExternalCandidate;
 import com.talentgrid.candidate.externalCandidate.mapper.ExternalCandidateMapper;
 import com.talentgrid.candidate.externalCandidate.repository.ExternalCandidateRepository;
 import com.talentgrid.candidate.externalCandidate.utility.HashUtil;
-import com.talentgrid.candidate.kafka.CandidateKafkaProducer;
-import com.talentgrid.kafka.events.candidate.CandidatePayload;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +20,13 @@ public class ExternalCandidateService {
 
     private final ExternalCandidateRepository externalCandidateRepository;
     private final HashUtil hashUtil;
-    private final CandidateKafkaProducer candidateKafkaProducer;
 
     public ExternalCandidateService(
             ExternalCandidateRepository externalCandidateRepository,
-            HashUtil hashUtil,
-            CandidateKafkaProducer candidateKafkaProducer
+            HashUtil hashUtil
     ) {
         this.externalCandidateRepository = externalCandidateRepository;
         this.hashUtil = hashUtil;
-        this.candidateKafkaProducer = candidateKafkaProducer;
     }
 
     @Transactional
@@ -73,13 +68,6 @@ public class ExternalCandidateService {
         ExternalCandidate savedCandidate =
                 externalCandidateRepository.save(candidate);
 
-        CandidatePayload payload =
-                buildCandidatePayload(savedCandidate);
-
-        candidateKafkaProducer.publishCandidateCreated(
-                payload,
-                null
-        );
 
         return CandidateResponse.builder()
                 .status(HttpStatus.CREATED.value())
@@ -128,13 +116,6 @@ public class ExternalCandidateService {
         ExternalCandidate savedCandidate =
                 externalCandidateRepository.save(existingCandidate);
 
-        CandidatePayload payload =
-                buildCandidatePayload(savedCandidate);
-
-        candidateKafkaProducer.publishCandidateUpdated(
-                payload,
-                null
-        );
 
         return CandidateResponse.builder()
                 .status(HttpStatus.OK.value())
@@ -172,13 +153,6 @@ public class ExternalCandidateService {
         ExternalCandidate deletedCandidate =
                 externalCandidateRepository.save(candidate);
 
-        CandidatePayload payload =
-                buildCandidatePayload(deletedCandidate);
-
-        candidateKafkaProducer.publishCandidateDeleted(
-                payload,
-                null
-        );
     }
 
     private String normalizeEmail(String email) {
@@ -189,15 +163,5 @@ public class ExternalCandidateService {
         return phone.trim();
     }
 
-    private CandidatePayload buildCandidatePayload(
-            ExternalCandidate candidate
-    ) {
-        return CandidatePayload.builder()
-                .candidateId(candidate.getCandidateId())
-                .firstName(candidate.getFirstName())
-                .lastName(candidate.getLastName())
-                .email(candidate.getEmail())
-                .build();
-    }
 
 }
