@@ -37,7 +37,8 @@ public class ApplicationService {
             ApplicationRepository applicationRepository,
             CandidateClient candidateClient,
             DemandClient demandClient
-    ) {
+    )
+    {
         this.applicationRepository = applicationRepository;
         this.candidateClient = candidateClient;
         this.demandClient = demandClient;
