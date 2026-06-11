@@ -6,36 +6,31 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<!-- FIX #7: 3.5.14 does not exist. Latest stable Spring Boot 3.x is 3.4.5 -->
 		<version>3.4.5</version>
 		<relativePath/>
 	</parent>
 
 	<groupId>com.talentgrid</groupId>
 	<artifactId>talentgrid-parent</artifactId>
-	<!-- FIX #2: Unified version used by all child modules -->
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>TalentGrid Parent</name>
 	<description>Root BOM — dependency versions locked centrally for TalentGrid</description>
 
-	<!-- FIX #1: Declare all child modules so Maven can build the multi-module project -->
 	<modules>
 		<module>talentgrid-shared</module>
 		<module>talentgrid-kafka</module>
-		<!-- Add service modules below as they are implemented -->
-		<!-- <module>services/demand-service</module> -->
+		<module>talentgrid-clients/notification-client</module>
+		<module>talentgrid-clients/audit-client</module>
+		<module>services/demand-service</module>
+		<module>talentgrid-audit-service</module>
+		<module>talentgrid-notification-service</module>
 	</modules>
 
 	<properties>
 		<java.version>17</java.version>
 	</properties>
 
-	<!--
-		Root pom is a BOM / parent aggregator only.
-		Do NOT put <dependencies> here — each child module declares only what it needs.
-		Common dependency versions are managed via <dependencyManagement> if needed.
-		FIX #12: spring-boot-maven-plugin removed from here; only runnable services need it.
-	-->
+
 
 </project>

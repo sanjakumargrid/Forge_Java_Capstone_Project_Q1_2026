@@ -16,12 +16,17 @@
     <name>TalentGrid Demand Service</name>
     <description>Demand lifecycle management service for TalentGrid</description>
     <packaging>jar</packaging>
-
     <dependencies>
         <!-- Web layer -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>notification-client</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- TalentGrid Shared (BaseEvent, DTOs) -->
@@ -37,6 +42,7 @@
             <artifactId>talentgrid-kafka</artifactId>
             <version>${project.version}</version>
         </dependency>
+
 
         <!-- Lombok -->
         <dependency>
@@ -63,6 +69,12 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>audit-client</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,4 @@
-package com.talentgrid.demand.dto;
+package com.talentgrid.kafka.events.demand;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +19,6 @@ public class DemandPayload {
     private List<String> skills;    // e.g. ["Java", "Kafka", "Spring Boot"]
     private String location;
     private String status;          // e.g. "OPEN", "APPROVED", "CLOSED"
-    private String raisedBy;        // Employee/manager who raised the demand
+    private String raisedBy; // Employee/manager who raised the demand
+    private String recipientEmail;
 }

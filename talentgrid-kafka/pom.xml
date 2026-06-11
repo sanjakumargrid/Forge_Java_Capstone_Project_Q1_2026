@@ -52,15 +52,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- TalentGrid Shared (for BaseEvent, enums, etc.) -->
-        <!-- FIX #3: ${project.version} now resolves correctly because both modules
-             share the same parent version (1.0.0-SNAPSHOT) -->
-        <dependency>
-            <groupId>com.talentgrid</groupId>
-            <artifactId>talentgrid-shared</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
