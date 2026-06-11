@@ -1,0 +1,6 @@
+Employee ID,Name,Email,Level,Availability Date,Location,Contract Type,Current Project,Utilisation %,Manager ID,HRIS Sync Status,Skills
+,Alice,notanemail,INTERN,not-a-date,,,,,,,
+EMP002,Bob,bob@example.com,MID,,,,,150,,SYNCED,
+EMP001,Alice Duplicate,alice@example.com,SENIOR,,,,,,,,
+EMP001,Second Duplicate,second@example.com,MID,,,,,,,,
+EMP005,,noatsign,JUNIOR,2026-07-01,,,,,abc,UNKNOWN,
