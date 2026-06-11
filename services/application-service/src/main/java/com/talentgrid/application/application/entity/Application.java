@@ -31,15 +31,13 @@ public class Application {
     @Column(name = "application_id")
     private Long id;
 
-    @NotNull(message = "Candidate is required")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "candidate_id", nullable = false )
-    private ExternalCanidate candidate;
+    @NotNull(message = "Candidate ID is required")
+    @Column(name = "candidate_id", nullable = false)
+    private Long candidateId;
 
-//    @NotNull(message = "Demand is required")
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "demand_id", nullable = false)
-//    private Demand demand;
+    @NotNull(message = "Demand ID is required")
+    @Column(name = "demand_id", nullable = false)
+    private Long demandId;
 
     @NotNull(message = "Source is required")
     @Enumerated(EnumType.STRING)
@@ -133,10 +131,17 @@ public class Application {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "rejected_at")
     private LocalDateTime rejectedAt;
-
     @Size(max = 100, message = "Rejection reason must not exceed 100 characters")
     @Column(name = "rejection_reason", length = 100)
     private String rejectionReason;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt;
+
+    @Size(max = 100, message = "Withdraw reason must not exceed 100 characters")
+    @Column(name = "withdrawn_reason", length = 100)
+    private String withdrawnReason;
 
     @Size(max = 50, message = "Referral code must not exceed 50 characters")
     @Column(name = "referral_code", length = 50)

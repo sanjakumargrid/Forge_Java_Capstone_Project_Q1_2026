@@ -1,257 +1,203 @@
 package com.talentgrid.application.application.mapper;
 
-import com.forge.talentAcquisitionEngine.applicationService.application.dto.ApplicationDto;
-import com.forge.talentAcquisitionEngine.applicationService.application.entity.Application;
-import com.forge.talentAcquisitionEngine.candidateService.externalCandidate.entity.ExternalCandidate;
-import com.forge.talentAcquisitionEngine.interviewService.interview.entity.Interview;
+import com.talentgrid.application.application.dto.ApplicationDto;
+import com.talentgrid.application.application.entity.Application;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ApplicationMapper {
 
   private ApplicationMapper() {
   }
 
-  public static Application dtoToEntity(
-      ApplicationDto dto,
-      ExternalCandidate candidate
+  public static Application dtoToApplicationEntity(
+          ApplicationDto dto
   ) {
 
     if (dto == null) {
       return null;
     }
 
-    Application entity = new Application();
+    Application application = new Application();
 
-    entity.setId(dto.getId());
-
-    entity.setCandidate(candidate);
-
-    entity.setSource(dto.getSource());
-
-    entity.setResumeFilePath(
-        dto.getResumeFilePath()
+    application.setCandidateId(
+            dto.getCandidateId()
     );
 
-    entity.setResumeOriginalFilename(
-        dto.getResumeOriginalFilename()
+    application.setDemandId(
+            dto.getDemandId()
     );
 
-    entity.setMatchedSkills(
-        dto.getMatchedSkills()
+    application.setSource(
+            dto.getSource()
     );
 
-    entity.setMissingSkills(
-        dto.getMissingSkills()
+    application.setResumeFilePath(
+            dto.getResumeFilePath()
     );
 
-    entity.setOtherSkills(
-        dto.getOtherSkills()
+    application.setResumeOriginalFilename(
+            dto.getResumeOriginalFilename()
     );
 
-    entity.setAiScore(
-        dto.getAiScore()
+    application.setMatchedSkills(
+            dto.getMatchedSkills() == null
+                    ? new ArrayList<>()
+                    : dto.getMatchedSkills()
     );
 
-    entity.setAiRationale(
-        dto.getAiRationale()
+    application.setMissingSkills(
+            dto.getMissingSkills() == null
+                    ? new ArrayList<>()
+                    : dto.getMissingSkills()
     );
 
-    entity.setCurrentStage(
-        dto.getCurrentStage()
+    application.setOtherSkills(
+            dto.getOtherSkills() == null
+                    ? new ArrayList<>()
+                    : dto.getOtherSkills()
     );
 
-    entity.setStageMoveReason(
-        dto.getStageMoveReason()
+    application.setAiScore(
+            dto.getAiScore()
     );
 
-    entity.setFreeNotes(
-        dto.getFreeNotes()
+    application.setAiRationale(
+            dto.getAiRationale()
     );
 
-    entity.setReferralCode(
-        dto.getReferralCode()
+    application.setCurrentStage(
+            dto.getCurrentStage()
     );
 
-    entity.setBlockedFromReapply(
-        dto.getBlockedFromReapply()
+    application.setStageMoveReason(
+            dto.getStageMoveReason()
     );
 
-    entity.setAppliedAt(
-        dto.getAppliedAt()
+    application.setFreeNotes(
+            dto.getFreeNotes()
     );
 
-    entity.setScreeningAt(
-        dto.getScreeningAt()
+    application.setReferralCode(
+            dto.getReferralCode()
     );
 
-    entity.setTechnicalAt(
-        dto.getTechnicalAt()
+    application.setBlockedFromReapply(
+            dto.getBlockedFromReapply()
     );
 
-    entity.setInterviewAt(
-        dto.getInterviewAt()
+    application.setRejectionReason(
+            dto.getRejectionReason()
     );
 
-    entity.setReapplyAllowedAfter(
-        dto.getReapplyAllowedAfter()
-    );
-
-    entity.setFinalRoundAt(
-        dto.getFinalRoundAt()
-    );
-
-    entity.setOfferAt(
-        dto.getOfferAt()
-    );
-
-    entity.setHiredAt(
-        dto.getHiredAt()
-    );
-
-    entity.setRejectedAt(
-        dto.getRejectedAt()
-    );
-
-    entity.setRejectionReason(
-        dto.getRejectionReason()
-    );
-
-    return entity;
+    return application;
   }
 
-  public static ApplicationDto entityToDto(
-      Application entity
+  public static ApplicationDto applicationEntityToDto(
+          Application application
   ) {
 
-    if (entity == null) {
+    if (application == null) {
       return null;
     }
 
     ApplicationDto dto = new ApplicationDto();
 
-    dto.setId(
-        entity.getId()
+    dto.setCandidateId(
+            application.getCandidateId()
     );
 
-    if (entity.getCandidate() != null) {
-
-      dto.setCandidateId(
-          entity.getCandidate().getCandidateId()
-      );
-    }
+    dto.setDemandId(
+            application.getDemandId()
+    );
 
     dto.setSource(
-        entity.getSource()
+            application.getSource()
     );
 
     dto.setResumeFilePath(
-        entity.getResumeFilePath()
+            application.getResumeFilePath()
     );
 
     dto.setResumeOriginalFilename(
-        entity.getResumeOriginalFilename()
+            application.getResumeOriginalFilename()
     );
 
     dto.setMatchedSkills(
-        entity.getMatchedSkills()
+            application.getMatchedSkills()
     );
 
     dto.setMissingSkills(
-        entity.getMissingSkills()
+            application.getMissingSkills()
     );
 
     dto.setOtherSkills(
-        entity.getOtherSkills()
+            application.getOtherSkills()
     );
 
     dto.setAiScore(
-        entity.getAiScore()
+            application.getAiScore()
     );
 
     dto.setAiRationale(
-        entity.getAiRationale()
+            application.getAiRationale()
     );
 
     dto.setCurrentStage(
-        entity.getCurrentStage()
+            application.getCurrentStage()
     );
 
     dto.setStageMoveReason(
-        entity.getStageMoveReason()
+            application.getStageMoveReason()
     );
 
     dto.setFreeNotes(
-        entity.getFreeNotes()
+            application.getFreeNotes()
     );
 
     dto.setReferralCode(
-        entity.getReferralCode()
+            application.getReferralCode()
     );
 
     dto.setBlockedFromReapply(
-        entity.getBlockedFromReapply()
+            application.getBlockedFromReapply()
     );
 
     dto.setAppliedAt(
-        entity.getAppliedAt()
+            application.getAppliedAt()
     );
 
     dto.setScreeningAt(
-        entity.getScreeningAt()
+            application.getScreeningAt()
     );
 
     dto.setTechnicalAt(
-        entity.getTechnicalAt()
+            application.getTechnicalAt()
     );
 
     dto.setInterviewAt(
-        entity.getInterviewAt()
+            application.getInterviewAt()
     );
 
     dto.setFinalRoundAt(
-        entity.getFinalRoundAt()
+            application.getFinalRoundAt()
     );
 
     dto.setOfferAt(
-        entity.getOfferAt()
+            application.getOfferAt()
     );
 
     dto.setHiredAt(
-        entity.getHiredAt()
+            application.getHiredAt()
     );
 
     dto.setRejectedAt(
-        entity.getRejectedAt()
+            application.getRejectedAt()
     );
 
-    dto.setReapplyAllowedAfter(
-        entity.getReapplyAllowedAfter()
-    );
     dto.setRejectionReason(
-        entity.getRejectionReason()
+            application.getRejectionReason()
     );
-
-    if (entity.getInterviews() != null) {
-
-      List<Long> interviewIds =
-          entity.getInterviews()
-              .stream()
-              .map(Interview::getId)
-              .collect(Collectors.toList());
-
-      dto.setInterviewIds(
-          interviewIds
-      );
-
-    } else {
-
-      dto.setInterviewIds(
-          new ArrayList<>()
-      );
-    }
 
     return dto;
   }
