@@ -15,7 +15,6 @@ public class ResumeMappingService {
     public ParsedResumeDTO mapToDTO(JsonNode rootNode) {
         JsonNode data = rootNode.path("data");
 
-        // Basic Info (Updated to match your raw JSON structure)
         String firstName = getSafeString(data.path("firstName"));
         String lastName = getSafeString(data.path("lastName"));
         String email = getSafeString(data.path("email"));
@@ -23,16 +22,16 @@ public class ResumeMappingService {
         String location = getSafeString(data.path("location"));
         String summary = getSafeString(data.path("summary"));
 
-        // Simple Lists
+
         List<String> websites = extractList(data.path("websites"));
         List<String> skills = extractList(data.path("skills"));
         List<String> languages = extractList(data.path("languages"));
 
-        // Work Experience List
+
         List<WorkExperienceDTO> workList = new ArrayList<>();
         if (data.path("workExperience").isArray()) {
             for (JsonNode jobContainer : data.path("workExperience")) {
-                // In your JSON, the actual job data is nested inside a "parsed" object
+
                 JsonNode job = jobContainer.path("parsed");
 
                 workList.add(new WorkExperienceDTO(

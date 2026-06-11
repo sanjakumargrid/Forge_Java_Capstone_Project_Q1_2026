@@ -34,12 +34,12 @@ public class ResumeParseService {
             RestTemplate restTemplate = new RestTemplate();
             ObjectMapper mapper = new ObjectMapper();
 
-            // 1. Prepare Headers
+
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             headers.set("Authorization", "Bearer " + apiKey);
 
-            // 2. Prepare Body
+
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
             ByteArrayResource fileResource = new ByteArrayResource(resumeFile.getBytes()) {
                 @Override
@@ -51,11 +51,10 @@ public class ResumeParseService {
             body.add("file", fileResource);
             body.add("workspace", workspaceId);
             body.add("wait", "true");
-            //body.add("documentType", "resume");
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            // 3. Call Affinda API
+
             ResponseEntity<String> response = restTemplate.exchange(
                     AFFINDA_URL,
                     HttpMethod.POST,
@@ -63,7 +62,7 @@ public class ResumeParseService {
                     String.class
             );
 
-            // 4. Delegate parsing to the Mapping Service!
+
             JsonNode rootNode = mapper.readTree(response.getBody());
             String rawJson = response.getBody();
             System.out.println("RAW AFFINDA JSON: " + rawJson);
