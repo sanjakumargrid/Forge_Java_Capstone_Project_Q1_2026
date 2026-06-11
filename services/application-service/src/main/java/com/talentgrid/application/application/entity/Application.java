@@ -131,10 +131,17 @@ public class Application {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "rejected_at")
     private LocalDateTime rejectedAt;
-
     @Size(max = 100, message = "Rejection reason must not exceed 100 characters")
     @Column(name = "rejection_reason", length = 100)
     private String rejectionReason;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt;
+
+    @Size(max = 100, message = "Withdraw reason must not exceed 100 characters")
+    @Column(name = "withdrawn_reason", length = 100)
+    private String withdrawnReason;
 
     @Size(max = 50, message = "Referral code must not exceed 50 characters")
     @Column(name = "referral_code", length = 50)

@@ -8,29 +8,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-  boolean existsByCandidateIdAndDemandId(
-          Long candidateId,
-          Long demandId
-  );
+    boolean existsByCandidateIdAndDemandId(Long candidateId, Long demandId);
 
-  Page<Application> findByDemandDemandId(
-          Long demandId,
-          Pageable pageable
-  );
+    Page<Application> findByDemandId(Long demandId, Pageable pageable);
 
-  Page<Application> findByCurrentStage(
-          Stage currentStage,
-          Pageable pageable
-  );
+    Page<Application> findByCurrentStage(Stage currentStage, Pageable pageable);
 
-  Page<Application> findByDemandIdAndCurrentStage(
-          Long demandId,
-          Stage currentStage,
-          Pageable pageable
-  );
+    Page<Application> findByDemandIdAndCurrentStage(
+            Long demandId,
+            Stage currentStage,
+            Pageable pageable
+    );
 
-  Page<Application> findByAiScoreGreaterThanEqual(
-          Integer aiScore,
-          Pageable pageable
-  );
+    Page<Application> findByAiScoreGreaterThanEqual(
+            Integer aiScore,
+            Pageable pageable
+    );
 }
