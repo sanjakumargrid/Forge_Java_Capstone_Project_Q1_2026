@@ -2,6 +2,10 @@ package com.talentgrid.candidate.externalCandidate.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import com.talentgrid.candidate.externalCandidate.enums.Source;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -37,6 +41,11 @@ public class ExternalCandidateDto {
             message = "Phone number must be a valid 10 digit Indian mobile number"
     )
     private String phoneNumber;
+
+    @NotNull(message = "Source is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
+    private Source source;
 
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")

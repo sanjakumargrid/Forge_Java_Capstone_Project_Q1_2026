@@ -2,6 +2,7 @@ package com.talentgrid.candidate.externalCandidate.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import com.talentgrid.candidate.externalCandidate.enums.Source;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
@@ -61,6 +62,11 @@ public class ExternalCandidate {
     @Pattern(regexp = "^[6-9][0-9]{9}$")
     @Column(name = "phone_number", nullable = false, length = 10)
     private String phoneNumber;
+
+    @NotNull(message = "Source is required")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "source", nullable = false)
+    private Source source;
 
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")

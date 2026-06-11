@@ -35,6 +35,7 @@ public class ExternalCandidateMapper {
     candidate.setNoticePeriodDays(dto.getNoticePeriodDays());
     candidate.setWillingToRelocate(dto.getWillingToRelocate());
     candidate.setFreeNotes(dto.getFreeNotes());
+    candidate.setSource(dto.getSource());
 
 
     candidate.setAddress(addressDtoToEntity(dto.getAddress(), candidate));
@@ -69,6 +70,7 @@ public class ExternalCandidateMapper {
     dto.setNoticePeriodDays(candidate.getNoticePeriodDays());
     dto.setWillingToRelocate(candidate.getWillingToRelocate());
     dto.setFreeNotes(candidate.getFreeNotes());
+    dto.setSource(candidate.getSource());
 
 
     dto.setAddress(addressEntityToDto(candidate.getAddress()));
@@ -104,7 +106,7 @@ public class ExternalCandidateMapper {
     candidate.setNoticePeriodDays(dto.getNoticePeriodDays());
     candidate.setWillingToRelocate(dto.getWillingToRelocate());
     candidate.setFreeNotes(dto.getFreeNotes());
-
+    candidate.setSource(dto.getSource());
 
     updateAddress(dto, candidate);
     updateSkills(dto, candidate);
