@@ -53,7 +53,7 @@ public class BenchCsvFilterServiceImpl implements BenchCsvFilterService {
             // Data
             for (BenchEmployeeDto emp : filtered) {
                 writer.printf("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s%n",
-                        escapeCsv(emp.getEmployeeId()),
+                        escapeCsv(getEmployeeDisplayId(emp)),
                         escapeCsv(emp.getName()),
                         escapeCsv(emp.getEmail()),
                         emp.getLevel(),
@@ -94,7 +94,7 @@ public class BenchCsvFilterServiceImpl implements BenchCsvFilterService {
         
         if (request != null) {
             if (StringUtils.hasText(request.getEmployeeId())) {
-                stream = stream.filter(e -> e.getEmployeeId() != null && e.getEmployeeId().toLowerCase().contains(request.getEmployeeId().toLowerCase()));
+                stream = stream.filter(e -> getEmployeeDisplayId(e).toLowerCase().contains(request.getEmployeeId().toLowerCase()));
             }
             if (StringUtils.hasText(request.getName())) {
                 stream = stream.filter(e -> e.getName() != null && e.getName().toLowerCase().contains(request.getName().toLowerCase()));
@@ -165,7 +165,7 @@ public class BenchCsvFilterServiceImpl implements BenchCsvFilterService {
         }
         
         return switch (sortBy) {
-            case "employeeId" -> Comparator.comparing(BenchEmployeeDto::getEmployeeId, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+            case "employeeId" -> Comparator.comparing(this::getEmployeeDisplayId, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
             case "name" -> Comparator.comparing(BenchEmployeeDto::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
             case "email" -> Comparator.comparing(BenchEmployeeDto::getEmail, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
             case "level" -> Comparator.comparing(e -> e.getLevel() != null ? e.getLevel().name() : "", Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
@@ -177,5 +177,15 @@ public class BenchCsvFilterServiceImpl implements BenchCsvFilterService {
             case "hrisSyncStatus" -> Comparator.comparing(e -> e.getHrisSyncStatus() != null ? e.getHrisSyncStatus().name() : "", Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
             default -> Comparator.comparing(BenchEmployeeDto::getAvailabilityDate, Comparator.nullsLast(Comparator.naturalOrder()));
         };
+    }
+
+    private String getEmployeeDisplayId(BenchEmployeeDto employee) {
+        if (employee == null) {
+            return "";
+        }
+        if (StringUtils.hasText(employee.getEmployeeCode())) {
+            return employee.getEmployeeCode();
+        }
+        return employee.getEmployeeId() != null ? String.valueOf(employee.getEmployeeId()) : "";
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "RMG Dashboard Api", description = "API'S for the RMG Dashboard and all nomination flow ")
-public class RmgController {
+public class RmgDemandStatusController {
 
     private final RmgService rmgService;
 
@@ -53,13 +52,17 @@ public class RmgController {
         return ResponseEntity.ok(response);
     }
 
+    @PatchMapping("/demands/{id}/cancel")
+    @Operation(summary = "Cancel a demand by ID", description = "Update the status of the specified demand to CANCELLED")
+    public ResponseEntity<DemandDto> cancelDemand(@PathVariable("id") Long id) {
+        log.info("Received request to cancel demand - id={}", id);
+        DemandDto response = rmgService.updateDemandStatus(id, "CANCELLED");
+        return ResponseEntity.ok(response);
+    }
+
     @PatchMapping("/demands/{id}/status")
-    @Operation(summary = "Update demand status",
-            description = "Update the status for a given demand and forward the update to demand-service")
-    public ResponseEntity<DemandDto> updateDemandStatus(
-            @PathVariable("id") Long demandId,
-            @RequestBody StatusUpdateRequest statusUpdate) {
-        log.info("Updating demand {} status to {} via RMG dashboard", demandId, statusUpdate.getStatus());
+    @Operation(summary = "Update demand status", description = "Update the status for a given demand and forward the update to demand-service")
+    public ResponseEntity<DemandDto> updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody StatusUpdateRequest statusUpdate) {
         DemandDto response = rmgService.updateDemandStatus(demandId, statusUpdate.getStatus());
         return ResponseEntity.ok(response);
     }

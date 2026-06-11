@@ -72,7 +72,8 @@ public class BenchReportServiceImpl implements BenchReportService {
 
     private BenchEmployeeDto mapToBenchEmployeeDto(InternalEmployee employee) {
         BenchEmployeeDto dto = new BenchEmployeeDto();
-        dto.setEmployeeId(employee.getEmployeeId());
+        dto.setEmployeeId(employee.getId());
+        dto.setEmployeeCode(employee.getEmployeeId());
         dto.setName(employee.getName());
         dto.setEmail(employee.getEmail());
         dto.setLevel(employee.getLevel());

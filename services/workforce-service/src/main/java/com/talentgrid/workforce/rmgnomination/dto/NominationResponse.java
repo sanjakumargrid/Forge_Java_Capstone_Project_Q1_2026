@@ -1,27 +1,30 @@
-package com.talentgrid.workforce.benchreport.dto;
+package com.talentgrid.workforce.rmgnomination.dto;
 
 import com.talentgrid.workforce.engineerprofilemanagement.enums.ContractType;
-import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.Level;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class BenchEmployeeDto {
-
+@Builder
+public class NominationResponse {
+    private Long matchId;
     private Long employeeId;
     private String employeeCode;
-    private String name;
-    private String email;
+    private String employeeName;
+    private String employeeEmail;
     private Level level;
     private LocalDate availabilityDate;
     private String location;
     private ContractType contractType;
-    private String currentProject;
-    private Integer utilisationPct;
-    private Long managerId;
-    private HrisSyncStatus hrisSyncStatus;
     private List<String> skills;
+    private Long demandId;
+    private String matchStatus;
+    private String nominationType;
+    private LocalDateTime nominatedAt;
+    private Integer utilisationAfter;
 }

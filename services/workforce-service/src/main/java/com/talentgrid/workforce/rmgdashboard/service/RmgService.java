@@ -25,6 +25,9 @@ public class RmgService {
                 status, pageable.getPageNumber(), pageable.getPageSize());
 
         List<DemandDto> allDemands = demandClient.getDemandsByStatus(status);
+        if (allDemands == null) {
+            allDemands = List.of();
+        }
         List<DemandDto> filteredDemands = allDemands.stream()
                 .filter(demand -> status.equalsIgnoreCase(demand.getStatus()))
                 .collect(Collectors.toList());

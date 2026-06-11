@@ -3,15 +3,7 @@ package com.talentgrid.workforce.engineerprofilemanagement.entity;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.ContractType;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.Level;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -19,7 +11,14 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "internal_employees")
+@Table(name = "internal_employees",
+        indexes = {
+                @Index(name = "idx_employee_id", columnList = "employee_id"),
+                @Index(name = "idx_email", columnList = "email"),
+                @Index(name = "idx_level", columnList = "level"),
+                @Index(name = "idx_availability_date", columnList = "availability_date"),
+                @Index(name = "idx_is_deleted", columnList = "is_deleted")
+        })
 public class InternalEmployee {
 
     @Id
@@ -59,7 +58,7 @@ public class InternalEmployee {
     private ContractType contractType;
 
     @Column(name = "utilisation_pct")
-    private Integer utilisationPct;
+    private Integer utilisationPct = 0;
 
     @Column(name = "manager_id")
     private Long managerId;
@@ -77,11 +76,22 @@ public class InternalEmployee {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }
