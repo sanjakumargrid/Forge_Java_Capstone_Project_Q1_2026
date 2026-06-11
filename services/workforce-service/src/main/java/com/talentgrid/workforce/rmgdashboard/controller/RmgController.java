@@ -63,5 +63,4 @@ public class RmgController {
         DemandDto response = rmgService.updateDemandStatus(demandId, statusUpdate.getStatus());
         return ResponseEntity.ok(response);
     }
-
 }
