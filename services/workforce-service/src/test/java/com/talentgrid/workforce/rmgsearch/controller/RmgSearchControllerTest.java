@@ -61,7 +61,7 @@ class RmgSearchControllerTest {
         @DisplayName("response body contains totalResults and results array")
         void responseBodyShape() throws Exception {
             BenchEmployeeDto dto = new BenchEmployeeDto();
-            dto.setEmployeeId("E001");
+            dto.setEmployeeId(1L);
             dto.setName("Alice");
 
             when(rmgSearchService.search(any()))
@@ -70,7 +70,7 @@ class RmgSearchControllerTest {
             mockMvc.perform(get(SEARCH_URL))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.totalResults").value(1))
-                    .andExpect(jsonPath("$.results[0].employeeId").value("E001"))
+                    .andExpect(jsonPath("$.results[0].employeeId").value(1))
                     .andExpect(jsonPath("$.results[0].name").value("Alice"));
         }
 

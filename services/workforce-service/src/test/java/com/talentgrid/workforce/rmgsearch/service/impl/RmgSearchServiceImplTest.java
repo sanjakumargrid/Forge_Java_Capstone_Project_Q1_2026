@@ -40,13 +40,13 @@ class RmgSearchServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        alice = buildEmployee("E001", "Alice", Level.SENIOR, ContractType.FULL_TIME,
+        alice = buildEmployee(1L, "Alice", Level.SENIOR, ContractType.FULL_TIME,
                 "New York", LocalDate.now().plusDays(5), "Java", "Spring");
-        dan   = buildEmployee("E004", "Dan",   Level.SENIOR, ContractType.PART_TIME,
+        dan   = buildEmployee(4L, "Dan",   Level.SENIOR, ContractType.PART_TIME,
                 "Berlin",   LocalDate.now().plusDays(10), "Java");
-        bob   = buildEmployee("E002", "Bob",   Level.MID,    ContractType.CONTRACT,
+        bob   = buildEmployee(2L, "Bob",   Level.MID,    ContractType.CONTRACT,
                 "London",   LocalDate.now().plusDays(35), "Python", "Django");
-        carol = buildEmployee("E003", "Carol", Level.JUNIOR, ContractType.FULL_TIME,
+        carol = buildEmployee(3L, "Carol", Level.JUNIOR, ContractType.FULL_TIME,
                 "New York",  LocalDate.now().plusDays(65), "Java", "React");
     }
 
@@ -54,7 +54,7 @@ class RmgSearchServiceImplTest {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private BenchEmployeeDto buildEmployee(String id, String name, Level level,
+    private BenchEmployeeDto buildEmployee(Long id, String name, Level level,
                                            ContractType contractType, String location,
                                            LocalDate availabilityDate, String... skills) {
         BenchEmployeeDto dto = new BenchEmployeeDto();
@@ -100,7 +100,7 @@ class RmgSearchServiceImplTest {
             assertThat(response.getTotalResults()).isEqualTo(4);
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactly("E001", "E004", "E002", "E003");
+                    .containsExactly(1L, 4L, 2L, 3L);
         }
 
         @Test
@@ -143,7 +143,7 @@ class RmgSearchServiceImplTest {
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E004", "E003");
+                    .containsExactlyInAnyOrder(1L, 4L, 3L);
         }
 
         @Test
@@ -172,7 +172,7 @@ class RmgSearchServiceImplTest {
         @Test
         @DisplayName("excludes employees whose skills list is null")
         void excludesEmployeesWithNullSkillsList() {
-            BenchEmployeeDto noSkills = buildEmployee("E099", "Eve", Level.MID,
+            BenchEmployeeDto noSkills = buildEmployee(99L, "Eve", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
             noSkills.setSkills(null);
 
@@ -188,7 +188,7 @@ class RmgSearchServiceImplTest {
         @Test
         @DisplayName("excludes employees whose skills list is empty")
         void excludesEmployeesWithEmptySkillsList() {
-            BenchEmployeeDto emptySkills = buildEmployee("E098", "Fay", Level.MID,
+            BenchEmployeeDto emptySkills = buildEmployee(98L, "Fay", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
             emptySkills.setSkills(List.of());
 
@@ -233,8 +233,8 @@ class RmgSearchServiceImplTest {
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .doesNotContain("E001", "E004")
-                    .contains("E002", "E003");
+                    .doesNotContain(1L, 4L)
+                    .contains(2L, 3L);
         }
 
         @Test
@@ -249,7 +249,7 @@ class RmgSearchServiceImplTest {
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E004");
+                    .containsExactlyInAnyOrder(1L, 4L);
         }
 
         @Test
@@ -266,7 +266,7 @@ class RmgSearchServiceImplTest {
             // alice (+5d) is excluded, dan (+10d) and bob (+35d) are included, carol (+65d) is excluded
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactly("E004", "E002");
+                    .containsExactly(4L, 2L);
         }
     }
 
@@ -288,7 +288,7 @@ class RmgSearchServiceImplTest {
 
             assertThat(rmgSearchService.search(request).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E003");
+                    .containsExactlyInAnyOrder(1L, 3L);
         }
 
         @Test
@@ -332,7 +332,7 @@ class RmgSearchServiceImplTest {
 
             assertThat(rmgSearchService.search(request).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E004");
+                    .containsExactlyInAnyOrder(1L, 4L);
         }
 
         @Test
@@ -362,7 +362,7 @@ class RmgSearchServiceImplTest {
 
             assertThat(rmgSearchService.search(request).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E003");
+                    .containsExactlyInAnyOrder(1L, 3L);
         }
 
         @Test
@@ -397,7 +397,7 @@ class RmgSearchServiceImplTest {
 
             // Only Alice satisfies every criterion
             assertThat(response.getTotalResults()).isEqualTo(1);
-            assertThat(response.getResults().get(0).getEmployeeId()).isEqualTo("E001");
+            assertThat(response.getResults().get(0).getEmployeeId()).isEqualTo(1L);
         }
 
         @Test
@@ -421,10 +421,10 @@ class RmgSearchServiceImplTest {
             request.setSkill("Java");
             request.setLocation("New York");
 
-            // alice (E001) and carol (E003) are Java engineers in New York; dan (E004) is in Berlin
+            // alice (1L) and carol (3L) are Java engineers in New York; dan (4L) is in Berlin
             assertThat(rmgSearchService.search(request).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactlyInAnyOrder("E001", "E003");
+                    .containsExactlyInAnyOrder(1L, 3L);
         }
     }
 
@@ -453,7 +453,7 @@ class RmgSearchServiceImplTest {
         @Test
         @DisplayName("employees with null availabilityDate appear last")
         void nullAvailabilityDateSortedLast() {
-            BenchEmployeeDto noDate = buildEmployee("E099", "Zara", Level.MID,
+            BenchEmployeeDto noDate = buildEmployee(99L, "Zara", Level.MID,
                     ContractType.FULL_TIME, "Oslo", null);
             noDate.setAvailabilityDate(null);
 
@@ -465,7 +465,7 @@ class RmgSearchServiceImplTest {
             assertThat(response.getResults())
                     .last()
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .isEqualTo("E099");
+                    .isEqualTo(99L);
         }
 
         @Test
@@ -479,7 +479,7 @@ class RmgSearchServiceImplTest {
             // even though alice was placed in the 30–60 bucket above
             assertThat(rmgSearchService.search(new RmgSearchRequest()).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
-                    .containsExactly("E001", "E004", "E002", "E003");
+                    .containsExactly(1L, 4L, 2L, 3L);
         }
     }
 }
