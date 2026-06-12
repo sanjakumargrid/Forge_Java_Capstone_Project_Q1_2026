@@ -1,7 +1,7 @@
 package com.talentgrid.candidate.resumeParser.controller;
 
 import com.talentgrid.candidate.resumeParser.model.ParsedResumeDTO;
-import com.talentgrid.candidate.resumeParser.service.ResumeParseService;
+import com.talentgrid.candidate.resumeParser.service.ResumeParserService;
 import com.talentgrid.candidate.resumeParser.service.ResumeStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,16 +12,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping("api/v1/aiengine")
 public class AiEngineFileController {
 
-    @Autowired
-    ResumeParseService resumeParseService;
+    final private ResumeParserService resumeParserService;
+
+    final private ResumeStoreService resumeStoreService;
 
     @Autowired
-    ResumeStoreService resumeStoreService;
+    public AiEngineFileController(){
+        this.resumeParserService = new ResumeParserService();
+        this.resumeStoreService = new ResumeStoreService();
+    }
 
 
     @PostMapping
@@ -48,8 +54,8 @@ public class AiEngineFileController {
     }
 
     @PostMapping("/parse")
-    public ResponseEntity<ParsedResumeDTO> parseResume(@RequestParam("file") MultipartFile file) {
-        ParsedResumeDTO parsedResumeDTO = resumeParseService.parseResume(file);
+    public ResponseEntity<ParsedResumeDTO> parseResume(@RequestParam("file") MultipartFile file) throws IOException {
+        ParsedResumeDTO parsedResumeDTO = resumeParserService.parseResume(file);
         return parsedResumeDTO == null ? ResponseEntity.status(HttpStatus.BAD_REQUEST).build() : ResponseEntity.status(HttpStatus.OK).body(parsedResumeDTO);
     }
 
