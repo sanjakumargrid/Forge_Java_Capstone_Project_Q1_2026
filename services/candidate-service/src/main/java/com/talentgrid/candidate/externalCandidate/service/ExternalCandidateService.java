@@ -176,6 +176,10 @@ public class ExternalCandidateService {
         applicationRequest.setCandidateId(candidateId);
         applicationRequest.setDemandId(dto.getDemandId());
 
+        if (dto.getSource() != null) {
+            applicationRequest.setSource(dto.getSource().name());
+        }
+
         applicationRequest.setResumeFilePath(getResumeFilePath(dto));
         applicationRequest.setResumeOriginalFilename(getResumeOriginalFilename(dto));
 

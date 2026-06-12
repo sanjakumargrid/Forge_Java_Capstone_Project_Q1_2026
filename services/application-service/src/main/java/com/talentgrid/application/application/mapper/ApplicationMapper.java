@@ -7,198 +7,206 @@ import java.util.ArrayList;
 
 public class ApplicationMapper {
 
-  private ApplicationMapper() {
-  }
-
-  public static Application dtoToApplicationEntity(
-          ApplicationDto dto
-  ) {
-
-    if (dto == null) {
-      return null;
+    private ApplicationMapper() {
     }
 
-    Application application = new Application();
+    public static Application dtoToApplicationEntity(
+            ApplicationDto dto
+    ) {
 
-    application.setCandidateId(
-            dto.getCandidateId()
-    );
+        if (dto == null) {
+            return null;
+        }
 
-    application.setDemandId(
-            dto.getDemandId()
-    );
+        Application application = new Application();
 
-    application.setSource(
-            dto.getSource()
-    );
+        application.setId(
+                dto.getApplicationId()
+        );
 
-    application.setResumeFilePath(
-            dto.getResumeFilePath()
-    );
+        application.setCandidateId(
+                dto.getCandidateId()
+        );
 
-    application.setResumeOriginalFilename(
-            dto.getResumeOriginalFilename()
-    );
+        application.setDemandId(
+                dto.getDemandId()
+        );
 
-    application.setMatchedSkills(
-            dto.getMatchedSkills() == null
-                    ? new ArrayList<>()
-                    : dto.getMatchedSkills()
-    );
+        application.setSource(
+                dto.getSource()
+        );
 
-    application.setMissingSkills(
-            dto.getMissingSkills() == null
-                    ? new ArrayList<>()
-                    : dto.getMissingSkills()
-    );
+        application.setResumeFilePath(
+                dto.getResumeFilePath()
+        );
 
-    application.setOtherSkills(
-            dto.getOtherSkills() == null
-                    ? new ArrayList<>()
-                    : dto.getOtherSkills()
-    );
+        application.setResumeOriginalFilename(
+                dto.getResumeOriginalFilename()
+        );
 
-    application.setAiScore(
-            dto.getAiScore()
-    );
+        application.setMatchedSkills(
+                dto.getMatchedSkills() == null
+                        ? new ArrayList<>()
+                        : dto.getMatchedSkills()
+        );
 
-    application.setAiRationale(
-            dto.getAiRationale()
-    );
+        application.setMissingSkills(
+                dto.getMissingSkills() == null
+                        ? new ArrayList<>()
+                        : dto.getMissingSkills()
+        );
 
-    application.setCurrentStage(
-            dto.getCurrentStage()
-    );
+        application.setOtherSkills(
+                dto.getOtherSkills() == null
+                        ? new ArrayList<>()
+                        : dto.getOtherSkills()
+        );
 
-    application.setStageMoveReason(
-            dto.getStageMoveReason()
-    );
+        application.setAiScore(
+                dto.getAiScore()
+        );
 
-    application.setFreeNotes(
-            dto.getFreeNotes()
-    );
+        application.setAiRationale(
+                dto.getAiRationale()
+        );
 
-    application.setReferralCode(
-            dto.getReferralCode()
-    );
+        application.setCurrentStage(
+                dto.getCurrentStage()
+        );
 
-    application.setBlockedFromReapply(
-            dto.getBlockedFromReapply()
-    );
+        application.setStageMoveReason(
+                dto.getStageMoveReason()
+        );
 
-    application.setRejectionReason(
-            dto.getRejectionReason()
-    );
+        application.setFreeNotes(
+                dto.getFreeNotes()
+        );
 
-    return application;
-  }
+        application.setReferralCode(
+                dto.getReferralCode()
+        );
 
-  public static ApplicationDto applicationEntityToDto(
-          Application application
-  ) {
+        application.setBlockedFromReapply(
+                dto.getBlockedFromReapply()
+        );
 
-    if (application == null) {
-      return null;
+        application.setRejectionReason(
+                dto.getRejectionReason()
+        );
+
+        return application;
     }
 
-    ApplicationDto dto = new ApplicationDto();
+    public static ApplicationDto applicationEntityToDto(
+            Application application
+    ) {
 
-    dto.setCandidateId(
-            application.getCandidateId()
-    );
+        if (application == null) {
+            return null;
+        }
 
-    dto.setDemandId(
-            application.getDemandId()
-    );
+        ApplicationDto dto = new ApplicationDto();
 
-    dto.setSource(
-            application.getSource()
-    );
+        dto.setApplicationId(
+                application.getId()
+        );
 
-    dto.setResumeFilePath(
-            application.getResumeFilePath()
-    );
+        dto.setCandidateId(
+                application.getCandidateId()
+        );
 
-    dto.setResumeOriginalFilename(
-            application.getResumeOriginalFilename()
-    );
+        dto.setDemandId(
+                application.getDemandId()
+        );
 
-    dto.setMatchedSkills(
-            application.getMatchedSkills()
-    );
+        dto.setSource(
+                application.getSource()
+        );
 
-    dto.setMissingSkills(
-            application.getMissingSkills()
-    );
+        dto.setResumeFilePath(
+                application.getResumeFilePath()
+        );
 
-    dto.setOtherSkills(
-            application.getOtherSkills()
-    );
+        dto.setResumeOriginalFilename(
+                application.getResumeOriginalFilename()
+        );
 
-    dto.setAiScore(
-            application.getAiScore()
-    );
+        dto.setMatchedSkills(
+                application.getMatchedSkills()
+        );
 
-    dto.setAiRationale(
-            application.getAiRationale()
-    );
+        dto.setMissingSkills(
+                application.getMissingSkills()
+        );
 
-    dto.setCurrentStage(
-            application.getCurrentStage()
-    );
+        dto.setOtherSkills(
+                application.getOtherSkills()
+        );
 
-    dto.setStageMoveReason(
-            application.getStageMoveReason()
-    );
+        dto.setAiScore(
+                application.getAiScore()
+        );
 
-    dto.setFreeNotes(
-            application.getFreeNotes()
-    );
+        dto.setAiRationale(
+                application.getAiRationale()
+        );
 
-    dto.setReferralCode(
-            application.getReferralCode()
-    );
+        dto.setCurrentStage(
+                application.getCurrentStage()
+        );
 
-    dto.setBlockedFromReapply(
-            application.getBlockedFromReapply()
-    );
+        dto.setStageMoveReason(
+                application.getStageMoveReason()
+        );
 
-    dto.setAppliedAt(
-            application.getAppliedAt()
-    );
+        dto.setFreeNotes(
+                application.getFreeNotes()
+        );
 
-    dto.setScreeningAt(
-            application.getScreeningAt()
-    );
+        dto.setReferralCode(
+                application.getReferralCode()
+        );
 
-    dto.setTechnicalAt(
-            application.getTechnicalAt()
-    );
+        dto.setBlockedFromReapply(
+                application.getBlockedFromReapply()
+        );
 
-    dto.setInterviewAt(
-            application.getInterviewAt()
-    );
+        dto.setAppliedAt(
+                application.getAppliedAt()
+        );
 
-    dto.setFinalRoundAt(
-            application.getFinalRoundAt()
-    );
+        dto.setScreeningAt(
+                application.getScreeningAt()
+        );
 
-    dto.setOfferAt(
-            application.getOfferAt()
-    );
+        dto.setTechnicalAt(
+                application.getTechnicalAt()
+        );
 
-    dto.setHiredAt(
-            application.getHiredAt()
-    );
+        dto.setInterviewAt(
+                application.getInterviewAt()
+        );
 
-    dto.setRejectedAt(
-            application.getRejectedAt()
-    );
+        dto.setFinalRoundAt(
+                application.getFinalRoundAt()
+        );
 
-    dto.setRejectionReason(
-            application.getRejectionReason()
-    );
+        dto.setOfferAt(
+                application.getOfferAt()
+        );
 
-    return dto;
-  }
+        dto.setHiredAt(
+                application.getHiredAt()
+        );
+
+        dto.setRejectedAt(
+                application.getRejectedAt()
+        );
+
+        dto.setRejectionReason(
+                application.getRejectionReason()
+        );
+
+        return dto;
+    }
 }

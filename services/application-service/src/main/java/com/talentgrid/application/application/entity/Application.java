@@ -54,14 +54,13 @@ public class Application {
     @Column(name = "resume_original_filename", nullable = false)
     private String resumeOriginalFilename;
 
-
     @ElementCollection
     @CollectionTable(
             name = "application_matched_skills",
             joinColumns = @JoinColumn(name = "application_id")
     )
     @Column(name = "skill", length = 50)
-    private List< String > matchedSkills;
+    private List<String> matchedSkills;
 
     @ElementCollection
     @CollectionTable(
@@ -69,10 +68,15 @@ public class Application {
             joinColumns = @JoinColumn(name = "application_id")
     )
     @Column(name = "skill", length = 50)
-    private List< String > missingSkills;
+    private List<String> missingSkills;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "application_other_skills",
+            joinColumns = @JoinColumn(name = "application_id")
+    )
     @Column(name = "skill", length = 50)
-    private List< String > otherSkills;
+    private List<String> otherSkills;
 
     @NotBlank(message = "AI rationale is required")
     @Size(min = 30, max = 300, message = "AI rationale must be between 30 and 300 characters")
@@ -82,7 +86,6 @@ public class Application {
     @Size(max = 100, message = "Free notes must not exceed 100 characters")
     @Column(name = "free_notes", columnDefinition = "TEXT")
     private String freeNotes;
-
 
     @NotNull(message = "Current stage is required")
     @Enumerated(EnumType.STRING)
@@ -131,6 +134,7 @@ public class Application {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "rejected_at")
     private LocalDateTime rejectedAt;
+
     @Size(max = 100, message = "Rejection reason must not exceed 100 characters")
     @Column(name = "rejection_reason", length = 100)
     private String rejectionReason;
@@ -146,9 +150,6 @@ public class Application {
     @Size(max = 50, message = "Referral code must not exceed 50 characters")
     @Column(name = "referral_code", length = 50)
     private String referralCode;
-
-//    @OneToMany(mappedBy = "application")
-//    private List<Interview> interviews;
 
     @NotNull
     @Column(name = "blocked_from_reapply", nullable = false)

@@ -13,85 +13,87 @@ import java.util.List;
 @Setter
 public class ApplicationDto {
 
-  @NotNull(message = "Candidate ID is required")
-  private Long candidateId;
+    private Long applicationId;
 
-  @NotNull(message = "Demand ID is required")
-  private Long demandId;
+    @NotNull(message = "Candidate ID is required")
+    private Long candidateId;
 
-  @NotNull(message = "Source is required")
-  private Source source;
+    @NotNull(message = "Demand ID is required")
+    private Long demandId;
 
-  @NotBlank(message = "Resume file path is required")
-  @Size(max = 500, message = "Resume file path must not exceed 500 characters")
-  private String resumeFilePath;
+    @NotNull(message = "Source is required")
+    private Source source;
 
-  @NotBlank(message = "Original resume filename is required")
-  @Size(max = 255, message = "Original filename must not exceed 255 characters")
-  private String resumeOriginalFilename;
+    @NotBlank(message = "Resume file path is required")
+    @Size(max = 500, message = "Resume file path must not exceed 500 characters")
+    private String resumeFilePath;
 
-  private List<String> matchedSkills;
+    @NotBlank(message = "Original resume filename is required")
+    @Size(max = 255, message = "Original filename must not exceed 255 characters")
+    private String resumeOriginalFilename;
 
-  private List<String> missingSkills;
+    private List<String> matchedSkills;
 
-  private List<String> otherSkills;
+    private List<String> missingSkills;
 
-  @NotBlank(message = "AI rationale is required")
-  @Size(
-          min = 30,
-          max = 300,
-          message = "AI rationale must be between 30 and 300 characters"
-  )
-  private String aiRationale;
+    private List<String> otherSkills;
 
-  @Size(
-          max = 100,
-          message = "Free notes must not exceed 100 characters"
-  )
-  private String freeNotes;
+    @NotBlank(message = "AI rationale is required")
+    @Size(
+            min = 30,
+            max = 300,
+            message = "AI rationale must be between 30 and 300 characters"
+    )
+    private String aiRationale;
 
-  @NotNull(message = "Current stage is required")
-  private Stage currentStage;
+    @Size(
+            max = 100,
+            message = "Free notes must not exceed 100 characters"
+    )
+    private String freeNotes;
 
-  @NotNull(message = "AI score is required")
-  @Min(value = 0, message = "AI score must be at least 0")
-  @Max(value = 100, message = "AI score must not exceed 100")
-  private Integer aiScore;
+    @NotNull(message = "Current stage is required")
+    private Stage currentStage;
 
-  @Size(
-          max = 500,
-          message = "Stage move reason must not exceed 500 characters"
-  )
-  private String stageMoveReason;
+    @NotNull(message = "AI score is required")
+    @Min(value = 0, message = "AI score must be at least 0")
+    @Max(value = 100, message = "AI score must not exceed 100")
+    private Integer aiScore;
 
-  private LocalDateTime appliedAt;
+    @Size(
+            max = 500,
+            message = "Stage move reason must not exceed 500 characters"
+    )
+    private String stageMoveReason;
 
-  private LocalDateTime screeningAt;
+    private LocalDateTime appliedAt;
 
-  private LocalDateTime technicalAt;
+    private LocalDateTime screeningAt;
 
-  private LocalDateTime interviewAt;
+    private LocalDateTime technicalAt;
 
-  private LocalDateTime finalRoundAt;
+    private LocalDateTime interviewAt;
 
-  private LocalDateTime offerAt;
+    private LocalDateTime finalRoundAt;
 
-  private LocalDateTime hiredAt;
+    private LocalDateTime offerAt;
 
-  private LocalDateTime rejectedAt;
+    private LocalDateTime hiredAt;
 
-  @Size(
-          max = 100,
-          message = "Rejection reason must not exceed 100 characters"
-  )
-  private String rejectionReason;
+    private LocalDateTime rejectedAt;
 
-  @Size(
-          max = 50,
-          message = "Referral code must not exceed 50 characters"
-  )
-  private String referralCode;
+    @Size(
+            max = 100,
+            message = "Rejection reason must not exceed 100 characters"
+    )
+    private String rejectionReason;
 
-  @NotNull(message = "Blocked from reapply flag is required")
-  private Boolean blockedFromReapply;
+    @Size(
+            max = 50,
+            message = "Referral code must not exceed 50 characters"
+    )
+    private String referralCode;
+
+    @NotNull(message = "Blocked from reapply flag is required")
+    private Boolean blockedFromReapply;
 }
