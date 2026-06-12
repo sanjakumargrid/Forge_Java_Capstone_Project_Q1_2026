@@ -101,7 +101,7 @@ public class DemandMapper {
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
         response.setDescription(demand.getDescription());
-        response.setLevel(enumName(demand.getLevel()));
+        response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
         response.setLocation(demand.getLocation());
         response.setProjectId(demand.getProjectId());
         response.setBusinessUnit(demand.getBusinessUnit());
