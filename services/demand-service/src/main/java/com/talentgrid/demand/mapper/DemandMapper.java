@@ -5,8 +5,7 @@ import com.talentgrid.demand.domain.entity.DemandStatusHistory;
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
-import com.talentgrid.demand.dto.request.CreateDemandRequest;
-import com.talentgrid.demand.dto.request.UpdateDemandRequest;
+import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.dto.response.DemandStatusHistoryResponse;
 import com.talentgrid.demand.dto.response.DemandSummaryResponse;
@@ -27,21 +26,23 @@ import java.util.stream.Collectors;
 @Component
 public class DemandMapper {
 
-    // ─── CreateDemandRequest → Demand ───────────────────────────────────────────
+    // ─── DemandRequest → Demand (create) ────────────────────────────────────────
 
     /**
      * Creates a new {@link Demand} entity from a create request.
      * Sets the initial status to {@code DRAFT} and zeroes all fill counts.
      *
-     * @param request the create request (must not be {@code null})
+     * @param request the demand request (must not be {@code null})
      * @return a new, unpersisted {@link Demand} entity
      */
-    public Demand toEntity(CreateDemandRequest request) {
+    public Demand toEntity(DemandRequest request) {
         Demand demand = new Demand();
         demand.setTitle(request.getTitle());
         demand.setDescription(request.getDescription());
         demand.setLevel(request.getLevel());
+        demand.setEmploymentType(request.getEmploymentType());
         demand.setLocation(request.getLocation());
+        demand.setAccountId(request.getAccountId());
         demand.setProjectId(request.getProjectId());
         demand.setBusinessUnit(request.getBusinessUnit());
         demand.setSkills(request.getSkills());
@@ -49,6 +50,7 @@ public class DemandMapper {
         demand.setRequiredCount(request.getRequiredCount());
         demand.setTargetDate(request.getTargetDate());
         demand.setPriority(request.getPriority());
+        demand.setSearchStartAt(request.getSearchStartAt());
         // Defaults set by business rule
         demand.setStatus(DemandStatus.DRAFT);
         demand.setInternalFilledCount(0);
@@ -58,20 +60,22 @@ public class DemandMapper {
         return demand;
     }
 
-    // ─── UpdateDemandRequest → Demand (partial patch) ───────────────────────────
+    // ─── DemandRequest → Demand (partial patch) ─────────────────────────────────
 
     /**
-     * Applies non-null fields from an {@link UpdateDemandRequest} onto an existing
+     * Applies non-null fields from a {@link DemandRequest} onto an existing
      * {@link Demand} entity. Null fields are ignored (PATCH semantics).
      *
      * @param request the update request
      * @param demand  the existing entity to patch
      */
-    public void applyUpdate(UpdateDemandRequest request, Demand demand) {
+    public void applyUpdate(DemandRequest request, Demand demand) {
         if (request.getTitle() != null)        demand.setTitle(request.getTitle());
         if (request.getDescription() != null)  demand.setDescription(request.getDescription());
         if (request.getLevel() != null)        demand.setLevel(request.getLevel());
+        if (request.getEmploymentType() != null) demand.setEmploymentType(request.getEmploymentType());
         if (request.getLocation() != null)     demand.setLocation(request.getLocation());
+        if (request.getAccountId() != null)    demand.setAccountId(request.getAccountId());
         if (request.getProjectId() != null)    demand.setProjectId(request.getProjectId());
         if (request.getBusinessUnit() != null) demand.setBusinessUnit(request.getBusinessUnit());
         if (request.getSkills() != null)       demand.setSkills(request.getSkills());
@@ -79,6 +83,7 @@ public class DemandMapper {
         if (request.getRequiredCount() != null) demand.setRequiredCount(request.getRequiredCount());
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
+        if (request.getSearchStartAt() != null) demand.setSearchStartAt(request.getSearchStartAt());
     }
 
     // ─── Demand → DemandResponse ────────────────────────────────────────────────
@@ -114,9 +119,14 @@ public class DemandMapper {
         response.setApprovedAt(demand.getApprovedAt());
         response.setClosureReason(demand.getClosureReason());
         response.setCreatedBy(demand.getCreatedBy());
+        response.setCreatorName(demand.getCreatorName());
+        response.setCreatorEmail(demand.getCreatorEmail());
         response.setAssignedRecruiter(demand.getAssignedRecruiter());
+        response.setAssignedRecruiterName(demand.getAssignedRecruiterName());
         response.setAssignedRm(demand.getAssignedRm());
+        response.setAssignedRmName(demand.getAssignedRmName());
         response.setApprovedBy(demand.getApprovedBy());
+        response.setApproverName(demand.getApproverName());
         response.setIsDeleted(demand.getIsDeleted());
         response.setVersion(demand.getVersion());
         response.setCreatedAt(demand.getCreatedAt());

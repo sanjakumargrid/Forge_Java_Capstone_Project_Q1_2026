@@ -1,6 +1,10 @@
 package com.talentgrid.demand.dto.request;
 
 import com.talentgrid.demand.domain.enums.DemandStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Request DTO for approving or rejecting a pending demand.
@@ -15,6 +19,10 @@ import com.talentgrid.demand.domain.enums.DemandStatus;
  *   <li>{@code CANCELLED}  — cancel outright from pending approval</li>
  * </ul>
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ApprovalRequest {
 
     /**
@@ -26,10 +34,12 @@ public class ApprovalRequest {
     /** Optional free-text rationale stored in the status history audit trail. */
     private String comments;
 
-    // ─── Getters & Setters ──────────────────────────────────────────────────────
-    public DemandStatus getDecision() { return decision; }
-    public void setDecision(DemandStatus decision) { this.decision = decision; }
+    /** Recruiter assigned during approval. */
+    private Long assignedRecruiter;
+    private String assignedRecruiterName;
 
-    public String getComments() { return comments; }
-    public void setComments(String comments) { this.comments = comments; }
+    /** RM assigned during approval. */
+    private Long assignedRm;
+    private String assignedRmName;
+
 }

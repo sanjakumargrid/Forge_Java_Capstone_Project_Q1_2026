@@ -10,7 +10,9 @@ public final class TalentGridTopics {
     // TEAM 1 — Demand, Notification, Audit
     // ─────────────────────────────────────────────────────
 
-    /** Demand lifecycle events: DEMAND_CREATED, DEMAND_APPROVED, DEMAND_CLOSED, etc. */
+    /**
+     * Demand lifecycle events: DEMAND_CREATED, DEMAND_APPROVED, DEMAND_CLOSED, etc.
+     */
     public static final String DEMAND_EVENTS = "demand-events";
 
     /** Notification dispatch events: EMAIL_TRIGGERED, SMS_TRIGGERED, etc. */
@@ -23,16 +25,23 @@ public final class TalentGridTopics {
     // TEAM 2 — Candidate, Application, Interview, Offer
     // ─────────────────────────────────────────────────────
 
-    /** Candidate lifecycle events: CANDIDATE_REGISTERED, CANDIDATE_SHORTLISTED, etc. */
+    /**
+     * Candidate lifecycle events: CANDIDATE_REGISTERED, CANDIDATE_SHORTLISTED, etc.
+     */
     public static final String CANDIDATE_EVENTS = "candidate-events";
 
     /** Application pipeline events: APPLICATION_SUBMITTED, STAGE_CHANGED, etc. */
     public static final String APPLICATION_EVENTS = "application-events";
 
-    /** Interview scheduling + feedback events: INTERVIEW_SCHEDULED, SCORECARD_SUBMITTED, etc. */
+    /**
+     * Interview scheduling + feedback events: INTERVIEW_SCHEDULED,
+     * SCORECARD_SUBMITTED, etc.
+     */
     public static final String INTERVIEW_EVENTS = "interview-events";
 
-    /** Offer lifecycle events: OFFER_CREATED, OFFER_ACCEPTED, OFFER_DECLINED, etc. */
+    /**
+     * Offer lifecycle events: OFFER_CREATED, OFFER_ACCEPTED, OFFER_DECLINED, etc.
+     */
     public static final String OFFER_EVENTS = "offer-events";
 
     // ─────────────────────────────────────────────────────
@@ -46,7 +55,10 @@ public final class TalentGridTopics {
     // TEAM 5 — Workforce Service
     // ─────────────────────────────────────────────────────
 
-    /** Workforce and bench management events: EMPLOYEE_BENCHED, ALLOCATION_CHANGED, etc. */
+    /**
+     * Workforce and bench management events: EMPLOYEE_BENCHED, ALLOCATION_CHANGED,
+     * etc.
+     */
     public static final String WORKFORCE_EVENTS = "workforce-events";
 
     public static final String NOTIFICATION_SEND = "notification.send";

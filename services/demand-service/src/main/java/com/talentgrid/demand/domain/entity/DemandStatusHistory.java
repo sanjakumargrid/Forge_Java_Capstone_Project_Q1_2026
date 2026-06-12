@@ -22,7 +22,7 @@ public class DemandStatusHistory {
     private Demand demand;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "from_status")
+    @Column(name = "from_status", nullable = false)
     private DemandStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
@@ -30,14 +30,14 @@ public class DemandStatusHistory {
     private DemandStatus toStatus;
 
     /** User ID (employee_id) of the actor who performed the transition. */
-    @Column(name = "changed_by")
+    @Column(name = "changed_by", nullable = false)
     private Long changedBy;
 
     /** Optional closure/transition reason code stored as string. */
     @Column(name = "closure_reason", length = 255)
     private String closureReason;
 
-    @Column(name = "comments", columnDefinition = "TEXT")
+    @Column(name = "comments", columnDefinition = "TEXT", nullable = false)
     private String comments;
 
     @Column(name = "changed_at", nullable = false)

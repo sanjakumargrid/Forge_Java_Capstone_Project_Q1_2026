@@ -2,6 +2,10 @@ package com.talentgrid.demand.dto.request;
 
 import com.talentgrid.demand.domain.enums.ClosureReason;
 import com.talentgrid.demand.domain.enums.DemandStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Request DTO for performing a demand workflow state transition.
@@ -10,6 +14,10 @@ import com.talentgrid.demand.domain.enums.DemandStatus;
  * <p>The {@code closureReason} must match the required reason for the target state
  * as enforced by {@code TransitionValidator}.
  */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class StatusTransitionRequest {
 
     /** The requested target status for this demand. */
@@ -25,13 +33,4 @@ public class StatusTransitionRequest {
     /** Optional free-text comment to record in the status history audit trail. */
     private String comments;
 
-    // ─── Getters & Setters ──────────────────────────────────────────────────────
-    public DemandStatus getTargetStatus() { return targetStatus; }
-    public void setTargetStatus(DemandStatus targetStatus) { this.targetStatus = targetStatus; }
-
-    public ClosureReason getClosureReason() { return closureReason; }
-    public void setClosureReason(ClosureReason closureReason) { this.closureReason = closureReason; }
-
-    public String getComments() { return comments; }
-    public void setComments(String comments) { this.comments = comments; }
 }

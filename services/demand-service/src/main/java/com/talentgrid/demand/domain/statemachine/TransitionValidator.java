@@ -87,20 +87,6 @@ public class TransitionValidator {
         }
     }
 
-    /**
-     * Convenience overload that accepts a {@code DemandTransition} record.
-     * Delegates to {@link #validate(Demand, DemandStatus, ClosureReason)}.
-     */
-    public void validate(DemandTransition transition) {
-        // This overload is kept for backward compatibility.
-        // Full validation requires the Demand entity; use the primary overload instead.
-        if (!stateMachine.canTransition(transition.getFrom(), transition.getTo())) {
-            throw new IllegalDemandTransitionException(
-                    String.format("Transition from %s to %s is not allowed.",
-                            transition.getFrom(), transition.getTo()));
-        }
-    }
-
     // ─── Private helpers ────────────────────────────────────────────────────────
 
     /**
