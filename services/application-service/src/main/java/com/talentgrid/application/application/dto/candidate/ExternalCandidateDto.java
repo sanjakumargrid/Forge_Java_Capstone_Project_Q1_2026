@@ -3,7 +3,7 @@ package com.talentgrid.application.application.dto.candidate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import com.talentgrid.candidate.externalCandidate.enums.Source;
+import com.talentgrid.application.application.enums.Source;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
