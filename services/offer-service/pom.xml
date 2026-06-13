@@ -12,9 +12,9 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>candidate-service</artifactId>
-    <name>TalentGrid Candidate Service</name>
-    <description>Candidate service for TalentGrid</description>
+    <artifactId>offer-service</artifactId>
+    <name>TalentGrid Offer Service</name>
+    <description>Offer service for TalentGrid</description>
     <packaging>jar</packaging>
     <dependencies>
 
@@ -119,13 +119,31 @@
             <version>2.48.0</version>
             <!-- Replace with latest stable version -->
         </dependency>
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.7.2</version>
+        </dependency>
 
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.39.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
             <version>2.0.29</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.10</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

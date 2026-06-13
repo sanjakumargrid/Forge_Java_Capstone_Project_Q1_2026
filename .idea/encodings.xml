@@ -5,6 +5,7 @@
     <file url="file://$PROJECT_DIR$/services/candidate-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/demand-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/services/interview-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/offer-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/talentgrid-audit-service/src/main/java" charset="UTF-8" />
@@ -13,5 +14,6 @@
     <file url="file://$PROJECT_DIR$/talentgrid-kafka/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/talentgrid-notification-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/talentgrid-shared/src/main/java" charset="UTF-8" />
+    <file url="file:///src/main/java" charset="UTF-8" />
   </component>
 </project>

@@ -3,68 +3,60 @@ package com.talentgrid.candidate.externalCandidate.client;
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationRequestDto;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationResponseDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Component
 public class ApplicationClient {
 
-    private final RestTemplate restTemplate;
+    private final WebClient applicationWebClient;
 
-    @Value("${application.service.url}")
-    private String applicationServiceUrl;
-
-    public ApplicationClient(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public ApplicationClient(WebClient applicationWebClient) {
+        this.applicationWebClient = applicationWebClient;
     }
 
-    public ApplicationResponseDto createApplication(ApplicationRequestDto requestDto) {
-
+    public ApplicationResponseDto createApplication(
+            ApplicationRequestDto request
+    ) {
         try {
-            return restTemplate.postForObject(
-                    applicationServiceUrl + "/applications",
-                    requestDto,
-                    ApplicationResponseDto.class
-            );
+            return applicationWebClient.post()
+                    .uri("/applications")
+                    .bodyValue(request)
+                    .retrieve()
+                    .bodyToMono(ApplicationResponseDto.class)
+                    .block();
 
-        } catch (HttpClientErrorException ex) {
-
-            HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
-
-            if (status == HttpStatus.CONFLICT) {
-                throw new BusinessException(
-                        HttpStatus.CONFLICT,
-                        "Application already exists for this candidate and demand"
-                );
-            }
-
+        } catch (WebClientResponseException.Conflict ex) {
             throw new BusinessException(
-                    status,
-                    extractErrorMessage(ex)
+                    HttpStatus.CONFLICT,
+                    "Application already exists for this candidate and demand"
             );
 
-        } catch (RestClientException ex) {
+        } catch (WebClientResponseException.BadRequest ex) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    ex.getResponseBodyAsString()
+            );
 
+        } catch (WebClientResponseException.NotFound ex) {
+            throw new BusinessException(
+                    HttpStatus.NOT_FOUND,
+                    ex.getResponseBodyAsString()
+            );
+
+        } catch (WebClientResponseException ex) {
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
-                    "Automatic application submission failed because application-service is unavailable: "
-                            + ex.getMessage()
+                    "Application-service error: " + ex.getResponseBodyAsString()
+            );
+
+        } catch (Exception ex) {
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Unable to connect application-service"
             );
         }
-    }
-
-    private String extractErrorMessage(HttpClientErrorException ex) {
-
-        String responseBody = ex.getResponseBodyAsString();
-
-        if (responseBody != null && !responseBody.isBlank()) {
-            return responseBody;
-        }
-
-        return "Application-service rejected the automatic application submission";
     }
 }
