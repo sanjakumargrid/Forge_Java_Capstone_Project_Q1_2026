@@ -3,7 +3,8 @@ package com.talentgrid.candidate.externalCandidate.service;
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.externalCandidate.client.ApplicationClient;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationRequestDto;
-import com.talentgrid.candidate.externalCandidate.dto.CandidateResponse;
+import com.talentgrid.candidate.externalCandidate.dto.ApplicationResponseDto;
+import com.talentgrid.candidate.externalCandidate.dto.response.CandidateResponse;
 import com.talentgrid.candidate.externalCandidate.dto.ExternalCandidateDto;
 import com.talentgrid.candidate.externalCandidate.entity.ExternalCandidate;
 import com.talentgrid.candidate.externalCandidate.mapper.ExternalCandidateMapper;
@@ -12,8 +13,7 @@ import com.talentgrid.candidate.externalCandidate.utility.HashUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,73 +24,150 @@ public class ExternalCandidateService {
     private final ExternalCandidateRepository externalCandidateRepository;
     private final HashUtil hashUtil;
     private final ApplicationClient applicationClient;
+    private final TransactionTemplate transactionTemplate;
 
     public ExternalCandidateService(
             ExternalCandidateRepository externalCandidateRepository,
             HashUtil hashUtil,
-            ApplicationClient applicationClient
+            ApplicationClient applicationClient,
+            TransactionTemplate transactionTemplate
     ) {
         this.externalCandidateRepository = externalCandidateRepository;
         this.hashUtil = hashUtil;
         this.applicationClient = applicationClient;
+        this.transactionTemplate = transactionTemplate;
     }
 
-    @Transactional
     public CandidateResponse createCandidate(ExternalCandidateDto dto) {
 
-        String email = normalizeEmail(dto.getEmail());
-        String phone = normalizePhone(dto.getPhoneNumber());
-
-        String emailHash = hashUtil.sha256(email);
-        String phoneHash = hashUtil.sha256(phone);
-
-        Optional<ExternalCandidate> existingCandidate =
-                externalCandidateRepository.findActiveDuplicate(emailHash, phoneHash);
-
-        if (existingCandidate.isPresent()) {
+        if (dto.getDemandId() == null) {
             throw new BusinessException(
-                    HttpStatus.CONFLICT,
-                    "Candidate already exists with same email or phone number"
+                    HttpStatus.BAD_REQUEST,
+                    "Demand ID is required for automatic application submission"
             );
         }
 
-        ExternalCandidate candidate = ExternalCandidateMapper.dtoToEntity(dto);
+        CandidateRegistrationResult registrationResult =
+                getOrCreateCandidateInTransaction(dto);
 
-        candidate.setCandidateId(null);
-        candidate.setEmail(email);
-        candidate.setPhoneNumber(phone);
-        candidate.setEmailHash(emailHash);
-        candidate.setPhoneHash(phoneHash);
+        ApplicationRequestDto applicationRequest =
+                buildApplicationRequest(
+                        dto,
+                        registrationResult.getCandidate().getCandidateId()
+                );
 
-        candidate.setIsDeleted(false);
-        candidate.setDeletedAt(null);
-        candidate.setDeletedBy(null);
-        candidate.setDeleteReason(null);
+        try {
+            ApplicationResponseDto applicationResponse =
+                    applicationClient.createApplication(applicationRequest);
 
-        ExternalCandidate savedCandidate =
-                externalCandidateRepository.save(candidate);
+            if (applicationResponse == null) {
+                throw new BusinessException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Automatic application submission failed because application-service returned empty response"
+                );
+            }
 
-        if (dto.getDemandId() != null) {
-            ApplicationRequestDto applicationRequest =
-                    buildApplicationRequest(dto, savedCandidate.getCandidateId());
+            if (registrationResult.isDuplicate()) {
+                return CandidateResponse.builder()
+                        .status(HttpStatus.OK.value())
+                        .message("Candidate already exists and application submitted for new demand")
+                        .duplicate(true)
+                        .candidateId(registrationResult.getCandidate().getCandidateId())
+                        .applicationSubmitted(true)
+                        .applicationMessage("Application created successfully")
+                        .build();
+            }
 
-            submitApplicationAfterCandidateCommit(applicationRequest);
+            return CandidateResponse.builder()
+                    .status(HttpStatus.CREATED.value())
+                    .message("Candidate created successfully and application submitted automatically")
+                    .duplicate(false)
+                    .candidateId(registrationResult.getCandidate().getCandidateId())
+                    .applicationSubmitted(true)
+                    .applicationMessage("Application created successfully")
+                    .build();
+
+        } catch (BusinessException ex) {
+
+            if (ex.getStatus() == HttpStatus.CONFLICT) {
+                return CandidateResponse.builder()
+                        .status(HttpStatus.CONFLICT.value())
+                        .message("Application already exists for this candidate and demand")
+                        .duplicate(true)
+                        .candidateId(registrationResult.getCandidate().getCandidateId())
+                        .applicationSubmitted(false)
+                        .applicationMessage(ex.getMessage())
+                        .build();
+            }
+
+            throw ex;
+        }
+    }
+
+    private CandidateRegistrationResult getOrCreateCandidateInTransaction(ExternalCandidateDto dto) {
+
+        return transactionTemplate.execute(status -> {
+
+            String email = normalizeEmail(dto.getEmail());
+            String phone = normalizePhone(dto.getPhoneNumber());
+
+            String emailHash = hashUtil.sha256(email);
+            String phoneHash = hashUtil.sha256(phone);
+
+            Optional<ExternalCandidate> existingCandidate =
+                    externalCandidateRepository.findActiveDuplicate(emailHash, phoneHash);
+
+            if (existingCandidate.isPresent()) {
+                return new CandidateRegistrationResult(existingCandidate.get(), true);
+            }
+
+            ExternalCandidate candidate = ExternalCandidateMapper.dtoToEntity(dto);
+
+            candidate.setCandidateId(null);
+            candidate.setEmail(email);
+            candidate.setPhoneNumber(phone);
+            candidate.setEmailHash(emailHash);
+            candidate.setPhoneHash(phoneHash);
+
+            candidate.setIsDeleted(false);
+            candidate.setDeletedAt(null);
+            candidate.setDeletedBy(null);
+            candidate.setDeleteReason(null);
+
+            ExternalCandidate savedCandidate =
+                    externalCandidateRepository.save(candidate);
+
+            return new CandidateRegistrationResult(savedCandidate, false);
+        });
+    }
+
+    private static class CandidateRegistrationResult {
+
+        private final ExternalCandidate candidate;
+        private final boolean duplicate;
+
+        private CandidateRegistrationResult(
+                ExternalCandidate candidate,
+                boolean duplicate
+        ) {
+            this.candidate = candidate;
+            this.duplicate = duplicate;
         }
 
-        return CandidateResponse.builder()
-                .status(HttpStatus.CREATED.value())
-                .message(
-                        dto.getDemandId() == null
-                                ? "Candidate created successfully"
-                                : "Candidate created successfully and application submission triggered automatically"
-                )
-                .duplicate(false)
-                .candidateId(savedCandidate.getCandidateId())
-                .build();
+        private ExternalCandidate getCandidate() {
+            return candidate;
+        }
+
+        private boolean isDuplicate() {
+            return duplicate;
+        }
     }
 
     @Transactional
-    public CandidateResponse updateCandidate(Long candidateId, ExternalCandidateDto dto) {
+    public CandidateResponse updateCandidate(
+            Long candidateId,
+            ExternalCandidateDto dto
+    ) {
 
         ExternalCandidate existingCandidate =
                 externalCandidateRepository.findWithDetailsByCandidateIdAndIsDeletedFalse(candidateId)
@@ -134,6 +211,8 @@ public class ExternalCandidateService {
                 .message("Candidate updated successfully")
                 .duplicate(false)
                 .candidateId(savedCandidate.getCandidateId())
+                .applicationSubmitted(false)
+                .applicationMessage(null)
                 .build();
     }
 
@@ -194,21 +273,6 @@ public class ExternalCandidateService {
         applicationRequest.setBlockedFromReapply(false);
 
         return applicationRequest;
-    }
-
-    private void submitApplicationAfterCandidateCommit(
-            ApplicationRequestDto applicationRequest
-    ) {
-
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-
-                    @Override
-                    public void afterCommit() {
-                        applicationClient.createApplication(applicationRequest);
-                    }
-                }
-        );
     }
 
     private String getResumeFilePath(ExternalCandidateDto dto) {

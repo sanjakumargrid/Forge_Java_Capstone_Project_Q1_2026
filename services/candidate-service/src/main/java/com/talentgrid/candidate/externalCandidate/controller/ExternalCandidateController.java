@@ -1,11 +1,9 @@
 package com.talentgrid.candidate.externalCandidate.controller;
 
-import com.talentgrid.candidate.externalCandidate.dto.CandidateResponse;
+import com.talentgrid.candidate.externalCandidate.dto.response.CandidateResponse;
 import com.talentgrid.candidate.externalCandidate.dto.ExternalCandidateDto;
 import com.talentgrid.candidate.externalCandidate.service.ExternalCandidateService;
 import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +13,9 @@ public class ExternalCandidateController {
 
     private final ExternalCandidateService externalCandidateService;
 
-    public ExternalCandidateController(ExternalCandidateService externalCandidateService) {
+    public ExternalCandidateController(
+            ExternalCandidateService externalCandidateService
+    ) {
         this.externalCandidateService = externalCandidateService;
     }
 
@@ -23,8 +23,13 @@ public class ExternalCandidateController {
     public ResponseEntity<CandidateResponse> createCandidate(
             @Valid @RequestBody ExternalCandidateDto externalCandidateDto
     ) {
-        CandidateResponse response = externalCandidateService.createCandidate(externalCandidateDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        CandidateResponse response =
+                externalCandidateService.createCandidate(externalCandidateDto);
+
+        return ResponseEntity
+                .status(response.getStatus())
+                .body(response);
     }
 
     @PutMapping("/{candidateId}")
@@ -32,7 +37,13 @@ public class ExternalCandidateController {
             @PathVariable Long candidateId,
             @Valid @RequestBody ExternalCandidateDto externalCandidateDto
     ) {
-        CandidateResponse response = externalCandidateService.updateCandidate(candidateId, externalCandidateDto);
+
+        CandidateResponse response =
+                externalCandidateService.updateCandidate(
+                        candidateId,
+                        externalCandidateDto
+                );
+
         return ResponseEntity.ok(response);
     }
 
@@ -40,7 +51,10 @@ public class ExternalCandidateController {
     public ResponseEntity<ExternalCandidateDto> getCandidateById(
             @PathVariable Long candidateId
     ) {
-        ExternalCandidateDto response = externalCandidateService.getByCandidateId(candidateId);
+
+        ExternalCandidateDto response =
+                externalCandidateService.getByCandidateId(candidateId);
+
         return ResponseEntity.ok(response);
     }
 
@@ -48,6 +62,7 @@ public class ExternalCandidateController {
     public ResponseEntity<Void> deleteById(
             @PathVariable Long candidateId
     ) {
+
         externalCandidateService.deleteById(candidateId);
         return ResponseEntity.noContent().build();
     }

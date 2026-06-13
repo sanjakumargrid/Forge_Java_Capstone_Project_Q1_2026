@@ -22,6 +22,7 @@
 		<module>talentgrid-kafka</module>
 		<module>talentgrid-clients/notification-client</module>
 		<module>services/demand-service</module>
+        <module>services/interview-service</module>
 		<module>services/candidate-service</module>
 		<module>services/application-service</module>
 		<module>talentgrid-notification-service</module>
