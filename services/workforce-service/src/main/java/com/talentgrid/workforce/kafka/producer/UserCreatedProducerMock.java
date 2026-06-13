@@ -1,8 +1,8 @@
 package com.talentgrid.workforce.kafka.producer;
 
+import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.producer.KafkaProducerService;
 import com.talentgrid.kafka.topics.TalentGridTopics;
-import com.talentgrid.shared.event.BaseEvent;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class UserCreatedProducerMock {
         userDto.setLocation("Hyderabad");
         userDto.setIsActive(true);
         userDto.setAvailableFrom(OffsetDateTime.now().plusDays(7));
-
+        String key = UUID.randomUUID().toString();
         BaseEvent<UserDto> event = BaseEvent.<UserDto>builder()
                 .eventType("USER_CREATED")
                 .source("user-service")
@@ -37,7 +37,7 @@ public class UserCreatedProducerMock {
                 .payload(userDto)
                 .build();
 
-        producerService.sendEvent(TalentGridTopics.WORKFORCE_EVENTS, event);
+        producerService.sendEvent(TalentGridTopics.WORKFORCE_EVENTS,key, event);
     }
 
 }

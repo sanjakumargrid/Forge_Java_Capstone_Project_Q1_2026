@@ -1,6 +1,6 @@
 package com.talentgrid.kafka.consumer;
 
-import com.talentgrid.shared.event.BaseEvent;
+import com.talentgrid.kafka.events.base.BaseEvent;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

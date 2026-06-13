@@ -1,6 +1,6 @@
 package com.talentgrid.kafka.producer;
 
-import com.talentgrid.shared.event.BaseEvent;
+import com.talentgrid.kafka.events.base.BaseEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,25 +16,36 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-
-    public void sendEvent(String topic, BaseEvent<?> event) {
-        log.info("[KAFKA-PRODUCER] Sending event | type={} | eventId={} | topic={} | source={}",
-                event.getEventType(), event.getEventId(), topic, event.getSource());
+    public void sendEvent(
+            String topic,
+            String key,
+            BaseEvent<?> event
+    ) {
 
         CompletableFuture<SendResult<String, Object>> future =
-                kafkaTemplate.send(topic, event.getEventType(), event);
+                kafkaTemplate.send(topic, key, event);
 
         future.whenComplete((result, ex) -> {
+
             if (ex != null) {
-                log.error("[KAFKA-PRODUCER] Failed to send event | type={} | eventId={} | error={}",
-                        event.getEventType(), event.getEventId(), ex.getMessage(), ex);
-                // TODO: Integrate with talentgrid-observability to emit failure metric
-                // TODO: Consider persisting to an outbox / dead-letter store for retry
-            } else {
-                log.debug("[KAFKA-PRODUCER] Event delivered | type={} | partition={} | offset={}",
+
+                log.error(
+                        "Failed to publish event | topic={} | key={} | eventType={}",
+                        topic,
+                        key,
                         event.getEventType(),
+                        ex
+                );
+
+            } else {
+
+                log.info(
+                        "Event published successfully | topic={} | partition={} | offset={} | eventType={}",
+                        topic,
                         result.getRecordMetadata().partition(),
-                        result.getRecordMetadata().offset());
+                        result.getRecordMetadata().offset(),
+                        event.getEventType()
+                );
             }
         });
     }

@@ -1,0 +1,139 @@
+package com.talentgrid.demand.service;
+
+import com.talentgrid.demand.dto.request.DemandRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Validates demand request DTOs before persistence.
+ * All fields are type-checked server-side as required by REQ-DM-01.
+ *
+ * <p>Validation rules:
+ * <ul>
+ *   <li>{@code title} — required, max 255 characters</li>
+ *   <li>{@code level} — required (seniority level)</li>
+ *   <li>{@code requiredCount} — required, must be &ge; 1</li>
+ *   <li>{@code priority} — required</li>
+ *   <li>{@code budget} — if provided, must be &ge; 0</li>
+ *   <li>{@code skills} — if provided, must not be empty</li>
+ * </ul>
+ *
+ * @throws IllegalArgumentException if any validation rule is violated
+ */
+@Service
+@Slf4j
+public class DemandValidationService {
+
+    /**
+     * Validates a create demand request. All mandatory fields must be present.
+     *
+     * @param request the create request to validate
+     * @throws IllegalArgumentException if validation fails
+     */
+    public void validateCreate(DemandRequest request) {
+        List<String> errors = new ArrayList<>();
+
+        if (request.getTitle() == null || request.getTitle().isBlank()) {
+            errors.add("title is required");
+        } else if (request.getTitle().length() > 255) {
+            errors.add("title must not exceed 255 characters");
+        }
+
+        if (request.getLevel() == null) {
+            errors.add("level (seniority level) is required");
+        }
+
+        if (request.getRequiredCount() == null) {
+            errors.add("requiredCount is required");
+        } else if (request.getRequiredCount() < 1) {
+            errors.add("requiredCount must be at least 1");
+        }
+
+        if (request.getPriority() == null) {
+            errors.add("priority is required");
+        }
+
+        if (request.getLocation() == null || request.getLocation().isBlank()) {
+            errors.add("location is required");
+        } else if (request.getLocation().length() > 150) {
+            errors.add("location must not exceed 150 characters");
+        }
+
+        if (request.getProjectId() == null) {
+            errors.add("projectId is required");
+        }
+
+        if (request.getBusinessUnit() == null || request.getBusinessUnit().isBlank()) {
+            errors.add("businessUnit is required");
+        } else if (request.getBusinessUnit().length() > 150) {
+            errors.add("businessUnit must not exceed 150 characters");
+        }
+
+        if (request.getBudget() == null) {
+            errors.add("budget is required");
+        } else if (request.getBudget().signum() < 0) {
+            errors.add("budget must be non-negative");
+        }
+
+        if (request.getTargetDate() == null) {
+            errors.add("targetDate is required");
+        }
+
+        if (request.getSkills() == null || request.getSkills().isEmpty()) {
+            errors.add("skills list is required and must not be empty");
+        }
+
+        if (!errors.isEmpty()) {
+            String errorMsg = "Validation failed: " + String.join("; ", errors);
+            log.warn("Create demand: {}", errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+    }
+
+    /**
+     * Validates an update demand request. Only non-null fields are validated.
+     *
+     * @param request the update request to validate
+     * @throws IllegalArgumentException if validation fails
+     */
+    public void validateUpdate(DemandRequest request) {
+        List<String> errors = new ArrayList<>();
+
+        if (request.getTitle() != null) {
+            if (request.getTitle().isBlank()) {
+                errors.add("title must not be blank");
+            } else if (request.getTitle().length() > 255) {
+                errors.add("title must not exceed 255 characters");
+            }
+        }
+
+        if (request.getRequiredCount() != null && request.getRequiredCount() < 1) {
+            errors.add("requiredCount must be at least 1");
+        }
+
+        if (request.getBudget() != null && request.getBudget().signum() < 0) {
+            errors.add("budget must be non-negative");
+        }
+
+        if (request.getSkills() != null && request.getSkills().isEmpty()) {
+            errors.add("skills list must not be empty if provided");
+        }
+
+        if (request.getLocation() != null && request.getLocation().length() > 150) {
+            errors.add("location must not exceed 150 characters");
+        }
+
+        if (request.getBusinessUnit() != null && request.getBusinessUnit().length() > 150) {
+            errors.add("businessUnit must not exceed 150 characters");
+        }
+
+        if (!errors.isEmpty()) {
+            String errorMsg = "Validation failed: " + String.join("; ", errors);
+            log.warn("Update demand: {}", errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+    }
+}

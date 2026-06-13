@@ -10,15 +10,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-
+import com.talentgrid.workforce.rmgdashboard.dto.DemandPageResponse;
 @FeignClient(name = "demand-service",
         url = "${demand-service.url:http://localhost:8081}")
 public interface DemandClient {
 
-    @GetMapping("/api/demands/status")
-    List<DemandDto> getDemandsByStatus(@RequestParam("status") String status);
+    @GetMapping("/api/demands")
+    DemandPageResponse getDemandsByStatus(
+            @RequestParam("status") String status,
+            @RequestParam(value = "size", defaultValue = "500") int size
+    );
 
     @PatchMapping("/api/demands/{id}/status")
-    DemandDto updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody StatusUpdateRequest statusUpdate);
+    DemandDto updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest statusUpdate);
 
 }

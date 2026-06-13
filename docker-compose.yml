@@ -1,18 +1,41 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# TalentGrid Local Infrastructure — Kafka (KRaft mode) + Kafka UI
+# TalentGrid Local Infrastructure
+# Kafka (KRaft) + Kafka UI + PostgreSQL
 # ─────────────────────────────────────────────────────────────────────────────
-# Usage:
+#
+# Start:
 #   docker compose up -d
-#   Kafka broker : localhost:9092
-#   Kafka UI     : http://localhost:7777
+#
+# Stop:
+#   docker compose down
+#
+# Kafka Broker:
+#   localhost:9092
+#
+# Kafka UI:
+#   http://localhost:7777
+#
+# PostgreSQL:
+#   localhost:5432
+#
+# DB Name:
+#   talentgrid
+#
+# Username:
+#   talentgrid
+#
+# Password:
+#   talentgrid
+#
 # ─────────────────────────────────────────────────────────────────────────────
 
 services:
+
   broker:
     image: confluentinc/cp-kafka:7.6.0
     container_name: talentgrid-kafka-broker
     networks:
-      - talentgrid-kafka-net
+      - talentgrid-network
     ports:
       - "9092:9092"
     volumes:
@@ -20,7 +43,8 @@ services:
     environment:
       CLUSTER_ID: "FZ5fgxe8QsiYlf7uOpvVWA"
       KAFKA_NODE_ID: 1
-      # KRaft mode — no ZooKeeper required
+
+      # KRaft Mode (No ZooKeeper)
       KAFKA_PROCESS_ROLES: "broker,controller"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@broker:9094"
 
@@ -36,11 +60,8 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
     healthcheck:
-      # FIX #9: Original used 'kafka-broker-api-versions' (no .sh suffix).
-      # In the cp-kafka container the binary is kafka-broker-api-versions (no .sh)
-      # BUT the PATH may not include it directly when run via CMD form.
-      # Using the full path + shell form is more reliable:
       test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 > /dev/null 2>&1"]
       interval: 10s
       timeout: 10s
@@ -51,7 +72,7 @@ services:
     image: provectuslabs/kafka-ui:latest
     container_name: talentgrid-kafka-ui
     networks:
-      - talentgrid-kafka-net
+      - talentgrid-network
     depends_on:
       broker:
         condition: service_healthy
@@ -59,9 +80,31 @@ services:
       - "7777:8080"
     restart: always
     environment:
-      - KAFKA_CLUSTERS_0_NAME=talentgrid-local-cluster
-      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=broker:9093
+      KAFKA_CLUSTERS_0_NAME: talentgrid-local-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:9093
+
+  postgres:
+    image: postgres:16
+    container_name: talentgrid-postgres
+    networks:
+      - talentgrid-network
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: talentgrid
+      POSTGRES_USER: talentgrid
+      POSTGRES_PASSWORD: talentgrid
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U talentgrid"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
-  talentgrid-kafka-net:
+  talentgrid-network:
     driver: bridge
+
+volumes:
+  postgres_data:

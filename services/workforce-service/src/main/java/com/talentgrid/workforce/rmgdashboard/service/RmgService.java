@@ -24,7 +24,10 @@ public class RmgService {
         log.info("Fetching demands from demand-service with status={}, page={}, size={}",
                 status, pageable.getPageNumber(), pageable.getPageSize());
 
-        List<DemandDto> allDemands = demandClient.getDemandsByStatus(status);
+        // Fetch ALL demands (up to 500) from Demand Service matching the status
+        // We do client-side pagination because Feign returns a flat List.
+        // If demand volumes grow, consider paginating at the Feign client level.
+        List<DemandDto> allDemands = demandClient.getDemandsByStatus(status, 500).getContent();
         if (allDemands == null) {
             allDemands = List.of();
         }
@@ -44,10 +47,10 @@ public class RmgService {
     }
 
     public DemandDto updateDemandStatus(Long demandId, String status) {
-        StatusUpdateRequest statusUpdateRequest = StatusUpdateRequest.builder()
-                .status(status)
+        com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest feignRequest = com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest.builder()
+                .targetStatus(status)
                 .build();
 
-        return demandClient.updateDemandStatus(demandId, statusUpdateRequest);
+        return demandClient.updateDemandStatus(demandId, feignRequest);
     }
 }

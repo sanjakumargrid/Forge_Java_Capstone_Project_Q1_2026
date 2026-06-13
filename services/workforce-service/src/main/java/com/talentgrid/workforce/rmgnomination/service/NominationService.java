@@ -44,7 +44,7 @@ public class NominationService {
         Long employeeId = employee.getId();
 
         // 2. Validate demand exists in APPROVED state
-        DemandDto approvedDemand = demandClient.getDemandsByStatus("APPROVED").stream()
+        DemandDto approvedDemand = demandClient.getDemandsByStatus("APPROVED", 500).getContent().stream()
                 .filter(demand -> demand.getDemandId() != null && demand.getDemandId().equals(request.getDemandId()))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,

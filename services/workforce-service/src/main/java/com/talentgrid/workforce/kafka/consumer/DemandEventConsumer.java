@@ -1,8 +1,8 @@
 package com.talentgrid.workforce.kafka.consumer;
 
 import com.talentgrid.kafka.consumer.BaseKafkaConsumer;
+import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.topics.TalentGridTopics;
-import com.talentgrid.shared.event.BaseEvent;
 import com.talentgrid.workforce.skillgapheatmap.service.SkillGapService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
