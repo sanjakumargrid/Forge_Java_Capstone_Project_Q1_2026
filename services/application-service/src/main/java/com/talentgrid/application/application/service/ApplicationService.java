@@ -4,6 +4,7 @@ import com.talentgrid.application.application.dto.ApplicationDto;
 import com.talentgrid.application.application.dto.DemandDto;
 import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 import com.talentgrid.application.application.dto.candidate.SkillDetailDto;
+import com.talentgrid.application.application.dto.request.ApplicationCreateRequest;
 import com.talentgrid.application.application.dto.request.StageMoveRequest;
 import com.talentgrid.application.application.entity.Application;
 import com.talentgrid.application.application.enums.Stage;
@@ -37,46 +38,43 @@ public class ApplicationService {
             ApplicationRepository applicationRepository,
             CandidateClient candidateClient,
             DemandClient demandClient
-    )
-    {
+    ) {
         this.applicationRepository = applicationRepository;
         this.candidateClient = candidateClient;
         this.demandClient = demandClient;
     }
 
     @Transactional
-    public ApplicationDto createApplication(ApplicationDto applicationDto) {
+    public ApplicationDto createApplication(ApplicationCreateRequest request) {
 
-        if (applicationDto == null) {
+        if (request == null) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Application details are required");
         }
 
-        validateCreateRequest(applicationDto);
-
         ExternalCandidateDto candidateDto =
-                candidateClient.getCandidate(applicationDto.getCandidateId());
+                candidateClient.getCandidate(request.getCandidateId());
 
         if (candidateDto == null) {
             throw new BusinessException(
                     HttpStatus.NOT_FOUND,
-                    "Candidate not found with id: " + applicationDto.getCandidateId()
+                    "Candidate not found with id: " + request.getCandidateId()
             );
         }
 
         DemandDto demandDto =
-                demandClient.getDemand(applicationDto.getDemandId());
+                demandClient.getDemand(request.getDemandId());
 
         if (demandDto == null) {
             throw new BusinessException(
                     HttpStatus.NOT_FOUND,
-                    "Demand not found with id: " + applicationDto.getDemandId()
+                    "Demand not found with id: " + request.getDemandId()
             );
         }
 
         boolean alreadyApplied =
                 applicationRepository.existsByCandidateIdAndDemandId(
-                        applicationDto.getCandidateId(),
-                        applicationDto.getDemandId()
+                        request.getCandidateId(),
+                        request.getDemandId()
                 );
 
         if (alreadyApplied) {
@@ -85,6 +83,16 @@ public class ApplicationService {
                     "Candidate already applied for this demand"
             );
         }
+
+        ApplicationDto applicationDto = new ApplicationDto();
+
+        applicationDto.setCandidateId(request.getCandidateId());
+        applicationDto.setDemandId(request.getDemandId());
+        applicationDto.setSource(request.getSource());
+        applicationDto.setResumeFilePath(request.getResumeFilePath());
+        applicationDto.setResumeOriginalFilename(request.getResumeOriginalFilename());
+        applicationDto.setFreeNotes(request.getFreeNotes());
+        applicationDto.setReferralCode(request.getReferralCode());
 
         calculateSkillMatching(applicationDto, candidateDto, demandDto);
 
@@ -202,7 +210,7 @@ public class ApplicationService {
         }
 
         if (application.getOfferAt() != null) {
-            timeline.add("OFFER : " + application.getOfferAt());
+            timeline.add("OFFERED : " + application.getOfferAt());
         }
 
         if (application.getHiredAt() != null) {
@@ -256,37 +264,6 @@ public class ApplicationService {
                         HttpStatus.NOT_FOUND,
                         "Application not found with id: " + applicationId
                 ));
-    }
-
-    private void validateCreateRequest(ApplicationDto applicationDto) {
-
-        List<String> errors = new ArrayList<>();
-
-        if (applicationDto.getCandidateId() == null) {
-            errors.add("Candidate ID is required");
-        }
-
-        if (applicationDto.getDemandId() == null) {
-            errors.add("Demand ID is required");
-        }
-
-        if (applicationDto.getSource() == null) {
-            errors.add("Source is required");
-        }
-
-        if (applicationDto.getResumeFilePath() == null ||
-                applicationDto.getResumeFilePath().isBlank()) {
-            errors.add("Resume file path is required");
-        }
-
-        if (applicationDto.getResumeOriginalFilename() == null ||
-                applicationDto.getResumeOriginalFilename().isBlank()) {
-            errors.add("Original resume filename is required");
-        }
-
-        if (!errors.isEmpty()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, errors);
-        }
     }
 
     private void validatePageRequest(int page, int size) {
@@ -379,7 +356,6 @@ public class ApplicationService {
             case HIRED -> application.setHiredAt(now);
             case REJECTED -> application.setRejectedAt(now);
             case APPLIED -> {
-                // APPLIED is created automatically using appliedAt.
             }
         }
     }
@@ -478,15 +454,22 @@ public class ApplicationService {
             List<String> otherSkills
     ) {
 
-        return "Candidate matched "
-                + matchedSkills.size()
-                + " required skills. Matched skills: "
-                + matchedSkills
-                + ". Missing skills: "
-                + missingSkills
-                + ". Other skills: "
-                + otherSkills
-                + ".";
+        String rationale =
+                "Candidate matched "
+                        + matchedSkills.size()
+                        + " required skills. Matched: "
+                        + matchedSkills
+                        + ". Missing: "
+                        + missingSkills
+                        + ". Other: "
+                        + otherSkills
+                        + ".";
+
+        if (rationale.length() > 300) {
+            return rationale.substring(0, 297) + "...";
+        }
+
+        return rationale;
     }
 
     private Stage parseStage(String stage) {

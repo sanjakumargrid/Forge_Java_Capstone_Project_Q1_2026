@@ -2,7 +2,9 @@ package com.talentgrid.application.application.dto;
 
 import com.talentgrid.application.application.enums.Source;
 import com.talentgrid.application.application.enums.Stage;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,21 +17,14 @@ public class ApplicationDto {
 
     private Long applicationId;
 
-    @NotNull(message = "Candidate ID is required")
     private Long candidateId;
 
-    @NotNull(message = "Demand ID is required")
     private Long demandId;
 
-    @NotNull(message = "Source is required")
     private Source source;
 
-    @NotBlank(message = "Resume file path is required")
-    @Size(max = 500, message = "Resume file path must not exceed 500 characters")
     private String resumeFilePath;
 
-    @NotBlank(message = "Original resume filename is required")
-    @Size(max = 255, message = "Original filename must not exceed 255 characters")
     private String resumeOriginalFilename;
 
     private List<String> matchedSkills;
@@ -38,11 +33,9 @@ public class ApplicationDto {
 
     private List<String> otherSkills;
 
-    @NotBlank(message = "AI rationale is required")
     @Size(
-            min = 30,
             max = 300,
-            message = "AI rationale must be between 30 and 300 characters"
+            message = "AI rationale must not exceed 300 characters"
     )
     private String aiRationale;
 
@@ -52,10 +45,8 @@ public class ApplicationDto {
     )
     private String freeNotes;
 
-    @NotNull(message = "Current stage is required")
     private Stage currentStage;
 
-    @NotNull(message = "AI score is required")
     @Min(value = 0, message = "AI score must be at least 0")
     @Max(value = 100, message = "AI score must not exceed 100")
     private Integer aiScore;
@@ -94,6 +85,5 @@ public class ApplicationDto {
     )
     private String referralCode;
 
-    @NotNull(message = "Blocked from reapply flag is required")
     private Boolean blockedFromReapply;
 }

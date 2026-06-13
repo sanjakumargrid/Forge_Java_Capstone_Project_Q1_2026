@@ -1,6 +1,7 @@
 package com.talentgrid.application.application.controller;
 
 import com.talentgrid.application.application.dto.ApplicationDto;
+import com.talentgrid.application.application.dto.request.ApplicationCreateRequest;
 import com.talentgrid.application.application.dto.request.StageMoveRequest;
 import com.talentgrid.application.application.service.ApplicationService;
 import jakarta.validation.Valid;
@@ -21,9 +22,9 @@ public class ApplicationController {
 
     @PostMapping
     public ApplicationDto createApplication(
-            @Valid @RequestBody ApplicationDto applicationDto
+            @Valid @RequestBody ApplicationCreateRequest request
     ) {
-        return applicationService.createApplication(applicationDto);
+        return applicationService.createApplication(request);
     }
 
     @GetMapping
