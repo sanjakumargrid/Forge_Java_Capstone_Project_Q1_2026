@@ -57,9 +57,7 @@ public class BenchReportWorkforceProvider implements WorkforceProvider {
 
     private EngineerResponse mapToEngineerResponse(BenchEmployeeDto employee) {
         return EngineerResponse.builder()
-                .employeeId(employee.getEmployeeCode() != null
-                        ? employee.getEmployeeCode()
-                        : (employee.getEmployeeId() != null ? String.valueOf(employee.getEmployeeId()) : null))
+                .employeeId(employee.getEmployeeId())
                 .name(employee.getName())
                 .skills(employee.getSkills() != null ? employee.getSkills() : Collections.emptyList())
                 .build();

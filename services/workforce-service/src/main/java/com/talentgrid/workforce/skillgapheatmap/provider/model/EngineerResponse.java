@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 public class EngineerResponse {
 
-    private String employeeId;
+    private Long employeeId;
     private String name;
     private List<String> skills;
 }

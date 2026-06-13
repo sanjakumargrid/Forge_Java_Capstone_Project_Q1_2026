@@ -8,69 +8,129 @@ import com.talentgrid.workforce.skillgapheatmap.provider.model.DemandSummary;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-/**
- * DemandProvider implementation that fetches open demands from the
- * demand-service via FeignClient.
- *
- * Strategy:
- *   1. Call GET /api/v1/demands to get all demand summaries
- *   2. Filter to only open/active statuses (INTERNAL_SEARCH, OPEN_EXTERNAL, FILLED_PARTIALLY)
- *   3. For each open demand, call GET /api/v1/demands/{id} to get skills
- *
- * Note: Step 3 makes one HTTP call per open demand. This is acceptable because
- * the number of concurrently open demands is typically small (< 50). If this
- * grows, the demand-service should expose a bulk endpoint with skills included.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class FeignDemandProvider implements DemandProvider {
 
     /**
-     * Statuses representing demands that are actively searching for candidates —
-     * these are the only ones that contribute to the skill gap.
+     * Demand statuses that represent an open (actively searching) demand.
+     * These are the only statuses that contribute to the skill gap.
      */
-    private static final Set<String> OPEN_STATUSES = Set.of(
+    private static final List<String> OPEN_STATUSES = List.of(
             "INTERNAL_SEARCH",
             "OPEN_EXTERNAL",
             "FILLED_PARTIALLY"
     );
 
+    /**
+     * Hard cap on total pages fetched per status to prevent runaway loops in
+     * case demand-service returns incorrect pagination metadata.
+     */
+    private static final int MAX_PAGES_PER_STATUS = 50;
+
     private final DemandServiceClient demandServiceClient;
+
+    /**
+     * Number of summaries requested per page when polling demand-service.
+     * Tunable via {@code skill-gap.fetch-page-size} — default 100.
+     */
+    @Value("${skill-gap.fetch-page-size:100}")
+    private int fetchPageSize;
 
     @Override
     public List<DemandResponse> getOpenDemands() {
-        try {
-            DemandSummary.PagedResponse page = demandServiceClient.getAllDemands();
+        // ── Step 1: Collect summaries for all open statuses ──────────────────
+        List<DemandSummary> openSummaries = new ArrayList<>();
 
+        for (String status : OPEN_STATUSES) {
+            List<DemandSummary> summaries = fetchAllSummariesByStatus(status);
+            openSummaries.addAll(summaries);
+        }
+
+        if (openSummaries.isEmpty()) {
+            log.info("[SKILL-GAP] No open demands found in demand-service — heatmap demand side will be empty.");
+            return Collections.emptyList();
+        }
+
+        log.info("[SKILL-GAP] Found {} open demand summaries across all open statuses.", openSummaries.size());
+
+        // ── Step 2: Fetch full detail (skills) for each summary ──────────────
+        List<DemandResponse> result = openSummaries.stream()
+                .filter(Objects::nonNull)
+                .filter(s -> s.getDemandId() != null)
+                .map(this::fetchFullDemand)
+                .filter(Objects::nonNull)
+                .toList();
+
+        log.info("[SKILL-GAP] Built {} DemandResponse objects for heatmap calculation.", result.size());
+        return result;
+    }
+
+    // ── Private helpers ──────────────────────────────────────────────────────
+
+    private List<DemandSummary> fetchAllSummariesByStatus(String status) {
+        List<DemandSummary> accumulated = new ArrayList<>();
+        int pageNumber = 0;
+
+        while (pageNumber < MAX_PAGES_PER_STATUS) {
+            DemandSummary.PagedResponse page = fetchSummaryPage(status, pageNumber);
             if (page == null || page.getContent() == null || page.getContent().isEmpty()) {
-                log.warn("[SKILL-GAP] Demand service returned no demands.");
-                return Collections.emptyList();
+                break;
             }
 
-            return page.getContent().stream()
+            List<DemandSummary> validSummaries = page.getContent().stream()
                     .filter(Objects::nonNull)
-                    .filter(d -> d.getStatus() != null && OPEN_STATUSES.contains(d.getStatus()))
-                    .map(this::fetchFullDemand)
-                    .filter(Objects::nonNull)
+                    .filter(s -> s.getDemandId() != null)
                     .toList();
 
+            accumulated.addAll(validSummaries);
+            log.debug("[SKILL-GAP] status={} page={} → {} demands (total so far: {}, last={})",
+                    status, pageNumber, validSummaries.size(), accumulated.size(), page.isLast());
+
+            if (page.isLast()) {
+                break;
+            }
+            pageNumber++;
+        }
+
+        if (pageNumber == MAX_PAGES_PER_STATUS) {
+            log.warn("[SKILL-GAP] status={} hit the MAX_PAGES_PER_STATUS cap ({}) — " +
+                    "there may be more demands beyond what was fetched. " +
+                    "Consider raising skill-gap.fetch-page-size.", status, MAX_PAGES_PER_STATUS);
+        }
+
+        log.debug("[SKILL-GAP] status={} fully paginated — {} total summaries fetched across {} page(s).",
+                status, accumulated.size(), pageNumber + 1);
+        return accumulated;
+    }
+
+    private DemandSummary.PagedResponse fetchSummaryPage(String status, int pageNumber) {
+        try {
+            return demandServiceClient.getDemandsByStatus(status, fetchPageSize, pageNumber);
+        } catch (FeignException ex) {
+            if (isServiceDown(ex)) {
+                throw new DemandServiceUnavailableException(
+                        "demand-service is unavailable while fetching demands with status=" + status
+                                + " page=" + pageNumber, ex);
+            }
+            log.warn("[SKILL-GAP] HTTP {} fetching demands status={} page={} — skipping this status. Body: {}",
+                    ex.status(), status, pageNumber, ex.contentUTF8());
+            return null;
         } catch (DemandServiceUnavailableException ex) {
             throw ex;
         } catch (Exception ex) {
-            if (isEndpointUnavailable(ex)) {
-                throw new DemandServiceUnavailableException(
-                        "demand-service is unavailable while fetching open demands", ex);
-            }
             throw new DemandServiceUnavailableException(
-                    "unexpected error while fetching open demands from demand-service", ex);
+                    "demand-service is unavailable while fetching demands with status=" + status
+                            + " page=" + pageNumber, ex);
         }
     }
 
@@ -79,7 +139,13 @@ public class FeignDemandProvider implements DemandProvider {
             DemandServiceResponse full = demandServiceClient.getDemandById(summary.getDemandId());
 
             if (full == null) {
-                log.warn("[SKILL-GAP] Demand {} returned null from demand-service.", summary.getDemandId());
+                log.warn("[SKILL-GAP] Demand {} returned null detail — skipping.", summary.getDemandId());
+                return null;
+            }
+
+            List<String> skills = full.getSkills();
+            if (skills == null || skills.isEmpty()) {
+                log.debug("[SKILL-GAP] Demand {} has no skills — skipping.", summary.getDemandId());
                 return null;
             }
 
@@ -87,44 +153,30 @@ public class FeignDemandProvider implements DemandProvider {
                     .demandId(full.getDemandId())
                     .demandTitle(full.getTitle())
                     .headcount(resolveHeadcount(summary))
-                    .requiredSkills(full.getSkills() != null ? full.getSkills() : Collections.emptyList())
+                    .requiredSkills(skills)
                     .build();
 
         } catch (DemandServiceUnavailableException ex) {
             throw ex;
-        } catch (Exception ex) {
-            if (isServiceUnavailable(ex)) {
+        } catch (FeignException ex) {
+            if (isServiceDown(ex)) {
                 throw new DemandServiceUnavailableException(
                         "demand-service is unavailable while fetching demand " + summary.getDemandId(), ex);
             }
-            log.warn("[SKILL-GAP] Could not fetch full details for demand {}: {}",
-                    summary.getDemandId(), ex.getMessage());
+            // 404 = demand deleted between list and detail call; other 4xx = skip gracefully
+            log.warn("[SKILL-GAP] HTTP {} fetching demand {} — skipping.",
+                    ex.status(), summary.getDemandId());
             return null;
+        } catch (Exception ex) {
+            throw new DemandServiceUnavailableException(
+                    "demand-service is unavailable while fetching demand " + summary.getDemandId(), ex);
         }
     }
 
-    private boolean isEndpointUnavailable(Throwable ex) {
-        Throwable current = ex;
-        while (current != null) {
-            if (current instanceof FeignException feignException) {
-                int status = feignException.status();
-                return status == -1 || status == 404 || status >= 500;
-            }
-            current = current.getCause();
-        }
-        return true;
-    }
 
-    private boolean isServiceUnavailable(Throwable ex) {
-        Throwable current = ex;
-        while (current != null) {
-            if (current instanceof FeignException feignException) {
-                int status = feignException.status();
-                return status == -1 || status >= 500;
-            }
-            current = current.getCause();
-        }
-        return true;
+    private boolean isServiceDown(FeignException ex) {
+        int status = ex.status();
+        return status == -1 || status >= 500;
     }
 
     private int resolveHeadcount(DemandSummary summary) {

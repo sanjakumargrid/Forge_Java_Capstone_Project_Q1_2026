@@ -56,14 +56,20 @@ public class RmgDemandStatusController {
     @Operation(summary = "Cancel a demand by ID", description = "Update the status of the specified demand to CANCELLED")
     public ResponseEntity<DemandDto> cancelDemand(@PathVariable("id") Long id) {
         log.info("Received request to cancel demand - id={}", id);
-        DemandDto response = rmgService.updateDemandStatus(id, "CANCELLED");
+        // CANCELLED is the required ClosureReason enum value when transitioning to CANCELLED status
+        DemandDto response = rmgService.updateDemandStatus(id, "CANCELLED", "CANCELLED", null);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/demands/{id}/status")
     @Operation(summary = "Update demand status", description = "Update the status for a given demand and forward the update to demand-service")
     public ResponseEntity<DemandDto> updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody StatusUpdateRequest statusUpdate) {
-        DemandDto response = rmgService.updateDemandStatus(demandId, statusUpdate.getStatus());
+        DemandDto response = rmgService.updateDemandStatus(
+                demandId,
+                statusUpdate.getStatus(),
+                statusUpdate.getClosureReason(),
+                statusUpdate.getComments()
+        );
         return ResponseEntity.ok(response);
     }
 }

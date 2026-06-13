@@ -2,6 +2,7 @@ package com.talentgrid.workforce.rmgdashboard.service;
 
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest;
 import com.talentgrid.workforce.rmgdashboard.dto.StatusUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +48,17 @@ public class RmgService {
     }
 
     public DemandDto updateDemandStatus(Long demandId, String status) {
-        com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest feignRequest = com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest.builder()
+        return updateDemandStatus(demandId, status, null, null);
+    }
+
+    public DemandDto updateDemandStatus(Long demandId, String status, String closureReason, String comments) {
+        log.info("Updating demand {} status to {} (closureReason={}, comments={})",
+                demandId, status, closureReason, comments);
+
+        DemandStatusTransitionRequest feignRequest = DemandStatusTransitionRequest.builder()
                 .targetStatus(status)
+                .closureReason(closureReason)
+                .comments(comments)
                 .build();
 
         return demandClient.updateDemandStatus(demandId, feignRequest);

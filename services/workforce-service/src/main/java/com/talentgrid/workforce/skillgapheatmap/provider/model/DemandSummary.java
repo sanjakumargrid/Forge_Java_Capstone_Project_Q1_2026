@@ -29,6 +29,13 @@ public class DemandSummary {
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PagedResponse {
+
         private List<DemandSummary> content;
+
+        private int totalPages;
+
+        private long totalElements;
+
+        private boolean last;
     }
 }
