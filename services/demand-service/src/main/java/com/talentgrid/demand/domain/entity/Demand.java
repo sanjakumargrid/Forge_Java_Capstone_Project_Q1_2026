@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * JPA entity representing a workforce demand.
- * Maps all 27 columns of the {@code demands} table as specified in the schema.
+ * Maps all 37 columns of the {@code demands} table as specified in the schema.
  *
  * <p>
  * Lifecycle callbacks:

@@ -20,13 +20,13 @@ import java.util.List;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code POST  /demands/{id}/approve} — approve or reject a pending
+ * <li>{@code POST  /api/demands/{id}/approve} — approve or reject a pending
  * demand</li>
- * <li>{@code PATCH /demands/{id}/status} — perform a legal status
+ * <li>{@code PATCH /api/demands/{id}/status} — perform a legal status
  * transition</li>
- * <li>{@code GET   /demands/{id}/pipeline} — unified internal + external hiring
+ * <li>{@code GET   /api/demands/{id}/pipeline} — unified internal + external hiring
  * pipeline</li>
- * <li>{@code GET   /demands/{id}/history} — full audit trail of status transitions</li>
+ * <li>{@code GET   /api/demands/{id}/history} — full audit trail of status transitions</li>
  * </ul>
  */
 @RestController

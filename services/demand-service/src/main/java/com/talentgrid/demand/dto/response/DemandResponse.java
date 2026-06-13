@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Full response DTO for a demand entity.
  * Returned by {@code GET /demands/{id}} and {@code POST /demands}.
- * Maps all 27 columns from the {@code demands} table.
+ * Maps all 37 fields from the {@code demands} table.
  */
 @Data
 @Builder
@@ -25,8 +25,12 @@ public class DemandResponse {
     private String title;
     private String description;
     private String level;
+    private String employmentType;
     private String location;
+    private Long accountId;
+    private String accountName;
     private Long projectId;
+    private String projectName;
     private String businessUnit;
     private List<String> skills;
     private BigDecimal budget;

@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.*;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code GET    /demands} — enterprise demand search with
+ * <li>{@code GET    /api/demands} — enterprise demand search with
  * filters/sorting</li>
- * <li>{@code POST   /demands} — create a new workforce demand (status:
+ * <li>{@code POST   /api/demands} — create a new workforce demand (status:
  * DRAFT)</li>
- * <li>{@code GET    /demands/{id}} — get detailed demand information</li>
- * <li>{@code PATCH  /demands/{id}} — update editable fields (DRAFT only)</li>
- * <li>{@code DELETE /demands/{id}} — soft delete a draft demand</li>
+ * <li>{@code GET    /api/demands/{id}} — get detailed demand information</li>
+ * <li>{@code PATCH  /api/demands/{id}} — update editable fields (DRAFT only)</li>
+ * <li>{@code DELETE /api/demands/{id}} — soft delete a draft demand</li>
  * </ul>
  */
 @RestController

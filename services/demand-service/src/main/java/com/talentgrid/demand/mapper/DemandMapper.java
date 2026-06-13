@@ -102,8 +102,12 @@ public class DemandMapper {
         response.setTitle(demand.getTitle());
         response.setDescription(demand.getDescription());
         response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
+        response.setEmploymentType(enumName(demand.getEmploymentType()));
         response.setLocation(demand.getLocation());
+        response.setAccountId(demand.getAccountId());
+        response.setAccountName(demand.getAccountName());
         response.setProjectId(demand.getProjectId());
+        response.setProjectName(demand.getProjectName());
         response.setBusinessUnit(demand.getBusinessUnit());
         response.setSkills(demand.getSkills());
         response.setBudget(demand.getBudget());
@@ -151,6 +155,10 @@ public class DemandMapper {
         DemandSummaryResponse response = new DemandSummaryResponse();
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
+        response.setAccountName(demand.getAccountName());
+        response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
+        response.setEmploymentType(enumName(demand.getEmploymentType()));
+        response.setLocation(demand.getLocation());
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setBusinessUnit(demand.getBusinessUnit());
