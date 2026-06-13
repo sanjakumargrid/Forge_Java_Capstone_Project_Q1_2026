@@ -24,7 +24,7 @@ public class DemandClient {
 
         try {
             return webClient.get()
-                    .uri("/api/v1/demands/{id}", demandId)
+                    .uri("/api/demands/{id}", demandId)
                     .retrieve()
                     .bodyToMono(DemandDto.class)
                     .block();
