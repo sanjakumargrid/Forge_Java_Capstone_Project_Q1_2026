@@ -79,7 +79,7 @@ public class Demand {
     @Column(name = "skills", columnDefinition = "text[]", nullable = false)
     private List<String> skills;//
 
-    @Column(name = "budget", precision = 15, scale = 2)
+    @Column(name = "budget", precision = 15, scale = 2, nullable = false)
     private BigDecimal budget;
 
     /**

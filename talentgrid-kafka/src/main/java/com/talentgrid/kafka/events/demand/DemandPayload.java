@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class DemandPayload {
     // ── Core identifiers ────────────────────────────────────────────────────────
     private Long demandId;//
     private String title;//
+    private String description;
     private String status; //
 
     // ── Seniority & Skills ──────────────────────────────────────────────────────
@@ -26,6 +28,8 @@ public class DemandPayload {
     private String workMode;
     private Long experience;
     private String department;
+    private String employmentType;
+    private LocalDate onboardingDate;
 
     // ── Fill counts ─────────────────────────────────────────────────────────────
     private Integer requiredCount;//

@@ -81,6 +81,12 @@ public class DemandEventProducer {
         payload.setRequiredCount(demand.getRequiredCount());
         payload.setInternalFilledCount(demand.getInternalFilledCount());
         payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setDescription(demand.getDescription());
+        payload.setWorkMode(demand.getWorkMode() != null ? demand.getWorkMode().name() : null);
+        payload.setExperience(demand.getExperience());
+        payload.setDepartment(demand.getDepartment());
+        payload.setEmploymentType(demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
+        payload.setOnboardingDate(demand.getOnboardingDate());
         send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_EXTERNAL_OPENED", demand.getDemandId(), payload);
     }
 
@@ -207,9 +213,6 @@ public class DemandEventProducer {
                 .level(demand.getLevel() != null ? demand.getLevel().name() : null)
                 .skills(demand.getSkills())
                 .location(demand.getLocation())
-                .workMode(demand.getWorkMode() != null ? demand.getWorkMode().name() : null)
-                .experience(demand.getExperience())
-                .department(demand.getDepartment())
                 .build();
     }
 
