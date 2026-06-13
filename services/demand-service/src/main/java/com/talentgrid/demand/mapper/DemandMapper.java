@@ -48,6 +48,11 @@ public class DemandMapper {
         demand.setSkills(request.getSkills());
         demand.setBudget(request.getBudget());
         demand.setReqUtilPerc(request.getReqUtilPerc());
+        demand.setWorkMode(request.getWorkMode());
+        demand.setExperience(request.getExperience());
+        demand.setDepartment(request.getDepartment());
+        demand.setClientInterview(request.getClientInterview());
+        demand.setOnboardingDate(request.getOnboardingDate());
         demand.setRequiredCount(request.getRequiredCount());
         demand.setTargetDate(request.getTargetDate());
         demand.setPriority(request.getPriority());
@@ -82,6 +87,11 @@ public class DemandMapper {
         if (request.getSkills() != null)       demand.setSkills(request.getSkills());
         if (request.getBudget() != null)       demand.setBudget(request.getBudget());
         if (request.getReqUtilPerc() != null)  demand.setReqUtilPerc(request.getReqUtilPerc());
+        if (request.getWorkMode() != null)     demand.setWorkMode(request.getWorkMode());
+        if (request.getExperience() != null)   demand.setExperience(request.getExperience());
+        if (request.getDepartment() != null)   demand.setDepartment(request.getDepartment());
+        if (request.getClientInterview() != null) demand.setClientInterview(request.getClientInterview());
+        if (request.getOnboardingDate() != null) demand.setOnboardingDate(request.getOnboardingDate());
         if (request.getRequiredCount() != null) demand.setRequiredCount(request.getRequiredCount());
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
@@ -114,6 +124,11 @@ public class DemandMapper {
         response.setSkills(demand.getSkills());
         response.setBudget(demand.getBudget());
         response.setReqUtilPerc(demand.getReqUtilPerc());
+        response.setWorkMode(enumName(demand.getWorkMode()));
+        response.setExperience(demand.getExperience());
+        response.setDepartment(demand.getDepartment());
+        response.setClientInterview(demand.getClientInterview());
+        response.setOnboardingDate(demand.getOnboardingDate());
         response.setRequiredCount(demand.getRequiredCount());
         response.setRecruitedCount(demand.getRecruitedCount());
         response.setInternalFilledCount(demand.getInternalFilledCount());

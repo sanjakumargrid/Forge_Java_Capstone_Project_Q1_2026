@@ -55,6 +55,11 @@ public class DemandService {
         validationService.validateCreate(request);
         Demand demand = demandMapper.toEntity(request);
 
+        // Default onboarding date to target date if not provided
+        if (demand.getOnboardingDate() == null) {
+            demand.setOnboardingDate(demand.getTargetDate());
+        }
+
         // Fetch Account and Project info from UserAuthService
         if (request.getAccountId() != null) {
             try {

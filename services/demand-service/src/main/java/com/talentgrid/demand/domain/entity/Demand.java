@@ -4,6 +4,7 @@ import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -15,7 +16,7 @@ import java.util.List;
 
 /**
  * JPA entity representing a workforce demand.
- * Maps all 37 columns of the {@code demands} table as specified in the schema.
+ * Maps all 42 columns of the {@code demands} table as specified in the schema.
  *
  * <p>
  * Lifecycle callbacks:
@@ -93,6 +94,22 @@ public class Demand {
      */
     @Column(name = "req_util_perc")
     private Integer reqUtilPerc;//
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "work_mode", nullable = false)
+    private WorkMode workMode;
+
+    @Column(name = "experience", nullable = false)
+    private Long experience;
+
+    @Column(name = "department", nullable = false, length = 150)
+    private String department;
+
+    @Column(name = "client_interview", nullable = false)
+    private Boolean clientInterview;
+
+    @Column(name = "onboarding_date")
+    private LocalDate onboardingDate;
 
     // ─── Headcount Tracking ─────────────────────────────────────────────────────
     @Column(name = "required_count", nullable = false)
@@ -311,6 +328,21 @@ public class Demand {
 
     public Integer getReqUtilPerc() { return reqUtilPerc; }
     public void setReqUtilPerc(Integer reqUtilPerc) { this.reqUtilPerc = reqUtilPerc; }
+
+    public WorkMode getWorkMode() { return workMode; }
+    public void setWorkMode(WorkMode workMode) { this.workMode = workMode; }
+
+    public Long getExperience() { return experience; }
+    public void setExperience(Long experience) { this.experience = experience; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public Boolean getClientInterview() { return clientInterview; }
+    public void setClientInterview(Boolean clientInterview) { this.clientInterview = clientInterview; }
+
+    public LocalDate getOnboardingDate() { return onboardingDate; }
+    public void setOnboardingDate(LocalDate onboardingDate) { this.onboardingDate = onboardingDate; }
 
     public Integer getRequiredCount() {
         return requiredCount;

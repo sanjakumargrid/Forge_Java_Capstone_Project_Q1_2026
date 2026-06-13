@@ -23,6 +23,9 @@ public class DemandPayload {
     private String level; //
     private List<String> skills; //
     private String location;//
+    private String workMode;
+    private Long experience;
+    private String department;
 
     // ── Fill counts ─────────────────────────────────────────────────────────────
     private Integer requiredCount;//

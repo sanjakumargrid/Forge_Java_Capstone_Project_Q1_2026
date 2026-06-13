@@ -3,6 +3,7 @@ package com.talentgrid.demand.dto.request;
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,5 +50,10 @@ public class DemandRequest {
     private DemandPriority priority;
     private EmploymentType employmentType;
     private OffsetDateTime searchStartAt;
+    private WorkMode workMode;
+    private Long experience;
+    private String department;
+    private Boolean clientInterview;
+    private LocalDate onboardingDate;
 
 }

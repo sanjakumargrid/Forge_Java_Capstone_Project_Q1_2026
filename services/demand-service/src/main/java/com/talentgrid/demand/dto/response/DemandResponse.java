@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Full response DTO for a demand entity.
  * Returned by {@code GET /demands/{id}} and {@code POST /demands}.
- * Maps all 37 fields from the {@code demands} table.
+ * Maps all 42 fields from the {@code demands} table.
  */
 @Data
 @Builder
@@ -37,6 +37,21 @@ public class DemandResponse {
 
     /** Required utilization percentage (0–100) for this demand's project/account. */
     private Integer reqUtilPerc;
+
+    /** The designated work mode for the demand (e.g., REMOTE, HYBRID, ONSITE). */
+    private String workMode;
+
+    /** Required years of professional experience. */
+    private Long experience;
+
+    /** The specific department requesting the demand. */
+    private String department;
+
+    /** Indicates whether a client interview is a mandatory step. */
+    private Boolean clientInterview;
+
+    /** The target date for the candidate to be officially onboarded. */
+    private LocalDate onboardingDate;
 
     // Headcount
     private Integer requiredCount;

@@ -207,6 +207,9 @@ public class DemandEventProducer {
                 .level(demand.getLevel() != null ? demand.getLevel().name() : null)
                 .skills(demand.getSkills())
                 .location(demand.getLocation())
+                .workMode(demand.getWorkMode() != null ? demand.getWorkMode().name() : null)
+                .experience(demand.getExperience())
+                .department(demand.getDepartment())
                 .build();
     }
 
