@@ -3,7 +3,29 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+      </profile>
       <profile name="Annotation profile for TalentGrid Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="demand-service" />
+        <module name="notification-client" />
+        <module name="application-service" />
+        <module name="talentgrid-notification-service" />
+        <module name="audit-client" />
+        <module name="talentgrid-shared" />
+        <module name="talentgrid-kafka" />
+        <module name="talentgrid-audit-service" />
+      </profile>
+      <profile name="Annotation profile for candidate-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -11,21 +33,24 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="candidate-service" />
-        <module name="demand-service" />
-        <module name="notification-client" />
-        <module name="application-service" />
-        <module name="offer-service" />
-        <module name="talentgrid-notification-service" />
-        <module name="audit-client" />
-        <module name="talentgrid-shared" />
-        <module name="interview-service" />
-        <module name="talentgrid-kafka" />
-        <module name="talentgrid-audit-service" />
       </profile>
-      <profile name="Maven default annotation processors profile" enabled="true">
+      <profile name="Annotation profile for interview-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="interview-service" />
+      </profile>
+      <profile name="Annotation profile for offer-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="offer-service" />
       </profile>
     </annotationProcessing>
   </component>

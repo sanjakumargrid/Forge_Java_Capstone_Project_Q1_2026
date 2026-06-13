@@ -1,6 +1,6 @@
 package com.talentgrid.audit.client;
 
-import com.talentgrid.audit.dto.AuditAction;
+import com.talentgrid.audit.constants.AuditConstants;
 import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.producer.KafkaProducerService;
@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -17,60 +16,47 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuditLogClient {
 
-  private static final String AUDIT_TOPIC = TalentGridTopics.SYSTEM_EVENTS;
+  private static final String AUDIT_TOPIC =
+          TalentGridTopics.SYSTEM_EVENTS;
 
   private final KafkaProducerService kafkaProducerService;
 
   public void logAction(
-          String entityType,
-          Long entityId,
-          AuditAction action,
-          Long actorId,
-          Map<String, Object> beforeState,
-          Map<String, Object> afterState,
-          String traceId,
-          String serviceName,
-          String endpoint,
-          String ipAddress,
-          String userAgent
+          AuditLogPayload payload
   ) {
 
-    AuditLogPayload payload = AuditLogPayload.builder()
-            .entityType(entityType)
-            .entityId(entityId)
-            .action(action)
-            .actorId(actorId)
-            .beforeState(beforeState)
-            .afterState(afterState)
-            .traceId(traceId)
-            .serviceName(serviceName)
-            .endpoint(endpoint)
-            .ipAddress(ipAddress)
-            .userAgent(userAgent)
-            .build();
+    String correlationId =
+            payload.getTraceId() != null
+                    ? payload.getTraceId()
+                    : UUID.randomUUID().toString();
 
     BaseEvent<AuditLogPayload> event =
             BaseEvent.<AuditLogPayload>builder()
-                    .eventType("AUDIT_LOG_ENTRY")
-                    .source(serviceName)
-                    .correlationId(
-                            traceId != null
-                                    ? traceId
-                                    : UUID.randomUUID().toString()
+                    .eventType(
+                            AuditConstants.AUDIT_EVENT_TYPE
                     )
-                    .payload(payload)
+                    .source(
+                            payload.getServiceName()
+                    )
+                    .correlationId(
+                            correlationId
+                    )
+                    .payload(
+                            payload
+                    )
                     .build();
 
     kafkaProducerService.sendEvent(
             AUDIT_TOPIC,
+            correlationId,
             event
     );
 
     log.info(
             "Audit event published | entityType={} | entityId={} | action={}",
-            entityType,
-            entityId,
-            action
+            payload.getEntityType(),
+            payload.getEntityId(),
+            payload.getAction()
     );
   }
 }

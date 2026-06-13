@@ -1,6 +1,6 @@
 package com.talentgrid.application.application.dto.candidate;
 
-import com.talentgrid.candidate.externalCandidate.enums.Social;
+import com.talentgrid.application.application.enums.Social;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

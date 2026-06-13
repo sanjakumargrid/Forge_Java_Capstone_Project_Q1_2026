@@ -16,33 +16,59 @@
     <name>TalentGrid Demand Service</name>
     <description>Demand lifecycle management service for TalentGrid</description>
     <packaging>jar</packaging>
+
+    <properties>
+        <start-class>com.talentgrid.demand.DemandServiceApplication</start-class>
+    </properties>
+
     <dependencies>
+        <!-- Spring Cloud OpenFeign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- Web layer -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- JPA / Hibernate -->
         <dependency>
-            <groupId>com.talentgrid</groupId>
-            <artifactId>notification-client</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Security (@PreAuthorize, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- TalentGrid Shared (BaseEvent, DTOs) -->
         <dependency>
             <groupId>com.talentgrid</groupId>
             <artifactId>talentgrid-shared</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- TalentGrid Kafka (KafkaProducerService, TalentGridTopics, auto-config) -->
         <dependency>
             <groupId>com.talentgrid</groupId>
             <artifactId>talentgrid-kafka</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
+        <!-- TalentGrid Audit Client (AuditLogClient, AuditLogPayload) -->
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>audit-client</artifactId>
+        </dependency>
+
+        <!-- TalentGrid Notification Client (NotificationEventPublisher) -->
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>notification-client</artifactId>
+        </dependency>
 
         <!-- Lombok -->
         <dependency>
@@ -70,11 +96,11 @@
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <!-- PostgreSQL JDBC Driver -->
         <dependency>
-            <groupId>com.talentgrid</groupId>
-            <artifactId>audit-client</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

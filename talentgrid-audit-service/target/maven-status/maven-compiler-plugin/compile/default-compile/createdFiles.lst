@@ -1,6 +1,0 @@
-com/talentgrid/auditservice/AuditServiceApplication.class
-com/talentgrid/auditservice/audit/AuditLogRepository.class
-com/talentgrid/auditservice/kafka/AuditLogConsumer.class
-com/talentgrid/auditservice/audit/AuditLogEntity.class
-com/talentgrid/auditservice/audit/AuditLogService.class
-com/talentgrid/auditservice/audit/AuditLogEntity$AuditLogEntityBuilder.class

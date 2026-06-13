@@ -1,4 +1,0 @@
-com/talentgrid/demand/DemandServiceApplication.class
-com/talentgrid/demand/controller/DemandController.class
-com/talentgrid/demand/kafka/DemandKafkaProducer.class
-com/talentgrid/demand/kafka/DemandEventTranslator.class

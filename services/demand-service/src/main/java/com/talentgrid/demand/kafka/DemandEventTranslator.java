@@ -28,9 +28,9 @@ import java.util.Map;
  * log a WARN, and skip — with no indication in DemandEventTranslator logs
  * that the field was missing at the source.</p>
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private final NotificationEventPublisher notificationEventPublisher;
@@ -121,7 +121,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 title,
                 message,
                 "demand-service",
-                demand.getDemandId(),
+                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
                 "DEMAND",
                 "NORMAL",
                 "demand-created",
@@ -159,7 +159,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 title,
                 message,
                 "demand-service",
-                demand.getDemandId(),
+                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
                 "DEMAND",
                 "HIGH",
                 "demand-approved",

@@ -16,14 +16,37 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
+    public void sendEvent(
+            String topic,
+            String key,
+            BaseEvent<?> event
+    ) {
 
-    public void sendEvent(String topic, String key, BaseEvent<?> event) {
         CompletableFuture<SendResult<String, Object>> future =
                 kafkaTemplate.send(topic, key, event);
-        future.whenComplete((result, ex) -> { /* existing logging */ });
-    }
 
-    public void sendEvent(String topic, BaseEvent<?> event) {
-        sendEvent(topic, event.getEventType(), event);  // keep existing signature working
+        future.whenComplete((result, ex) -> {
+
+            if (ex != null) {
+
+                log.error(
+                        "Failed to publish event | topic={} | key={} | eventType={}",
+                        topic,
+                        key,
+                        event.getEventType(),
+                        ex
+                );
+
+            } else {
+
+                log.info(
+                        "Event published successfully | topic={} | partition={} | offset={} | eventType={}",
+                        topic,
+                        result.getRecordMetadata().partition(),
+                        result.getRecordMetadata().offset(),
+                        event.getEventType()
+                );
+            }
+        });
     }
 }
