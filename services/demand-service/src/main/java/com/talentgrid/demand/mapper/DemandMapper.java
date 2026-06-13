@@ -47,6 +47,7 @@ public class DemandMapper {
         demand.setBusinessUnit(request.getBusinessUnit());
         demand.setSkills(request.getSkills());
         demand.setBudget(request.getBudget());
+        demand.setReqUtilPerc(request.getReqUtilPerc());
         demand.setRequiredCount(request.getRequiredCount());
         demand.setTargetDate(request.getTargetDate());
         demand.setPriority(request.getPriority());
@@ -80,6 +81,7 @@ public class DemandMapper {
         if (request.getBusinessUnit() != null) demand.setBusinessUnit(request.getBusinessUnit());
         if (request.getSkills() != null)       demand.setSkills(request.getSkills());
         if (request.getBudget() != null)       demand.setBudget(request.getBudget());
+        if (request.getReqUtilPerc() != null)  demand.setReqUtilPerc(request.getReqUtilPerc());
         if (request.getRequiredCount() != null) demand.setRequiredCount(request.getRequiredCount());
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
@@ -111,6 +113,7 @@ public class DemandMapper {
         response.setBusinessUnit(demand.getBusinessUnit());
         response.setSkills(demand.getSkills());
         response.setBudget(demand.getBudget());
+        response.setReqUtilPerc(demand.getReqUtilPerc());
         response.setRequiredCount(demand.getRequiredCount());
         response.setRecruitedCount(demand.getRecruitedCount());
         response.setInternalFilledCount(demand.getInternalFilledCount());

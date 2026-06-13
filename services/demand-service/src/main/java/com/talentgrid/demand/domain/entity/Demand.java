@@ -78,8 +78,21 @@ public class Demand {
     @Column(name = "skills", columnDefinition = "text[]", nullable = false)
     private List<String> skills;//
 
-    @Column(name = "budget", nullable = false, precision = 15, scale = 2)
-    private BigDecimal budget;//
+    @Column(name = "budget", precision = 15, scale = 2)
+    private BigDecimal budget;
+
+    /**
+     * Required utilization percentage for this demand (0–100).
+     *
+     * <p>Represents the share of working hours an employee is expected to dedicate
+     * to this demand's project/account. For example, a value of {@code 60} means
+     * the matched employee should allocate 60% of their capacity here, leaving the
+     * remaining 40% available for other engagements.
+     *
+     * <p>Stored as {@code req_util_perc} in the database.
+     */
+    @Column(name = "req_util_perc")
+    private Integer reqUtilPerc;//
 
     // ─── Headcount Tracking ─────────────────────────────────────────────────────
     @Column(name = "required_count", nullable = false)
@@ -293,13 +306,11 @@ public class Demand {
         this.skills = skills;
     }
 
-    public BigDecimal getBudget() {
-        return budget;
-    }
+    public BigDecimal getBudget() { return budget; }
+    public void setBudget(BigDecimal budget) { this.budget = budget; }
 
-    public void setBudget(BigDecimal budget) {
-        this.budget = budget;
-    }
+    public Integer getReqUtilPerc() { return reqUtilPerc; }
+    public void setReqUtilPerc(Integer reqUtilPerc) { this.reqUtilPerc = reqUtilPerc; }
 
     public Integer getRequiredCount() {
         return requiredCount;

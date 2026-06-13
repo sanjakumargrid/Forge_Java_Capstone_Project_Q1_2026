@@ -35,6 +35,9 @@ public class DemandResponse {
     private List<String> skills;
     private BigDecimal budget;
 
+    /** Required utilization percentage (0–100) for this demand's project/account. */
+    private Integer reqUtilPerc;
+
     // Headcount
     private Integer requiredCount;
     private Integer recruitedCount;

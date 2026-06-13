@@ -41,6 +41,9 @@ public class DemandRequest {
     private String businessUnit;
     private List<String> skills;
     private BigDecimal budget;
+
+    /** Required utilization percentage (0–100). See {@code Demand.reqUtilPerc} for semantics. */
+    private Integer reqUtilPerc;
     private Integer requiredCount;
     private LocalDate targetDate;
     private DemandPriority priority;
