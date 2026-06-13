@@ -13,6 +13,7 @@ import com.talentgrid.application.application.repository.ApplicationRepository;
 import com.talentgrid.application.client.CandidateClient;
 import com.talentgrid.application.client.DemandClient;
 import com.talentgrid.application.exception.BusinessException;
+import com.talentgrid.application.kafka.producer.ApplicationEventProducer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,15 +34,18 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final CandidateClient candidateClient;
     private final DemandClient demandClient;
+    private final ApplicationEventProducer applicationEventProducer;
 
     public ApplicationService(
             ApplicationRepository applicationRepository,
             CandidateClient candidateClient,
-            DemandClient demandClient
+            DemandClient demandClient,
+            ApplicationEventProducer applicationEventProducer
     ) {
         this.applicationRepository = applicationRepository;
         this.candidateClient = candidateClient;
         this.demandClient = demandClient;
+        this.applicationEventProducer = applicationEventProducer;
     }
 
     @Transactional
@@ -103,6 +107,8 @@ public class ApplicationService {
                 ApplicationMapper.dtoToApplicationEntity(applicationDto);
 
         Application saved = applicationRepository.save(application);
+
+        applicationEventProducer.publishApplied(saved);
 
         return ApplicationMapper.applicationEntityToDto(saved);
     }
@@ -180,6 +186,33 @@ public class ApplicationService {
         }
 
         Application updated = applicationRepository.save(application);
+
+        switch (targetStage) {
+
+            case SCREENING ->
+                    applicationEventProducer.publishScreening(updated);
+
+            case TECHNICAL ->
+                    applicationEventProducer.publishTechnical(updated);
+
+            case INTERVIEW ->
+                    applicationEventProducer.publishInterview(updated);
+
+            case FINAL_ROUND ->
+                    applicationEventProducer.publishFinalRound(updated);
+
+            case OFFERED ->
+                    applicationEventProducer.publishOffered(updated);
+
+            case HIRED ->
+                    applicationEventProducer.publishHired(updated);
+
+            case REJECTED ->
+                    applicationEventProducer.publishRejected(updated);
+
+            case APPLIED -> {
+            }
+        }
 
         return ApplicationMapper.applicationEntityToDto(updated);
     }

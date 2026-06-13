@@ -10,6 +10,7 @@ import com.talentgrid.candidate.externalCandidate.entity.ExternalCandidate;
 import com.talentgrid.candidate.externalCandidate.mapper.ExternalCandidateMapper;
 import com.talentgrid.candidate.externalCandidate.repository.ExternalCandidateRepository;
 import com.talentgrid.candidate.externalCandidate.utility.HashUtil;
+import com.talentgrid.candidate.kafka.producer.CandidateEventProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +27,18 @@ public class ExternalCandidateService {
 
     private final ApplicationClient applicationClient;
 
+    private final CandidateEventProducer candidateEventProducer;
+
     public ExternalCandidateService(
             ExternalCandidateRepository externalCandidateRepository,
             HashUtil hashUtil,
-            ApplicationClient applicationClient
+            ApplicationClient applicationClient,
+            CandidateEventProducer candidateEventProducer
     ) {
         this.externalCandidateRepository = externalCandidateRepository;
         this.hashUtil = hashUtil;
         this.applicationClient = applicationClient;
+        this.candidateEventProducer = candidateEventProducer;
     }
 
     @Transactional
@@ -81,6 +86,8 @@ public class ExternalCandidateService {
              * If application-service fails after this, @Transactional will rollback this save.
              */
             externalCandidateRepository.flush();
+
+            candidateEventProducer.publishCreated(candidate);
         }
 
         ApplicationRequestDto applicationRequest =
@@ -167,6 +174,8 @@ public class ExternalCandidateService {
         ExternalCandidate savedCandidate =
                 externalCandidateRepository.save(existingCandidate);
 
+        candidateEventProducer.publishUpdated(savedCandidate);
+
         return CandidateResponse.builder()
                 .status(HttpStatus.OK.value())
                 .message("Candidate updated successfully")
@@ -205,7 +214,12 @@ public class ExternalCandidateService {
         candidate.setIsDeleted(true);
         candidate.setDeletedAt(LocalDateTime.now());
 
-        externalCandidateRepository.save(candidate);
+        ExternalCandidate deletedCandidate =
+                externalCandidateRepository.save(candidate);
+
+        candidateEventProducer.publishDeleted(
+                deletedCandidate
+        );
     }
 
     private void validateAutomaticApplicationRequiredFields(
