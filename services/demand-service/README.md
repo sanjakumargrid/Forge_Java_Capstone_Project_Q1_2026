@@ -394,3 +394,62 @@ curl -i -X PATCH http://localhost:8081/api/demands/3/status -H "Content-Type: ap
 
 * **Expected Output:** `200 OK` status showing terminal state `"status":"CLOSED"`.
 * **📧 Verification:** Check your mailbox. You will receive a final **Demand Closed** data breakdown message summarizing headcount completion matrices!
+
+
+**Note:**
+```markdown
+## 🛰️ Consuming Demand Events
+
+Other microservices can subscribe to demand lifecycle updates by listening to the `demand-events` Kafka topic.
+
+### 1. Add Dependency
+Include the shared Kafka library module in your service's `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>com.talentgrid</groupId>
+    <artifactId>talentgrid-kafka</artifactId>
+    <version>${project.version}</version>
+</dependency>
+
+```
+
+### 2. Configure Properties
+
+Add these configuration settings to your `application.properties` file. Because `add.type.headers=false` is enforced across the platform, you must explicitly declare the target deserialization wrapper class type:
+
+```properties
+spring.kafka.consumer.group-id=your-service-group
+spring.json.value.default.type=com.talentgrid.kafka.events.BaseEvent
+
+```
+
+### 3. Implement Kafka Listener
+
+Create a listener component to extract and handle incoming payload event packets:
+
+```java
+package com.talentgrid.yourservice.kafka;
+
+import com.talentgrid.kafka.events.BaseEvent;
+import com.talentgrid.kafka.events.demand.DemandPayload;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Component;
+
+@Component
+public class DemandEventSubscriber {
+
+    @KafkaListener(topics = "demand-events", groupId = "your-service-group")
+    public void onEvent(BaseEvent<DemandPayload> event) {
+        String eventType = event.getEventType(); // Can be DEMAND_SUBMITTED, DEMAND_APPROVED, DEMAND_EXTERNAL_OPENED, DEMAND_CLOSED
+        DemandPayload payload = event.getPayload();
+        
+        System.out.printf("Processed lifecycle event [%s] for Demand ID: %d%n", eventType, payload.getDemandId());
+    }
+}
+
+```
+
+```
+
+```
