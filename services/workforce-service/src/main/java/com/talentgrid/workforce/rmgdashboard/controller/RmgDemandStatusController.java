@@ -28,27 +28,16 @@ public class RmgDemandStatusController {
 
     private final RmgService rmgService;
 
-    @GetMapping("/pending-demands")
-    @Operation(summary = "Get Demand as per the status ",
-            description = "getting all demand having status pending for the approval for the select demand for the nomination flow ")
-    public ResponseEntity<Page<DemandDto>> getPendingDemands(
+    @GetMapping("/demands")
+    @Operation(summary = "Get demands by status",
+            description = "Fetch demand records by status for RMG dashboard and nomination flow")
+    public ResponseEntity<Page<DemandDto>> getDemandsByStatus(
+            @RequestParam(name = "status") String status,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("Received request to fetch pending demands - page={}, size={}", page, size);
+        log.info("Received request to fetch demands by status={} - page={}, size={}", status, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<DemandDto> response = rmgService.getDemandsByStatus("PENDING_APPROVAL", pageable);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/approved-demands")
-    @Operation(summary = "Get approved demands",
-            description = "Get demand records having status APPROVED for RMG nomination flow")
-    public ResponseEntity<Page<DemandDto>> getApprovedDemands(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
-        log.info("Received request to fetch approved demands - page={}, size={}", page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        Page<DemandDto> response = rmgService.getDemandsByStatus("APPROVED", pageable);
+        Page<DemandDto> response = rmgService.getDemandsByStatus(status, pageable);
         return ResponseEntity.ok(response);
     }
 

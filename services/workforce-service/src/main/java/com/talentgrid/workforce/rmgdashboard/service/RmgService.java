@@ -1,18 +1,24 @@
 package com.talentgrid.workforce.rmgdashboard.service;
 
+import feign.FeignException;
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest;
-import com.talentgrid.workforce.rmgdashboard.dto.StatusUpdateRequest;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryDto;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryPageResponse;
+import com.talentgrid.workforce.rmgdashboard.enums.DemandClosureReason;
+import com.talentgrid.workforce.rmgdashboard.enums.DemandTransitionStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,31 +26,34 @@ import java.util.stream.Collectors;
 public class RmgService {
 
     private final DemandClient demandClient;
+    private static final EnumSet<DemandTransitionStatus> CLOSURE_REASON_REQUIRED_FOR = EnumSet.of(
+            DemandTransitionStatus.FILLED_INTERNAL,
+            DemandTransitionStatus.FILLED_EXTERNAL,
+            DemandTransitionStatus.CANCELLED,
+            DemandTransitionStatus.ON_HOLD,
+            DemandTransitionStatus.DUPLICATE
+    );
 
     public Page<DemandDto> getDemandsByStatus(String status, Pageable pageable) {
         log.info("Fetching demands from demand-service with status={}, page={}, size={}",
                 status, pageable.getPageNumber(), pageable.getPageSize());
 
-        // Fetch ALL demands (up to 500) from Demand Service matching the status
-        // We do client-side pagination because Feign returns a flat List.
-        // If demand volumes grow, consider paginating at the Feign client level.
-        List<DemandDto> allDemands = demandClient.getDemandsByStatus(status, 500).getContent();
-        if (allDemands == null) {
-            allDemands = List.of();
-        }
-        List<DemandDto> filteredDemands = allDemands.stream()
-                .filter(demand -> status.equalsIgnoreCase(demand.getStatus()))
-                .collect(Collectors.toList());
+        DemandSummaryPageResponse summaryPage = demandClient.getDemandsByStatus(
+                status,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), filteredDemands.size());
+        List<DemandSummaryDto> summaries = summaryPage != null && summaryPage.getContent() != null
+                ? summaryPage.getContent()
+                : List.of();
 
-        if (start >= filteredDemands.size()) {
-            return new PageImpl<>(List.of(), pageable, filteredDemands.size());
-        }
+        List<DemandDto> demandsByStatus = summaries.stream()
+                .map(this::toDemandDtoFromSummary)
+                .toList();
 
-        List<DemandDto> pageContent = filteredDemands.subList(start, end);
-        return new PageImpl<>(pageContent, pageable, filteredDemands.size());
+        long totalElements = summaryPage != null ? summaryPage.getTotalElements() : demandsByStatus.size();
+        return new PageImpl<>(demandsByStatus, pageable, totalElements);
     }
 
     public DemandDto updateDemandStatus(Long demandId, String status) {
@@ -55,12 +64,81 @@ public class RmgService {
         log.info("Updating demand {} status to {} (closureReason={}, comments={})",
                 demandId, status, closureReason, comments);
 
+        DemandTransitionStatus targetStatus = parseTargetStatus(status);
+        DemandClosureReason parsedClosureReason = parseClosureReason(closureReason);
+
+        if (CLOSURE_REASON_REQUIRED_FOR.contains(targetStatus) && parsedClosureReason == null) {
+            throw new IllegalArgumentException(
+                    "closureReason is required for target status " + targetStatus
+                            + ". Allowed closure reasons: " + String.join(", ", enumNames(DemandClosureReason.values()))
+            );
+        }
+
         DemandStatusTransitionRequest feignRequest = DemandStatusTransitionRequest.builder()
-                .targetStatus(status)
-                .closureReason(closureReason)
+                .targetStatus(targetStatus)
+                .closureReason(parsedClosureReason)
                 .comments(comments)
                 .build();
+        try {
+            return demandClient.updateDemandStatus(demandId, feignRequest);
+        } catch (FeignException ex) {
+            HttpStatus statusCode = HttpStatus.resolve(ex.status());
+            HttpStatus resolved = statusCode != null ? statusCode : HttpStatus.BAD_GATEWAY;
+            String message = ex.contentUTF8() != null && !ex.contentUTF8().isBlank()
+                    ? ex.contentUTF8()
+                    : ex.getMessage();
+            throw new ResponseStatusException(resolved, message, ex);
+        }
+    }
 
-        return demandClient.updateDemandStatus(demandId, feignRequest);
+    private DemandTransitionStatus parseTargetStatus(String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException(
+                    "status is required. Allowed values: " + String.join(", ", enumNames(DemandTransitionStatus.values()))
+            );
+        }
+        try {
+            return DemandTransitionStatus.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid status '" + value + "'. Allowed values: "
+                            + String.join(", ", enumNames(DemandTransitionStatus.values()))
+            );
+        }
+    }
+
+    private DemandClosureReason parseClosureReason(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return DemandClosureReason.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(
+                    "Invalid closureReason '" + value + "'. Allowed values: "
+                            + String.join(", ", enumNames(DemandClosureReason.values()))
+            );
+        }
+    }
+
+    private String[] enumNames(Enum<?>[] values) {
+        return java.util.Arrays.stream(values).map(Enum::name).toArray(String[]::new);
+    }
+
+    private DemandDto toDemandDtoFromSummary(DemandSummaryDto summary) {
+        if (summary == null) {
+            return null;
+        }
+        return DemandDto.builder()
+                .demandId(summary.getDemandId())
+                .title(summary.getTitle())
+                .status(summary.getStatus())
+                .priority(summary.getPriority())
+                .businessUnit(summary.getBusinessUnit())
+                .requiredCount(summary.getRequiredCount())
+                .internalFilledCount(summary.getInternalFilledCount())
+                .externalFilledCount(summary.getExternalFilledCount())
+                .createdAt(summary.getCreatedAt())
+                .build();
     }
 }

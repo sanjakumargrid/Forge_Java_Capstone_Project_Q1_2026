@@ -4,6 +4,7 @@ import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmploye
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryPageResponse;
 import com.talentgrid.workforce.rmgnomination.dto.NominationRequest;
 import com.talentgrid.workforce.rmgnomination.dto.NominationResponse;
 import com.talentgrid.workforce.rmgnomination.entity.EmployeeUtilisation;
@@ -44,11 +45,16 @@ public class NominationService {
         Long employeeId = employee.getId();
 
         // 2. Validate demand exists in APPROVED state
-        DemandDto approvedDemand = demandClient.getDemandsByStatus("APPROVED", 500).getContent().stream()
-                .filter(demand -> demand.getDemandId() != null && demand.getDemandId().equals(request.getDemandId()))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                        "Demand is not available for nomination in APPROVED state: " + request.getDemandId()));
+        DemandSummaryPageResponse approvedDemands = demandClient.getDemandsByStatus("APPROVED", 0, 500);
+        boolean approvedDemandExists = approvedDemands != null
+                && approvedDemands.getContent() != null
+                && approvedDemands.getContent().stream()
+                .anyMatch(demand -> demand.getDemandId() != null && demand.getDemandId().equals(request.getDemandId()));
+        if (!approvedDemandExists) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Demand is not available for nomination in APPROVED state: " + request.getDemandId());
+        }
+        DemandDto approvedDemand = demandClient.getDemandById(request.getDemandId());
 
         // 3. Check demand headcount fulfillment
         if (isDemandAlreadyFulfilledInternally(approvedDemand)) {
