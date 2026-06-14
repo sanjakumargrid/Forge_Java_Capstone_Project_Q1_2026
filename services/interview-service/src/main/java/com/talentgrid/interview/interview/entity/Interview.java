@@ -22,7 +22,7 @@ public class Interview {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "interview_id")
-    private Long id;
+    private Long interviewId;
 
     @NotNull(message = "Application id is required")
     @Column(name = "application_id", nullable = false)
