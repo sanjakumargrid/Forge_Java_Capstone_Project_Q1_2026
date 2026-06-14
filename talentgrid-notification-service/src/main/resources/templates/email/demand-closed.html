@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${title}">Demand Closed</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 32px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .header { background: #374151; padding: 24px 32px; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 20px; }
+    .header p { color: #d1d5db; margin: 4px 0 0; font-size: 13px; }
+    .body { padding: 32px; color: #374151; }
+    .body h2 { font-size: 18px; color: #111827; margin-top: 0; }
+    .closed-badge { background: #f3f4f6; color: #374151; border-radius: 4px; padding: 4px 12px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 16px; border: 1px solid #d1d5db; }
+    .detail-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .detail-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    .detail-table td:first-child { font-weight: bold; color: #6b7280; width: 40%; }
+    .summary-box { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 16px; margin: 16px 0; }
+    .summary-box h3 { margin: 0 0 12px; font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid #e5e7eb; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-label { color: #6b7280; }
+    .stat-value { font-weight: bold; color: #111827; }
+    .footer { background: #f9fafb; padding: 16px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>TalentGrid</h1>
+    <p>Workforce Intelligence Platform</p>
+  </div>
+  <div class="body">
+    <h2>🔒 Demand Closed</h2>
+    <span class="closed-badge">CLOSED</span>
+
+    <p>Hi <strong th:text="${raisedBy}">Team Member</strong>,</p>
+    <p>Your demand for <strong th:text="${demandTitle}">the role</strong> has been formally closed.</p>
+
+    <table class="detail-table">
+      <tr>
+        <td>Role</td>
+        <td><strong th:text="${demandTitle}">-</strong></td>
+      </tr>
+      <tr>
+        <td>Closure Reason</td>
+        <td th:text="${closureReason}">-</td>
+      </tr>
+    </table>
+
+    <div class="summary-box">
+      <h3>Final Headcount Summary</h3>
+      <div class="stat-row">
+        <span class="stat-label">Positions Required</span>
+        <span class="stat-value" th:text="${requiredCount}">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Filled Internally</span>
+        <span class="stat-value" th:text="${internalFilled}">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Filled Externally</span>
+        <span class="stat-value" th:text="${externalFilled}">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Total Filled</span>
+        <span class="stat-value" th:text="${totalFilled}">0</span>
+      </div>
+    </div>
+
+    <p th:text="${message}">The demand has been closed.</p>
+  </div>
+  <div class="footer">
+    <p>You received this notification because you are subscribed to demand updates.</p>
+    <p>© 2026 TalentGrid · <a href="#" style="color:#6b7280;">Unsubscribe</a></p>
+  </div>
+</div>
+</body>
+</html>

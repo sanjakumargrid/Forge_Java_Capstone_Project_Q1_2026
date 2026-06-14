@@ -174,3 +174,223 @@ The service acts as a producer, broadcasting real-time asynchronous events upon 
 | `DEMAND_CANCELLED` | Demand is transitioned to `CANCELLED`. |
 | `DEMAND_DUPLICATE` | Demand is transitioned to `DUPLICATE`. |
 | `DEMAND_CLOSED` | Terminal state reached (`CLOSED`). |
+
+
+# TalentGrid Demand & Notification Lifecycle Verification Guide
+
+---
+
+## 📌 Project Overview
+
+This platform orchestrates enterprise workforce hiring requests (**Demands**) across a decoupled microservices architecture. It utilizes **Apache Kafka** as an asynchronous event-driven backbone to safely broadcast state machine transitions between core services.
+
+```
+[Client / Curl] 
+       │
+       ▼
+[demand-service] ──(Kafka: demand-events Topic)──► [DemandEventTranslator]
+                                                          │
+                                                (Kafka: notification.send)
+                                                          │
+                                                          ▼
+[Real Inbox / Email] ◄────────────────────────── [notification-service]
+
+```
+
+When an event occurs (such as submitting or approving a demand), **`demand-service`** broadcasts an immutable lifecycle token over Kafka. An internal listener catches the message, processes business mapping rules, and commands the **`notification-service`** to dynamically render rich HTML email templates and route them to real inboxes.
+
+---
+
+## 🛠️ Prerequisites
+
+* **Java:** Version 21 or 25
+
+
+* **Local Database:** PostgreSQL initialized and running locally on port `5432`
+
+* **Kafka Broker:** Apache Kafka cluster running on port `9092`
+
+
+---
+
+## 🚀 Running the Applications
+
+### 1. Build the Project Ecosystem
+
+From the root project directory, compile and package all modules and shared libraries:
+
+```bash
+mvn clean install -DskipTests
+
+```
+
+### 2. Configure Mailroom Properties (Crucial for Real Email Delivery)
+
+Before launching the services, you must equip the notification daemon with mail server credentials. Open the properties file located at `talentgrid-notification-service/src/main/resources/application.properties` and add your account details:
+
+```properties
+spring.mail.username=your-gmail@gmail.com
+spring.mail.password=xxxx-xxxx-xxxx-xxxx   # Your 16-character Google App Password (NOT your login password)
+notification.email.from=your-gmail@gmail.com
+
+```
+
+> **💡 Generation Tip:** You can quickly generate a secure 16-character App Password by visiting your account security dashboard at [https://myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
+>
+>
+> If you ever need to temporarily mute email routing during offline runs, set `notification.email.enabled=false`.
+>
+>
+
+### 3. Start the Notification Service
+
+Navigate to the notification module directory and run it:
+
+```bash
+cd talentgrid-notification-service
+mvn spring-boot:run
+
+```
+
+> **Expected Status:** Confirm console outputs `Started NotificationServiceApplication on port 8085` and is listening to group `notification-service-group`.
+>
+>
+
+### 4. Start the Demand Service
+
+Open a fresh terminal window, navigate to the demand service module directory, and run it:
+
+```bash
+cd services/demand-service
+mvn spring-boot:run
+
+```
+
+> **Expected Status:** Confirm console outputs `Started DemandServiceApplication on port 8081` and logs `Subscribed to topic(s): demand-events`.
+>
+>
+
+---
+
+## 🧪 End-to-End Foolproof Verification Sequence
+
+These single-line terminal commands ensure your shell parses the JSON string seamlessly without whitespace or newline failures.
+
+### Step 1: Create a Fresh Draft Demand
+
+This maps strictly to your service's data contract constraints (`clientInterview`, `businessUnit`, `budget`, `targetDate`) and specific granular enterprise grade enum definitions (`T3_SENIOR`, `FULL_TIME`).
+
+```bash
+curl -X POST http://localhost:8081/api/demands -H "Content-Type: application/json" -d '{"title": "Senior Java Developer", "description": "Experienced Java/Spring Boot developer needed for TalentGrid platform", "level": "T3_SENIOR", "skills": ["Java", "Spring Boot", "Kafka", "PostgreSQL"], "location": "Chennai", "workMode": "HYBRID", "experience": 5, "department": "Engineering", "employmentType": "FULL_TIME", "requiredCount": 2, "priority": "HIGH", "accountId": 1, "projectId": 1, "businessUnit": "Enterprise Applications", "budget": 150000.00, "targetDate": "2026-08-31", "clientInterview": true}'
+
+```
+
+* **Expected Output:** Returns a `201 Created` payload with `"status":"DRAFT"`.
+
+
+* **Action Item:** Identify and look at the value assigned to **`"demandId"`** in the JSON output block (Assume it is **`3`** for the steps below).
+
+---
+
+### Step 2: Route local event alerts to your corporate email
+
+Because local test profiles secure authentication via a default mock session (`creator@griddynamics.com`), you must execute a brief database routing override so the Kafka workers find your actual mailbox.
+
+Log into your local PostgreSQL database client tool or native terminal container and run:
+
+```sql
+UPDATE demands SET creator_email = 'your-email@griddynamics.com' WHERE demand_id = 3;
+
+```
+
+*(Swap `your-email@griddynamics.com` with your actual corporate email address, and verify `demand_id` matches your step 1 response output.)*
+
+---
+
+### Step 3: Submit the Demand for Management Approval
+
+Transition the demand out of a draft status using a `PATCH` payload:
+
+```bash
+curl -i -X PATCH http://localhost:8081/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "PENDING_APPROVAL", "comments": "Submitting verification run"}'
+
+```
+
+* **Expected Output:** `200 OK`.
+
+
+* **📧 Verification:** Check your mailbox. You will receive an automated **Demand Submitted for Approval** layout.
+
+
+
+---
+
+### Step 4: Approve the Request
+
+Enforce managerial signature clearing to release the demand to sourcing teams via a `POST` mapping:
+
+```bash
+curl -i -X POST http://localhost:8081/api/demands/3/approve -H "Content-Type: application/json" -d '{"decision": "APPROVED", "comments": "Approved", "assignedRm": 101, "assignedRmName": "Rahul Mehta"}'
+
+```
+
+* **Expected Output:** `200 OK`. The status shifts securely to `"INTERNAL_SEARCH"`.
+* **📧 Verification:** Check your mailbox. You will receive a **Demand Approved** layout stating "Approved By: Admin User".
+
+
+
+---
+
+### Step 5: Fast-Forward the RMG Time Gate
+
+Your core state engine prevents exposing demands to outside staffing agencies (`OPEN_EXTERNAL`) unless the local internal workbench team has exhausted search efforts for 5 business days.
+
+To fast-forward this restriction for your testing, run this time-travel script in your PostgreSQL instance:
+
+```sql
+UPDATE demands SET search_start_at = NOW() - INTERVAL '6 days' WHERE demand_id = 3;
+
+```
+
+---
+
+### Step 6: Open the Demand to External Vendors
+
+With the 5-day security check cleared, release the specification externally using a `PATCH` payload:
+
+```bash
+curl -i -X PATCH http://localhost:8081/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "OPEN_EXTERNAL", "comments": "Opening up to external agencies"}'
+
+```
+
+* **Expected Output:** `200 OK`.
+* **📧 Verification:** Check your mailbox. You will receive an **External Hiring Opened** notification layout.
+
+
+
+---
+
+### Step 7: Log External Fulfillment Milestone
+
+The state machine strictly bars moving directly from searching to archiving without intermediate fulfillment logging. Transition to the completed milestone flag first:
+
+```bash
+curl -i -X PATCH http://localhost:8081/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "FILLED_EXTERNAL", "closureReason": "FILLED_EXTERNAL", "comments": "All positions filled successfully via external tracking."}'
+
+```
+
+* **Expected Output:** `200 OK`.
+
+---
+
+### Step 8: Terminal Lifecycle Closure
+
+Now that the positions have been marked as fulfilled, permanently lock and complete the lifecycle file record:
+
+```bash
+curl -i -X PATCH http://localhost:8081/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "CLOSED", "closureReason": "FILLED_EXTERNAL", "comments": "Closing out the demand record permanently."}'
+
+```
+
+* **Expected Output:** `200 OK` status showing terminal state `"status":"CLOSED"`.
+* **📧 Verification:** Check your mailbox. You will receive a final **Demand Closed** data breakdown message summarizing headcount completion matrices!

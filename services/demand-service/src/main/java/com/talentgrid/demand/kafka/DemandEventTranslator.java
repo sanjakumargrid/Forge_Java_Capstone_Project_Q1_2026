@@ -16,18 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Event translator: consumes DEMAND_CREATED / DEMAND_APPROVED events from
- * {@code demand-events} and publishes {@code NOTIFICATION_SEND} events to
- * {@code notification.send}.
- *
- * <p><strong>FIX:</strong> Changed initial receipt log from DEBUG to INFO and
- * added explicit recipientEmail-presence check at INFO level before calling
- * NotificationEventPublisher. Previously, a null recipientEmail would silently
- * pass through to NotificationEventPublisher, reach EmailNotificationChannel,
- * log a WARN, and skip — with no indication in DemandEventTranslator logs
- * that the field was missing at the source.</p>
- */
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -48,8 +37,6 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
             @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
             @Header(KafkaHeaders.OFFSET) long offset) {
 
-        // FIX: INFO level (was DEBUG) — confirms translator is actually receiving messages.
-        // Without this, a missing log here vs. a debug-suppressed log were indistinguishable.
         log.info("[DEMAND-TRANSLATOR] ▶ Message received | topic={} | partition={} | offset={}",
                 topic, partition, offset);
 
@@ -66,8 +53,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         } catch (Exception e) {
             log.error("[DEMAND-TRANSLATOR] ✗ Failed to process message at offset={} | error={}",
                     offset, e.getMessage(), e);
-            // Do not rethrow — prevents consumer from sticking on a poison-pill message.
-            // TODO: Route to DLT (Dead Letter Topic) when talentgrid-kafka DLT support is added.
+            // Do not rethrow — prevents consumer from getting stuck on a poison-pill message.
+            // TODO: Route to demand-events.dlq (Dead Letter Queue) when DLT support is added.
         }
     }
 
@@ -81,28 +68,22 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 eventType, demand.getDemandId(), demand.getRaisedBy());
 
         switch (eventType) {
-            case "DEMAND_CREATED" -> translateDemandCreated(demand, correlationId);
-            case "DEMAND_APPROVED" -> translateDemandApproved(demand, correlationId);
-            default -> log.debug("[DEMAND-TRANSLATOR] No notification mapping for eventType='{}' — skipping", eventType);
+            case "DEMAND_CREATED"         -> translateDemandCreated(demand, correlationId);
+            case "DEMAND_SUBMITTED"       -> translateDemandSubmitted(demand, correlationId);
+            case "DEMAND_APPROVED"        -> translateDemandApproved(demand, correlationId);
+            case "DEMAND_EXTERNAL_OPENED" -> translateDemandExternalOpened(demand, correlationId);
+            case "DEMAND_CLOSED"          -> translateDemandClosed(demand, correlationId);
+            default -> log.debug(
+                    "[DEMAND-TRANSLATOR] No notification mapping for eventType='{}' — skipping", eventType);
         }
     }
 
-    // ─────────────────────────────────────────────────────────
-    // Translation Methods — one per business event type
-    // ─────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Translation Methods — one per notifiable business event type
+    // ─────────────────────────────────────────────────────────────────────────────
 
     private void translateDemandCreated(DemandPayload demand, String correlationId) {
-
-        // FIX: Validate recipientEmail HERE and log clearly so the problem is caught
-        // at the source (DemandEventTranslator) rather than silently in EmailNotificationChannel.
-        if (demand.getRecipientEmail() == null || demand.getRecipientEmail().isBlank()) {
-            log.warn("[DEMAND-TRANSLATOR] ⚠ recipientEmail is null/blank for demandId={}. " +
-                    "Email notification will be skipped. Ensure the POST /api/demands request " +
-                    "body includes a non-empty 'recipientEmail' field.", demand.getDemandId());
-        } else {
-            log.info("[DEMAND-TRANSLATOR] ▶ recipientEmail is present for demandId={} — email will be sent",
-                    demand.getDemandId());
-        }
+        warnIfRecipientEmailMissing(demand, "DEMAND_CREATED");
 
         String title = "New Demand Created: " + demand.getTitle();
         String message = String.format(
@@ -110,12 +91,12 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 demand.getTitle(),
                 demand.getLevel() != null ? demand.getLevel() : "N/A",
                 demand.getLocation() != null ? demand.getLocation() : "Remote",
-                demand.getRaisedBy(),
+                demand.getRaisedBy() != null ? demand.getRaisedBy() : "Unknown",
                 demand.getSkills() != null ? String.join(", ", demand.getSkills()) : "Not specified"
         );
 
         notificationEventPublisher.sendInAppAndEmail(
-                demand.getRaisedBy(),
+                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
                 "DEMAND_CREATED",
                 title,
@@ -126,11 +107,12 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 "NORMAL",
                 "demand-created",
                 Map.of(
-                        "demandTitle",    demand.getTitle()    != null ? demand.getTitle()    : "",
-                        "demandLevel",    demand.getLevel()    != null ? demand.getLevel()    : "N/A",
-                        "demandLocation", demand.getLocation() != null ? demand.getLocation() : "Remote",
-                        "raisedBy",       demand.getRaisedBy() != null ? demand.getRaisedBy() : "Unknown",
-                        "skills",         demand.getSkills()   != null ? String.join(", ", demand.getSkills()) : "N/A"
+                        "demandTitle",    safe(demand.getTitle()),
+                        "demandLevel",    safe(demand.getLevel(), "N/A"),
+                        "demandLocation", safe(demand.getLocation(), "Remote"),
+                        "raisedBy",       safe(demand.getRaisedBy(), "Unknown"),
+                        "skills",         demand.getSkills() != null
+                                ? String.join(", ", demand.getSkills()) : "N/A"
                 ),
                 correlationId
         );
@@ -139,21 +121,57 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 demand.getDemandId());
     }
 
-    private void translateDemandApproved(DemandPayload demand, String correlationId) {
+    private void translateDemandSubmitted(DemandPayload demand, String correlationId) {
+        warnIfRecipientEmailMissing(demand, "DEMAND_SUBMITTED");
 
-        if (demand.getRecipientEmail() == null || demand.getRecipientEmail().isBlank()) {
-            log.warn("[DEMAND-TRANSLATOR] ⚠ recipientEmail is null/blank for DEMAND_APPROVED | demandId={}",
-                    demand.getDemandId());
-        }
-
-        String title = "Demand Approved: " + demand.getTitle();
+        String title = "Demand Submitted for Approval: " + demand.getTitle();
         String message = String.format(
-                "Your demand for '%s' has been approved. Talent acquisition team will begin sourcing candidates shortly.",
-                demand.getTitle()
+                "Your demand for '%s' (%s, %s) has been submitted for approval. Skills required: %s.",
+                demand.getTitle(),
+                demand.getLevel() != null ? demand.getLevel() : "N/A",
+                demand.getLocation() != null ? demand.getLocation() : "Remote",
+                demand.getSkills() != null ? String.join(", ", demand.getSkills()) : "Not specified"
         );
 
         notificationEventPublisher.sendInAppAndEmail(
-                demand.getRaisedBy(),
+                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
+                demand.getRecipientEmail(),
+                "DEMAND_SUBMITTED",
+                title,
+                message,
+                "demand-service",
+                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
+                "DEMAND",
+                "NORMAL",
+                "demand-created",   // reuses the same HTML template as DEMAND_CREATED
+                Map.of(
+                        "demandTitle",    safe(demand.getTitle()),
+                        "demandLevel",    safe(demand.getLevel(), "N/A"),
+                        "demandLocation", safe(demand.getLocation(), "Remote"),
+                        "raisedBy",       safe(demand.getRaisedBy(), "Unknown"),
+                        "skills",         demand.getSkills() != null
+                                ? String.join(", ", demand.getSkills()) : "N/A"
+                ),
+                correlationId
+        );
+
+        log.info("[DEMAND-TRANSLATOR] ✓ NOTIFICATION_SEND published | demandId={} | type=DEMAND_SUBMITTED",
+                demand.getDemandId());
+    }
+
+    private void translateDemandApproved(DemandPayload demand, String correlationId) {
+        warnIfRecipientEmailMissing(demand, "DEMAND_APPROVED");
+
+        String title = "Demand Approved: " + demand.getTitle();
+        String message = String.format(
+                "Your demand for '%s' has been approved by %s. " +
+                        "The talent acquisition team will begin sourcing candidates shortly.",
+                demand.getTitle(),
+                demand.getApproverName() != null ? demand.getApproverName() : "the approver"
+        );
+
+        notificationEventPublisher.sendInAppAndEmail(
+                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
                 "DEMAND_APPROVED",
                 title,
@@ -164,18 +182,145 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 "HIGH",
                 "demand-approved",
                 Map.of(
-                        "demandTitle", demand.getTitle()    != null ? demand.getTitle()    : "",
-                        "raisedBy",    demand.getRaisedBy() != null ? demand.getRaisedBy() : "Unknown"
+                        "demandTitle",   safe(demand.getTitle()),
+                        "raisedBy",      safe(demand.getRaisedBy(), "Unknown"),
+                        "approverName",  safe(demand.getApproverName(), "Your Manager")
                 ),
                 correlationId
         );
+
         log.info("[DEMAND-TRANSLATOR] ✓ NOTIFICATION_SEND published | demandId={} | type=DEMAND_APPROVED",
                 demand.getDemandId());
     }
 
-    // ─────────────────────────────────────────────────────────
+    private void translateDemandExternalOpened(DemandPayload demand, String correlationId) {
+        warnIfRecipientEmailMissing(demand, "DEMAND_EXTERNAL_OPENED");
+
+        String recruiterInfo = demand.getAssignedRecruiterName() != null
+                ? demand.getAssignedRecruiterName()
+                : "an external recruiter";
+
+        String title = "External Hiring Opened: " + demand.getTitle();
+        String message = String.format(
+                "Your demand for '%s' has been opened for external hiring. " +
+                        "%s has been assigned to source candidates externally. " +
+                        "Positions open: %d (internal filled: %d).",
+                demand.getTitle(),
+                recruiterInfo,
+                demand.getRequiredCount() != null ? demand.getRequiredCount() : 0,
+                demand.getInternalFilledCount() != null ? demand.getInternalFilledCount() : 0
+        );
+
+        notificationEventPublisher.sendInAppAndEmail(
+                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
+                demand.getRecipientEmail(),
+                "DEMAND_EXTERNAL_OPENED",
+                title,
+                message,
+                "demand-service",
+                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
+                "DEMAND",
+                "NORMAL",
+                "demand-external-opened",
+                Map.of(
+                        "demandTitle",          safe(demand.getTitle()),
+                        "raisedBy",             safe(demand.getRaisedBy(), "Unknown"),
+                        "recruiterName",         safe(demand.getAssignedRecruiterName(), "External Recruiter"),
+                        "requiredCount",         demand.getRequiredCount() != null
+                                ? demand.getRequiredCount().toString() : "0",
+                        "internalFilledCount",   demand.getInternalFilledCount() != null
+                                ? demand.getInternalFilledCount().toString() : "0",
+                        "location",              safe(demand.getLocation(), "Remote"),
+                        "skills",                demand.getSkills() != null
+                                ? String.join(", ", demand.getSkills()) : "N/A"
+                ),
+                correlationId
+        );
+
+        log.info("[DEMAND-TRANSLATOR] ✓ NOTIFICATION_SEND published | demandId={} | type=DEMAND_EXTERNAL_OPENED",
+                demand.getDemandId());
+    }
+
+    private void translateDemandClosed(DemandPayload demand, String correlationId) {
+        warnIfRecipientEmailMissing(demand, "DEMAND_CLOSED");
+
+        int required  = demand.getRequiredCount()        != null ? demand.getRequiredCount()        : 0;
+        int internal  = demand.getInternalFilledCount()  != null ? demand.getInternalFilledCount()  : 0;
+        int external  = demand.getExternalFilledCount()  != null ? demand.getExternalFilledCount()  : 0;
+        int total     = demand.getRecruitedCount()       != null ? demand.getRecruitedCount()       : (internal + external);
+
+        String closureReason = demand.getClosureReason() != null
+                ? demand.getClosureReason().replace("_", " ")
+                : "Not specified";
+
+        String title = "Demand Closed: " + demand.getTitle();
+        String message = String.format(
+                "Your demand for '%s' has been closed. Reason: %s. " +
+                        "Total filled: %d of %d (Internal: %d, External: %d).",
+                demand.getTitle(),
+                closureReason,
+                total,
+                required,
+                internal,
+                external
+        );
+
+        notificationEventPublisher.sendInAppAndEmail(
+                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
+                demand.getRecipientEmail(),
+                "DEMAND_CLOSED",
+                title,
+                message,
+                "demand-service",
+                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
+                "DEMAND",
+                "NORMAL",
+                "demand-closed",
+                Map.of(
+                        "demandTitle",    safe(demand.getTitle()),
+                        "raisedBy",       safe(demand.getRaisedBy(), "Unknown"),
+                        "closureReason",  closureReason,
+                        "requiredCount",  String.valueOf(required),
+                        "internalFilled", String.valueOf(internal),
+                        "externalFilled", String.valueOf(external),
+                        "totalFilled",    String.valueOf(total)
+                ),
+                correlationId
+        );
+
+        log.info("[DEMAND-TRANSLATOR] ✓ NOTIFICATION_SEND published | demandId={} | type=DEMAND_CLOSED",
+                demand.getDemandId());
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Utilities
+    // ─────────────────────────────────────────────────────────────────────────────
+
+    /** Logs a WARNING if recipientEmail is missing — identifies the bug at the source. */
+    private void warnIfRecipientEmailMissing(DemandPayload demand, String eventType) {
+        if (demand.getRecipientEmail() == null || demand.getRecipientEmail().isBlank()) {
+            log.warn("[DEMAND-TRANSLATOR] ⚠ recipientEmail is null/blank for {} | demandId={}. " +
+                            "Email notification will be skipped by EmailNotificationChannel.",
+                    eventType, demand.getDemandId());
+        } else {
+            log.info("[DEMAND-TRANSLATOR] ▶ recipientEmail present for {} | demandId={} — email will be sent",
+                    eventType, demand.getDemandId());
+        }
+    }
+
+    /** Returns the value or empty string if null. */
+    private String safe(String value) {
+        return value != null ? value : "";
+    }
+
+    /** Returns the value or the fallback if null/blank. */
+    private String safe(String value, String fallback) {
+        return (value != null && !value.isBlank()) ? value : fallback;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────────
     // Deserialization Utility
-    // ─────────────────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────────
 
     @SuppressWarnings("unchecked")
     private BaseEvent<DemandPayload> extractPayload(Object rawEvent) throws Exception {
