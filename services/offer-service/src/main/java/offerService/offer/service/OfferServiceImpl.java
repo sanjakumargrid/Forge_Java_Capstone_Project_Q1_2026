@@ -5,14 +5,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import offerService.kafka.producer.OfferEventProducer;
 import offerService.offer.client.ApplicationClient;
-import offerService.offer.dto.ApplicationDto;
-import offerService.offer.dto.ApprovalChainRequestDto;
-import offerService.offer.dto.ApprovalStep;
-import offerService.offer.dto.ApprovalStepDto;
-import offerService.offer.dto.DocuSignWebhookDto;
+import offerService.offer.client.CandidateClient;
+import offerService.offer.dto.*;
 import offerService.offer.entity.Offer;
 import offerService.offer.enums.Status;
 import offerService.offer.integration.DocuSignClient;
+import offerService.offer.integration.OfferDocumentService;
 import offerService.offer.repository.OfferRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +39,13 @@ public class OfferServiceImpl implements OfferService {
     private final ApplicationClient applicationClient;
 
 
+    private final CandidateClient candidateClient;
+
+
     private final DocuSignClient docuSignClient;
+
+
+    private final OfferDocumentService offerDocumentService;
 
 
     private final AuditLogClient auditLogClient;
@@ -248,7 +252,27 @@ public class OfferServiceImpl implements OfferService {
         }
 
 
-        String envelopeId = docuSignClient.createEnvelope(offer);
+        ApplicationDto application =
+                applicationClient.getApplication(
+                        offer.getApplicationId()
+                );
+
+        CandidateDto candidate =
+                candidateClient.getCandidate(
+                        application.getCandidateId()
+                );
+
+        byte[] pdf =
+                offerDocumentService.generateOfferPdf(
+                        offer
+                );
+
+        String envelopeId =
+                docuSignClient.createEnvelope(
+                        offer,
+                        candidate,
+                        pdf
+                );
 
 
         offer.setDocuSignId(envelopeId);

@@ -16,4 +16,15 @@ public class WebClientConfig {
                 .baseUrl(applicationServiceUrl)
                 .build();
     }
+
+
+    @Bean
+    public WebClient candidateWebClient(
+            @Value("${candidate.service.url}") String candidateServiceUrl
+    ) {
+        return WebClient.builder()
+                .baseUrl(candidateServiceUrl)
+                .build();
+    }
+
 }
