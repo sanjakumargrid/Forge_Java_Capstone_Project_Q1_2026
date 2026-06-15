@@ -1,4 +1,4 @@
-package com.talentgrid.workforce.commonconfig;
+package com.talentgrid.workforce.common.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
