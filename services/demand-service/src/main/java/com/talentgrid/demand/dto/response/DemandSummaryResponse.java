@@ -22,7 +22,6 @@ public class DemandSummaryResponse {
 
     private Long demandId;
     private String title;
-    private String accountName;
     private String level;
     private String employmentType;
     private String location;
