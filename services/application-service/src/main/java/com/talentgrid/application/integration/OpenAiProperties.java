@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "openai")
 public class OpenAiProperties {
 
-    private String apiKey;
-    private String model = "gpt-4o-mini";
-    private String baseUrl = "https://api.openai.com/v1";
+//    private String apiKey;
+//    private String model = "gpt-4o-mini";
+//    private String baseUrl = "https://api.openai.com/v1";
 }
