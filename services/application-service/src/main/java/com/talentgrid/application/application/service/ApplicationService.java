@@ -229,11 +229,10 @@ public class ApplicationService {
         );
 
 
-        application.setCurrentStage(targetStage);
-
-
         Stage previousStage =
                 application.getCurrentStage();
+
+        application.setCurrentStage(targetStage);
 
 
         application.setStageMoveReason(reason);
