@@ -39,7 +39,9 @@ public class OfferDocumentService {
     private String buildOfferHtml(Offer offer) {
 
         String candidateName =
-                "Candidate for application " + offer.getApplicationId();
+                (offer.getCandidateName() != null && !offer.getCandidateName().isBlank())
+                        ? offer.getCandidateName()
+                        : "Candidate (Application #" + offer.getApplicationId() + ")";
 
         String templateContent =
                 offerTemplateRepository.findByActiveTrue()

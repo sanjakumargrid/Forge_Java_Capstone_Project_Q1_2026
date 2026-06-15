@@ -234,6 +234,10 @@ public class InterviewServiceImpl implements InterviewService {
             );
         }
 
+        if (interview.getCalendarEventId() != null) {
+            googleCalendarClient.deleteEvent(interview.getCalendarEventId());
+        }
+
         interview.setStatus(Status.CANCELLED);
 
         Interview savedInterview =
