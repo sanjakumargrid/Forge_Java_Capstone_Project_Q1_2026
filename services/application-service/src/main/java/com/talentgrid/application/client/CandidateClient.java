@@ -1,50 +1,41 @@
 package com.talentgrid.application.client;
 
 import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
-import com.talentgrid.application.exception.BusinessException;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
-@Service
+@Component
+@RequiredArgsConstructor
 public class CandidateClient {
 
-    private final WebClient webClient;
+    private final RestClient.Builder restClientBuilder;
 
-    public CandidateClient(
-            @Qualifier("candidateWebClient")
-            WebClient webClient
-    ) {
-        this.webClient = webClient;
-    }
+    @Value("${candidate.service.url}")
+    private String candidateServiceUrl;
 
-    public ExternalCandidateDto getCandidate(Long candidateId) {
+    public ExternalCandidateDto getCandidateById(Long candidateId) {
 
         try {
-            return webClient.get()
-                    .uri("/api/v1/external-candidates/{id}", candidateId)
+            return restClientBuilder
+                    .baseUrl(candidateServiceUrl)
+                    .build()
+                    .get()
+                    .uri("/api/v1/external-candidates/{candidateId}", candidateId)
                     .retrieve()
-                    .bodyToMono(ExternalCandidateDto.class)
-                    .block();
+                    .body(ExternalCandidateDto.class);
 
-        } catch (WebClientResponseException.NotFound ex) {
-            throw new BusinessException(
-                    HttpStatus.NOT_FOUND,
-                    "Candidate not found with id: " + candidateId
-            );
-
-        } catch (WebClientResponseException ex) {
-            throw new BusinessException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Candidate-service error: " + ex.getResponseBodyAsString()
-            );
-
-        } catch (Exception ex) {
-            throw new BusinessException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Unable to connect candidate-service"
+        } catch (RestClientResponseException e) {
+            throw new IllegalStateException(
+                    "Failed to fetch candidate from candidate-service. Candidate id: "
+                            + candidateId
+                            + ", status: "
+                            + e.getStatusCode()
+                            + ", response: "
+                            + e.getResponseBodyAsString(),
+                    e
             );
         }
     }
