@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -24,6 +25,9 @@ public class GoogleCalendarClient {
 
     private final Calendar googleCalendarService;
 
+    @Value("${google.calendar.enabled:false}")
+    private boolean googleCalendarEnabled;
+
     /**
      * REQ-ER-07: Checks if any interviewer has a conflicting calendar event at the
      * scheduled interview time, then creates a Google Calendar event with an
@@ -33,7 +37,21 @@ public class GoogleCalendarClient {
      * @return GoogleCalendarResponse containing the real eventId and Google Meet link
      */
     public GoogleCalendarResponse createEvent(Interview interview) {
+
+        if (!googleCalendarEnabled) {
+            String eventId = "mock-calendar-event-" + UUID.randomUUID();
+            String meetLink = "https://meet.google.com/mock-local";
+
+            log.info("[GoogleCalendarClient] Google Calendar disabled. Returning mock eventId={} meetLink={}",
+                    eventId,
+                    meetLink
+            );
+
+            return new GoogleCalendarResponse(eventId, meetLink);
+        }
+
         try {
+            // existing real Google Calendar code
             ZoneId zone = ZoneId.of(interview.getTimeZone());
 
             ZonedDateTime startZdt = interview.getScheduledAt().atZone(zone);
@@ -106,6 +124,12 @@ public class GoogleCalendarClient {
      * @param interview the interview entity with the updated details
      */
     public void updateEvent(String eventId, Interview interview) {
+
+        if (!googleCalendarEnabled || eventId == null || eventId.startsWith("mock-calendar-event-")) {
+            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock update for eventId={}", eventId);
+            return;
+        }
+
         try {
             ZoneId zone = ZoneId.of(interview.getTimeZone());
             ZonedDateTime startZdt = interview.getScheduledAt().atZone(zone);
@@ -154,6 +178,12 @@ public class GoogleCalendarClient {
      * @param eventId the calendar event ID to delete
      */
     public void deleteEvent(String eventId) {
+
+        if (!googleCalendarEnabled || eventId == null || eventId.startsWith("mock-calendar-event-")) {
+            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock delete for eventId={}", eventId);
+            return;
+        }
+
         try {
             googleCalendarService.events()
                     .delete("primary", eventId)

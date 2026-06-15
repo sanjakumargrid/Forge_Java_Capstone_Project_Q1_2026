@@ -1,5 +1,8 @@
 package com.talentgrid.candidate.externalCandidate.service;
 
+import com.talentgrid.audit.client.AuditLogClient;
+import com.talentgrid.audit.dto.AuditAction;
+import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.externalCandidate.client.ApplicationClient;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationRequestDto;
@@ -14,9 +17,6 @@ import com.talentgrid.candidate.kafka.producer.CandidateEventProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.talentgrid.audit.client.AuditLogClient;
-import com.talentgrid.audit.dto.AuditAction;
-import com.talentgrid.audit.dto.AuditLogPayload;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -35,21 +35,24 @@ public class ExternalCandidateService {
 
     private final CandidateEventProducer candidateEventProducer;
 
+    private final ExternalCandidatePersistenceService candidatePersistenceService;
+
     public ExternalCandidateService(
             ExternalCandidateRepository externalCandidateRepository,
             HashUtil hashUtil,
             ApplicationClient applicationClient,
             AuditLogClient auditLogClient,
-            CandidateEventProducer candidateEventProducer
+            CandidateEventProducer candidateEventProducer,
+            ExternalCandidatePersistenceService candidatePersistenceService
     ) {
         this.externalCandidateRepository = externalCandidateRepository;
         this.hashUtil = hashUtil;
         this.applicationClient = applicationClient;
         this.auditLogClient = auditLogClient;
         this.candidateEventProducer = candidateEventProducer;
+        this.candidatePersistenceService = candidatePersistenceService;
     }
 
-    @Transactional
     public CandidateResponse createCandidate(ExternalCandidateDto dto) {
 
         validateAutomaticApplicationRequiredFields(dto);
@@ -86,14 +89,13 @@ public class ExternalCandidateService {
             candidate.setDeletedBy(null);
             candidate.setDeleteReason(null);
 
-            candidate = externalCandidateRepository.save(candidate);
-
             /*
              * Important:
-             * flush makes sure candidateId is generated before calling application-service.
-             * If application-service fails after this, @Transactional will rollback this save.
+             * saveCandidate() is in a separate service with @Transactional.
+             * So the candidate save commits before calling application-service.
+             * This prevents application-service from getting "Candidate not found".
              */
-            externalCandidateRepository.flush();
+            candidate = candidatePersistenceService.saveCandidate(candidate);
 
             auditLogClient.logAction(
                     AuditLogPayload.builder()
