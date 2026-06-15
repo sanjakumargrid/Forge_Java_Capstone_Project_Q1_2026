@@ -30,6 +30,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "location", length = 150)
+    private String location;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;

@@ -207,6 +207,9 @@ public class Demand {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;//
 
+    @Column(name = "approval_reminder_sent")
+    private Boolean approvalReminderSent;
+
     // ─── Relationships ───────────────────────────────────────────────────────────
 
     @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -229,6 +232,9 @@ public class Demand {
         }
         if (this.recruitedCount == null) {
             this.recruitedCount = 0;
+        }
+        if (this.approvalReminderSent == null) {
+            this.approvalReminderSent = false;
         }
     }
 
@@ -561,5 +567,13 @@ public class Demand {
 
     public String getCreatorSlackId() {
         return creatorSlackId;
+    }
+
+    public Boolean getApprovalReminderSent() {
+        return approvalReminderSent;
+    }
+
+    public void setApprovalReminderSent(Boolean approvalReminderSent) {
+        this.approvalReminderSent = approvalReminderSent;
     }
 }

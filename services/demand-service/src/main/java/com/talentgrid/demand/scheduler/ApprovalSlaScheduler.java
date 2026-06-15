@@ -30,8 +30,9 @@ public class ApprovalSlaScheduler {
   /**
    * Runs every hour.
    *
-   * Checks all demands currently in PENDING_APPROVAL and
-   * triggers reminder notifications if approval SLA exceeds 72 hours.
+   * Finds demands currently in PENDING_APPROVAL and
+   * sends SLA reminder notifications if they have
+   * remained there longer than 72 hours.
    */
   @Scheduled(cron = "0 0 * * * *")
   public void checkApprovalSla() {
@@ -79,14 +80,38 @@ public class ApprovalSlaScheduler {
           continue;
         }
 
-        log.info(
+        /*
+         * Skip if an SLA reminder has already
+         * been sent for this demand.
+         */
+        if (Boolean.TRUE.equals(demand.getApprovalReminderSent())) {
+
+          log.debug(
+                  "Skipping reminder for demandId={} because SLA reminder was already sent",
+                  demand.getDemandId());
+
+          continue;
+        }
+
+        log.warn(
                 "Approval SLA breached for demandId={} ({} hours pending)",
                 demand.getDemandId(),
                 elapsedHours);
 
-        approvalReminderService.sendApprovalReminder(
-                demand,
-                elapsedHours);
+        boolean reminderSent =
+                approvalReminderService.sendApprovalReminder(
+                        demand,
+                        elapsedHours);
+
+        if (reminderSent) {
+          demand.setApprovalReminderSent(true);
+          demandRepository.save(demand);
+
+          log.info(
+                  "Marked approval reminder as sent for demandId={}",
+                  demand.getDemandId());
+        }
+
 
       } catch (Exception ex) {
 

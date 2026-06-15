@@ -125,6 +125,14 @@ stateDiagram-v2
    The entity carefully tracks `requiredCount`, `internalFilledCount`, and `externalFilledCount`. 
    `recruitedCount` is computed automatically.
 
+5. **Approval SLA Reminder**:
+Demands remaining in `PENDING_APPROVAL` for more than 72 hours trigger an automated SLA reminder workflow.
+
+- The reminder is sent to:
+   - The RMG responsible for the demand location
+   - The Hiring Manager who created the demand
+- Notifications are delivered through the Notification Service.
+- Only one reminder is sent per demand using the `approval_reminder_sent` flag.
 ---
 
 ## 🌐 REST API Endpoints

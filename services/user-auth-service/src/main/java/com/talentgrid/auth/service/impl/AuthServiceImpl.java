@@ -62,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
+                .location(request.getLocation())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .enabled(true)
                 .slackId(request.getSlackId())
