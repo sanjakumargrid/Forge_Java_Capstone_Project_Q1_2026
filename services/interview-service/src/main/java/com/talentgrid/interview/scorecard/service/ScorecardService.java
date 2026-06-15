@@ -231,7 +231,7 @@ public class ScorecardService {
 
         return ScorecardResponseDto.builder()
                 .scorecardId(scorecard.getId())
-                .interviewId(scorecard.getInterview().getId())
+                .interviewId(scorecard.getInterview().getInterviewId())
                 .applicationId(scorecard.getApplicationId())
                 .interviewerId(scorecard.getInterviewerId())
                 .technicalScore(scorecard.getTechnicalScore())
@@ -249,7 +249,7 @@ public class ScorecardService {
 
         return ScorecardSummaryDto.builder()
                 .scorecardId(scorecard.getId())
-                .interviewId(scorecard.getInterview().getId())
+                .interviewId(scorecard.getInterview().getInterviewId())
                 .applicationId(scorecard.getApplicationId())
                 .interviewerId(scorecard.getInterviewerId())
                 .averageScore(scorecard.getAverageScore())
