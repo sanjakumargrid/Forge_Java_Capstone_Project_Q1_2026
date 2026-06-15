@@ -69,7 +69,7 @@ public class ApplicationService {
 
 
         ExternalCandidateDto candidateDto =
-                candidateClient.getCandidate(request.getCandidateId());
+                candidateClient.getCandidateById(request.getCandidateId());
 
 
         if (candidateDto == null) {

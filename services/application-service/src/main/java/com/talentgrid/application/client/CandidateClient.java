@@ -23,7 +23,7 @@ public class CandidateClient {
                     .baseUrl(candidateServiceUrl)
                     .build()
                     .get()
-                    .uri("/candidates/{candidateId}", candidateId)
+                    .uri("/api/v1/external-candidates/{candidateId}", candidateId)
                     .retrieve()
                     .body(ExternalCandidateDto.class);
 
