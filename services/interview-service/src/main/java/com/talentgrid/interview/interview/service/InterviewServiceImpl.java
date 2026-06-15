@@ -1,5 +1,8 @@
 package com.talentgrid.interview.interview.service;
 
+import com.talentgrid.audit.client.AuditLogClient;
+import com.talentgrid.audit.dto.AuditAction;
+import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.interview.client.ApplicationClient;
 import com.talentgrid.interview.exception.BusinessException;
 import com.talentgrid.interview.interview.dto.ApplicationDto;
@@ -11,12 +14,15 @@ import com.talentgrid.interview.interview.integration.GoogleCalendarClient;
 import com.talentgrid.interview.interview.integration.GoogleCalendarResponse;
 import com.talentgrid.interview.interview.mapper.InterviewMapper;
 import com.talentgrid.interview.interview.repository.InterviewRepository;
+import com.talentgrid.interview.kafka.producer.InterviewEventProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,10 @@ public class InterviewServiceImpl implements InterviewService {
     private final ApplicationClient applicationClient;
 
     private final GoogleCalendarClient googleCalendarClient;
+
+    private final InterviewEventProducer interviewEventProducer;
+
+    private final AuditLogClient auditLogClient;
 
     @Override
     @Transactional
@@ -73,6 +83,22 @@ public class InterviewServiceImpl implements InterviewService {
 
         Interview savedInterview =
                 interviewRepository.save(interview);
+
+        interviewEventProducer.publishScheduled(savedInterview);
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("INTERVIEW")
+                        .entityId(savedInterview.getInterviewId())
+                        .action(AuditAction.CREATE)
+                        .afterState(Map.of(
+                                "applicationId", savedInterview.getApplicationId(),
+                                "status", savedInterview.getStatus().name()
+                        ))
+                        .serviceName("interview-service")
+                        .endpoint("/api/interviews")
+                        .build()
+        );
 
         return InterviewMapper.entityToDto(savedInterview);
     }
@@ -211,6 +237,21 @@ public class InterviewServiceImpl implements InterviewService {
         Interview savedInterview =
                 interviewRepository.save(existingInterview);
 
+        interviewEventProducer.publishUpdated(savedInterview);
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("INTERVIEW")
+                        .entityId(savedInterview.getInterviewId())
+                        .action(AuditAction.UPDATE)
+                        .afterState(Map.of(
+                                "status", savedInterview.getStatus().name()
+                        ))
+                        .serviceName("interview-service")
+                        .endpoint("/api/interviews/" + id)
+                        .build()
+        );
+
         return InterviewMapper.entityToDto(savedInterview);
     }
 
@@ -243,6 +284,24 @@ public class InterviewServiceImpl implements InterviewService {
         Interview savedInterview =
                 interviewRepository.save(interview);
 
+        interviewEventProducer.publishCancelled(
+                savedInterview,
+                "Interview cancelled"
+        );
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("INTERVIEW")
+                        .entityId(savedInterview.getInterviewId())
+                        .action(AuditAction.UPDATE)
+                        .afterState(Map.of(
+                                "status", "CANCELLED"
+                        ))
+                        .serviceName("interview-service")
+                        .endpoint("/api/interviews/" + id + "/cancel")
+                        .build()
+        );
+
         return InterviewMapper.entityToDto(savedInterview);
     }
 
@@ -271,6 +330,21 @@ public class InterviewServiceImpl implements InterviewService {
         Interview savedInterview =
                 interviewRepository.save(interview);
 
+        interviewEventProducer.publishCompleted(savedInterview);
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("INTERVIEW")
+                        .entityId(savedInterview.getInterviewId())
+                        .action(AuditAction.UPDATE)
+                        .afterState(Map.of(
+                                "status", "COMPLETED"
+                        ))
+                        .serviceName("interview-service")
+                        .endpoint("/api/interviews/" + id + "/complete")
+                        .build()
+        );
+
         return InterviewMapper.entityToDto(savedInterview);
     }
 
@@ -288,5 +362,15 @@ public class InterviewServiceImpl implements InterviewService {
                         );
 
         interviewRepository.delete(interview);
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("INTERVIEW")
+                        .entityId(interview.getInterviewId())
+                        .action(AuditAction.DELETE)
+                        .serviceName("interview-service")
+                        .endpoint("/api/interviews/" + id)
+                        .build()
+        );
     }
 }
