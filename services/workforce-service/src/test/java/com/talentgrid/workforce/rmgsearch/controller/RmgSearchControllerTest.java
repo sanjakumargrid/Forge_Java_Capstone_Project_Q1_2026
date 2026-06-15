@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import com.talentgrid.shared.auth.security.JwtAuthenticationProvider;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(RmgSearchController.class)
 @DisplayName("RmgSearchController")
+@WithMockUser(authorities = "WORKFORCE_BENCH_SEARCH")
 class RmgSearchControllerTest {
 
     private static final String SEARCH_URL = "/api/v1/rmg-search/search";
@@ -38,6 +41,9 @@ class RmgSearchControllerTest {
 
     @MockitoBean
     private RmgSearchService rmgSearchService;
+
+    @MockitoBean
+    private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     // -------------------------------------------------------------------------
     // HTTP contract

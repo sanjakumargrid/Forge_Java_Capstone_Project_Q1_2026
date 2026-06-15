@@ -3,7 +3,7 @@ package com.talentgrid.workforce.rmganalyticsdashboard.service;
 import com.talentgrid.workforce.benchreport.dto.BenchReportResponse;
 import com.talentgrid.workforce.benchreport.service.BenchReportService;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
-import com.talentgrid.workforce.rmganalyticsdashboard.client.RmgAnalyticsDemandServiceClient;
+import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmganalyticsdashboard.dto.*;
 import com.talentgrid.workforce.rmganalyticsdashboard.repository.RmgAnalyticsInternalEmployeeRepository;
 import com.talentgrid.workforce.rmganalyticsdashboard.repository.RmgAnalyticsInternalMatchRepository;
@@ -40,7 +40,7 @@ public class RmgAnalyticsDashboardService {
     public static final String WINDOW_MORE_THAN_ONE_MONTH = "MORE_THAN_ONE_MONTH";
     public static final String OPEN_DEMAND = "APPROVED";
 
-    private final RmgAnalyticsDemandServiceClient demandServiceClient;
+    private final DemandClient demandServiceClient;
     private final BenchReportService benchReportService;
     private final RmgAnalyticsInternalMatchRepository analyticsMatchRepository;
     private final RmgAnalyticsInternalEmployeeRepository analyticsEmployeeRepository;
@@ -267,7 +267,7 @@ public class RmgAnalyticsDashboardService {
             final int pageSize = 100;
             int page = 0;
             while (true) {
-                DemandSummaryPageResponse response = demandServiceClient.searchDemands(trimmed, page, pageSize);
+                DemandSummaryPageResponse response = demandServiceClient.getDemandsByStatus(trimmed, page, pageSize);
                 if (response == null || response.getContent() == null || response.getContent().isEmpty()) {
                     break;
                 }

@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/rmg-analytics-dashboard")
 @RequiredArgsConstructor
 @Tag(name = "RMG Analytics Dashboard", description = "RMG KPIs and bench distribution charts for deployable talent")
+@PreAuthorize("hasAuthority('WORKFORCE_ANALYTICS_VIEW')")
 public class RmgAnalyticsDashboardController {
 
     private final RmgAnalyticsDashboardService analyticsDashboardService;

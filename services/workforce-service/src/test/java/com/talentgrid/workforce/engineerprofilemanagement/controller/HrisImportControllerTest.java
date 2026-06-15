@@ -13,6 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import com.talentgrid.shared.auth.security.JwtAuthenticationProvider;
+import org.springframework.security.test.context.support.WithMockUser;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(HrisImportController.class)
 @DisplayName("HrisImportController")
+@WithMockUser(authorities = "WORKFORCE_HRIS_IMPORT")
 class HrisImportControllerTest {
 
     private static final String CSV = """
@@ -41,6 +45,9 @@ class HrisImportControllerTest {
 
     @MockitoBean
     private HrisImportService hrisImportService;
+
+    @MockitoBean
+    private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @Test
     @DisplayName("POST without commit returns validation only")
@@ -67,7 +74,8 @@ class HrisImportControllerTest {
                 CSV.getBytes(StandardCharsets.UTF_8));
 
         mockMvc.perform(multipart("/api/v1/engineer-profile/hris-import")
-                        .file(file))
+                        .file(file)
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commitRequested").value(false))
                 .andExpect(jsonPath("$.validation.totalRows").value(1))
@@ -114,7 +122,8 @@ class HrisImportControllerTest {
         mockMvc.perform(multipart("/api/v1/engineer-profile/hris-import")
                         .file(file)
                         .param("commit", "true")
-                        .header("X-Request-Id", "req-123"))
+                        .header("X-Request-Id", "req-123")
+                        .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.commitRequested").value(true))
                 .andExpect(jsonPath("$.commitResult.created").value(1))

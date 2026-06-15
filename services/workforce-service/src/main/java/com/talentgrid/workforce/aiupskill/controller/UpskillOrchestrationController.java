@@ -5,6 +5,7 @@ import com.talentgrid.workforce.aiupskill.dto.UpskillingRecommendationResponse;
 import com.talentgrid.workforce.aiupskill.entity.UpskillHistoryEntity;
 import com.talentgrid.workforce.aiupskill.service.UpskillOrchestrationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class UpskillOrchestrationController {
      * against ALL open demands to compute and rank the top skill gaps.
      */
     @PostMapping("/generate")
+    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_REFRESH')")
     public ResponseEntity<UpskillingRecommendationResponse> generateLearningPath(
             @RequestBody EmployeeAuditRequest request) {
         UpskillingRecommendationResponse response = orchestrationService
@@ -38,6 +40,7 @@ public class UpskillOrchestrationController {
      * Records are returned sorted by generation timestamp, newest first.
      */
     @GetMapping("/history")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
     public ResponseEntity<List<UpskillHistoryEntity>> getHistory(@RequestParam String employeeId) {
         List<UpskillHistoryEntity> historyLog = orchestrationService.getEmployeeAuditHistory(employeeId);
         return ResponseEntity.ok(historyLog);

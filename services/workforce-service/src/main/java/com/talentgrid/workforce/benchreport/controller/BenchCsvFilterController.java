@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +28,7 @@ public class BenchCsvFilterController {
 
     @Operation(summary = "Search and filter bench employees", description = "Returns paginated list of filtered bench employees")
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('WORKFORCE_BENCH_SEARCH')")
     public ResponseEntity<BenchFilterPageResponse> searchBenchEmployees(
             BenchFilterRequest filterRequest,
             @RequestParam(defaultValue = "0") int page,
@@ -40,6 +42,7 @@ public class BenchCsvFilterController {
 
     @Operation(summary = "Export bench employees as CSV", description = "Downloads filtered bench employees as a CSV file")
     @GetMapping("/export/csv")
+    @PreAuthorize("hasAuthority('WORKFORCE_REPORT_EXPORT')")
     public ResponseEntity<byte[]> exportBenchEmployeesCsv(
             BenchFilterRequest filterRequest,
             @RequestParam(defaultValue = "availabilityDate") String sortBy,

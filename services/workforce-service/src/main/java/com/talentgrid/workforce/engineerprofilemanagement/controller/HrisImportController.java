@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/engineer-profile/hris-import")
@@ -34,6 +35,7 @@ public class HrisImportController {
                     + "Maximum 1,000 data rows. Headers align with bench export plus optional Skills."
     )
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('WORKFORCE_HRIS_IMPORT')")
     public ResponseEntity<HrisImportResponse> importCsv(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "commit", defaultValue = "false") boolean commit,

@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,6 +26,7 @@ public class KafkaTestController {
      */
     @Operation(summary = "Send a test Kafka event", description = "Sends a sample Workforce event to the Kafka topic workforce-events")
     @PostMapping("/userCreated")
+    @PreAuthorize("hasAuthority('WORKFORCE_HRIS_IMPORT')")
     public ResponseEntity<String> mockUserCreated() {
         userCreatedProducerMock.userDtoKafkaProducer();
         return ResponseEntity.ok("user-created");

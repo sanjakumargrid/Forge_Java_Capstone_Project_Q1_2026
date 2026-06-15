@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,24 +25,28 @@ public class SkillGapController {
 
     @Operation(summary = "Get full skill gap heatmap", description = "Returns all skills with demand count, bench count, gap score, gap level and trend direction")
     @GetMapping("/heatmap")
+    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_VIEW')")
     public ResponseEntity<SkillGapResponse> getSkillGap() {
         return ResponseEntity.ok(skillGapService.getSkillGap());
     }
 
     @Operation(summary = "Get skill gap summary", description = "Returns aggregated counts per gap level (CRITICAL / HIGH / MEDIUM / LOW)")
     @GetMapping("/summary")
+    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_VIEW')")
     public ResponseEntity<SkillGapSummaryResponse> getSummary() {
         return ResponseEntity.ok(skillGapService.getSummary());
     }
 
     @Operation(summary = "Get skill trends", description = "Returns skill gap trend direction comparing the two most recent snapshots")
     @GetMapping("/trends")
+    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_VIEW')")
     public ResponseEntity<SkillTrendResponse> getTrends() {
         return ResponseEntity.ok(skillGapService.getTrends());
     }
 
     @Operation(summary = "Trigger manual refresh", description = "Recalculates the skill gap heatmap from current demand and bench data")
     @PostMapping("/refresh")
+    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_REFRESH')")
     public ResponseEntity<RefreshResponse> refresh() {
         return ResponseEntity.ok(skillGapService.refresh());
     }

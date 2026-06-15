@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/rmg")
@@ -29,6 +30,7 @@ public class RmgDemandStatusController {
     private final RmgService rmgService;
 
     @GetMapping("/demands")
+    @PreAuthorize("hasAnyAuthority('WORKFORCE_BENCH_SEARCH', 'WORKFORCE_NOMINATION_VIEW')")
     @Operation(summary = "Get demands by status",
             description = "Fetch demand records by status for RMG dashboard and nomination flow")
     public ResponseEntity<Page<DemandDto>> getDemandsByStatus(
@@ -42,6 +44,7 @@ public class RmgDemandStatusController {
     }
 
     @PatchMapping("/demands/{id}/cancel")
+    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION')")
     @Operation(summary = "Cancel a demand by ID", description = "Update the status of the specified demand to CANCELLED")
     public ResponseEntity<DemandDto> cancelDemand(@PathVariable("id") Long id) {
         log.info("Received request to cancel demand - id={}", id);
@@ -51,6 +54,7 @@ public class RmgDemandStatusController {
     }
 
     @PatchMapping("/demands/{id}/status")
+    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION')")
     @Operation(summary = "Update demand status", description = "Update the status for a given demand and forward the update to demand-service")
     public ResponseEntity<DemandDto> updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody StatusUpdateRequest statusUpdate) {
         DemandDto response = rmgService.updateDemandStatus(

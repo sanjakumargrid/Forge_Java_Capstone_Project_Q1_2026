@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class NominationController {
     private final NominationService nominationService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('WORKFORCE_NOMINATION_CREATE')")
     @Operation(summary = "Nominate engineer for demand",
             description = "Creates a manual nomination after duplicate and utilisation checks")
     public ResponseEntity<NominationResponse> nominateEngineer(@Valid @RequestBody NominationRequest request) {
@@ -39,6 +41,7 @@ public class NominationController {
     }
 
     @GetMapping("/demand/{demandId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_NOMINATION_VIEW')")
     @Operation(summary = "Get nominations by demand",
             description = "Returns all non-deleted nominations created for a given demand ID")
     public ResponseEntity<List<NominationResponse>> getNominationsByDemand(@PathVariable Long demandId) {
@@ -46,6 +49,7 @@ public class NominationController {
     }
 
     @GetMapping("/engineer/{employeeId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_NOMINATION_VIEW')")
     @Operation(summary = "Get nominations by engineer",
             description = "Returns all non-deleted nominations for a specific engineer")
     public ResponseEntity<List<NominationResponse>> getNominationsByEngineer(@PathVariable Long employeeId) {

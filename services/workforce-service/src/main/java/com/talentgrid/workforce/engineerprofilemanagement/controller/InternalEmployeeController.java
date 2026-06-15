@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class InternalEmployeeController {
     @Operation(summary = "Get internal employee by employee ID",
             description = "Returns internal employee profile details for a given employee_id")
     @GetMapping("/employees/{employeeId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
     public ResponseEntity<InternalEmployeeResponse> getEmployeeByEmployeeId(
             @PathVariable("employeeId") String employeeId) {
         InternalEmployeeResponse response = internalEmployeeService.getEmployeeDetailsById(employeeId);
@@ -33,6 +35,7 @@ public class InternalEmployeeController {
             description = "Authenticated engineers update their own skills and availability date. "
                     + "Changes publish an employee.skills_updated event to refresh pgvector embeddings.")
     @PatchMapping("/update")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_UPDATE')")
     public ResponseEntity<InternalEmployeeResponse> updateOwnProfile(
             @RequestHeader("X-Employee-Id") String employeeId,
             @Valid @RequestBody UpdateEngineerProfileRequest request,
