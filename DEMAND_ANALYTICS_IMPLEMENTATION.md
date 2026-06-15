@@ -86,16 +86,7 @@ GET /api/analytics/demands?startDate=2026-05-15&endDate=2026-06-14
 
 **Response:** `DemandAnalyticsMetricsResponse`
 
----
 
-## Key Decisions Implemented
-
-1. ✅ **Position-Level Metrics:** Unlike demand-count metrics, this analytics computes actual positions filled
-2. ✅ **Use `createdAt` as start point:** Time-to-fill measured from demand creation (not searchStartAt)
-3. ✅ **Use history transition timestamp:** `demand_status_history.changed_at` for precise fill moment
-4. ✅ **Date range filtering:** Includes both demand created AND filled in window
-5. ✅ **30-day default window:** Automatic if no dates provided
-6. ✅ **Mixed fulfillment support:** Single demand can have internal + external fills counted together
 
 ---
 
@@ -146,21 +137,4 @@ These queries execute on demand without pre-aggregation, suitable for real-time 
 
 ---
 
-## Files Modified/Created
-
-1. ✅ Created: `DemandAnalyticsMetricsResponse.java` (new response DTO)
-2. ✅ Modified: `DemandRepository.java` (added 9 new position-level queries)
-3. ✅ Modified: `DemandAnalyticsService.java` (refactored to position-level, date filtering)
-4. ✅ Modified: `DemandAnalyticsController.java` (added startDate/endDate parameters)
-5. ✅ Created: `DemandAnalyticsServiceTest.java` (4 unit test cases, all passing)
-
----
-
-## Next Steps
-
-The implementation is complete and ready for:
-- Integration testing with a real database
-- Performance testing on large datasets (potential materialized views for >1M demands)
-- Dashboard integration by BL Team 4
-- Monitoring of metric accuracy vs. source systems (offer-service, candidate-service)
 
