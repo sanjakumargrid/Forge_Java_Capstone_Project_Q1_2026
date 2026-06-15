@@ -59,7 +59,7 @@ public class ScorecardService {
         }
 
         boolean alreadySubmitted =
-                scorecardRepository.existsByInterview_IdAndInterviewerId(
+                scorecardRepository.existsByInterview_InterviewIdAndInterviewerId(
                         interviewId,
                         requestDto.getInterviewerId()
                 );
@@ -125,7 +125,7 @@ public class ScorecardService {
             );
         }
 
-        return scorecardRepository.findAllByInterview_Id(interviewId)
+        return scorecardRepository.findAllByInterview_InterviewId(interviewId)
                 .stream()
                 .map(this::toSummaryDto)
                 .toList();
@@ -154,7 +154,7 @@ public class ScorecardService {
         }
 
         Scorecard scorecard =
-                scorecardRepository.findByInterview_IdAndInterviewerId(
+                scorecardRepository.findByInterview_InterviewIdAndInterviewerId(
                                 interviewId,
                                 interviewerId
                         )
@@ -231,7 +231,7 @@ public class ScorecardService {
 
         return ScorecardResponseDto.builder()
                 .scorecardId(scorecard.getId())
-                .interviewId(scorecard.getInterview().getId())
+                .interviewId(scorecard.getInterview().getInterviewId())
                 .applicationId(scorecard.getApplicationId())
                 .interviewerId(scorecard.getInterviewerId())
                 .technicalScore(scorecard.getTechnicalScore())
@@ -249,7 +249,7 @@ public class ScorecardService {
 
         return ScorecardSummaryDto.builder()
                 .scorecardId(scorecard.getId())
-                .interviewId(scorecard.getInterview().getId())
+                .interviewId(scorecard.getInterview().getInterviewId())
                 .applicationId(scorecard.getApplicationId())
                 .interviewerId(scorecard.getInterviewerId())
                 .averageScore(scorecard.getAverageScore())

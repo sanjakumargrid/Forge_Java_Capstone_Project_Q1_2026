@@ -52,7 +52,7 @@ public class AtsEvaluationService {
             """;
 
         // 3. Target Gemini endpoint
-        String geminiUrl = "[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=)" + apiKey;
+        String geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
 
         // 4. Combine prompt, resume text, and job description into the payload
         String userContent = String.format(

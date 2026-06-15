@@ -10,21 +10,21 @@ import java.util.Optional;
 @Repository
 public interface ScorecardRepository extends JpaRepository<Scorecard, Long> {
 
-    List<Scorecard> findAllByInterview_Id(Long interviewId);
+    List<Scorecard> findAllByInterview_InterviewId(Long interviewId);
 
     List<Scorecard> findAllByApplicationId(Long applicationId);
 
-    Optional<Scorecard> findByInterview_IdAndInterviewerId(
+    Optional<Scorecard> findByInterview_InterviewIdAndInterviewerId(
             Long interviewId,
             Long interviewerId
     );
 
-    boolean existsByInterview_IdAndInterviewerId(
+    boolean existsByInterview_InterviewIdAndInterviewerId(
             Long interviewId,
             Long interviewerId
     );
 
-    long countByInterview_Id(Long interviewId);
+    long countByInterview_InterviewId(Long interviewId);
 
     long countByApplicationId(Long applicationId);
 }

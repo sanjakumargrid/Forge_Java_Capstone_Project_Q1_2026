@@ -21,6 +21,9 @@ public class OfferDto {
   @NotNull(message = "Application id is required")
   private Long applicationId;
 
+  @Size(max = 255, message = "Candidate name must not exceed 255 characters")
+  private String candidateName;
+
   @NotBlank(message = "Role is required")
   @Size(max = 100, message = "Role must not exceed 100 characters")
   private String role;

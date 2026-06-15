@@ -30,6 +30,10 @@ public class Offer {
     @Column(name = "application_id", nullable = false)
     private Long applicationId;
 
+    @Size(max = 255, message = "Candidate name must not exceed 255 characters")
+    @Column(name = "candidate_name", length = 255)
+    private String candidateName;
+
     @Column(name = "current_approval_step")
     private Integer currentApprovalStep = 0;
 

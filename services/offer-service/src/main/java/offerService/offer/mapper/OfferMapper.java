@@ -18,6 +18,7 @@ public class OfferMapper {
 
         entity.setId(dto.getId());
         entity.setApplicationId(dto.getApplicationId());
+        entity.setCandidateName(dto.getCandidateName());
         entity.setRole(dto.getRole());
         entity.setBaseSalary(dto.getBaseSalary());
         entity.setBonus(dto.getBonus());
@@ -47,6 +48,7 @@ public class OfferMapper {
 
         dto.setId(entity.getId());
         dto.setApplicationId(entity.getApplicationId());
+        dto.setCandidateName(entity.getCandidateName());
         dto.setRole(entity.getRole());
         dto.setBaseSalary(entity.getBaseSalary());
         dto.setBonus(entity.getBonus());
