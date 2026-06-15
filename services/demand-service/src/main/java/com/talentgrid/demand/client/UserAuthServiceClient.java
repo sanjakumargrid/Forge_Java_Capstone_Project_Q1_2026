@@ -2,6 +2,7 @@ package com.talentgrid.demand.client;
 
 import com.talentgrid.demand.client.dto.AccountDto;
 import com.talentgrid.demand.client.dto.ProjectDto;
+import com.talentgrid.demand.client.dto.UserDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,4 +33,7 @@ public interface UserAuthServiceClient {
      */
     @GetMapping("/projects/{id}")
     ProjectDto getProjectById(@PathVariable("id") Long id);
+
+    @GetMapping("/users/{id}")
+    UserDto getUserById(@PathVariable("id") Long id);
 }

@@ -52,6 +52,7 @@ public class NotificationEventPublisher {
     public void sendInAppAndEmail(
             String recipientUserId,
             String recipientEmail,
+            String recipientSlackId,
             String notificationType,
             String title,
             String message,
@@ -66,10 +67,11 @@ public class NotificationEventPublisher {
         publish(NotificationPayload.builder()
                 .recipientUserId(recipientUserId)
                 .recipientEmail(recipientEmail)
+                .recipientSlackId(recipientSlackId)
                 .notificationType(notificationType)
                 .title(title)
                 .message(message)
-                .channels(List.of("IN_APP", "EMAIL"))
+                .channels(List.of("IN_APP", "EMAIL", "SLACK"))
                 .moduleName(moduleName)
                 .referenceId(referenceId)
                 .referenceType(referenceType)

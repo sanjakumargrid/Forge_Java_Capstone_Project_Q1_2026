@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>3.5.14</version>
 		<relativePath/>
 	</parent>
 
@@ -23,13 +23,15 @@
 		<module>talentgrid-clients/notification-client</module>
 		<module>talentgrid-clients/audit-client</module>
 		<module>services/demand-service</module>
+		<module>services/user-auth-service</module>
 		<module>talentgrid-audit-service</module>
 		<module>talentgrid-notification-service</module>
 	</modules>
 
 	<properties>
 		<java.version>17</java.version>
-		<spring-cloud.version>2024.0.0</spring-cloud.version>
+		<spring-cloud.version>2025.0.0</spring-cloud.version>
+		<lombok.version>1.18.46</lombok.version>
 	</properties>
 
 	<dependencyManagement>

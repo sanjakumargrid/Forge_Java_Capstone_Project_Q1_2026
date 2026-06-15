@@ -86,6 +86,11 @@ public class DemandService {
         demand.setCreatedBy(SecurityUtils.getCurrentUserId());
         demand.setCreatorEmail(SecurityUtils.getCurrentUserEmail());
         demand.setCreatorName(SecurityUtils.getCurrentUserName());
+        Long creatorId = SecurityUtils.getCurrentUserId();
+        var user = userAuthServiceClient.getUserById(creatorId);
+        if (user != null && user.getSlackId() != null) {
+            demand.setCreatorSlackId(user.getSlackId());
+        }
 
         Demand saved = demandRepository.save(demand);
 

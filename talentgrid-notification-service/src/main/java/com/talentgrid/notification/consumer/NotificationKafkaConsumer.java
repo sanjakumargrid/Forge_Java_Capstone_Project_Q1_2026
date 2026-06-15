@@ -62,11 +62,12 @@ public class NotificationKafkaConsumer extends BaseKafkaConsumer<NotificationPay
 
             // FIX: Log payload summary at INFO level so you can see channels and email presence
             NotificationPayload p = event.getPayload();
-            log.info("[NOTIFICATION-CONSUMER] ▶ Payload deserialized | type={} | userId={} | channels={} | emailPresent={}",
+            log.info("[NOTIFICATION-CONSUMER] ▶ Payload deserialized | type={} | userId={} | channels={} | emailPresent={} | slackIdPresent={}",
                     p.getNotificationType(),
                     p.getRecipientUserId(),
                     p.getChannels(),
-                    p.getRecipientEmail() != null && !p.getRecipientEmail().isBlank());
+                    p.getRecipientEmail() != null && !p.getRecipientEmail().isBlank(),
+                    p.getRecipientSlackId() != null && !p.getRecipientSlackId().isBlank());
 
             process(event);
 

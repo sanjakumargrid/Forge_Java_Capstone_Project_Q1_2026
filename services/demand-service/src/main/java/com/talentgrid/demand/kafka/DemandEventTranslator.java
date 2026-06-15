@@ -84,6 +84,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private void translateDemandCreated(DemandPayload demand, String correlationId) {
         warnIfRecipientEmailMissing(demand, "DEMAND_CREATED");
+        warnIfRecipientSlackIdMissing(demand, "DEMAND_CREATED");
+
 
         String title = "New Demand Created: " + demand.getTitle();
         String message = String.format(
@@ -98,6 +100,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         notificationEventPublisher.sendInAppAndEmail(
                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
+                demand.getRecipientSlackId(),
                 "DEMAND_CREATED",
                 title,
                 message,
@@ -123,6 +126,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private void translateDemandSubmitted(DemandPayload demand, String correlationId) {
         warnIfRecipientEmailMissing(demand, "DEMAND_SUBMITTED");
+        warnIfRecipientSlackIdMissing(demand, "DEMAND_SUBMITTED");
+
 
         String title = "Demand Submitted for Approval: " + demand.getTitle();
         String message = String.format(
@@ -136,6 +141,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         notificationEventPublisher.sendInAppAndEmail(
                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
+                demand.getRecipientSlackId(),
                 "DEMAND_SUBMITTED",
                 title,
                 message,
@@ -161,6 +167,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private void translateDemandApproved(DemandPayload demand, String correlationId) {
         warnIfRecipientEmailMissing(demand, "DEMAND_APPROVED");
+        warnIfRecipientSlackIdMissing(demand, "DEMAND_APPROVED");
+
 
         String title = "Demand Approved: " + demand.getTitle();
         String message = String.format(
@@ -173,6 +181,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         notificationEventPublisher.sendInAppAndEmail(
                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
+                demand.getRecipientSlackId(),
                 "DEMAND_APPROVED",
                 title,
                 message,
@@ -195,6 +204,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private void translateDemandExternalOpened(DemandPayload demand, String correlationId) {
         warnIfRecipientEmailMissing(demand, "DEMAND_EXTERNAL_OPENED");
+        warnIfRecipientSlackIdMissing(demand, "DEMAND_EXTERNAL_OPENED");
+
 
         String recruiterInfo = demand.getAssignedRecruiterName() != null
                 ? demand.getAssignedRecruiterName()
@@ -214,6 +225,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         notificationEventPublisher.sendInAppAndEmail(
                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
+                demand.getRecipientSlackId(),
                 "DEMAND_EXTERNAL_OPENED",
                 title,
                 message,
@@ -243,6 +255,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
 
     private void translateDemandClosed(DemandPayload demand, String correlationId) {
         warnIfRecipientEmailMissing(demand, "DEMAND_CLOSED");
+        warnIfRecipientSlackIdMissing(demand, "DEMAND_CLOSED");
 
         int required  = demand.getRequiredCount()        != null ? demand.getRequiredCount()        : 0;
         int internal  = demand.getInternalFilledCount()  != null ? demand.getInternalFilledCount()  : 0;
@@ -268,6 +281,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         notificationEventPublisher.sendInAppAndEmail(
                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
                 demand.getRecipientEmail(),
+                demand.getRecipientSlackId(),
                 "DEMAND_CLOSED",
                 title,
                 message,
@@ -304,6 +318,17 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                     eventType, demand.getDemandId());
         } else {
             log.info("[DEMAND-TRANSLATOR] ▶ recipientEmail present for {} | demandId={} — email will be sent",
+                    eventType, demand.getDemandId());
+        }
+    }
+
+    private void warnIfRecipientSlackIdMissing(DemandPayload demand, String eventType) {
+        if (demand.getRecipientSlackId() == null || demand.getRecipientSlackId().isBlank()) {
+            log.warn("[DEMAND-TRANSLATOR] ⚠ recipientSlackId is null/blank for {} | demandId={}. " +
+                            "Slack notification will be skipped by SlackNotificationChannel.",
+                    eventType, demand.getDemandId());
+        } else {
+            log.info("[DEMAND-TRANSLATOR] ▶ recipientSlackId present for {} | demandId={} — Message will be sent",
                     eventType, demand.getDemandId());
         }
     }

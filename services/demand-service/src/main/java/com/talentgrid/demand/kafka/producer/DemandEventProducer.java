@@ -25,6 +25,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -36,6 +37,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -57,6 +59,7 @@ public class DemandEventProducer {
         payload.setApprovedAt(demand.getApprovedAt());
         payload.setSearchStartAt(demand.getSearchStartAt());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -83,6 +86,7 @@ public class DemandEventProducer {
         payload.setOnboardingDate(demand.getOnboardingDate());
         // FIX: recipientEmail and raisedBy were missing — causing email notifications to be skipped
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -100,6 +104,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -115,6 +120,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -133,6 +139,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -146,6 +153,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -162,6 +170,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -178,6 +187,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -194,6 +204,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -210,6 +221,7 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
         // FIX: raisedBy was missing — notification message body showed null
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()

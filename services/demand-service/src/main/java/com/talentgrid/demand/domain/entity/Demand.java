@@ -159,6 +159,9 @@ public class Demand {
     @Column(name = "creator_email")
     private String creatorEmail;
 
+    @Column(name = "creator_slack_id", length = 50)
+    private String creatorSlackId;
+
     @Column(name = "assigned_recruiter")
     private Long assignedRecruiter;
 
@@ -550,5 +553,13 @@ public class Demand {
 
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public void setCreatorSlackId(String slackId) {
+        this.creatorSlackId = slackId;
+    }
+
+    public String getCreatorSlackId() {
+        return creatorSlackId;
     }
 }

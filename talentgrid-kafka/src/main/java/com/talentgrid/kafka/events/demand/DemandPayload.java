@@ -30,6 +30,7 @@ public class DemandPayload {
     private Long createdBy;
     private String creatorName;
     private String recipientEmail;
+    private String recipientSlackId;
     private String raisedBy;
     private BigDecimal budget;
     private LocalDate targetDate;
