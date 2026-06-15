@@ -10,11 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaveResumePDF {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
+
     @Lob
-    @Column(columnDefinition = "LONGBLOB")
-    byte [] data;
-    Integer userId;
+    @Column(name = "data", columnDefinition = "bytea")
+    private byte[] data;
+
+    private Integer userId;
 }

@@ -2,21 +2,16 @@ package com.talentgrid.application.application.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.talentgrid.application.application.dto.RejectionEmailDraftRequestDto;
 import com.talentgrid.application.application.dto.RejectionEmailDraftResponseDto;
-import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 import com.talentgrid.application.application.entity.Application;
 import com.talentgrid.application.application.repository.ApplicationRepository;
-import com.talentgrid.application.client.CandidateClient;
-import com.talentgrid.application.integration.OpenAiProperties;
+import com.talentgrid.application.integration.GeminiProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,118 +20,91 @@ import java.util.Map;
 public class RejectionEmailDraftService {
 
     private final ApplicationRepository applicationRepository;
-    private final CandidateClient candidateClient;
-    private final OpenAiProperties openAiProperties;
+    private final GeminiProperties geminiProperties;
     private final ObjectMapper objectMapper;
 
     public RejectionEmailDraftResponseDto generateDraft(
             Long applicationId,
             RejectionEmailDraftRequestDto request
     ) {
-
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Application not found with id: " + applicationId
-                ));
-
-        Long candidateId = application.getCandidateId();
-
-        if (candidateId == null) {
-            throw new IllegalStateException(
-                    "Candidate id is missing for application id: " + applicationId
-            );
-        }
-
-        ExternalCandidateDto candidate = candidateClient.getCandidateById(candidateId);
+                .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
 
         String prompt = """
-                Generate a personalised rejection email draft for recruiter review.
-                Never auto-send. Return only valid JSON with keys: subject, body.
+                Generate a polite personalised rejection email draft.
 
-                Candidate name: %s %s
-                Candidate email: %s
-                Candidate source: %s
-                Current stage: %s
-                Rejection reason: %s
-                Additional context: %s
+                Rules:
+                - Recruiter will review before sending.
+                - Do not say the email was sent.
+                - Keep it professional and empathetic.
+                - Include subject and body.
+                - Return valid JSON only with fields: subject, body.
 
-                The email must be polite, specific, concise, and professional.
-                """
-                .formatted(
-                        candidate.getFirstName(),
-                        candidate.getLastName(),
-                        candidate.getEmail(),
-                        candidate.getSource(),
-                        application.getCurrentStage(),
-                        request.getRejectionReason(),
-                        request.getAdditionalContext()
-                );
-
-        String content = callOpenAi(prompt);
-        JsonNode json = parseJson(content);
-
-        return RejectionEmailDraftResponseDto.builder()
-                .subject(json.path("subject").asText("Rejection update"))
-                .body(json.path("body").asText(content))
-                .build();
-    }
-
-    private String callOpenAi(String prompt) {
-
-        RestClient restClient = RestClient.builder()
-                .baseUrl(openAiProperties.getBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + openAiProperties.getApiKey())
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .build();
-
-        Map<String, Object> system = Map.of(
-                "role", "system",
-                "content", "You are an HR assistant. Return only valid JSON with keys subject and body."
+                Candidate ID: %s
+                Demand ID: %s
+                Current Stage: %s
+                Rejection Reason: %s
+                Additional Context: %s
+                """.formatted(
+                application.getCandidateId(),
+                application.getDemandId(),
+                application.getCurrentStage(),
+                request.getRejectionReason(),
+                request.getAdditionalContext()
         );
 
-        Map<String, Object> user = Map.of(
-                "role", "user",
-                "content", prompt
+        String url = geminiProperties.getBaseUrl()
+                + "/models/"
+                + geminiProperties.getModel()
+                + ":generateContent?key="
+                + geminiProperties.getApiKey();
+
+        Map<String, Object> body = Map.of(
+                "contents", List.of(
+                        Map.of(
+                                "parts", List.of(
+                                        Map.of("text", prompt)
+                                )
+                        )
+                )
         );
 
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("model", openAiProperties.getModel());
-        payload.put("temperature", 0.4);
-        payload.put("messages", List.of(system, user));
-
-        JsonNode response = restClient.post()
-                .uri("/chat/completions")
-                .body(payload)
+        String response = RestClient.create()
+                .post()
+                .uri(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body)
                 .retrieve()
-                .body(JsonNode.class);
+                .body(String.class);
 
-        if (response == null) {
-            throw new IllegalStateException("OpenAI returned an empty response");
-        }
-
-        JsonNode choices = response.path("choices");
-
-        if (!choices.isArray() || choices.isEmpty()) {
-            throw new IllegalStateException("OpenAI response did not include choices");
-        }
-
-        return choices.get(0)
-                .path("message")
-                .path("content")
-                .asText();
+        return parseGeminiResponse(response);
     }
 
-    private JsonNode parseJson(String content) {
-
-        String cleaned = content.trim()
-                .replaceAll("^```json\\s*", "")
-                .replaceAll("^```\\s*", "")
-                .replaceAll("\\s*```$", "");
-
+    private RejectionEmailDraftResponseDto parseGeminiResponse(String response) {
         try {
-            return objectMapper.readTree(cleaned);
+            JsonNode root = objectMapper.readTree(response);
+
+            String text = root.path("candidates")
+                    .get(0)
+                    .path("content")
+                    .path("parts")
+                    .get(0)
+                    .path("text")
+                    .asText();
+
+            text = text.replace("```json", "")
+                    .replace("```", "")
+                    .trim();
+
+            JsonNode draftJson = objectMapper.readTree(text);
+
+            return RejectionEmailDraftResponseDto.builder()
+                    .subject(draftJson.path("subject").asText())
+                    .body(draftJson.path("body").asText())
+                    .build();
+
         } catch (Exception e) {
-            throw new IllegalStateException("OpenAI draft was not valid JSON", e);
+            throw new IllegalStateException("Failed to parse Gemini rejection email draft response", e);
         }
     }
 }
