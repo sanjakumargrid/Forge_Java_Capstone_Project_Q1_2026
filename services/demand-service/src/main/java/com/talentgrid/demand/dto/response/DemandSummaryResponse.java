@@ -30,6 +30,12 @@ public class DemandSummaryResponse {
     private String priority;
     private String businessUnit;
 
+    // Project / Account linkage for quick dashboard grouping
+    private Long accountId;
+    private String accountName;
+    private Long projectId;
+    private String projectName;
+
     /** Age of the demand in days from creation to now — computed by the mapper. */
     private Long ageInDays;
 
