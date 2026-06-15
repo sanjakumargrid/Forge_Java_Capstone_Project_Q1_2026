@@ -18,7 +18,7 @@ public class InterviewMapper {
 
         Interview entity = new Interview();
 
-        entity.setId(dto.getId());
+        entity.setInterviewId(dto.getId());
         entity.setApplicationId(dto.getApplicationId());
         entity.setInterviewers(dto.getInterviewers());
         entity.setInterviewType(dto.getInterviewType());
@@ -42,7 +42,7 @@ public class InterviewMapper {
 
         InterviewDto dto = new InterviewDto();
 
-        dto.setId(entity.getId());
+        dto.setId(entity.getInterviewId());
         dto.setApplicationId(entity.getApplicationId());
         dto.setInterviewers(entity.getInterviewers());
         dto.setInterviewType(entity.getInterviewType());
