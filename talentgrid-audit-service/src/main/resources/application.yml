@@ -8,8 +8,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/talentgrid
-    username: astephanas
-    password:
+    username: talentgrid
+    password: talentgrid
     driver-class-name: org.postgresql.Driver
 
   jpa:

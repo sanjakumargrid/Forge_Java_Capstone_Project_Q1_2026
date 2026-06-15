@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -23,16 +24,22 @@ public interface DemandRepository extends JpaRepository<Demand, Long> {
     Optional<Demand> findByDemandIdAndIsDeletedFalse(Long demandId);
 
     /**
+     * Finds all non-deleted demands with the given status.
+     * Used by the Approval SLA scheduler to locate pending approvals.
+     */
+    List<Demand> findByStatusAndIsDeletedFalse(DemandStatus status);
+
+    /**
      * Enterprise search with optional filters on status, priority, and business unit.
      * Excludes soft-deleted records. Supports pagination and sorting.
      */
     @Query("SELECT d FROM Demand d WHERE d.isDeleted = false " +
-           "AND (:status IS NULL OR d.status = :status) " +
-           "AND (:priority IS NULL OR d.priority = :priority) " +
-           "AND (:businessUnit IS NULL OR d.businessUnit = :businessUnit) " +
-           "AND (:accountName IS NULL OR d.accountName = :accountName) " +
-           "AND (:location IS NULL OR d.location = :location) " +
-           "AND (:employmentType IS NULL OR d.employmentType = :employmentType)")
+            "AND (:status IS NULL OR d.status = :status) " +
+            "AND (:priority IS NULL OR d.priority = :priority) " +
+            "AND (:businessUnit IS NULL OR d.businessUnit = :businessUnit) " +
+            "AND (:accountName IS NULL OR d.accountName = :accountName) " +
+            "AND (:location IS NULL OR d.location = :location) " +
+            "AND (:employmentType IS NULL OR d.employmentType = :employmentType)")
     Page<Demand> searchDemands(
             @Param("status") DemandStatus status,
             @Param("priority") DemandPriority priority,
