@@ -14,8 +14,12 @@ import com.talentgrid.candidate.kafka.producer.CandidateEventProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.talentgrid.audit.client.AuditLogClient;
+import com.talentgrid.audit.dto.AuditAction;
+import com.talentgrid.audit.dto.AuditLogPayload;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -27,17 +31,21 @@ public class ExternalCandidateService {
 
     private final ApplicationClient applicationClient;
 
+    private final AuditLogClient auditLogClient;
+
     private final CandidateEventProducer candidateEventProducer;
 
     public ExternalCandidateService(
             ExternalCandidateRepository externalCandidateRepository,
             HashUtil hashUtil,
             ApplicationClient applicationClient,
+            AuditLogClient auditLogClient,
             CandidateEventProducer candidateEventProducer
     ) {
         this.externalCandidateRepository = externalCandidateRepository;
         this.hashUtil = hashUtil;
         this.applicationClient = applicationClient;
+        this.auditLogClient = auditLogClient;
         this.candidateEventProducer = candidateEventProducer;
     }
 
@@ -86,6 +94,21 @@ public class ExternalCandidateService {
              * If application-service fails after this, @Transactional will rollback this save.
              */
             externalCandidateRepository.flush();
+
+            auditLogClient.logAction(
+                    AuditLogPayload.builder()
+                            .entityType("CANDIDATE")
+                            .entityId(candidate.getCandidateId())
+                            .action(AuditAction.CREATE)
+                            .afterState(Map.of(
+                                    "firstName", candidate.getFirstName(),
+                                    "lastName", candidate.getLastName(),
+                                    "email", candidate.getEmail()
+                            ))
+                            .serviceName("candidate-service")
+                            .endpoint("/api/candidates")
+                            .build()
+            );
 
             candidateEventProducer.publishCreated(candidate);
         }
@@ -174,6 +197,21 @@ public class ExternalCandidateService {
         ExternalCandidate savedCandidate =
                 externalCandidateRepository.save(existingCandidate);
 
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("CANDIDATE")
+                        .entityId(savedCandidate.getCandidateId())
+                        .action(AuditAction.UPDATE)
+                        .afterState(Map.of(
+                                "firstName", savedCandidate.getFirstName(),
+                                "lastName", savedCandidate.getLastName(),
+                                "email", savedCandidate.getEmail()
+                        ))
+                        .serviceName("candidate-service")
+                        .endpoint("/api/candidates/" + candidateId)
+                        .build()
+        );
+
         candidateEventProducer.publishUpdated(savedCandidate);
 
         return CandidateResponse.builder()
@@ -216,6 +254,19 @@ public class ExternalCandidateService {
 
         ExternalCandidate deletedCandidate =
                 externalCandidateRepository.save(candidate);
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("CANDIDATE")
+                        .entityId(candidate.getCandidateId())
+                        .action(AuditAction.DELETE)
+                        .afterState(Map.of(
+                                "isDeleted", true
+                        ))
+                        .serviceName("candidate-service")
+                        .endpoint("/api/candidates/" + candidateId)
+                        .build()
+        );
 
         candidateEventProducer.publishDeleted(
                 deletedCandidate

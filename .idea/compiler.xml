@@ -21,8 +21,8 @@
         <module name="application-service" />
         <module name="offer-service" />
         <module name="talentgrid-notification-service" />
-        <module name="talentgrid-shared" />
         <module name="audit-client" />
+        <module name="talentgrid-shared" />
         <module name="interview-service" />
         <module name="talentgrid-kafka" />
         <module name="talentgrid-audit-service" />
