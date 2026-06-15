@@ -1,5 +1,6 @@
 package com.talentgrid.application.application.service;
 
+
 import com.talentgrid.application.application.dto.ApplicationDto;
 import com.talentgrid.application.application.dto.DemandDto;
 import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
@@ -20,7 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.talentgrid.audit.client.AuditLogClient;
+import com.talentgrid.audit.dto.AuditAction;
+import com.talentgrid.audit.dto.AuditLogPayload;
+import java.util.Map;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,35 +32,45 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+
 @Service
 public class ApplicationService {
+
 
     private final ApplicationRepository applicationRepository;
     private final CandidateClient candidateClient;
     private final DemandClient demandClient;
     private final ApplicationEventProducer applicationEventProducer;
+    private final AuditLogClient auditLogClient;
+
 
     public ApplicationService(
             ApplicationRepository applicationRepository,
             CandidateClient candidateClient,
             DemandClient demandClient,
+            AuditLogClient auditLogClient,
             ApplicationEventProducer applicationEventProducer
     ) {
         this.applicationRepository = applicationRepository;
         this.candidateClient = candidateClient;
         this.demandClient = demandClient;
+        this.auditLogClient = auditLogClient;
         this.applicationEventProducer = applicationEventProducer;
     }
 
+
     @Transactional
     public ApplicationDto createApplication(ApplicationCreateRequest request) {
+
 
         if (request == null) {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Application details are required");
         }
 
+
         ExternalCandidateDto candidateDto =
                 candidateClient.getCandidate(request.getCandidateId());
+
 
         if (candidateDto == null) {
             throw new BusinessException(
@@ -65,8 +79,10 @@ public class ApplicationService {
             );
         }
 
+
         DemandDto demandDto =
                 demandClient.getDemand(request.getDemandId());
+
 
         if (demandDto == null) {
             throw new BusinessException(
@@ -75,11 +91,13 @@ public class ApplicationService {
             );
         }
 
+
         boolean alreadyApplied =
                 applicationRepository.existsByCandidateIdAndDemandId(
                         request.getCandidateId(),
                         request.getDemandId()
                 );
+
 
         if (alreadyApplied) {
             throw new BusinessException(
@@ -88,7 +106,9 @@ public class ApplicationService {
             );
         }
 
+
         ApplicationDto applicationDto = new ApplicationDto();
+
 
         applicationDto.setCandidateId(request.getCandidateId());
         applicationDto.setDemandId(request.getDemandId());
@@ -98,20 +118,43 @@ public class ApplicationService {
         applicationDto.setFreeNotes(request.getFreeNotes());
         applicationDto.setReferralCode(request.getReferralCode());
 
+
         calculateSkillMatching(applicationDto, candidateDto, demandDto);
+
 
         applicationDto.setCurrentStage(Stage.APPLIED);
         applicationDto.setBlockedFromReapply(false);
 
+
         Application application =
                 ApplicationMapper.dtoToApplicationEntity(applicationDto);
 
+
         Application saved = applicationRepository.save(application);
+
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("APPLICATION")
+                        .entityId(saved.getId())
+                        .action(AuditAction.CREATE)
+                        .afterState(Map.of(
+                                "candidateId", saved.getCandidateId(),
+                                "demandId", saved.getDemandId(),
+                                "stage", saved.getCurrentStage().name()
+                        ))
+                        .serviceName("application-service")
+                        .endpoint("/api/applications")
+                        .build()
+        );
+
 
         applicationEventProducer.publishApplied(saved);
 
+
         return ApplicationMapper.applicationEntityToDto(saved);
     }
+
 
     public Page<ApplicationDto> getApplications(
             Long demandId,
@@ -120,10 +163,13 @@ public class ApplicationService {
             int size
     ) {
 
+
         validatePageRequest(page, size);
+
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Application> applications;
+
 
         if (demandId != null && stage != null && !stage.isBlank()) {
             applications = applicationRepository.findByDemandIdAndCurrentStage(
@@ -142,8 +188,10 @@ public class ApplicationService {
             applications = applicationRepository.findAll(pageable);
         }
 
+
         return applications.map(ApplicationMapper::applicationEntityToDto);
     }
+
 
     public ApplicationDto getApplicationById(Long applicationId) {
         return ApplicationMapper.applicationEntityToDto(
@@ -151,11 +199,13 @@ public class ApplicationService {
         );
     }
 
+
     @Transactional
     public ApplicationDto moveStage(
             Long applicationId,
             StageMoveRequest request
     ) {
+
 
         if (request == null) {
             throw new BusinessException(
@@ -164,10 +214,13 @@ public class ApplicationService {
             );
         }
 
+
         Application application = getApplicationEntity(applicationId);
+
 
         Stage targetStage = parseStage(request.getTargetStage());
         String reason = request.getReason();
+
 
         validateStageMovement(
                 application.getCurrentStage(),
@@ -175,87 +228,136 @@ public class ApplicationService {
                 reason
         );
 
+
         application.setCurrentStage(targetStage);
+
+
+        Stage previousStage =
+                application.getCurrentStage();
+
+
         application.setStageMoveReason(reason);
 
+
         setStageTimestamp(application, targetStage);
+
 
         if (targetStage == Stage.REJECTED) {
             application.setRejectionReason(reason);
             application.setBlockedFromReapply(true);
         }
 
+
         Application updated = applicationRepository.save(application);
 
+
+        auditLogClient.logAction(
+                AuditLogPayload.builder()
+                        .entityType("APPLICATION")
+                        .entityId(updated.getId())
+                        .action(AuditAction.STATUS_CHANGE)
+                        .beforeState(Map.of(
+                                "stage", previousStage.name()
+                        ))
+                        .afterState(Map.of(
+                                "stage", updated.getCurrentStage().name()
+                        ))
+                        .serviceName("application-service")
+                        .endpoint("/api/applications/" + applicationId + "/stage")
+                        .build()
+        );
+
+
         switch (targetStage) {
+
 
             case SCREENING ->
                     applicationEventProducer.publishScreening(updated);
 
+
             case TECHNICAL ->
                     applicationEventProducer.publishTechnical(updated);
+
 
             case INTERVIEW ->
                     applicationEventProducer.publishInterview(updated);
 
+
             case FINAL_ROUND ->
                     applicationEventProducer.publishFinalRound(updated);
+
 
             case OFFERED ->
                     applicationEventProducer.publishOffered(updated);
 
+
             case HIRED ->
                     applicationEventProducer.publishHired(updated);
 
+
             case REJECTED ->
                     applicationEventProducer.publishRejected(updated);
+
 
             case APPLIED -> {
             }
         }
 
+
         return ApplicationMapper.applicationEntityToDto(updated);
     }
 
+
     public List<String> getTimeline(Long applicationId) {
+
 
         Application application = getApplicationEntity(applicationId);
         List<String> timeline = new ArrayList<>();
+
 
         if (application.getAppliedAt() != null) {
             timeline.add("APPLIED : " + application.getAppliedAt());
         }
 
+
         if (application.getScreeningAt() != null) {
             timeline.add("SCREENING : " + application.getScreeningAt());
         }
+
 
         if (application.getTechnicalAt() != null) {
             timeline.add("TECHNICAL : " + application.getTechnicalAt());
         }
 
+
         if (application.getInterviewAt() != null) {
             timeline.add("INTERVIEW : " + application.getInterviewAt());
         }
+
 
         if (application.getFinalRoundAt() != null) {
             timeline.add("FINAL_ROUND : " + application.getFinalRoundAt());
         }
 
+
         if (application.getOfferAt() != null) {
             timeline.add("OFFERED : " + application.getOfferAt());
         }
+
 
         if (application.getHiredAt() != null) {
             timeline.add("HIRED : " + application.getHiredAt());
         }
 
+
         if (application.getRejectedAt() != null) {
             timeline.add("REJECTED : " + application.getRejectedAt());
         }
 
+
         return timeline;
     }
+
 
     public Page<ApplicationDto> searchApplications(
             Integer minScore,
@@ -263,7 +365,9 @@ public class ApplicationService {
             int size
     ) {
 
+
         validatePageRequest(page, size);
+
 
         if (minScore != null && (minScore < 0 || minScore > 100)) {
             throw new BusinessException(
@@ -272,7 +376,9 @@ public class ApplicationService {
             );
         }
 
+
         Pageable pageable = PageRequest.of(page, size);
+
 
         Page<Application> applications =
                 applicationRepository.findByAiScoreGreaterThanEqual(
@@ -280,10 +386,13 @@ public class ApplicationService {
                         pageable
                 );
 
+
         return applications.map(ApplicationMapper::applicationEntityToDto);
     }
 
+
     private Application getApplicationEntity(Long applicationId) {
+
 
         if (applicationId == null) {
             throw new BusinessException(
@@ -292,6 +401,7 @@ public class ApplicationService {
             );
         }
 
+
         return applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new BusinessException(
                         HttpStatus.NOT_FOUND,
@@ -299,7 +409,9 @@ public class ApplicationService {
                 ));
     }
 
+
     private void validatePageRequest(int page, int size) {
+
 
         if (page < 0) {
             throw new BusinessException(
@@ -307,6 +419,7 @@ public class ApplicationService {
                     "Page number cannot be negative"
             );
         }
+
 
         if (size <= 0) {
             throw new BusinessException(
@@ -316,11 +429,13 @@ public class ApplicationService {
         }
     }
 
+
     private void validateStageMovement(
             Stage currentStage,
             Stage targetStage,
             String reason
     ) {
+
 
         if (currentStage == Stage.HIRED || currentStage == Stage.REJECTED) {
             throw new BusinessException(
@@ -329,12 +444,14 @@ public class ApplicationService {
             );
         }
 
+
         if (targetStage == Stage.APPLIED) {
             throw new BusinessException(
                     HttpStatus.BAD_REQUEST,
                     "Cannot move back to APPLIED stage"
             );
         }
+
 
         if (targetStage == Stage.REJECTED) {
             if (reason == null || reason.isBlank()) {
@@ -346,7 +463,9 @@ public class ApplicationService {
             return;
         }
 
+
         Stage expectedNextStage = getNextStage(currentStage);
+
 
         if (targetStage != expectedNextStage) {
             throw new BusinessException(
@@ -360,7 +479,9 @@ public class ApplicationService {
         }
     }
 
+
     private Stage getNextStage(Stage currentStage) {
+
 
         return switch (currentStage) {
             case APPLIED -> Stage.SCREENING;
@@ -373,12 +494,15 @@ public class ApplicationService {
         };
     }
 
+
     private void setStageTimestamp(
             Application application,
             Stage stage
     ) {
 
+
         LocalDateTime now = LocalDateTime.now();
+
 
         switch (stage) {
             case SCREENING -> application.setScreeningAt(now);
@@ -393,13 +517,16 @@ public class ApplicationService {
         }
     }
 
+
     private void calculateSkillMatching(
             ApplicationDto applicationDto,
             ExternalCandidateDto candidateDto,
             DemandDto demandDto
     ) {
 
+
         List<String> requiredSkills = normalizeSkills(demandDto.getSkills());
+
 
         List<String> candidateSkills =
                 candidateDto.getSkills() == null
@@ -412,6 +539,7 @@ public class ApplicationService {
                         .collect(Collectors.toList())
                 );
 
+
         List<String> matchedSkills =
                 candidateSkills.stream()
                         .filter(candidateSkill ->
@@ -421,6 +549,7 @@ public class ApplicationService {
                                         )
                         )
                         .collect(Collectors.toList());
+
 
         List<String> missingSkills =
                 requiredSkills.stream()
@@ -432,6 +561,7 @@ public class ApplicationService {
                         )
                         .collect(Collectors.toList());
 
+
         List<String> otherSkills =
                 candidateSkills.stream()
                         .filter(candidateSkill ->
@@ -442,6 +572,7 @@ public class ApplicationService {
                         )
                         .collect(Collectors.toList());
 
+
         applicationDto.setMatchedSkills(matchedSkills);
         applicationDto.setMissingSkills(missingSkills);
         applicationDto.setOtherSkills(otherSkills);
@@ -451,11 +582,14 @@ public class ApplicationService {
         );
     }
 
+
     private List<String> normalizeSkills(List<String> skills) {
+
 
         if (skills == null) {
             return List.of();
         }
+
 
         return skills.stream()
                 .filter(Objects::nonNull)
@@ -466,26 +600,32 @@ public class ApplicationService {
                 .collect(Collectors.toList());
     }
 
+
     private Integer calculateAiScore(
             List<String> requiredSkills,
             List<String> matchedSkills
     ) {
 
+
         if (requiredSkills == null || requiredSkills.isEmpty()) {
             return 0;
         }
 
+
         double score =
                 ((double) matchedSkills.size() / requiredSkills.size()) * 100;
 
+
         return (int) Math.round(score);
     }
+
 
     private String buildAiRationale(
             List<String> matchedSkills,
             List<String> missingSkills,
             List<String> otherSkills
     ) {
+
 
         String rationale =
                 "Candidate matched "
@@ -498,14 +638,18 @@ public class ApplicationService {
                         + otherSkills
                         + ".";
 
+
         if (rationale.length() > 300) {
             return rationale.substring(0, 297) + "...";
         }
 
+
         return rationale;
     }
 
+
     private Stage parseStage(String stage) {
+
 
         if (stage == null || stage.isBlank()) {
             throw new BusinessException(
@@ -513,6 +657,7 @@ public class ApplicationService {
                     "Stage is required"
             );
         }
+
 
         try {
             return Stage.valueOf(stage.trim().toUpperCase(Locale.ROOT));
@@ -524,3 +669,4 @@ public class ApplicationService {
         }
     }
 }
+
