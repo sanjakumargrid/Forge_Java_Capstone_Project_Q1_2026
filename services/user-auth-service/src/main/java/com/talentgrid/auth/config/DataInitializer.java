@@ -69,6 +69,83 @@ public class DataInitializer
                                 )
                         );
 
+        Scope demandView =
+                scopeRepository.findByName("DEMAND_VIEW")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_VIEW")
+                                                .description("View demands")
+                                                .build()
+                                )
+                        );
+
+        Scope demandCreate =
+                scopeRepository.findByName("DEMAND_CREATE")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_CREATE")
+                                                .description("Create demands")
+                                                .build()
+                                )
+                        );
+
+        Scope demandUpdate =
+                scopeRepository.findByName("DEMAND_UPDATE")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_UPDATE")
+                                                .description("Update demands")
+                                                .build()
+                                )
+                        );
+
+        Scope demandDelete =
+                scopeRepository.findByName("DEMAND_DELETE")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_DELETE")
+                                                .description("Delete demands")
+                                                .build()
+                                )
+                        );
+
+        Scope demandApprove =
+                scopeRepository.findByName("DEMAND_APPROVE")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_APPROVE")
+                                                .description("Approve demands")
+                                                .build()
+                                )
+                        );
+
+        Scope demandStatusTransition =
+                scopeRepository.findByName("DEMAND_STATUS_TRANSITION")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_STATUS_TRANSITION")
+                                                .description("Demand Status Transitions")
+                                                .build()
+                                )
+                        );
+
+        Scope demandPipelineView =
+                scopeRepository.findByName("DEMAND_PIPELINE_VIEW")
+                        .orElseGet(() ->
+                                scopeRepository.save(
+                                        Scope.builder()
+                                                .name("DEMAND_PIPELINE_VIEW")
+                                                .description("View demands pipeline")
+                                                .build()
+                                )
+                        );
+
         // =========================================
         // CREATE ADMIN ROLE
         // =========================================
@@ -85,6 +162,13 @@ public class DataInitializer
                             role.getScopes().add(userCreate);
                             role.getScopes().add(userDelete);
                             role.getScopes().add(userView);
+                            role.getScopes().add(demandCreate);
+                            role.getScopes().add(demandUpdate);
+                            role.getScopes().add(demandDelete);
+                            role.getScopes().add(demandView);
+                            role.getScopes().add(demandApprove);
+                            role.getScopes().add(demandStatusTransition);
+                            role.getScopes().add(demandPipelineView);
 
                             return roleRepository.save(role);
                         });
@@ -94,14 +178,14 @@ public class DataInitializer
         // =========================================
 
         if (!userRepository.existsByEmail(
-                "admin@griddynamics.com"
+                "<user-name>@griddynamics.com"
         )) {
 
             User admin = User.builder()
-                    .username("Admin")
-                    .email("admin@griddynamics.com")
+                    .username("<user-name>")
+                    .email("<user-name>@griddynamics.com")
                     .password(
-                            passwordEncoder.encode("admin@123")
+                            passwordEncoder.encode("<password>")
                     )
                     .enabled(true)
                     .roles(Set.of(adminRole))

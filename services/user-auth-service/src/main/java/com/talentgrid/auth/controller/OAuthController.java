@@ -8,6 +8,7 @@ import com.talentgrid.auth.jwt.JwtService;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class OAuthController {
 
     private final RefreshTokenService refreshTokenService;
 
+    @Deprecated
     @GetMapping("/oauth-success")
     public ResponseEntity<LoginResponse> oauthSuccess(
             @RequestParam String email
@@ -37,20 +39,21 @@ public class OAuthController {
                 .orElseGet(() -> {
 
                     // DEFAULT ROLE
-                    Role candidateRole = roleRepository
-                            .findByName("CANDIDATE")
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "CANDIDATE role not found"
-                                    )
-                            );
+                    Role employeeRole =
+                            roleRepository
+                                    .findByName("EMPLOYEE")
+                                    .orElseThrow(() ->
+                                            new RuntimeException(
+                                                    "EMPLOYEE role not found"
+                                            )
+                                    );
 
                     User newUser = User.builder()
                             .username(email.split("@")[0])
                             .email(email)
                             .password("OAUTH_USER")
                             .enabled(true)
-                            .roles(Set.of(candidateRole))
+                            .roles(Set.of(employeeRole))
                             .build();
 
                     return userRepository.save(newUser);
@@ -76,4 +79,34 @@ public class OAuthController {
                         .build()
         );
     }
+
+    @GetMapping("/session")
+    public ResponseEntity<LoginResponse> session(
+            HttpSession session
+    ) {
+
+        String email =
+                (String) session.getAttribute(
+                        "oauth_email"
+                );
+
+        Boolean authenticated =
+                (Boolean) session.getAttribute(
+                        "oauth_authenticated"
+                );
+
+        if (email == null ||
+                !Boolean.TRUE.equals(authenticated)) {
+
+            throw new RuntimeException(
+                    "OAuth authentication required"
+            );
+        }
+
+        session.removeAttribute("oauth_email");
+        session.removeAttribute("oauth_authenticated");
+
+        return oauthSuccess(email);
+    }
+
 }

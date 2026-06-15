@@ -73,6 +73,7 @@ public class AuthServiceImpl implements AuthService {
 
         return RegisterResponse.builder()
                 .message("User registered successfully")
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .role(role.getName())
                 .build();
