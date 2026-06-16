@@ -1,0 +1,265 @@
+server:
+  port: ${PORT:8080}
+spring:
+  application:
+    name: talentgrid-api-gateway-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+            allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+            allowed-headers: "*"
+            exposed-headers: X-RateLimit-Remaining,X-RateLimit-Limit,X-Trace-Id,X-Correlation-Id
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: ${ratelimit.default.replenishRate}
+            redis-rate-limiter.burstCapacity: ${ratelimit.default.burstCapacity}
+            redis-rate-limiter.requestedTokens: ${ratelimit.default.requestedTokens}
+
+
+      routes:
+        - id: user-auth-service
+          uri: http://${USER_AUTH_SERVICE_HOST:localhost}:8081
+          predicates:
+            - "Path=/api/v1/auth/**, /talentgrid/auth/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: user-auth-service-frontend-rewrite
+          uri: http://${USER_AUTH_SERVICE_HOST:localhost}:8081
+          predicates:
+            - "Path=/talentgrid/login, /talentgrid/register, /talentgrid/logout, /talentgrid/refresh"
+          filters:
+            - "RewritePath=/talentgrid/(?<segment>.*), /api/v1/auth/${segment}"
+        - id: user-auth-admin
+          uri: http://${USER_AUTH_SERVICE_HOST:localhost}:8081
+          predicates:
+            - "Path=/api/v1/admin/**, /talentgrid/admin/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-analytics
+          uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
+          predicates:
+            - "Path=/api/v1/analytics/demands, /talentgrid/analytics/demands"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-scorecards-to-interview
+          uri: http://${INTERVIEW_SERVICE_HOST:localhost}:8087
+          predicates:
+            - "Path=/api/v1/demands/*/scorecards, /talentgrid/demands/*/scorecards"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-service
+          uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
+          predicates:
+            - "Path=/api/v1/demands/**, /talentgrid/demands/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: notification-service
+          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:8083
+          predicates:
+            - "Path=/api/v1/notifications/**, /talentgrid/notifications/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: audit-service
+          uri: http://${AUDIT_SERVICE_HOST:localhost}:8084
+          predicates:
+            - "Path=/api/v1/audit/**, /talentgrid/audit/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: ai-candidates
+          uri: http://${CANDIDATE_SERVICE_HOST:localhost}:8085
+          predicates:
+            - "Path=/api/v1/ai/candidates/**, /talentgrid/ai/candidates/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: candidate-service
+          uri: http://${CANDIDATE_SERVICE_HOST:localhost}:8085
+          predicates:
+            - "Path=/api/v1/candidates/**, /talentgrid/candidates/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: gdpr-service
+          uri: http://${CANDIDATE_SERVICE_HOST:localhost}:8085
+          predicates:
+            - "Path=/api/v1/gdpr/**, /talentgrid/gdpr/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: async-jobs
+          uri: http://${CANDIDATE_SERVICE_HOST:localhost}:8085
+          predicates:
+            - "Path=/api/v1/jobs/**, /talentgrid/jobs/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: pipeline-analytics
+          uri: http://${APPLICATION_SERVICE_HOST:localhost}:8086
+          predicates:
+            - "Path=/api/v1/analytics/pipeline, /talentgrid/analytics/pipeline"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: application-service
+          uri: http://${APPLICATION_SERVICE_HOST:localhost}:8086
+          predicates:
+            - "Path=/api/v1/applications/**, /talentgrid/applications/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: ai-interviews
+          uri: http://${INTERVIEW_SERVICE_HOST:localhost}:8087
+          predicates:
+            - "Path=/api/v1/ai/interviews/**, /talentgrid/ai/interviews/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: interview-service
+          uri: http://${INTERVIEW_SERVICE_HOST:localhost}:8087
+          predicates:
+            - "Path=/api/v1/interviews/**, /talentgrid/interviews/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: recruiter-calendar
+          uri: http://${INTERVIEW_SERVICE_HOST:localhost}:8087
+          predicates:
+            - "Path=/api/v1/recruiter/**, /talentgrid/recruiter/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: offer-service
+          uri: http://${OFFER_SERVICE_HOST:localhost}:8088
+          predicates:
+            - "Path=/api/v1/offers/**, /talentgrid/offers/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: docusign-webhook
+          uri: http://${OFFER_SERVICE_HOST:localhost}:8088
+          predicates:
+            - "Path=/api/v1/webhooks/docusign, /talentgrid/webhooks/docusign"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: job-service
+          uri: http://${JOB_SERVICE_HOST:localhost}:8089
+          predicates:
+            - "Path=/api/v1/job-postings/**, /talentgrid/job-postings/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: careers-portal
+          uri: http://${JOB_SERVICE_HOST:localhost}:8089
+          predicates:
+            - "Path=/api/v1/careers/**, /talentgrid/careers/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: branding
+          uri: http://${JOB_SERVICE_HOST:localhost}:8089
+          predicates:
+            - "Path=/api/v1/branding, /talentgrid/branding"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-ai-skills
+          uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
+          predicates:
+            - "Path=/api/v1/ai/suggestions/skills, /talentgrid/ai/suggestions/skills"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: ai-match
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/ai/match/**, /talentgrid/ai/match/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: ai-embed
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/ai/embed/**, /talentgrid/ai/embed/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: ai-service
+          uri: http://${AI_SERVICE_HOST:localhost}:8090
+          predicates:
+            - "Path=/api/v1/ai/**, /talentgrid/ai/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: engineer-service
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/engineers/**, /talentgrid/engineers/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: utilisation-service
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/utilisation/**, /talentgrid/utilisation/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: nomination-service
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/nominations/**, /talentgrid/nominations/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-embeddings
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/demand-embeddings/**, /talentgrid/demand-embeddings/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: hris-import
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/hris/**, /talentgrid/hris/**"
+            
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: workforce-match-analytics
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/analytics/match-summary, /talentgrid/analytics/match-summary"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: workforce-utilisation-analytics
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/analytics/utilisation-summary, /talentgrid/analytics/utilisation-summary"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: health-endpoints
+          uri: http://${CANDIDATE_SERVICE_HOST:localhost}:8085
+          predicates:
+            - "Path=/api/v1/health/**, /talentgrid/health/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+  config:
+    import: "classpath:rbac-rules.yml,optional:configserver:"
+ratelimit:
+  default:
+    replenishRate: ${RATE_LIMIT_REPLENISH:30}
+    burstCapacity: ${RATE_LIMIT_BURST:60}
+    requestedTokens: ${RATE_LIMIT_TOKENS:1}
+management:
+  otlp:
+    tracing:
+      endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+  tracing:
+    sampling:
+      probability: ${OTEL_TRACING_SAMPLING_PROBABILITY:1.0}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+jwt:
+  secret: ${JWT_SECRET:changeme-replace-in-production-immediately}
+  issuer: talentgrid-auth-service
+logging:
+  level:
+    com:
+      talentgrid:
+        gateway: DEBUG
+    org:
+      springframework:
+        cloud:
+          gateway: INFO

@@ -16,6 +16,7 @@
 	<packaging>pom</packaging>
 	<name>TalentGrid Parent</name>
 	<description>Root BOM — dependency versions locked centrally for TalentGrid</description>
+	<url/>
 
 	<modules>
 		<module>talentgrid-shared</module>
@@ -26,7 +27,21 @@
 		<module>services/user-auth-service</module>
 		<module>talentgrid-audit-service</module>
 		<module>talentgrid-notification-service</module>
+		<module>talentgrid-api-gateway-service</module>
 	</modules>
+
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
 
 	<properties>
 		<java.version>17</java.version>
