@@ -52,8 +52,12 @@ public class NotificationPayload {
      */
     private String recipientEmail;
 
+    /**
+     * Optional Slack recipient identifier (user ID or channel). Used when
+     * {@link #channels} contains "SLACK". Kept optional because not all
+     * notifications target Slack.
+     */
     private String recipientSlackId;
-
 
     /**
      * Notification type identifier, e.g. DEMAND_CREATED, DEMAND_APPROVED,

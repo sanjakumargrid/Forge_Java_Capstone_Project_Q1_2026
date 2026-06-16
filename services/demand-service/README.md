@@ -122,11 +122,11 @@ stateDiagram-v2
    Terminal transitions require a `closureReason`. The engine enforces that the supplied reason mathematically aligns with the target state (e.g., trying to set target `FILLED_INTERNAL` but supplying `CANCELLED` as a reason will throw an error).
 
 4. **Split Tracking**:
-   The entity carefully tracks `requiredCount`, `internalFilledCount`, and `externalFilledCount`. 
+   The entity carefully tracks `requiredCount`, `internalFilledCount`, and `externalFilledCount`.
    `recruitedCount` is computed automatically.
 
 5. **Approval SLA Reminder**:
-Demands remaining in `PENDING_APPROVAL` for more than 72 hours trigger an automated SLA reminder workflow.
+   Demands remaining in `PENDING_APPROVAL` for more than 72 hours trigger an automated SLA reminder workflow.
 
 - The reminder is sent to:
    - The RMG responsible for the demand location
@@ -447,13 +447,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DemandEventSubscriber {
 
-    @KafkaListener(topics = "demand-events", groupId = "your-service-group")
-    public void onEvent(BaseEvent<DemandPayload> event) {
-        String eventType = event.getEventType(); // Can be DEMAND_SUBMITTED, DEMAND_APPROVED, DEMAND_EXTERNAL_OPENED, DEMAND_CLOSED
-        DemandPayload payload = event.getPayload();
-        
-        System.out.printf("Processed lifecycle event [%s] for Demand ID: %d%n", eventType, payload.getDemandId());
-    }
+   @KafkaListener(topics = "demand-events", groupId = "your-service-group")
+   public void onEvent(BaseEvent<DemandPayload> event) {
+      String eventType = event.getEventType(); // Can be DEMAND_SUBMITTED, DEMAND_APPROVED, DEMAND_EXTERNAL_OPENED, DEMAND_CLOSED
+      DemandPayload payload = event.getPayload();
+
+      System.out.printf("Processed lifecycle event [%s] for Demand ID: %d%n", eventType, payload.getDemandId());
+   }
 }
 
 ```

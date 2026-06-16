@@ -21,14 +21,18 @@
 	<modules>
 		<module>talentgrid-shared</module>
 		<module>talentgrid-kafka</module>
-		<module>talentgrid-clients/notification-client</module>
 		<module>talentgrid-clients/audit-client</module>
-		<module>services/demand-service</module>
 		<module>services/user-auth-service</module>
-		<module>talentgrid-audit-service</module>
-		<module>talentgrid-notification-service</module>
 		<module>talentgrid-api-gateway-service</module>
-	</modules>
+        <module>services/application-service</module>
+        <module>services/candidate-service</module>
+        <module>services/offer-service</module>
+        <module>services/interview-service</module>
+        <module>talentgrid-clients/notification-client</module>
+        <module>services/demand-service</module>
+        <module>talentgrid-audit-service</module>
+        <module>talentgrid-notification-service</module>
+    </modules>
 
 	<licenses>
 		<license/>
