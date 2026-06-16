@@ -1,6 +1,7 @@
 package com.talentgrid.demand.security;
 
 import com.talentgrid.demand.domain.entity.Demand;
+import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.repository.DemandRepository;
 import com.talentgrid.demand.util.SecurityUtils;
 import org.slf4j.Logger;
@@ -55,14 +56,79 @@ public class DemandSecurityService {
         return isOwner;
     }
 
-    /**
-     * Checks if the user is either the owner of the demand OR has an Admin/RM role 
-     * that grants universal access.
-     */
     public boolean isOwnerOrHasGlobalAccess(Long demandId) {
-        // Here we could extract roles from SecurityContextHolder to see if they are ADMIN or RM
-        // For now, if they are the owner, they definitely have access.
-        // TODO: Expand to check "hasRole('ADMIN') || hasRole('RM')" once token validation is live.
+        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+            return true;
+        }
         return isOwner(demandId);
+    }
+
+    /**
+     * Checks if the user can view the demand based on their role and the demand's status.
+     */
+    public boolean canView(Long demandId) {
+        if (isOwnerOrHasGlobalAccess(demandId)) {
+            return true;
+        }
+
+        Optional<Demand> demandOpt = demandRepository.findById(demandId);
+        if (demandOpt.isEmpty()) {
+            return false;
+        }
+
+        Demand demand = demandOpt.get();
+        DemandStatus status = demand.getStatus();
+
+        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+            return status == DemandStatus.OPEN_EXTERNAL ||
+                   status == DemandStatus.FILLED_PARTIALLY ||
+                   status == DemandStatus.FILLED_EXTERNAL ||
+                   status == DemandStatus.CLOSED;
+        }
+
+        if (SecurityUtils.hasAnyRole("EMPLOYEE")) {
+            return status == DemandStatus.OPEN_EXTERNAL;
+        }
+
+        if (SecurityUtils.hasAnyRole("HM")) {
+            Long userAccountId = SecurityUtils.getCurrentUserAccountId();
+            if (userAccountId != null && userAccountId.equals(demand.getAccountId())) {
+                return true;
+            }
+            return status == DemandStatus.OPEN_EXTERNAL;
+        }
+
+        // Default fallback
+        return status == DemandStatus.OPEN_EXTERNAL;
+    }
+
+    /**
+     * Checks if the user is authorized to perform state transitions on the demand.
+     */
+    public boolean canTransition(Long demandId) {
+        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+            return true;
+        }
+
+        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+            Optional<Demand> demandOpt = demandRepository.findById(demandId);
+            if (demandOpt.isEmpty()) {
+                return false;
+            }
+            DemandStatus status = demandOpt.get().getStatus();
+            // Recruiters can transition demands that are actively recruiting externally
+            return status == DemandStatus.OPEN_EXTERNAL ||
+                   status == DemandStatus.FILLED_PARTIALLY;
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the user is authorized to close or cancel a demand.
+     * Only RMG and ADMIN roles have this permission.
+     */
+    public boolean canCloseOrCancel() {
+        return SecurityUtils.hasAnyRole("ADMIN", "RMG");
     }
 }

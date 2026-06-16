@@ -4,6 +4,7 @@ import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -15,7 +16,7 @@ import java.util.List;
 
 /**
  * JPA entity representing a workforce demand.
- * Maps all 27 columns of the {@code demands} table as specified in the schema.
+ * Maps all 42 columns of the {@code demands} table as specified in the schema.
  *
  * <p>
  * Lifecycle callbacks:
@@ -78,8 +79,37 @@ public class Demand {
     @Column(name = "skills", columnDefinition = "text[]", nullable = false)
     private List<String> skills;//
 
-    @Column(name = "budget", nullable = false, precision = 15, scale = 2)
-    private BigDecimal budget;//
+    @Column(name = "budget", precision = 15, scale = 2, nullable = false)
+    private BigDecimal budget;
+
+    /**
+     * Required utilization percentage for this demand (0–100).
+     *
+     * <p>Represents the share of working hours an employee is expected to dedicate
+     * to this demand's project/account. For example, a value of {@code 60} means
+     * the matched employee should allocate 60% of their capacity here, leaving the
+     * remaining 40% available for other engagements.
+     *
+     * <p>Stored as {@code req_util_perc} in the database.
+     */
+    @Column(name = "req_util_perc")
+    private Integer reqUtilPerc;//
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "work_mode", nullable = false)
+    private WorkMode workMode;
+
+    @Column(name = "experience", nullable = false)
+    private Long experience;
+
+    @Column(name = "department", nullable = false, length = 150)
+    private String department;
+
+    @Column(name = "client_interview", nullable = false)
+    private Boolean clientInterview;
+
+    @Column(name = "onboarding_date")
+    private LocalDate onboardingDate;
 
     // ─── Headcount Tracking ─────────────────────────────────────────────────────
     @Column(name = "required_count", nullable = false)
@@ -129,6 +159,9 @@ public class Demand {
     @Column(name = "creator_email")
     private String creatorEmail;
 
+    @Column(name = "creator_slack_id", length = 50)
+    private String creatorSlackId;
+
     @Column(name = "assigned_recruiter")
     private Long assignedRecruiter;
 
@@ -174,6 +207,9 @@ public class Demand {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;//
 
+    @Column(name = "approval_reminder_sent")
+    private Boolean approvalReminderSent;
+
     // ─── Relationships ───────────────────────────────────────────────────────────
 
     @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -196,6 +232,9 @@ public class Demand {
         }
         if (this.recruitedCount == null) {
             this.recruitedCount = 0;
+        }
+        if (this.approvalReminderSent == null) {
+            this.approvalReminderSent = false;
         }
     }
 
@@ -293,13 +332,26 @@ public class Demand {
         this.skills = skills;
     }
 
-    public BigDecimal getBudget() {
-        return budget;
-    }
+    public BigDecimal getBudget() { return budget; }
+    public void setBudget(BigDecimal budget) { this.budget = budget; }
 
-    public void setBudget(BigDecimal budget) {
-        this.budget = budget;
-    }
+    public Integer getReqUtilPerc() { return reqUtilPerc; }
+    public void setReqUtilPerc(Integer reqUtilPerc) { this.reqUtilPerc = reqUtilPerc; }
+
+    public WorkMode getWorkMode() { return workMode; }
+    public void setWorkMode(WorkMode workMode) { this.workMode = workMode; }
+
+    public Long getExperience() { return experience; }
+    public void setExperience(Long experience) { this.experience = experience; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public Boolean getClientInterview() { return clientInterview; }
+    public void setClientInterview(Boolean clientInterview) { this.clientInterview = clientInterview; }
+
+    public LocalDate getOnboardingDate() { return onboardingDate; }
+    public void setOnboardingDate(LocalDate onboardingDate) { this.onboardingDate = onboardingDate; }
 
     public Integer getRequiredCount() {
         return requiredCount;
@@ -507,5 +559,21 @@ public class Demand {
 
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public void setCreatorSlackId(String slackId) {
+        this.creatorSlackId = slackId;
+    }
+
+    public String getCreatorSlackId() {
+        return creatorSlackId;
+    }
+
+    public Boolean getApprovalReminderSent() {
+        return approvalReminderSent;
+    }
+
+    public void setApprovalReminderSent(Boolean approvalReminderSent) {
+        this.approvalReminderSent = approvalReminderSent;
     }
 }

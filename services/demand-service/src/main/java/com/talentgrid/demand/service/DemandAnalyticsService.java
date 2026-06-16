@@ -1,24 +1,23 @@
 package com.talentgrid.demand.service;
 
-import com.talentgrid.demand.domain.enums.DemandStatus;
-import com.talentgrid.demand.dto.response.DemandAnalyticsResponse;
+import com.talentgrid.demand.dto.response.DemandAnalyticsMetricsResponse;
+import com.talentgrid.demand.dto.response.DemandAnalyticsMetricsResponse.*;
 import com.talentgrid.demand.repository.DemandRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 /**
- * Provides demand analytics dashboard metrics.
+ * Provides position-level demand analytics metrics for the dashboard.
  *
- * <p>Metrics computed:
+ * <p>Metrics computed (for a given time window, default=last 30 days):
  * <ul>
- *   <li><b>Total demands</b> — all non-deleted demands.</li>
- *   <li><b>Counts by status</b> — draft, pending, active (internal + external search),
- *       filled, cancelled, on-hold, closed.</li>
- *   <li><b>Fill rate</b> — percentage of filled demands out of total.</li>
- *   <li><b>Average time-to-fill</b> — days from creation to closure for filled demands.</li>
- *   <li><b>Internal vs external fill split</b> — aggregate filled counts.</li>
+ *   <li><b>Demand Fill Rate</b> — total filled positions / total required positions</li>
+ *   <li><b>Average Time-to-Fill</b> — average days from demand creation to first FILLED_* status</li>
+ *   <li><b>Internal vs External Split</b> — distribution of filled positions by source</li>
  * </ul>
  */
 @Service
@@ -30,60 +29,95 @@ public class DemandAnalyticsService {
     private final DemandRepository demandRepository;
 
     /**
-     * Computes the demand analytics dashboard response.
+     * Computes position-level demand analytics for the specified time window.
+     * Defaults to last 30 days if dates are not provided.
      *
-     * @return analytics response with fill rate, avg time-to-fill, and breakdowns
+     * @param startDate start of analytics window (inclusive); null = 30 days ago
+     * @param endDate   end of analytics window (inclusive); null = today
+     * @return analytics response with fill rate, avg time-to-fill, and internal/external split
      */
-    public DemandAnalyticsResponse getAnalytics() {
-        DemandAnalyticsResponse response = new DemandAnalyticsResponse();
+    public DemandAnalyticsMetricsResponse getAnalytics(LocalDate startDate, LocalDate endDate) {
+        // Default to last 30 days if not provided
+        LocalDate end = endDate != null ? endDate : LocalDate.now();
+        LocalDate start = startDate != null ? startDate : end.minusDays(30);
 
-        long totalDemands = demandRepository.countByIsDeletedFalse();
-        response.setTotalDemands(totalDemands);
+        int windowDays = (int) java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
 
-        // ── Status counts ───────────────────────────────────────────────────────
-        response.setDraftCount(demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.DRAFT));
-        response.setPendingApprovalCount(
-                demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.PENDING_APPROVAL));
+        // ── Fill Rate (Position-Level) ──────────────────────────────────────────────
+        long totalRequiredPositions = demandRepository.sumRequiredPositionsBetween(start, end);
+        long totalFilledPositions = demandRepository.sumFilledPositionsBetween(start, end);
 
-        long internalSearch = demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.INTERNAL_SEARCH);
-        long openExternal = demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.OPEN_EXTERNAL);
-        response.setActiveSearchCount(internalSearch + openExternal);
-
-        long filledInternal = demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.FILLED_INTERNAL);
-        long filledExternal = demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.FILLED_EXTERNAL);
-        long filledPartially = demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.FILLED_PARTIALLY);
-        response.setFilledCount(filledInternal + filledExternal + filledPartially);
-
-        response.setCancelledCount(
-                demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.CANCELLED));
-        response.setOnHoldCount(
-                demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.ON_HOLD));
-        response.setClosedCount(
-                demandRepository.countByStatusAndIsDeletedFalse(DemandStatus.CLOSED));
-
-        // ── Fill rate ───────────────────────────────────────────────────────────
-        if (totalDemands > 0) {
-            double fillRate = (double) (filledInternal + filledExternal + filledPartially) / totalDemands * 100.0;
-            response.setFillRatePercent(Math.round(fillRate * 100.0) / 100.0);
-        } else {
-            response.setFillRatePercent(0.0);
+        double fillRatePercent = 0.0;
+        if (totalRequiredPositions > 0) {
+            fillRatePercent = Math.round(((double) totalFilledPositions / totalRequiredPositions * 100.0) * 100.0) / 100.0;
         }
 
-        // ── Average time-to-fill ────────────────────────────────────────────────
+        FillRate fillRate = FillRate.builder()
+                .totalRequiredPositions(totalRequiredPositions)
+                .totalFilledPositions(totalFilledPositions)
+                .fillRatePercent(fillRatePercent)
+                .build();
+
+        // ── Internal vs External Split ──────────────────────────────────────────────
+        long internalFilledCount = demandRepository.sumInternalFilledCountBetween(start, end);
+        long externalFilledCount = demandRepository.sumExternalFilledCountBetween(start, end);
+
+        double internalPercentage = 0.0;
+        double externalPercentage = 0.0;
+        long totalFilled = internalFilledCount + externalFilledCount;
+        if (totalFilled > 0) {
+            internalPercentage = Math.round(((double) internalFilledCount / totalFilled * 100.0) * 100.0) / 100.0;
+            externalPercentage = Math.round(((double) externalFilledCount / totalFilled * 100.0) * 100.0) / 100.0;
+        }
+
+        InternalExternalSplit split = InternalExternalSplit.builder()
+                .internalFilledCount(internalFilledCount)
+                .externalFilledCount(externalFilledCount)
+                .internalPercentage(internalPercentage)
+                .externalPercentage(externalPercentage)
+                .build();
+
+        // ── Average Time-to-Fill ───────────────────────────────────────────────────
+        double avgTimeToFillDays;
+        double minTimeToFillDays;
+        double maxTimeToFillDays;
+        long filledDemandsCount;
+
         try {
-            double avgDays = demandRepository.averageTimeToFillDays();
-            response.setAvgTimeToFillDays(Math.round(avgDays * 100.0) / 100.0);
+            avgTimeToFillDays = Math.round(demandRepository.averageTimeToFillBetween(start, end) * 100.0) / 100.0;
+            minTimeToFillDays = Math.round(demandRepository.minTimeToFillBetween(start, end) * 100.0) / 100.0;
+            maxTimeToFillDays = Math.round(demandRepository.maxTimeToFillBetween(start, end) * 100.0) / 100.0;
+            filledDemandsCount = demandRepository.countDemandsWithFilledPositionsBetween(start, end);
         } catch (Exception e) {
-            response.setAvgTimeToFillDays(0.0);
+            log.warn("Error computing time-to-fill metrics: {}", e.getMessage());
+            avgTimeToFillDays = 0.0;
+            minTimeToFillDays = 0.0;
+            maxTimeToFillDays = 0.0;
+            filledDemandsCount = 0;
         }
 
-        // ── Internal vs external fill split ─────────────────────────────────────
-        long totalInternalFilled = demandRepository.sumInternalFilledCount();
-        long totalExternalFilled = demandRepository.sumExternalFilledCount();
-        response.setTotalInternalFilled(totalInternalFilled);
-        response.setTotalExternalFilled(totalExternalFilled);
+        TimeToFill timeToFill = TimeToFill.builder()
+                .averageDaysToFill(avgTimeToFillDays)
+                .totalFilledDemands(filledDemandsCount)
+                .minDaysToFill(minTimeToFillDays)
+                .maxDaysToFill(maxTimeToFillDays)
+                .build();
 
-        log.info("Successfully fetched demand analytics metrics");
+        // ── Build Response ──────────────────────────────────────────────────────────
+        Metadata metadata = Metadata.builder()
+                .startDate(start)
+                .endDate(end)
+                .windowDays(windowDays)
+                .build();
+
+        DemandAnalyticsMetricsResponse response = DemandAnalyticsMetricsResponse.builder()
+                .metadata(metadata)
+                .fillRate(fillRate)
+                .internalVsExternalSplit(split)
+                .timeToFill(timeToFill)
+                .build();
+
+        log.info("Successfully computed position-level demand analytics for window [{}, {}]", start, end);
         return response;
     }
 }

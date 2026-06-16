@@ -30,6 +30,9 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "location", length = 150)
+    private String location;
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;
@@ -41,6 +44,9 @@ public class User implements Serializable {
     @Column(name = "account_locked")
     @Builder.Default
     private Boolean accountLocked = false;
+
+    @Column(name = "slack_id", length = 50)
+    private String slackId;
 
     @Column(name = "lock_time")
     private LocalDateTime lockTime;

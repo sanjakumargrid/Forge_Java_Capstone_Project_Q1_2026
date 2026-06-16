@@ -52,6 +52,7 @@ public class NotificationEventPublisher {
     public void sendInAppAndEmail(
             String recipientUserId,
             String recipientEmail,
+            String recipientSlackId,
             String notificationType,
             String title,
             String message,
@@ -66,10 +67,11 @@ public class NotificationEventPublisher {
         publish(NotificationPayload.builder()
                 .recipientUserId(recipientUserId)
                 .recipientEmail(recipientEmail)
+                .recipientSlackId(recipientSlackId)
                 .notificationType(notificationType)
                 .title(title)
                 .message(message)
-                .channels(List.of("IN_APP", "EMAIL"))
+                .channels(List.of("IN_APP", "EMAIL", "SLACK"))
                 .moduleName(moduleName)
                 .referenceId(referenceId)
                 .referenceType(referenceType)
@@ -77,6 +79,40 @@ public class NotificationEventPublisher {
                 .templateId(templateId)
                 .templateVariables(templateVariables)
                 .build(),
+                correlationId);
+    }
+
+    /**
+     * Backwards-compatible overload used by older callers that don't provide a
+     * Slack recipient. Delegates to the full method with a null slack id.
+     */
+    public void sendInAppAndEmail(
+            String recipientUserId,
+            String recipientEmail,
+            String notificationType,
+            String title,
+            String message,
+            String moduleName,
+            String referenceId,
+            String referenceType,
+            String priority,
+            String templateId,
+            Map<String, String> templateVariables,
+            String correlationId) {
+
+        sendInAppAndEmail(
+                recipientUserId,
+                recipientEmail,
+                null,
+                notificationType,
+                title,
+                message,
+                moduleName,
+                referenceId,
+                referenceType,
+                priority,
+                templateId,
+                templateVariables,
                 correlationId);
     }
 

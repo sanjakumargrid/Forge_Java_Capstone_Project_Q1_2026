@@ -1,0 +1,12 @@
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/constants/JwtConstants.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/dto/JwtUserContext.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/exception/ExpiredJwtException.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/exception/InvalidJwtException.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/exception/UnauthorizedException.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/jwt/JwtTokenService.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/security/JwtAuthenticationProvider.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/security/JwtAuthenticationToken.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/auth/security/JwtPrincipal.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/common/dto/ApiResponse.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/config/JwtAutoConfiguration.java
+/Users/arathod/Desktop/Organization-capstone-forge/Forge_Java_Capstone_Project_Q1_2026_Services/talentgrid-shared/src/main/java/com/talentgrid/shared/config/JwtProperties.java

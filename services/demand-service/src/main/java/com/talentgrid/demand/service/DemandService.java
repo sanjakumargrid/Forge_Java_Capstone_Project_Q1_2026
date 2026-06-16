@@ -55,6 +55,11 @@ public class DemandService {
         validationService.validateCreate(request);
         Demand demand = demandMapper.toEntity(request);
 
+        // Default onboarding date to target date if not provided
+        if (demand.getOnboardingDate() == null) {
+            demand.setOnboardingDate(demand.getTargetDate());
+        }
+
         // Fetch Account and Project info from UserAuthService
         if (request.getAccountId() != null) {
             try {
@@ -81,6 +86,11 @@ public class DemandService {
         demand.setCreatedBy(SecurityUtils.getCurrentUserId());
         demand.setCreatorEmail(SecurityUtils.getCurrentUserEmail());
         demand.setCreatorName(SecurityUtils.getCurrentUserName());
+        Long creatorId = SecurityUtils.getCurrentUserId();
+        var user = userAuthServiceClient.getUserById(creatorId);
+        if (user != null && user.getSlackId() != null) {
+            demand.setCreatorSlackId(user.getSlackId());
+        }
 
         Demand saved = demandRepository.save(demand);
 

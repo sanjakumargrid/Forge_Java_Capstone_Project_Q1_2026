@@ -20,13 +20,13 @@ import java.util.List;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code POST  /demands/{id}/approve} — approve or reject a pending
+ * <li>{@code POST  /api/demands/{id}/approve} — approve or reject a pending
  * demand</li>
- * <li>{@code PATCH /demands/{id}/status} — perform a legal status
+ * <li>{@code PATCH /api/demands/{id}/status} — perform a legal status
  * transition</li>
- * <li>{@code GET   /demands/{id}/pipeline} — unified internal + external hiring
+ * <li>{@code GET   /api/demands/{id}/pipeline} — unified internal + external hiring
  * pipeline</li>
- * <li>{@code GET   /demands/{id}/history} — full audit trail of status transitions</li>
+ * <li>{@code GET   /api/demands/{id}/history} — full audit trail of status transitions</li>
  * </ul>
  */
 @RestController
@@ -77,7 +77,7 @@ public class DemandLifecycleController {
      * @return 200 OK
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION') and @demandSecurity.canTransition(#id)")
     public ResponseEntity<DemandResponse> transitionStatus(
             @PathVariable Long id, @RequestBody StatusTransitionRequest request) {
         DemandResponse response = lifecycleService.transitionStatus(id, request);
@@ -92,7 +92,7 @@ public class DemandLifecycleController {
      * @return the unified pipeline view
      */
     @GetMapping("/{id}/pipeline")
-    @PreAuthorize("hasAuthority('DEMAND_PIPELINE_VIEW') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_PIPELINE_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandPipelineResponse> getPipeline(@PathVariable Long id) {
         DemandPipelineResponse response = queryService.getPipeline(id);
         return ResponseEntity.ok(response);
@@ -105,7 +105,7 @@ public class DemandLifecycleController {
      * @return list of status history entries
      */
     @GetMapping("/{id}/history")
-    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<List<DemandStatusHistoryResponse>> getHistory(@PathVariable Long id) {
         List<DemandStatusHistoryResponse> response = queryService.getDemandHistory(id);
         return ResponseEntity.ok(response);

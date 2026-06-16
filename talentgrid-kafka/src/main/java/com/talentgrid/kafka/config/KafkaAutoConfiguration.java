@@ -5,10 +5,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
 @AutoConfiguration
 @Import(TalentGridTopicConfig.class)
+@ComponentScan("com.talentgrid.kafka")
 public class KafkaAutoConfiguration {
 
     @Bean

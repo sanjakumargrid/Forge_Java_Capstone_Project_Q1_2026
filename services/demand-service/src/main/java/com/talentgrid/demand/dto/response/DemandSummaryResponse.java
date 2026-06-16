@@ -22,9 +22,18 @@ public class DemandSummaryResponse {
 
     private Long demandId;
     private String title;
+    private String level;
+    private String employmentType;
+    private String location;
     private String status;
     private String priority;
     private String businessUnit;
+
+    // Project / Account linkage for quick dashboard grouping
+    private Long accountId;
+    private String accountName;
+    private Long projectId;
+    private String projectName;
 
     /** Age of the demand in days from creation to now — computed by the mapper. */
     private Long ageInDays;
