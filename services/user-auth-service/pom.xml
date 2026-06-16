@@ -25,6 +25,12 @@
             <version>4.0.0</version>
         </dependency>
 
+        <!-- Eureka Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.talentgrid</groupId>
             <artifactId>talentgrid-shared</artifactId>
