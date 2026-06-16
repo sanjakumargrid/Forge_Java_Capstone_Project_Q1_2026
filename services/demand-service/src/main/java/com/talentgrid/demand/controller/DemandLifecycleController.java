@@ -77,7 +77,7 @@ public class DemandLifecycleController {
      * @return 200 OK
      */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION') and @demandSecurity.canTransition(#id)")
     public ResponseEntity<DemandResponse> transitionStatus(
             @PathVariable Long id, @RequestBody StatusTransitionRequest request) {
         DemandResponse response = lifecycleService.transitionStatus(id, request);
@@ -92,7 +92,7 @@ public class DemandLifecycleController {
      * @return the unified pipeline view
      */
     @GetMapping("/{id}/pipeline")
-    @PreAuthorize("hasAuthority('DEMAND_PIPELINE_VIEW') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_PIPELINE_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandPipelineResponse> getPipeline(@PathVariable Long id) {
         DemandPipelineResponse response = queryService.getPipeline(id);
         return ResponseEntity.ok(response);
@@ -105,7 +105,7 @@ public class DemandLifecycleController {
      * @return list of status history entries
      */
     @GetMapping("/{id}/history")
-    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<List<DemandStatusHistoryResponse>> getHistory(@PathVariable Long id) {
         List<DemandStatusHistoryResponse> response = queryService.getDemandHistory(id);
         return ResponseEntity.ok(response);

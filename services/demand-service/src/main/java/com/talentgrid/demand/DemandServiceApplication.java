@@ -8,7 +8,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * Main entry point for the TalentGrid Demand Service.
  *
- * <p>Bootstraps the Spring context, scanning local packages as well as shared libraries
+ * <p>
+ * Bootstraps the Spring context, scanning local packages as well as shared
+ * libraries
  * for Kafka configuration, Audit client integration, and Feign clients.
  */
 @EnableScheduling

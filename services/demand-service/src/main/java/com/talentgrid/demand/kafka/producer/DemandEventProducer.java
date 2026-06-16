@@ -84,7 +84,8 @@ public class DemandEventProducer {
         payload.setDepartment(demand.getDepartment());
         payload.setEmploymentType(demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
         payload.setOnboardingDate(demand.getOnboardingDate());
-        // FIX: recipientEmail and raisedBy were missing — causing email notifications to be skipped
+        // FIX: recipientEmail and raisedBy were missing — causing email notifications
+        // to be skipped
         payload.setRecipientEmail(demand.getCreatorEmail());
         payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null

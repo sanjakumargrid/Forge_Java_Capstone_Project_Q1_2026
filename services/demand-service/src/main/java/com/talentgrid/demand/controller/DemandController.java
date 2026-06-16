@@ -26,7 +26,8 @@ import org.springframework.web.bind.annotation.*;
  * <li>{@code POST   /api/demands} — create a new workforce demand (status:
  * DRAFT)</li>
  * <li>{@code GET    /api/demands/{id}} — get detailed demand information</li>
- * <li>{@code PATCH  /api/demands/{id}} — update editable fields (DRAFT only)</li>
+ * <li>{@code PATCH  /api/demands/{id}} — update editable fields (DRAFT
+ * only)</li>
  * <li>{@code DELETE /api/demands/{id}} — soft delete a draft demand</li>
  * </ul>
  */
@@ -41,16 +42,19 @@ public class DemandController {
     /**
      * Enterprise demand search with optional filters and pagination.
      *
-     * @param status       optional filter by demand status
-     * @param priority     optional filter by demand priority
-     * @param businessUnit optional filter by business unit
-     * @param sortBy       sort field: "age" or "priority" (default: created_at
-     *                     desc)
-     * @param sortDir      sort direction: "asc" or "desc" (default: "desc")
-     * @param page         zero-based page index (default: 0)
-     * @param size         page size (default: 20, max: 100)
+     * @param status         optional filter by demand status
+     * @param priority       optional filter by demand priority
+     * @param businessUnit   optional filter by business unit
+     * @param accountName    optional filter by account name
+     * @param location       optional filter by location
+     * @param employmentType optional filter by employment type
+     * @param sortBy         sort field (default: "createdAt")
+     * @param sortDir        sort direction: "asc" or "desc" (default: "desc")
+     * @param page           zero-based page index (default: 0)
+     * @param size           page size (default: 20, max: 100)
      * @return paginated list of demand summaries
      */
+
     @GetMapping
     @PreAuthorize("hasAuthority('DEMAND_VIEW')")
     public ResponseEntity<Page<DemandSummaryResponse>> searchDemands(
@@ -90,7 +94,7 @@ public class DemandController {
      * @return the full demand response
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandResponse> getDemandById(@PathVariable Long id) {
         return ResponseEntity.ok(demandQueryService.getDemandById(id));
     }

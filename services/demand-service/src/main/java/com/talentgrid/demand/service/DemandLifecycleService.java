@@ -20,6 +20,7 @@ import com.talentgrid.audit.dto.AuditAction;
 import com.talentgrid.audit.dto.AuditLogPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,6 +63,10 @@ public class DemandLifecycleService {
      */
     @Transactional
     public DemandResponse approve(Long id, ApprovalRequest request) {
+        if (!SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+            throw new AccessDeniedException("Only ADMIN or RMG roles can approve or reject demands.");
+        }
+
         Demand demand = findActiveOrThrow(id);
 
         if (demand.getStatus() != DemandStatus.PENDING_APPROVAL) {
@@ -174,6 +179,20 @@ public class DemandLifecycleService {
         transitionValidator.validate(demand, targetStatus, closureReason);
 
         DemandStatus fromStatus = demand.getStatus();
+
+        // ── RBAC Checks ─────────────────────────────────────────────────────────
+        if ((targetStatus == DemandStatus.CLOSED || targetStatus == DemandStatus.CANCELLED) 
+            && !SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+            throw new AccessDeniedException("Only ADMIN or RMG roles can close or cancel a demand.");
+        }
+
+        if (SecurityUtils.hasAnyRole("RECRUITER") && !SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+            if (fromStatus != DemandStatus.OPEN_EXTERNAL 
+             && fromStatus != DemandStatus.FILLED_PARTIALLY 
+             && fromStatus != DemandStatus.FILLED_EXTERNAL) {
+                throw new AccessDeniedException("Recruiters can only transition demands that are in OPEN_EXTERNAL or later stages.");
+            }
+        }
 
         // ── Handle ON_HOLD: save previousStatus before transitioning ────────────
         if (targetStatus == DemandStatus.ON_HOLD) {
