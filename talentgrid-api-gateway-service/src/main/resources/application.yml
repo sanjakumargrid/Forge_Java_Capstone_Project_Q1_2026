@@ -252,7 +252,7 @@ management:
     health:
       show-details: always
 jwt:
-  secret: ${JWT_SECRET:changeme-replace-in-production-immediately}
+  secret: ${JWT_SECRET}
   issuer: talentgrid-auth-service
 logging:
   level:

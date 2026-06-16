@@ -7,9 +7,9 @@ spring:
     name: talentgrid-audit-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/talentgrid
-    username: talentgrid
-    password: talentgrid
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/talentgrid}
+    username: ${DB_USERNAME:talentgrid}
+    password: ${DB_PASSWORD:talentgrid}
     driver-class-name: org.postgresql.Driver
 
   jpa:
