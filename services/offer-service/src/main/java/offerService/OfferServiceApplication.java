@@ -17,7 +17,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 )
 @EnableConfigurationProperties({
         GeminiProperties.class,
-        DocuSignProperties.class
+        DocuSignProperties.class,
+        OpenAiProperties.class
 })
 public class OfferServiceApplication {
 

@@ -17,7 +17,6 @@ public class WebClientConfig {
                 .build();
     }
 
-
     @Bean
     public WebClient candidateWebClient(
             @Value("${candidate.service.url}") String candidateServiceUrl
@@ -26,5 +25,4 @@ public class WebClientConfig {
                 .baseUrl(candidateServiceUrl)
                 .build();
     }
-
 }

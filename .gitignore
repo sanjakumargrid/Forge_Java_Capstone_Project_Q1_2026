@@ -1,0 +1,10 @@
+cat >> .gitignore <<'EOF'
+
+# Google / DocuSign secrets
+**/src/main/resources/google/service-account.json
+**/src/main/resources/google/oauth-client-secret.json
+**/src/main/resources/docusign/private.key
+**/*.pem
+**/*.p12
+**/*.key
+EOF

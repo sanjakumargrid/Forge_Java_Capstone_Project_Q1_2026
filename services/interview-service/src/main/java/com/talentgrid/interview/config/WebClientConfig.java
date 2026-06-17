@@ -21,6 +21,15 @@ public class WebClientConfig {
     }
 
     @Bean
+    public WebClient userAuthWebClient(
+            @Value("${user-auth-service.url:http://localhost:8080}") String userAuthServiceUrl
+    ) {
+        return WebClient.builder()
+                .baseUrl(userAuthServiceUrl)
+                .build();
+    }
+
+    @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
