@@ -4,6 +4,7 @@ import com.talentgrid.interview.ai.dto.FollowUpQuestionsResponseDto;
 import com.talentgrid.interview.ai.service.InterviewQuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,11 @@ public class InterviewQuestionController {
      *
      * GET /api/interviews/{interviewId}/follow-up-questions
      */
+    @PreAuthorize("hasAuthority('INTERVIEW_VIEW')")
     @GetMapping("/interviews/{interviewId}/follow-up-questions")
     public ResponseEntity<FollowUpQuestionsResponseDto> getFollowUpQuestions(
-            @PathVariable Long interviewId
-    ) {
-        FollowUpQuestionsResponseDto response =
-                interviewQuestionService.generateFollowUpQuestions(interviewId);
+            @PathVariable Long interviewId) {
+        FollowUpQuestionsResponseDto response = interviewQuestionService.generateFollowUpQuestions(interviewId);
 
         return ResponseEntity.ok(response);
     }
