@@ -25,8 +25,8 @@ public class InternalEmployee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "employee_id", nullable = false, unique = true, length = 50)
-    private String employeeId;
+    @Column(name = "employee_id", nullable = false, unique = true)
+    private Long employeeId;
 
     @Column(nullable = false, length = 150)
     private String name;

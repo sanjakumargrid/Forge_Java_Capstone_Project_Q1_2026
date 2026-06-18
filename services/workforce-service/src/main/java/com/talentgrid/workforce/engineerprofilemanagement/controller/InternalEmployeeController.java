@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/engineer-profile")
 @Tag(name = "Engineer Profile Management", description = "APIs for internal employee profile retrieval")
@@ -26,8 +28,18 @@ public class InternalEmployeeController {
     @GetMapping("/employees/{employeeId}")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
     public ResponseEntity<InternalEmployeeResponse> getEmployeeByEmployeeId(
-            @PathVariable("employeeId") String employeeId) {
+            @PathVariable("employeeId") Long employeeId) {
         InternalEmployeeResponse response = internalEmployeeService.getEmployeeDetailsById(employeeId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get internal employee by database ID",
+            description = "Returns internal employee profile details for a given database ID (primary key, e.g., 7002)")
+    @GetMapping("/employees-by-id/{id}")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    public ResponseEntity<InternalEmployeeResponse> getEmployeeByDatabaseId(
+            @PathVariable("id") Long id) {
+        InternalEmployeeResponse response = internalEmployeeService.getEmployeeByDatabaseId(id);
         return ResponseEntity.ok(response);
     }
 
@@ -37,10 +49,19 @@ public class InternalEmployeeController {
     @PatchMapping("/update")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_UPDATE')")
     public ResponseEntity<InternalEmployeeResponse> updateOwnProfile(
-            @RequestHeader("X-Employee-Id") String employeeId,
+            @RequestHeader("X-Employee-Id") Long employeeId,
             @Valid @RequestBody UpdateEngineerProfileRequest request,
             @RequestHeader(value = "X-Request-Id", required = false) String requestId) {
         InternalEmployeeResponse response = internalEmployeeService.updateOwnProfile(employeeId, request, requestId);
         return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/engineers")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    @Operation(summary = "Load all engineers",
+            description = "Returns all non-deleted engineers from internal_employees")
+    public ResponseEntity<List<InternalEmployeeResponse>> getAllEngineers() {
+        return ResponseEntity.ok(internalEmployeeService.getAllEngineers());
     }
 }

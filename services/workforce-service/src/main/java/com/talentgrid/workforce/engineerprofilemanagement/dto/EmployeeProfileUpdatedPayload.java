@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class EmployeeProfileUpdatedPayload {
 
-    private String employeeId;
+    private Long employeeId;
     private List<String> updatedFields;
     private List<String> skills;
     private LocalDate availabilityDate;

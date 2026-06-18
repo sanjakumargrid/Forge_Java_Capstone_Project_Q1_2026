@@ -5,12 +5,18 @@ import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProf
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface InternalEmployeeService {
 
-    InternalEmployeeResponse getEmployeeDetailsById(String employeeId);
+    InternalEmployeeResponse getEmployeeDetailsById(Long employeeId);
 
-    InternalEmployeeResponse updateOwnProfile(String employeeId, UpdateEngineerProfileRequest request, String requestId);
+    InternalEmployeeResponse getEmployeeByDatabaseId(Long id);
+
+    List<InternalEmployeeResponse> getAllEngineers();
+
+    InternalEmployeeResponse updateOwnProfile(Long employeeId, UpdateEngineerProfileRequest request, String requestId);
 
     InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto);
 }

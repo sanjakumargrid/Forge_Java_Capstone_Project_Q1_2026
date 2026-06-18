@@ -1,10 +1,13 @@
 package com.talentgrid.workforce.rmgnomination.service;
 
+import com.talentgrid.workforce.skillgapheatmap.client.DemandServiceClient;
+import com.talentgrid.workforce.skillgapheatmap.provider.model.DemandServiceResponse;
+import feign.FeignException;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
-import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryPageResponse;
+import com.talentgrid.workforce.rmgdashboard.service.RmgService;
 import com.talentgrid.workforce.rmgnomination.dto.NominationRequest;
 import com.talentgrid.workforce.rmgnomination.dto.NominationResponse;
 import com.talentgrid.workforce.rmgnomination.entity.EmployeeUtilisation;
@@ -22,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +37,8 @@ public class NominationService {
     private final InternalMatchRepository internalMatchRepository;
     private final EmployeeUtilisationRepository employeeUtilisationRepository;
     private final DemandClient demandClient;
+    private final DemandServiceClient demandServiceClient;
+    private final RmgService rmgService;
 
     @Transactional
     public NominationResponse nominate(NominationRequest request) {
@@ -44,20 +50,24 @@ public class NominationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Engineer not found: " + request.getEmployeeId()));
         Long employeeId = employee.getId();
 
-        // 2. Validate demand exists in APPROVED state
-        DemandSummaryPageResponse approvedDemands = demandClient.getDemandsByStatus("APPROVED", 0, 500);
-        boolean approvedDemandExists = approvedDemands != null
-                && approvedDemands.getContent() != null
-                && approvedDemands.getContent().stream()
-                .anyMatch(demand -> demand.getDemandId() != null && demand.getDemandId().equals(request.getDemandId()));
-        if (!approvedDemandExists) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
-                    "Demand is not available for nomination in APPROVED state: " + request.getDemandId());
+        // 2. Validate demand exists and is in nominatable state.
+        //    On first RM nomination from APPROVED, auto-transition to INTERNAL_SEARCH.
+        DemandDto demand = demandClient.getDemandById(request.getDemandId());
+        String currentStatus = normalizedStatus(demand.getStatus());
+
+        if ("APPROVED".equals(currentStatus)) {
+            demand = transitionApprovedToInternalSearch(request.getDemandId(), demand);
+            currentStatus = normalizedStatus(demand.getStatus());
         }
-        DemandDto approvedDemand = demandClient.getDemandById(request.getDemandId());
+
+        if (!"INTERNAL_SEARCH".equals(currentStatus)) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Demand is not available for nomination. Expected status APPROVED or INTERNAL_SEARCH, found: "
+                            + demand.getStatus());
+        }
 
         // 3. Check demand headcount fulfillment
-        if (isDemandAlreadyFulfilledInternally(approvedDemand)) {
+        if (isDemandAlreadyFulfilledInternally(demand)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Demand is already filled internally for demandId: " + request.getDemandId());
         }
@@ -71,9 +81,17 @@ public class NominationService {
         }
 
         // 5. Compute Live Utilisation
-        int liveUtil = employeeUtilisationRepository.sumAllocatedPercentageByEmployeeId(employeeId);
+        // Old logic kept as requested:
+        // int liveUtil = employeeUtilisationRepository.sumAllocatedPercentageByEmployeeId(employeeId);
+        int liveUtil = safeInt(employee.getUtilisationPct());
         int requestedAllocation = request.getAllocationPercentage();
 
+        // Old logic kept as requested:
+        // if (liveUtil + requestedAllocation > 100) {
+        //     String errorMsg = String.format("Engineer utilisation would exceed 100%%. Current: %d%%, Requested: %d%%, Total would be: %d%%",
+        //             liveUtil, requestedAllocation, liveUtil + requestedAllocation);
+        //     throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, errorMsg);
+        // }
         if (liveUtil + requestedAllocation > 100) {
             String errorMsg = String.format("Engineer utilisation would exceed 100%%. Current: %d%%, Requested: %d%%, Total would be: %d%%",
                     liveUtil, requestedAllocation, liveUtil + requestedAllocation);
@@ -144,6 +162,61 @@ public class NominationService {
                 .collect(Collectors.toList());
     }
 
+    public DemandServiceResponse getDemandDetailsById(Long demandId) {
+        try {
+            DemandServiceResponse demand = demandServiceClient.getDemandById(demandId);
+            if (demand == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Demand not found: " + demandId);
+            }
+            return demand;
+        } catch (FeignException ex) {
+            HttpStatus statusCode = HttpStatus.resolve(ex.status());
+            HttpStatus resolved = statusCode != null ? statusCode : HttpStatus.BAD_GATEWAY;
+            String message = ex.contentUTF8() != null && !ex.contentUTF8().isBlank()
+                    ? ex.contentUTF8()
+                    : ex.getMessage();
+            throw new ResponseStatusException(resolved, message, ex);
+        }
+    }
+
+    public DemandDto moveDemandToInternalSearch(Long demandId) {
+        DemandDto demand = demandClient.getDemandById(demandId);
+        if (demand == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Demand not found: " + demandId);
+        }
+
+        String currentStatus = normalizedStatus(demand.getStatus());
+        if ("INTERNAL_SEARCH".equals(currentStatus)) {
+            return demand;
+        }
+
+        // If demand is pending approval, move it to APPROVED first, then to INTERNAL_SEARCH.
+        if ("PENDING_APPROVAL".equals(currentStatus)) {
+            demand = rmgService.updateDemandStatus(
+                    demandId,
+                    "APPROVED",
+                    null,
+                    "Auto-transitioned to APPROVED before moving to INTERNAL_SEARCH from RMG nomination API"
+            );
+            currentStatus = normalizedStatus(demand.getStatus());
+        }
+
+        if ("APPROVED".equals(currentStatus)) {
+            return rmgService.updateDemandStatus(
+                    demandId,
+                    "INTERNAL_SEARCH",
+                    null,
+                    "Transitioned by RMG nomination API"
+            );
+        }
+
+        throw new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "Demand transition to INTERNAL_SEARCH is allowed only from PENDING_APPROVAL or APPROVED. Current status: "
+                        + demand.getStatus()
+        );
+    }
+
     private boolean isDemandAlreadyFulfilledInternally(DemandDto demand) {
         int recruitedCount = safeInt(demand.getRecruitedCount());
         int internalFilledCount = safeInt(demand.getInternalFilledCount());
@@ -152,6 +225,30 @@ public class NominationService {
 
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
+    }
+
+    private String normalizedStatus(String status) {
+        return status == null ? "" : status.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private DemandDto transitionApprovedToInternalSearch(Long demandId, DemandDto currentDemand) {
+        try {
+            return rmgService.updateDemandStatus(
+                    demandId,
+                    "INTERNAL_SEARCH",
+                    null,
+                    "Auto-transitioned from APPROVED to INTERNAL_SEARCH on first RM nomination"
+            );
+        } catch (ResponseStatusException ex) {
+            // Concurrency-safe fallback:
+            // if another request already moved status to INTERNAL_SEARCH, proceed.
+            DemandDto latestDemand = demandClient.getDemandById(demandId);
+            if ("INTERNAL_SEARCH".equals(normalizedStatus(latestDemand.getStatus()))) {
+                log.info("Demand {} already moved to INTERNAL_SEARCH by concurrent request; continuing nomination", demandId);
+                return latestDemand;
+            }
+            throw ex;
+        }
     }
 
     private NominationResponse mapToResponse(InternalMatch match) {

@@ -13,7 +13,7 @@ import java.time.Instant;
 @AllArgsConstructor
 public class EmployeeImportedPayload {
 
-    private String employeeId;
+    private Long employeeId;
     private String email;
     private String action;
     private Instant importedAt;

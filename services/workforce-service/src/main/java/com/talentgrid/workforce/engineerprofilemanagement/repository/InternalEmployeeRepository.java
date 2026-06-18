@@ -10,9 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InternalEmployeeRepository extends JpaRepository<InternalEmployee, Long> {
 
-    Optional<InternalEmployee> findByEmployeeIdAndIsDeletedFalse(String employeeId);
+    Optional<InternalEmployee> findByEmployeeIdAndIsDeletedFalse(Long employeeId);
 
     Optional<InternalEmployee> findByEmailIgnoreCaseAndIsDeletedFalse(String email);
 
-    List<InternalEmployee> findByEmployeeIdInAndIsDeletedFalse(Collection<String> employeeIds);
+    List<InternalEmployee> findByEmployeeIdInAndIsDeletedFalse(Collection<Long> employeeIds);
+
+    List<InternalEmployee> findByIsDeletedFalseOrderByIdAsc();
 }

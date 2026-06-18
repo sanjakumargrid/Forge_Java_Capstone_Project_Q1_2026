@@ -33,7 +33,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     }
 
     @Override
-    public InternalEmployeeResponse getEmployeeDetailsById(String employeeId) {
+    public InternalEmployeeResponse getEmployeeDetailsById(Long employeeId) {
         InternalEmployee employee = repository.findByEmployeeIdAndIsDeletedFalse(employeeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Internal employee not found for id: " + employeeId));
 
@@ -41,8 +41,25 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     }
 
     @Override
+    public InternalEmployeeResponse getEmployeeByDatabaseId(Long id) {
+        InternalEmployee employee = repository.findById(id)
+                .filter(e -> !e.getIsDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Internal employee not found for database id: " + id));
+
+        return mapToResponse(employee);
+    }
+
+    @Override
+    public List<InternalEmployeeResponse> getAllEngineers() {
+        return repository.findByIsDeletedFalseOrderByIdAsc()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
     @Transactional
-    public InternalEmployeeResponse updateOwnProfile(String employeeId,
+    public InternalEmployeeResponse updateOwnProfile(Long employeeId,
                                                      UpdateEngineerProfileRequest request,
                                                      String requestId) {
 
@@ -144,7 +161,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
             throw new IllegalArgumentException("Kafka user payload must contain employeeId");
         }
 
-        String employeeId = String.valueOf(userDto.getEmployeeId());
+        Long employeeId = userDto.getEmployeeId();
         LocalDateTime now = LocalDateTime.now();
 
         InternalEmployee employee = repository.findByEmployeeIdAndIsDeletedFalse(employeeId)

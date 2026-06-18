@@ -205,8 +205,16 @@ public class HrisImportServiceImpl implements HrisImportService {
         int r = row.getRowNumber();
         if (!StringUtils.hasText(row.getEmployeeId())) {
             errors.add(new HrisImportRowError(r, "employeeId", "Employee ID is required"));
-        } else if (row.getEmployeeId().length() > 50) {
-            errors.add(new HrisImportRowError(r, "employeeId", "Employee ID must be at most 50 characters"));
+        } else {
+            String rawEmployeeId = row.getEmployeeId().trim();
+            try {
+                Long employeeId = Long.parseLong(rawEmployeeId);
+                if (employeeId <= 0) {
+                    errors.add(new HrisImportRowError(r, "employeeId", "Employee ID must be a positive whole number"));
+                }
+            } catch (NumberFormatException ex) {
+                errors.add(new HrisImportRowError(r, "employeeId", "Employee ID must be a whole number"));
+            }
         }
 
         if (!StringUtils.hasText(row.getName())) {
@@ -318,14 +326,12 @@ public class HrisImportServiceImpl implements HrisImportService {
     }
 
     private void validateDuplicatesInFile(List<HrisImportPreparedRow> rows, List<HrisImportRowError> errors) {
-        Map<String, List<Integer>> byEmployeeId = new HashMap<>();
+        Map<Long, List<Integer>> byEmployeeId = new HashMap<>();
         Map<String, List<Integer>> byEmail = new HashMap<>();
 
         for (HrisImportPreparedRow row : rows) {
-            if (StringUtils.hasText(row.getEmployeeId())) {
-                String key = row.getEmployeeId().trim().toLowerCase(Locale.ROOT);
-                byEmployeeId.computeIfAbsent(key, k -> new ArrayList<>()).add(row.getRowNumber());
-            }
+            parseEmployeeId(row.getEmployeeId())
+                    .ifPresent(id -> byEmployeeId.computeIfAbsent(id, k -> new ArrayList<>()).add(row.getRowNumber()));
             if (StringUtils.hasText(row.getEmail())) {
                 String key = row.getEmail().trim().toLowerCase(Locale.ROOT);
                 byEmail.computeIfAbsent(key, k -> new ArrayList<>()).add(row.getRowNumber());
@@ -353,7 +359,11 @@ public class HrisImportServiceImpl implements HrisImportService {
             if (!StringUtils.hasText(row.getEmployeeId()) || !StringUtils.hasText(row.getEmail())) {
                 continue;
             }
-            String employeeId = row.getEmployeeId().trim();
+            Optional<Long> parsedEmployeeId = parseEmployeeId(row.getEmployeeId());
+            if (parsedEmployeeId.isEmpty()) {
+                continue;
+            }
+            Long employeeId = parsedEmployeeId.get();
             String email = row.getEmail().trim();
 
             Optional<InternalEmployee> byEmail = repository.findByEmailIgnoreCaseAndIsDeletedFalse(email);
@@ -365,14 +375,14 @@ public class HrisImportServiceImpl implements HrisImportService {
     }
 
     private List<PersistedRow> persistAll(List<HrisImportPreparedRow> rows) {
-        List<String> ids = rows.stream()
+        List<Long> ids = rows.stream()
                 .map(HrisImportPreparedRow::getEmployeeId)
-                .filter(StringUtils::hasText)
-                .map(String::trim)
+                .map(this::parseEmployeeId)
+                .flatMap(Optional::stream)
                 .distinct()
                 .toList();
 
-        Map<String, InternalEmployee> existing = new HashMap<>();
+        Map<Long, InternalEmployee> existing = new HashMap<>();
         if (!ids.isEmpty()) {
             for (InternalEmployee e : repository.findByEmployeeIdInAndIsDeletedFalse(ids)) {
                 existing.put(e.getEmployeeId(), e);
@@ -386,7 +396,8 @@ public class HrisImportServiceImpl implements HrisImportService {
             int end = Math.min(i + processBatchSize, rows.size());
             for (int j = i; j < end; j++) {
                 HrisImportPreparedRow row = rows.get(j);
-                String employeeId = row.getEmployeeId().trim();
+                Long employeeId = parseEmployeeId(row.getEmployeeId())
+                        .orElseThrow(() -> new IllegalArgumentException("Employee ID must be a whole number"));
                 InternalEmployee entity = existing.get(employeeId);
                 boolean created = entity == null;
                 if (entity == null) {
@@ -403,6 +414,17 @@ public class HrisImportServiceImpl implements HrisImportService {
         }
 
         return result;
+    }
+
+    private Optional<Long> parseEmployeeId(String raw) {
+        if (!StringUtils.hasText(raw)) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Long.parseLong(raw.trim()));
+        } catch (NumberFormatException ex) {
+            return Optional.empty();
+        }
     }
 
     private void applyRowToEntity(HrisImportPreparedRow row, InternalEmployee entity, LocalDateTime now) {
@@ -486,6 +508,6 @@ public class HrisImportServiceImpl implements HrisImportService {
     private record ValidationOutcome(HrisImportValidationResponse response, List<HrisImportPreparedRow> rows) {
     }
 
-    private record PersistedRow(String employeeId, String email, boolean created) {
+    private record PersistedRow(Long employeeId, String email, boolean created) {
     }
 }

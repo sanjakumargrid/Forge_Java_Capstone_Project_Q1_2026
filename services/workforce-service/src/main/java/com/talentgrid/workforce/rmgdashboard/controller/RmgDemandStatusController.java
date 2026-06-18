@@ -35,8 +35,8 @@ public class RmgDemandStatusController {
             description = "Fetch demand records by status for RMG dashboard and nomination flow")
     public ResponseEntity<Page<DemandDto>> getDemandsByStatus(
             @RequestParam(name = "status") String status,
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size) {
+            @RequestParam(required = false, name = "page", defaultValue = "0") int page,
+            @RequestParam(required = false, name = "size", defaultValue = "10") int size) {
         log.info("Received request to fetch demands by status={} - page={}, size={}", status, page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<DemandDto> response = rmgService.getDemandsByStatus(status, pageable);

@@ -3,6 +3,8 @@ package com.talentgrid.workforce.rmgnomination.controller;
 import com.talentgrid.workforce.rmgnomination.dto.NominationRequest;
 import com.talentgrid.workforce.rmgnomination.dto.NominationResponse;
 import com.talentgrid.workforce.rmgnomination.service.NominationService;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
+import com.talentgrid.workforce.skillgapheatmap.provider.model.DemandServiceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,5 +57,21 @@ public class NominationController {
             description = "Returns all non-deleted nominations for a specific engineer")
     public ResponseEntity<List<NominationResponse>> getNominationsByEngineer(@PathVariable Long employeeId) {
         return ResponseEntity.ok(nominationService.getNominationsByEngineer(employeeId));
+    }
+
+    @GetMapping("/getDemandById/{demandId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_NOMINATION_VIEW')")
+    @Operation(summary = "Get demand details by demand ID",
+            description = "Fetches demand details from demand-service by demand ID for RMG nomination flow")
+    public ResponseEntity<DemandServiceResponse> getDemandById(@PathVariable Long demandId) {
+        return ResponseEntity.ok(nominationService.getDemandDetailsById(demandId));
+    }
+
+    @PatchMapping("/demands/{demandId}/internal-search")
+    @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION')")
+    @Operation(summary = "Move demand to INTERNAL_SEARCH for nomination",
+            description = "Transitions demand from APPROVED to INTERNAL_SEARCH using demand-service transition API")
+    public ResponseEntity<DemandDto> moveDemandToInternalSearch(@PathVariable Long demandId) {
+        return ResponseEntity.ok(nominationService.moveDemandToInternalSearch(demandId));
     }
 }

@@ -24,9 +24,13 @@ public class DemandDto {
     private String level;
     private String location;
     private Long projectId;
+    private String projectName;
+    private Long accountId;
+    private String accountName;
     private String businessUnit;
     private List<String> skills;
     private BigDecimal budget;
+    private String employmentType;
     private Integer requiredCount;
     private Integer recruitedCount;
     private Integer internalFilledCount;
@@ -41,9 +45,14 @@ public class DemandDto {
     private OffsetDateTime updatedAt;
     private String closureReason;
     private Long createdBy;
+    private String creatorName;
+    private String creatorEmail;
     private Long assignedRecruiter;
+    private String assignedRecruiterName;
     private Long assignedRm;
+    private String assignedRmName;
     private Long approvedBy;
+    private String approverName;
     private Boolean isDeleted;
     private Integer version;
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public class BenchEmployeeDto {
 
     private Long employeeId;
-    private String employeeCode;
+    private Long employeeCode;
     private String name;
     private String email;
     private Level level;

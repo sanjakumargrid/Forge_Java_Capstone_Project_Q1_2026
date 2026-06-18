@@ -6,8 +6,10 @@ import com.talentgrid.shared.config.JwtAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("!dev")
 @Import(JwtAutoConfiguration.class)
 public class JwtConfig {
 

@@ -183,8 +183,8 @@ public class BenchCsvFilterServiceImpl implements BenchCsvFilterService {
         if (employee == null) {
             return "";
         }
-        if (StringUtils.hasText(employee.getEmployeeCode())) {
-            return employee.getEmployeeCode();
+        if (employee.getEmployeeCode() != null) {
+            return String.valueOf(employee.getEmployeeCode());
         }
         return employee.getEmployeeId() != null ? String.valueOf(employee.getEmployeeId()) : "";
     }

@@ -14,7 +14,7 @@ import java.util.List;
 public class NominationResponse {
     private Long matchId;
     private Long employeeId;
-    private String employeeCode;
+    private Long employeeCode;
     private String employeeName;
     private String employeeEmail;
     private Level level;
