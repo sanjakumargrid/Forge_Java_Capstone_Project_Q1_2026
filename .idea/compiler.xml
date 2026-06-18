@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Annotation profile for TalentGrid Parent" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="candidate-service" />
+        <module name="demand-service" />
+        <module name="notification-client" />
+        <module name="application-service" />
+        <module name="offer-service" />
+        <module name="talentgrid-notification-service" />
+        <module name="audit-client" />
+        <module name="interview-service" />
+        <module name="user-auth-service" />
+        <module name="talentgrid-kafka" />
+        <module name="talentgrid-audit-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="talentgrid-shared" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="application-service" options="-parameters" />
+      <module name="audit-client" options="-parameters" />
+      <module name="candidate-service" options="-parameters" />
+      <module name="demand-service" options="-parameters" />
+      <module name="interview-service" options="-parameters" />
+      <module name="notification-client" options="-parameters" />
+      <module name="offer-service" options="-parameters" />
+      <module name="talentgrid-audit-service" options="-parameters" />
+      <module name="talentgrid-kafka" options="-parameters" />
+      <module name="talentgrid-notification-service" options="-parameters" />
+      <module name="talentgrid-shared" options="-parameters" />
+      <module name="user-auth-service" options="-parameters" />
+    </option>
+  </component>
+</project>

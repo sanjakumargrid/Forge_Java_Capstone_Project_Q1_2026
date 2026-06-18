@@ -4,59 +4,614 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1c2907b9-ae99-4a72-bc6f-5532eb1efa99" name="Changes" comment="" />
+    <list default="true" id="ab6e121e-ce89-412f-8b8f-6d2dbdc44254" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/services/application-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/ApplicationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/RejectionEmailDraftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/RejectionEmailDraftController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/filter/JwtAuthFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/ApplicationServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/ApplicationServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/controller/ApplicationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/controller/ApplicationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/controller/RejectionEmailDraftController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/controller/RejectionEmailDraftController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/ApplicationDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/ApplicationDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/DemandDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/DemandDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftResponseDto$RejectionEmailDraftResponseDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftResponseDto$RejectionEmailDraftResponseDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftResponseDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/RejectionEmailDraftResponseDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/AddressDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/AddressDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/CertificationDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/CertificationDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/EducationDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/EducationDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ExperienceDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ExperienceDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ExternalCandidateDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ExternalCandidateDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ResumeDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/ResumeDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/SkillDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/SkillDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/SocialLinksDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/candidate/SocialLinksDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/request/ApplicationCreateRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/request/ApplicationCreateRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/request/StageMoveRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/dto/request/StageMoveRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/entity/Application.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/entity/Application.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Social.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Social.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Source.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Source.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Stage.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/enums/Stage.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/mapper/ApplicationMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/mapper/ApplicationMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/repository/ApplicationRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/repository/ApplicationRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/service/ApplicationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/service/ApplicationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/service/RejectionEmailDraftService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/application/service/RejectionEmailDraftService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/client/CandidateClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/client/CandidateClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/client/DemandClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/client/DemandClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/JwtConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/JwtConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/WebClientConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/config/WebClientConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/ApiErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/ApiErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/BusinessException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/BusinessException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/GlobalExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/exception/GlobalExceptionHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/filter/JwtAuthFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/filter/JwtAuthFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/integration/GeminiProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/integration/GeminiProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/integration/OpenAiProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/integration/OpenAiProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/kafka/ApplicationEventTranslator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/kafka/ApplicationEventTranslator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/kafka/producer/ApplicationEventProducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/kafka/producer/ApplicationEventProducer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/util/SecurityUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/com/talentgrid/application/util/SecurityUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/filter/JwtAuthFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/CandidateServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/CandidateServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/JwtConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/JwtConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/WebClientConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/config/WebClientConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/ApiErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/ApiErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/BusinessException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/BusinessException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/GlobalExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/exception/GlobalExceptionHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/client/ApplicationClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/client/ApplicationClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/AddressDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/AddressDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ApplicationRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ApplicationRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ApplicationResponseDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ApplicationResponseDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/CertificationDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/CertificationDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/EducationDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/EducationDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ExperienceDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ExperienceDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ExternalCandidateDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ExternalCandidateDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ResumeDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/ResumeDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/SkillDetailDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/SkillDetailDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/SocialLinksDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/SocialLinksDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/response/CandidateResponse$CandidateResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/response/CandidateResponse$CandidateResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/response/CandidateResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/dto/response/CandidateResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/Address.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/Address.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/CertificationDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/CertificationDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/EducationDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/EducationDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ExperienceDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ExperienceDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ExternalCandidate.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ExternalCandidate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ResumeDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/ResumeDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/SkillDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/SkillDetail.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/SocialLinks.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/entity/SocialLinks.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/enums/Social.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/enums/Social.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/enums/Source.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/enums/Source.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/mapper/ExternalCandidateMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/mapper/ExternalCandidateMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/repository/ExternalCandidateRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/repository/ExternalCandidateRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/service/ExternalCandidatePersistenceService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/service/ExternalCandidatePersistenceService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/utility/HashUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/externalCandidate/utility/HashUtil.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/filter/JwtAuthFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/filter/JwtAuthFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/kafka/CandidateEventTranslator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/kafka/CandidateEventTranslator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/kafka/producer/CandidateEventProducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/kafka/producer/CandidateEventProducer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/client/DemandServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/client/DemandServiceClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/entity/SaveResumePDF.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/entity/SaveResumePDF.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/AtsEvaluationDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/AtsEvaluationDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/DemandDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/DemandDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/EducationDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/EducationDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/ParsedResumeDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/ParsedResumeDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/WorkExperienceDTO.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/model/WorkExperienceDTO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/repository/SaveResumePDFRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/repository/SaveResumePDFRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/AtsEvaluationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/AtsEvaluationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeMappingService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeMappingService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeParserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeParserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeStoreService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/ResumeStoreService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/SaveResumePDFService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/resumeParser/service/SaveResumePDFService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/util/SecurityUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/com/talentgrid/candidate/util/SecurityUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/DemandServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/DemandServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/UserAuthServiceClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/UserAuthServiceClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/AccountDto$AccountDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/AccountDto$AccountDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/AccountDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/AccountDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/ProjectDto$ProjectDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/ProjectDto$ProjectDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/ProjectDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/client/dto/ProjectDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/config/FeignConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/config/FeignConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandAnalyticsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandAnalyticsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandLifecycleController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/controller/DemandLifecycleController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/entity/Demand.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/entity/Demand.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/entity/DemandStatusHistory.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/entity/DemandStatusHistory.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/ClosureReason.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/ClosureReason.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/DemandPriority.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/DemandPriority.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/DemandStatus.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/DemandStatus.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/EmploymentType.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/EmploymentType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/SeniorityLevel.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/enums/SeniorityLevel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/statemachine/DemandStateMachine.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/statemachine/DemandStateMachine.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/statemachine/TransitionValidator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/domain/statemachine/TransitionValidator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/ApprovalRequest$ApprovalRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/ApprovalRequest$ApprovalRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/ApprovalRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/ApprovalRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/DemandRequest$DemandRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/DemandRequest$DemandRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/DemandRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/DemandRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/StatusTransitionRequest$StatusTransitionRequestBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/StatusTransitionRequest$StatusTransitionRequestBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/StatusTransitionRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/request/StatusTransitionRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandAnalyticsResponse$DemandAnalyticsResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandAnalyticsResponse$DemandAnalyticsResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandAnalyticsResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandAnalyticsResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandPipelineResponse$DemandPipelineResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandPipelineResponse$DemandPipelineResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandPipelineResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandPipelineResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandResponse$DemandResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandResponse$DemandResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandStatusHistoryResponse$DemandStatusHistoryResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandStatusHistoryResponse$DemandStatusHistoryResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandStatusHistoryResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandStatusHistoryResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandSummaryResponse$DemandSummaryResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandSummaryResponse$DemandSummaryResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandSummaryResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/DemandSummaryResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/ErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/dto/response/ErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandExceptionHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandNotFoundException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandNotFoundException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandServiceException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/DemandServiceException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/IllegalDemandTransitionException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/IllegalDemandTransitionException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/InvalidDemandStateException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/exception/InvalidDemandStateException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/kafka/DemandEventTranslator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/kafka/DemandEventTranslator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/kafka/producer/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/kafka/producer/DemandEventProducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/kafka/producer/DemandEventProducer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/mapper/DemandMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/mapper/DemandMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/repository/DemandRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/repository/DemandRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/repository/DemandStatusHistoryRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/repository/DemandStatusHistoryRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/security/DemandSecurityService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/security/DemandSecurityService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandAnalyticsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandAnalyticsService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandLifecycleService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandLifecycleService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandQueryService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandQueryService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandValidationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/service/DemandValidationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/util/SecurityUtils$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/util/SecurityUtils$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/util/SecurityUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/target/classes/com/talentgrid/demand/util/SecurityUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/target/test-classes/com/talentgrid/demand/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/ai/controller/InterviewQuestionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/ai/controller/InterviewQuestionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/ai/service/InterviewQuestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/ai/service/InterviewQuestionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/controller/InterviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/controller/InterviewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/scorecard/controller/ScorecardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/scorecard/controller/ScorecardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/InterviewServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/InterviewServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/controller/InterviewQuestionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/controller/InterviewQuestionController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/dto/FollowUpQuestionDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/dto/FollowUpQuestionDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/dto/FollowUpQuestionsResponseDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/dto/FollowUpQuestionsResponseDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService$2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/ai/service/InterviewQuestionService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/controller/AnalyticsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/controller/AnalyticsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/AnalyticsResponse$AnalyticsResponseBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/AnalyticsResponse$AnalyticsResponseBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/AnalyticsResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/AnalyticsResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/ConversionRateDto$ConversionRateDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/ConversionRateDto$ConversionRateDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/ConversionRateDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/ConversionRateDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/SummaryDto$SummaryDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/SummaryDto$SummaryDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/SummaryDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/dto/SummaryDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/PipelineConversionRate$PipelineConversionRateBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/PipelineConversionRate$PipelineConversionRateBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/PipelineConversionRate.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/PipelineConversionRate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/RecruitmentAnalyticsSnapshot$RecruitmentAnalyticsSnapshotBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/RecruitmentAnalyticsSnapshot$RecruitmentAnalyticsSnapshotBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/RecruitmentAnalyticsSnapshot.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/entity/RecruitmentAnalyticsSnapshot.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/repository/AnalyticsSnapshotRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/repository/AnalyticsSnapshotRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/service/AnalyticsService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/analytics/service/AnalyticsService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/ApplicationClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/ApplicationClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/EmployeeClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/EmployeeClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/dto/EmployeeDto$EmployeeDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/dto/EmployeeDto$EmployeeDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/dto/EmployeeDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/client/dto/EmployeeDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/GoogleCalendarConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/GoogleCalendarConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/GoogleOAuthTokenService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/GoogleOAuthTokenService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/JwtConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/JwtConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/KafkaProducerConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/KafkaProducerConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/WebClientConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/config/WebClientConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/controller/GoogleOAuthController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/controller/GoogleOAuthController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/ApiErrorResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/ApiErrorResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/BusinessException.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/BusinessException.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/GlobalExceptionHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/exception/GlobalExceptionHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/filter/JwtAuthFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/filter/JwtAuthFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/controller/InterviewController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/controller/InterviewController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/ApplicationDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/ApplicationDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/InterviewDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/InterviewDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/StageMoveRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/dto/StageMoveRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/entity/Interview.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/entity/Interview.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/entity/Interviewer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/entity/Interviewer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/enums/Status.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/enums/Status.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/enums/Type.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/enums/Type.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/integration/GoogleCalendarClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/integration/GoogleCalendarClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/integration/GoogleCalendarResponse.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/integration/GoogleCalendarResponse.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/mapper/InterviewMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/mapper/InterviewMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/repository/InterviewRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/repository/InterviewRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/service/InterviewService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/service/InterviewService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/service/InterviewServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/interview/service/InterviewServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/kafka/InterviewEventTranslator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/kafka/InterviewEventTranslator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/kafka/producer/InterviewEventProducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/kafka/producer/InterviewEventProducer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/controller/ScorecardController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/controller/ScorecardController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardResponseDto$ScorecardResponseDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardResponseDto$ScorecardResponseDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardResponseDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardResponseDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardSummaryDto$ScorecardSummaryDtoBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardSummaryDto$ScorecardSummaryDtoBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardSummaryDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/dto/ScorecardSummaryDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/entity/Scorecard.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/entity/Scorecard.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/enums/Recommendation.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/enums/Recommendation.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/repository/ScorecardRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/repository/ScorecardRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/service/ScorecardService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/scorecard/service/ScorecardService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/util/SecurityUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/com/talentgrid/interview/util/SecurityUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/offer/controller/OfferController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/offer/controller/OfferController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/OfferServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/OfferServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/JwtConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/JwtConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/WebClientConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/config/WebClientConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/filter/JwtAuthFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/filter/JwtAuthFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/kafka/OfferEventTranslator.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/kafka/OfferEventTranslator.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/kafka/producer/OfferEventProducer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/kafka/producer/OfferEventProducer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/client/ApplicationClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/client/ApplicationClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/client/CandidateClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/client/CandidateClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/controller/DocuSignWebhookController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/controller/DocuSignWebhookController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/controller/OfferController.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/controller/OfferController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApplicationDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApplicationDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalChainRequestDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalChainRequestDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalStep.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalStep.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalStepDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/ApprovalStepDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/CandidateDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/CandidateDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/DocuSignWebhookDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/DocuSignWebhookDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/OfferDto.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/OfferDto.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/StageMoveRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/dto/StageMoveRequest.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/entity/Offer.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/entity/Offer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/entity/OfferTemplate.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/entity/OfferTemplate.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/enums/Status.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/enums/Status.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignConfiguration.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/DocuSignProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/GeminiProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/GeminiProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/OfferDocumentService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/OfferDocumentService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/OpenAiProperties.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/integration/OpenAiProperties.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/mapper/OfferMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/mapper/OfferMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/repository/OfferRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/repository/OfferRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/repository/OfferTemplateRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/repository/OfferTemplateRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/service/OfferService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/service/OfferService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/service/OfferServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offer/service/OfferServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offerTemplate/service/OfferTemplateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offerTemplate/service/OfferTemplateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offerTemplate/service/OfferTemplateServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/offerTemplate/service/OfferTemplateServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/util/SecurityUtils.class" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/offerService/util/SecurityUtils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/user-auth-service/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/AuditServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/AuditServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogEntity$AuditLogEntityBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogEntity$AuditLogEntityBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogEntity.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogEntity.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogService.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/audit/AuditLogService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/kafka/AuditLogConsumer.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/target/classes/com/talentgrid/auditservice/kafka/AuditLogConsumer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/client/AuditLogClient.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/client/AuditLogClient.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/constants/AuditConstants.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/constants/AuditConstants.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditAction.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditAction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditLogPayload$AuditLogPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditLogPayload$AuditLogPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditLogPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/audit-client/target/classes/com/talentgrid/audit/dto/AuditLogPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/notification-client/target/classes/com/talentgrid/clients/notification/NotificationClientAutoConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/notification-client/target/classes/com/talentgrid/clients/notification/NotificationClientAutoConfiguration.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-clients/notification-client/target/classes/com/talentgrid/clients/notification/NotificationEventPublisher.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-clients/notification-client/target/classes/com/talentgrid/clients/notification/NotificationEventPublisher.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/config/KafkaAutoConfiguration.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/config/KafkaAutoConfiguration.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/config/TalentGridTopicConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/config/TalentGridTopicConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/consumer/BaseKafkaConsumer.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/consumer/BaseKafkaConsumer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/application/ApplicationPayload$ApplicationPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/application/ApplicationPayload$ApplicationPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/application/ApplicationPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/application/ApplicationPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/base/BaseEvent$BaseEventBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/base/BaseEvent$BaseEventBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/base/BaseEvent.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/base/BaseEvent.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/candidate/CandidatePayload$CandidatePayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/candidate/CandidatePayload$CandidatePayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/candidate/CandidatePayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/candidate/CandidatePayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/demand/DemandPayload$DemandPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/demand/DemandPayload$DemandPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/demand/DemandPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/demand/DemandPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/interview/InterviewPayload$InterviewPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/interview/InterviewPayload$InterviewPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/interview/InterviewPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/interview/InterviewPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/notification/NotificationPayload$NotificationPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/notification/NotificationPayload$NotificationPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/notification/NotificationPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/notification/NotificationPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/offer/OfferPayload$OfferPayloadBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/offer/OfferPayload$OfferPayloadBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/offer/OfferPayload.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/events/offer/OfferPayload.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/producer/KafkaProducerService.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/producer/KafkaProducerService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/serializer/EventDeserializer.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/serializer/EventDeserializer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/topics/TalentGridTopics.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-kafka/target/classes/com/talentgrid/kafka/topics/TalentGridTopics.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/NotificationServiceApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/NotificationServiceApplication.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/EmailNotificationChannel.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/EmailNotificationChannel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/InAppNotificationChannel.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/InAppNotificationChannel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/NotificationChannelHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/channel/NotificationChannelHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/config/NotificationChannelRegistry.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/config/NotificationChannelRegistry.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/config/NotificationController.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/config/NotificationController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/consumer/NotificationKafkaConsumer.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/consumer/NotificationKafkaConsumer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/Notification$NotificationBuilder.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/Notification$NotificationBuilder.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/Notification.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/Notification.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/NotificationChannelType.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/NotificationChannelType.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/NotificationRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/model/NotificationRepository.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/service/NotificationOrchestrationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/service/NotificationOrchestrationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/service/NotificationService.class" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/target/classes/com/talentgrid/notification/service/NotificationService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/target/test-classes/com/talentgrid/notification/NotificationOrchestrationServiceTest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/java/com/talentgrid/shared/dto/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/java/com/talentgrid/shared/enums/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/java/com/talentgrid/shared/util/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/target/classes/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/target/classes/com/talentgrid/shared/dto/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/target/classes/com/talentgrid/shared/enums/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-shared/target/classes/com/talentgrid/shared/util/.gitkeep" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/spratap/TalentGridTeam2" value="3EzdLcKHTBYPuHG5tqgqJtpYlHq" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="613" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "dhsharmagrid"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;spratapgrid&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/rdevakirubaigrid/TalentGridTeam2.git",
-    "accountId": "7c62c26f-a6fa-46d1-af32-54ea5a3727e8"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/rdevakirubaigrid/TalentGridTeam2.git&quot;,
+    &quot;accountId&quot;: &quot;6d4c1247-3e0e-4e46-a91f-f154e23687f1&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
-  <component name="ProjectId" id="3F1XzxEl7Yj1CBBZ0Gt9zm20MHg" />
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.4632940309451854" />
+      <entry key="MS500" value="1.8573760366341716" />
+      <entry key="S2" value="1.9622609371762996" />
+      <entry key="S5" value="1.986492019619002" />
+      <entry key="S10" value="2.0517004326025576" />
+      <entry key="S30" value="2.616684244278285" />
+      <entry key="S60" value="3.1115936411937763" />
+      <entry key="M2" value="3.4912538888919618" />
+      <entry key="M5" value="3.778486885305113" />
+      <entry key="M10" value="3.886001843131788" />
+      <entry key="M15" value="3.9232620175197894" />
+      <entry key="M30" value="3.961521787525477" />
+      <entry key="H1" value="4.096379787770749" />
+      <entry key="H2" value="6.993882644809189" />
+      <entry key="H4" value="25.079466645810545" />
+      <entry key="D1" value="170.11940523013516" />
+      <entry key="W1" value="253.952778778603" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="2.7326350736180934E-135" />
+      <entry key="MS500" value="1.2226899081827391E-27" />
+      <entry key="S2" value="1.8699460718228752E-7" />
+      <entry key="S5" value="0.002035783700033562" />
+      <entry key="S10" value="0.04511965979518864" />
+      <entry key="S30" value="0.35600432335780974" />
+      <entry key="S60" value="0.5966609785781283" />
+      <entry key="M2" value="0.7724383331879175" />
+      <entry key="M5" value="0.901873294610071" />
+      <entry key="M10" value="0.9496700977761018" />
+      <entry key="M15" value="0.9661587892898879" />
+      <entry key="M30" value="0.9829337664818021" />
+      <entry key="H1" value="0.9914305116692139" />
+      <entry key="H2" value="0.9964789822809714" />
+      <entry key="H4" value="1.0417591279180674" />
+      <entry key="D1" value="2.464476723416672" />
+      <entry key="W1" value="3.707126789689733" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.426932833050913" />
+      <entry key="MS500" value="1.8473034608434031" />
+      <entry key="S2" value="1.9595557670114192" />
+      <entry key="S5" value="1.9864630155981537" />
+      <entry key="S10" value="2.083842639119533" />
+      <entry key="S30" value="2.93625040621087" />
+      <entry key="S60" value="3.6769644383249767" />
+      <entry key="M2" value="4.243179895709127" />
+      <entry key="M5" value="4.670706218070682" />
+      <entry key="M10" value="4.830575977182837" />
+      <entry key="M15" value="4.885961523960065" />
+      <entry key="M30" value="4.942694279056669" />
+      <entry key="H1" value="5.086908681638811" />
+      <entry key="H2" value="7.9897653021356705" />
+      <entry key="H4" value="26.120443408066095" />
+      <entry key="D1" value="172.58293507692338" />
+      <entry key="W1" value="257.6596962242435" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3EzdLcKHTBYPuHG5tqgqJtpYlHq" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectSessionTemplates">
+    <option name="inlineTemplate">
+      <template>
+        <option name="modeId" value="InlineAgent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="LOCAL" />
+      </template>
+    </option>
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "sample",
-    "kotlin-language-version-configured": "true"
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "team2-dev",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/spratap/TalentGridTeam2/services",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.configurations.included.in.services": "true",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid" />
+      <recent name="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.talentgrid.candidate.filter" />
+      <recent name="com.talentgrid.application.filter" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ApplicationServiceApplication">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="TalentGridTeam2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="TalentGridTeam2" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ApplicationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="application-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.application.ApplicationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AuditServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="talentgrid-audit-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.auditservice.AuditServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CandidateServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="candidate-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.candidate.CandidateServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DemandServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="demand-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.demand.DemandServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="InterviewServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="interview-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.interview.InterviewServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="talentgrid-notification-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.notification.NotificationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OfferServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="offer-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="offerService.OfferServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserAuthServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="user-auth-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.auth.UserAuthServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
       </set>
     </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1c2907b9-ae99-4a72-bc6f-5532eb1efa99" name="Changes" comment="" />
-      <created>1781243814212</created>
+      <changelist id="ab6e121e-ce89-412f-8b8f-6d2dbdc44254" name="Changes" comment="" />
+      <created>1781185276458</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1781243814212</updated>
+      <updated>1781185276458</updated>
+      <workItem from="1781185277485" duration="9223000" />
+      <workItem from="1781335070845" duration="2085000" />
+      <workItem from="1781675198798" duration="3051000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/InterviewServiceApplication.java</url>
+          <line>18</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

@@ -1,0 +1,1852 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd\">\n\t<modelVersion>4.0.0</modelVersion>\n\n\t<parent>\n\t\t<groupId>org.springframework.boot</groupId>\n\t\t<artifactId>spring-boot-starter-parent</artifactId>\n\t\t<version>3.4.5</version>\n\t\t<relativePath/>\n\t</parent>\n\n\t<groupId>com.talentgrid</groupId>\n\t<artifactId>talentgrid-parent</artifactId>\n\t<version>1.0.0-SNAPSHOT</version>\n\t<packaging>pom</packaging>\n\t<name>TalentGrid Parent</name>\n\t<description>Root BOM — dependency versions locked centrally for TalentGrid</description>\n\n\t<modules>\n\t\t<module>talentgrid-shared</module>\n\t\t<module>talentgrid-kafka</module>\n\t\t<module>talentgrid-clients/notification-client</module>\n\t\t<module>services/demand-service</module>\n\t\t<module>services/candidate-service</module>\n\t\t<module>services/application-service</module>\n\t\t<module>talentgrid-notification-service</module>\n\t\t<module>talentgrid-clients/audit-client</module>\n\t\t<module>talentgrid-audit-service</module>\n\t</modules>\n\n\t<properties>\n\t\t<java.version>17</java.version>\n\t</properties>\n\n\n\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	(revision be0de16611be0f1ed61be6ddf40c45c64dcff4da)
++++ b/pom.xml	(date 1781188325658)
+@@ -27,6 +27,7 @@
+ 		<module>talentgrid-notification-service</module>
+ 		<module>talentgrid-clients/audit-client</module>
+ 		<module>talentgrid-audit-service</module>
++		<module>services/interview-service</module>
+ 	</modules>
+ 
+ 	<properties>
+Index: services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarClient.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarClient.java b/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarClient.java
+new file mode 100644
+--- /dev/null	(date 1781263900227)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarClient.java	(date 1781263900227)
+@@ -0,0 +1,48 @@
++package com.forge.talentacquisitionengine.interviewService.interview.integration;
++
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import org.springframework.stereotype.Service;
++
++import java.util.UUID;
++
++@Service
++public class GoogleCalendarClient {
++
++    public GoogleCalendarResponse createEvent(
++            Interview interview
++    ) {
++
++        String eventId =
++                UUID.randomUUID().toString();
++
++        String meetLink =
++                "https://meet.google.com/mock-"
++                        + UUID.randomUUID();
++
++        return new GoogleCalendarResponse(
++                eventId,
++                meetLink
++        );
++    }
++
++    public void updateEvent(
++            String eventId,
++            Interview interview
++    ) {
++
++        System.out.println(
++                "Updating Google Calendar Event: "
++                        + eventId
++        );
++    }
++
++    public void deleteEvent(
++            String eventId
++    ) {
++
++        System.out.println(
++                "Deleting Google Calendar Event: "
++                        + eventId
++        );
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/enums/Recommendation.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/enums/Recommendation.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/enums/Recommendation.java
+new file mode 100644
+--- /dev/null	(date 1781263900398)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/enums/Recommendation.java	(date 1781263900398)
+@@ -0,0 +1,9 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.enums;
++
++public enum Recommendation {
++    STRONG_HIRE,
++    HIRE,
++    HOLD,
++    NO_HIRE,
++    STRONG_NO_HIRE;
++}
+Index: services/interview-service/src/main/java/com/talentgrid/interview/repository/InterviewRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/repository/InterviewRepository.java b/services/interview-service/src/main/java/com/talentgrid/interview/repository/InterviewRepository.java
+new file mode 100644
+--- /dev/null	(date 1781263900342)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/repository/InterviewRepository.java	(date 1781263900342)
+@@ -0,0 +1,98 @@
++package com.forge.talentacquisitionengine.interviewService.interview.repository;
++
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Status;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Type;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Repository
++public interface InterviewRepository
++        extends JpaRepository<Interview, Long> {
++
++    /**
++     * Find all interviews for an application
++     */
++    Page<Interview> findByApplicationId(
++            Long applicationId,
++            Pageable pageable
++    );
++
++    /**
++     * Find all interviews by status
++     */
++    Page<Interview> findByStatus(
++            Status status,
++            Pageable pageable
++    );
++
++    /**
++     * Find interviews by application + status
++     */
++    Page<Interview> findByApplicationIdAndStatus(
++            Long applicationId,
++            Status status,
++            Pageable pageable
++    );
++
++    /**
++     * Find interviews by type
++     */
++    Page<Interview> findByInterviewType(
++            Type interviewType,
++            Pageable pageable
++    );
++
++    /**
++     * Find interviews scheduled between dates
++     */
++    List<Interview> findByScheduledAtBetween(
++            LocalDateTime start,
++            LocalDateTime end
++    );
++
++    /**
++     * Find upcoming interviews
++     */
++    List<Interview> findByScheduledAtAfter(
++            LocalDateTime dateTime
++    );
++
++    /**
++     * Find interviews for a specific interviewer
++     */
++    List<Interview> findByInterviewersContains(
++            Long interviewerEmployeeId
++    );
++
++    /**
++     * Check overlapping interviews
++     */
++    List<Interview> findByScheduledAtBetweenAndInterviewersContains(
++            LocalDateTime start,
++            LocalDateTime end,
++            Long interviewerEmployeeId
++    );
++
++    /**
++     * Count interviews by status
++     */
++    long countByStatus(Status status);
++
++    /**
++     * Count interviews for application
++     */
++    long countByApplicationId(Long applicationId);
++
++    /**
++     * Exists by calendar event ID
++     */
++    boolean existsByCalendarEventId(
++            String calendarEventId
++    );
++}
+\ No newline at end of file
+Index: services/offer-service/src/main/java/com/talentgrid/offer/dto/OfferDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/offer-service/src/main/java/com/talentgrid/offer/dto/OfferDto.java b/services/offer-service/src/main/java/com/talentgrid/offer/dto/OfferDto.java
+new file mode 100644
+--- /dev/null	(date 1781263900321)
++++ b/services/offer-service/src/main/java/com/talentgrid/offer/dto/OfferDto.java	(date 1781263900321)
+@@ -0,0 +1,95 @@
++package com.forge.talentacquisitionengine.offerService.offer.dto;
++
++import com.fasterxml.jackson.annotation.JsonFormat;
++
++import com.forge.talentacquisitionengine.offerService.offer.enums.Status;
++import jakarta.validation.constraints.*;
++import lombok.Getter;
++import lombok.Setter;
++
++import java.math.BigDecimal;
++import java.time.LocalDate;
++import java.time.LocalDateTime;
++
++@Getter
++@Setter
++public class OfferDto {
++
++    private Long id;
++
++    @NotNull(message = "Application id is required")
++    private Long applicationId;
++
++    @NotBlank(message = "Role is required")
++    @Size(max = 100, message = "Role must not exceed 100 characters")
++    private String role;
++
++    @NotNull(message = "Base salary is required")
++    @DecimalMin(
++            value = "0.0",
++            inclusive = false,
++            message = "Base salary must be greater than 0"
++    )
++    private BigDecimal baseSalary;
++
++    @DecimalMin(
++            value = "0.0",
++            message = "Bonus cannot be negative"
++    )
++    private BigDecimal bonus;
++
++    @DecimalMin(
++            value = "0.0",
++            message = "Equity cannot be negative"
++    )
++    private BigDecimal equity;
++
++    @NotNull(message = "Joining date is required")
++    @Future(message = "Joining date must be in the future")
++    @JsonFormat(pattern = "yyyy-MM-dd")
++    private LocalDate joiningDate;
++
++    @NotNull(message = "Offer status is required")
++    private Status offerStatus;
++
++    @NotBlank(message = "Employment type is required")
++    @Size(
++            max = 50,
++            message = "Employment type must not exceed 50 characters"
++    )
++    private String employmentType;
++
++    @Size(
++            max = 100,
++            message = "Approved by must not exceed 100 characters"
++    )
++    private String approvedBy;
++
++    @Size(
++            max = 100,
++            message = "Rejected by must not exceed 100 characters"
++    )
++    private String rejectedBy;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime approvedAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime rejectedAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime sentAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime signedAt;
++
++    @Future(message = "Offer expiry date must be in the future")
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime expiresAt;
++
++    @Size(
++            max = 150,
++            message = "DocuSign ID must not exceed 150 characters"
++    )
++    private String docuSignId;
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/entity/Scorecard.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/entity/Scorecard.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/entity/Scorecard.java
+new file mode 100644
+--- /dev/null	(date 1781263900384)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/entity/Scorecard.java	(date 1781263900384)
+@@ -0,0 +1,87 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.entity;
++
++import com.fasterxml.jackson.annotation.JsonFormat;
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.scorecard.enums.Recommendation;
++import jakarta.persistence.*;
++import jakarta.validation.constraints.*;
++import lombok.Getter;
++import lombok.Setter;
++import org.hibernate.annotations.CreationTimestamp;
++
++import java.time.LocalDateTime;
++
++@Getter
++@Setter
++@Entity
++@Table(
++        name = "scorecard",
++        uniqueConstraints = {
++                @UniqueConstraint(
++                        name = "interview_interviewer_unique",
++                        columnNames = {"interview_id", "interviewer_id"}
++                )
++        }
++)
++public class Scorecard {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.AUTO)
++    @Column(name = "scorecard_id")
++    private Long id;
++
++    @NotNull(message = "Interview is required")
++    @ManyToOne(fetch = FetchType.LAZY)
++    @JoinColumn(name = "interview_id", nullable = false)
++    private Interview interview;
++
++    @NotNull(message = "Application is required")
++    @ManyToOne(fetch = FetchType.LAZY)
++    @JoinColumn(name = "application_id", nullable = false)
++    private Application application;
++
++    @NotNull(message = "Interviewer ID is required")
++    @Positive(message = "Interviewer ID must be positive")
++    @Column(name = "interviewer_id", nullable = false)
++    private Long interviewerId;
++
++    @NotNull(message = "Score is required")
++    @Min(value = 0, message = "Score must be at least 0")
++    @Max(value = 100, message = "Score must not exceed 100")
++    @Column(name = "score", nullable = false)
++    private Integer score;
++
++    @NotNull(message = "Overall score is required")
++    @Min(value = 0, message = "Overall score must be at least 0")
++    @Max(value = 100, message = "Overall score must not exceed 100")
++    @Column(name = "overall_score", nullable = false)
++    private Integer overallScore;
++
++    @NotBlank(message = "Competency ratings are required")
++    @Column(name = "competency_ratings", nullable = false, columnDefinition = "jsonb")
++    private String competencyRatings;
++
++    @NotBlank(message = "Strengths are required")
++    @Size(min = 10, max = 2000, message = "Strengths must be between 10 and 2000 characters")
++    @Column(name = "strengths", nullable = false, columnDefinition = "TEXT")
++    private String strengths;
++
++    @Size(max = 2000, message = "Concerns must not exceed 2000 characters")
++    @Column(name = "concerns", columnDefinition = "TEXT")
++    private String concerns;
++
++    @Size(max = 3000, message = "Comments must not exceed 3000 characters")
++    @Column(name = "comments", columnDefinition = "TEXT")
++    private String comments;
++
++    @NotNull(message = "Recommendation is required")
++    @Enumerated(EnumType.STRING)
++    @Column(name = "recommendation", nullable = false, length = 30)
++    private Recommendation recommendation;
++
++    @CreationTimestamp
++    @Column(name = "submitted_at", nullable = false, updatable = false)
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    private LocalDateTime submittedAt;
++}
+\ No newline at end of file
+Index: services/offer-service/src/main/java/com/talentgrid/offer/enums/Status.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/offer-service/src/main/java/com/talentgrid/offer/enums/Status.java b/services/offer-service/src/main/java/com/talentgrid/offer/enums/Status.java
+new file mode 100644
+--- /dev/null	(date 1781263900273)
++++ b/services/offer-service/src/main/java/com/talentgrid/offer/enums/Status.java	(date 1781263900273)
+@@ -0,0 +1,11 @@
++package com.forge.talentacquisitionengine.offerService.offer.enums;
++
++public enum Status {
++    DRAFT,
++    PENDING_APPROVAL,
++    APPROVED,
++    SENT,
++    SIGNED,
++    REJECTED,
++    EXPIRED,
++}
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/repository/ScorecardRepository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/repository/ScorecardRepository.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/repository/ScorecardRepository.java
+new file mode 100644
+--- /dev/null	(date 1781263900327)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/repository/ScorecardRepository.java	(date 1781263900327)
+@@ -0,0 +1,20 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.repository;
++
++import com.forge.talentacquisitionengine.interviewService.scorecard.entity.Scorecard;
++import org.springframework.data.jpa.repository.JpaRepository;
++import org.springframework.stereotype.Repository;
++
++import java.util.List;
++import java.util.Optional;
++
++@Repository
++public interface ScorecardRepository extends JpaRepository<Scorecard, Long> {
++
++    List<Scorecard> findAllByInterview_Id(Long interviewId);
++
++    List<Scorecard> findAllByApplication_Id(Long applicationId);
++
++    Optional<Scorecard> findByInterview_IdAndInterviewerId(Long interviewId, Long interviewerId);
++
++    boolean existsByInterview_IdAndInterviewerId(Long interviewId, Long interviewerId);
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewService.java b/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewService.java
+new file mode 100644
+--- /dev/null	(date 1781263900292)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewService.java	(date 1781263900292)
+@@ -0,0 +1,30 @@
++package com.forge.talentacquisitionengine.interviewService.interview.service;
++
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Status;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++
++public interface InterviewService {
++
++    Interview createInterview(Interview interview);
++
++    Interview getInterviewById(Long id);
++
++    Page<Interview> getAllInterviews(
++            Long applicationId,
++            Status status,
++            Pageable pageable
++    );
++
++    Interview updateInterview(
++            Long id,
++            Interview interview
++    );
++
++    Interview cancelInterview(Long id);
++
++    Interview completeInterview(Long id);
++
++    void deleteInterview(Long id);
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/mapper/InterviewMapper.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/mapper/InterviewMapper.java b/services/interview-service/src/main/java/com/talentgrid/interview/mapper/InterviewMapper.java
+new file mode 100644
+--- /dev/null	(date 1781263900302)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/mapper/InterviewMapper.java	(date 1781263900302)
+@@ -0,0 +1,162 @@
++package com.forge.talentacquisitionengine.interviewService.interview.mapper;
++
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.interviewService.interview.dto.InterviewDto;
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.scorecard.entity.Scorecard;
++
++import java.util.ArrayList;
++import java.util.List;
++import java.util.stream.Collectors;
++
++public class InterviewMapper {
++
++    private InterviewMapper() {
++    }
++
++    public static Interview dtoToEntity(
++            InterviewDto dto,
++            Application application
++    ) {
++
++        if (dto == null) {
++            return null;
++        }
++
++        Interview entity = new Interview();
++
++        entity.setId(
++                dto.getId()
++        );
++
++        entity.setApplication(
++                application
++        );
++
++        entity.setInterviewers(
++                dto.getInterviewers()
++        );
++
++        entity.setInterviewType(
++                dto.getInterviewType()
++        );
++
++        entity.setScheduledAt(
++                dto.getScheduledAt()
++        );
++
++        entity.setDurationMins(
++                dto.getDurationMins()
++        );
++
++        entity.setTimeZone(
++                dto.getTimeZone()
++        );
++
++        entity.setMeetLink(
++                dto.getMeetLink()
++        );
++
++        entity.setStatus(
++                dto.getStatus()
++        );
++
++        entity.setCalendarEventId(
++                dto.getCalendarEventId()
++        );
++
++        entity.setCreatedAt(
++                dto.getCreatedAt()
++        );
++
++        entity.setUpdatedAt(
++                dto.getUpdatedAt()
++        );
++
++        return entity;
++    }
++
++
++    public static InterviewDto entityToDto(
++            Interview entity
++    ) {
++
++        if (entity == null) {
++            return null;
++        }
++
++        InterviewDto dto = new InterviewDto();
++
++        dto.setId(
++                entity.getId()
++        );
++
++        if (entity.getApplication() != null) {
++
++            dto.setApplicationId(
++                    entity.getApplication().getId()
++            );
++        }
++
++        dto.setInterviewers(
++                entity.getInterviewers()
++        );
++
++        dto.setInterviewType(
++                entity.getInterviewType()
++        );
++
++        dto.setScheduledAt(
++                entity.getScheduledAt()
++        );
++
++        dto.setDurationMins(
++                entity.getDurationMins()
++        );
++
++        dto.setTimeZone(
++                entity.getTimeZone()
++        );
++
++        dto.setMeetLink(
++                entity.getMeetLink()
++        );
++
++        dto.setStatus(
++                entity.getStatus()
++        );
++
++        dto.setCalendarEventId(
++                entity.getCalendarEventId()
++        );
++
++        dto.setCreatedAt(
++                entity.getCreatedAt()
++        );
++
++        dto.setUpdatedAt(
++                entity.getUpdatedAt()
++        );
++
++        if (entity.getScorecards() != null) {
++
++            List<Long> scorecardIds =
++                    entity.getScorecards()
++                            .stream()
++                            .map(Scorecard::getId)
++                            .collect(Collectors.toList());
++
++            dto.setScorecardIds(
++                    scorecardIds
++            );
++
++        } else {
++
++            dto.setScorecardIds(
++                    new ArrayList<>()
++            );
++        }
++
++        return dto;
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewServiceImpl.java b/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewServiceImpl.java
+new file mode 100644
+--- /dev/null	(date 1781263900335)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/service/InterviewServiceImpl.java	(date 1781263900335)
+@@ -0,0 +1,263 @@
++package com.forge.talentacquisitionengine.interviewService.interview.service;
++
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.applicationService.application.repository.ApplicationRepository;
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Status;
++import com.forge.talentacquisitionengine.interviewService.interview.integration.GoogleCalendarClient;
++import com.forge.talentacquisitionengine.interviewService.interview.repository.InterviewRepository;
++import com.forge.talentacquisitionengine.interviewService.interview.integration.GoogleCalendarResponse;
++import jakarta.persistence.EntityNotFoundException;
++
++import lombok.RequiredArgsConstructor;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++import org.springframework.stereotype.Service;
++
++@Service
++@RequiredArgsConstructor
++public class InterviewServiceImpl implements com.forge.talentacquisitionengine.interviewService.interview.service.InterviewService {
++
++    private final InterviewRepository interviewRepository;
++    private final ApplicationRepository applicationRepository;
++    private final GoogleCalendarClient googleCalendarClient;
++    /**
++     * Create Interview
++     */
++    @Override
++    public Interview createInterview(Interview interview) {
++
++        /*
++         * Validate Application Exists
++         */
++        Long applicationId =
++                interview.getApplication().getId();
++
++        Application application =
++                applicationRepository.findById(applicationId)
++                        .orElseThrow(() ->
++                                new EntityNotFoundException(
++                                        "Application not found with ID: "
++                                                + applicationId
++                                )
++                        );
++
++        interview.setApplication(application);
++
++        /*
++         * Default Status
++         */
++        if (interview.getStatus() == null) {
++            interview.setStatus(Status.SCHEDULED);
++        }
++
++        /*
++         * Save Interview
++         */
++        GoogleCalendarResponse response =
++                googleCalendarClient.createEvent(
++                        interview
++                );
++
++        interview.setCalendarEventId(
++                response.getEventId()
++        );
++
++        interview.setMeetLink(
++                response.getMeetLink()
++        );
++
++        return interviewRepository.save(
++                interview
++        );
++    }
++
++    /**
++     * Get Interview By ID
++     */
++    @Override
++    public Interview getInterviewById(Long id) {
++
++        return interviewRepository.findById(id)
++                .orElseThrow(() ->
++                        new EntityNotFoundException(
++                                "Interview not found with ID: " + id
++                        )
++                );
++    }
++
++    /**
++     * Get All Interviews
++     */
++    @Override
++    public Page<Interview> getAllInterviews(
++            Long applicationId,
++            Status status,
++            Pageable pageable
++    ) {
++
++        /*
++         * Filter By Application + Status
++         */
++        if (applicationId != null && status != null) {
++
++            return interviewRepository
++                    .findByApplicationIdAndStatus(
++                            applicationId,
++                            status,
++                            pageable
++                    );
++        }
++
++        /*
++         * Filter By Application
++         */
++        if (applicationId != null) {
++
++            return interviewRepository
++                    .findByApplicationId(
++                            applicationId,
++                            pageable
++                    );
++        }
++
++        /*
++         * Filter By Status
++         */
++        if (status != null) {
++
++            return interviewRepository
++                    .findByStatus(
++                            status,
++                            pageable
++                    );
++        }
++
++        /*
++         * Fetch All
++         */
++        return interviewRepository.findAll(pageable);
++    }
++
++    /**
++     * Update Interview
++     */
++    @Override
++    public Interview updateInterview(
++            Long id,
++            Interview updatedInterview
++    ) {
++
++        Interview existingInterview =
++                getInterviewById(id);
++
++        /*
++         * Update Fields
++         */
++        existingInterview.setInterviewType(
++                updatedInterview.getInterviewType()
++        );
++
++        existingInterview.setInterviewers(
++                updatedInterview.getInterviewers()
++        );
++
++        existingInterview.setScheduledAt(
++                updatedInterview.getScheduledAt()
++        );
++
++        existingInterview.setDurationMins(
++                updatedInterview.getDurationMins()
++        );
++
++        existingInterview.setTimeZone(
++                updatedInterview.getTimeZone()
++        );
++
++        existingInterview.setMeetLink(
++                updatedInterview.getMeetLink()
++        );
++
++        existingInterview.setCalendarEventId(
++                updatedInterview.getCalendarEventId()
++        );
++
++        /*
++         * Save Updated Interview
++         */
++        if(existingInterview.getCalendarEventId() != null) {
++
++            googleCalendarClient.updateEvent(
++                    existingInterview.getCalendarEventId(),
++                    existingInterview
++            );
++        }
++        return interviewRepository.save(existingInterview);
++    }
++
++    /**
++     * Cancel Interview
++     */
++    @Override
++    public Interview cancelInterview(Long id) {
++
++        Interview interview =
++                getInterviewById(id);
++
++        /*
++         * Business Validation
++         */
++        if (interview.getStatus() == Status.COMPLETED) {
++
++            throw new IllegalStateException(
++                    "Completed interview cannot be cancelled"
++            );
++        }
++
++        interview.setStatus(Status.CANCELLED);
++        if(interview.getCalendarEventId() != null) {
++
++            googleCalendarClient.deleteEvent(
++                    interview.getCalendarEventId()
++            );
++        }
++
++        return interviewRepository.save(interview);
++    }
++
++    /**
++     * Complete Interview
++     */
++    @Override
++    public Interview completeInterview(Long id) {
++
++        Interview interview =
++                getInterviewById(id);
++
++        /*
++         * Business Validation
++         */
++        if (interview.getStatus() == Status.CANCELLED) {
++
++            throw new IllegalStateException(
++                    "Cancelled interview cannot be completed"
++            );
++        }
++
++        interview.setStatus(Status.COMPLETED);
++
++        return interviewRepository.save(interview);
++    }
++
++    /**
++     * Delete Interview
++     */
++    @Override
++    public void deleteInterview(Long id) {
++
++        Interview interview =
++                getInterviewById(id);
++
++        interviewRepository.delete(interview);
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/enums/Type.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/enums/Type.java b/services/interview-service/src/main/java/com/talentgrid/interview/enums/Type.java
+new file mode 100644
+--- /dev/null	(date 1781263900306)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/enums/Type.java	(date 1781263900306)
+@@ -0,0 +1,8 @@
++package com.forge.talentacquisitionengine.interviewService.interview.enums;
++
++public enum Type {
++    TECHNICAL,
++    BEHAVIOURAL,
++    CULTURAL_FIT,
++    FINAL
++}
+Index: services/interview-service/src/main/java/com/talentgrid/interview/enums/Status.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/enums/Status.java b/services/interview-service/src/main/java/com/talentgrid/interview/enums/Status.java
+new file mode 100644
+--- /dev/null	(date 1781263900258)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/enums/Status.java	(date 1781263900258)
+@@ -0,0 +1,10 @@
++package com.forge.talentacquisitionengine.interviewService.interview.enums;
++
++public enum Status {
++    PENDING_SCHEDULING,
++    RESCHEDULED,
++    SCHEDULED,
++    COMPLETED,
++    CANCELLED,
++    NO_SHOW
++}
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/service/ScorecardService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/service/ScorecardService.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/service/ScorecardService.java
+new file mode 100644
+--- /dev/null	(date 1781263900270)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/service/ScorecardService.java	(date 1781263900270)
+@@ -0,0 +1,189 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.service;
++
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.applicationService.application.repository.ApplicationRepository;
++import com.forge.talentacquisitionengine.interviewService.interview.entity.Interview;
++import com.forge.talentacquisitionengine.interviewService.interview.repository.InterviewRepository;
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardRequestDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardResponseDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardSummaryDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.entity.Scorecard;
++import com.forge.talentacquisitionengine.interviewService.scorecard.repository.ScorecardRepository;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Type;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Status;
++import jakarta.persistence.EntityNotFoundException;
++import lombok.RequiredArgsConstructor;
++import org.springframework.stereotype.Service;
++import org.springframework.transaction.annotation.Transactional;
++
++import java.util.List;
++import java.util.stream.Collectors;
++
++@Service
++@RequiredArgsConstructor
++public class ScorecardService {
++
++    private final ScorecardRepository scorecardRepository;
++    private final InterviewRepository interviewRepository;
++    private final ApplicationRepository applicationRepository;
++
++
++    @Transactional
++    public ScorecardResponseDto submitScorecard(Long interviewId, ScorecardRequestDto dto) {
++        Interview interview = interviewRepository.findById(interviewId)
++                .orElseThrow(() -> new EntityNotFoundException("Interview not found with id: " + interviewId));
++        if (!interview.getInterviewers()
++                .contains(dto.getInterviewerId())) {
++
++            throw new IllegalArgumentException(
++                    "Interviewer "
++                            + dto.getInterviewerId()
++                            + " is not assigned to interview "
++                            + interviewId
++            );
++        }
++        if (interview.getStatus() != Status.COMPLETED) {
++
++            throw new IllegalArgumentException(
++                    "Scorecards can only be submitted for completed interviews"
++            );
++        }
++
++        validateCompetencies(
++                interview.getInterviewType(),
++                dto.getCompetencyRatings()
++        );
++        Application application = applicationRepository.findById(dto.getApplicationId())
++                .orElseThrow(() -> new EntityNotFoundException("Application not found with id: " + dto.getApplicationId()));
++
++        if (scorecardRepository.existsByInterview_IdAndInterviewerId(interviewId, dto.getInterviewerId())) {
++            throw new IllegalStateException(
++                    "Scorecard already submitted by interviewer " + dto.getInterviewerId()
++                            + " for interview " + interviewId);
++        }
++
++        Scorecard scorecard = new Scorecard();
++        scorecard.setInterview(interview);
++        scorecard.setApplication(application);
++        scorecard.setInterviewerId(dto.getInterviewerId());
++        scorecard.setScore(dto.getScore());
++        scorecard.setOverallScore(dto.getOverallScore());
++        scorecard.setCompetencyRatings(dto.getCompetencyRatings());
++        scorecard.setStrengths(dto.getStrengths());
++        scorecard.setConcerns(dto.getConcerns());
++        scorecard.setComments(dto.getComments());
++        scorecard.setRecommendation(dto.getRecommendation());
++
++        Scorecard saved = scorecardRepository.save(scorecard);
++        return toResponseDto(saved);
++    }
++
++    @Transactional(readOnly = true)
++    public List<ScorecardSummaryDto> getScorecardsByInterview(Long interviewId) {
++        if (!interviewRepository.existsById(interviewId)) {
++            throw new EntityNotFoundException("Interview not found with id: " + interviewId);
++        }
++        return scorecardRepository.findAllByInterview_Id(interviewId)
++                .stream()
++                .map(this::toSummaryDto)
++                .collect(Collectors.toList());
++    }
++
++    @Transactional(readOnly = true)
++    public ScorecardResponseDto getScorecardByInterviewer(Long interviewId, Long interviewerId) {
++        if (!interviewRepository.existsById(interviewId)) {
++            throw new EntityNotFoundException("Interview not found with id: " + interviewId);
++        }
++        Scorecard scorecard = scorecardRepository.findByInterview_IdAndInterviewerId(interviewId, interviewerId)
++                .orElseThrow(() -> new EntityNotFoundException(
++                        "Scorecard not found for interviewer " + interviewerId
++                                + " in interview " + interviewId));
++        return toResponseDto(scorecard);
++    }
++
++    @Transactional(readOnly = true)
++    public List<ScorecardSummaryDto> getScorecardsByDemand(String demandId) {
++        return scorecardRepository.findAll()
++                .stream()
++//                .filter(sc -> demandId.equals(sc.getApplication().getDemand().getDemandId()))
++                .map(this::toSummaryDto)
++                .collect(Collectors.toList());
++    }
++
++    // ── Mappers ──────────────────────────────────────────────────────────────
++
++    private ScorecardResponseDto toResponseDto(Scorecard sc) {
++        return ScorecardResponseDto.builder()
++                .scorecardId(sc.getId())
++                .interviewId(sc.getInterview().getId())
++                .applicationId(sc.getApplication().getId())
++                .interviewerId(sc.getInterviewerId())
++                .score(sc.getScore())
++                .overallScore(sc.getOverallScore())
++                .competencyRatings(sc.getCompetencyRatings())
++                .strengths(sc.getStrengths())
++                .concerns(sc.getConcerns())
++                .comments(sc.getComments())
++                .recommendation(sc.getRecommendation())
++                .submittedAt(sc.getSubmittedAt())
++                .build();
++    }
++
++    private ScorecardSummaryDto toSummaryDto(Scorecard sc) {
++        return ScorecardSummaryDto.builder()
++                .scorecardId(sc.getId())
++                .interviewerId(sc.getInterviewerId())
++                .score(sc.getScore())
++                .recommendation(sc.getRecommendation())
++                .build();
++    }
++
++    private void validateCompetencies(
++            Type interviewType,
++            String competencyRatings
++    ) {
++
++        competencyRatings = competencyRatings.toLowerCase();
++
++        switch (interviewType) {
++
++            case TECHNICAL -> {
++                if (!competencyRatings.contains("coding")
++                        || !competencyRatings.contains("dsa")
++                        || !competencyRatings.contains("systemdesign")) {
++                    throw new IllegalArgumentException(
++                            "Technical interview requires coding, dsa and system design ratings"
++                    );
++                }
++            }
++
++            case BEHAVIOURAL -> {
++                if (!competencyRatings.contains("communication")
++                        || !competencyRatings.contains("leadership")
++                        || !competencyRatings.contains("collaboration")) {
++                    throw new IllegalArgumentException(
++                            "Behavioural interview requires communication, leadership and collaboration ratings"
++                    );
++                }
++            }
++
++            case CULTURAL_FIT -> {
++                if (!competencyRatings.contains("culturefit")
++                        || !competencyRatings.contains("ownership")
++                        || !competencyRatings.contains("teamwork")) {
++                    throw new IllegalArgumentException(
++                            "Cultural fit interview requires cultureFit, ownership and teamwork ratings"
++                    );
++                }
++            }
++
++            case FINAL -> {
++                if (!competencyRatings.contains("overallassessment")) {
++                    throw new IllegalArgumentException(
++                            "Final round requires overallAssessment rating"
++                    );
++                }
++            }
++        }
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardSummaryDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardSummaryDto.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardSummaryDto.java
+new file mode 100644
+--- /dev/null	(date 1781263900253)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardSummaryDto.java	(date 1781263900253)
+@@ -0,0 +1,18 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.dto;
++
++import com.forge.talentacquisitionengine.interviewService.scorecard.enums.Recommendation;
++import lombok.Builder;
++import lombok.Getter;
++import lombok.Setter;
++
++@Getter
++@Setter
++@Builder
++public class ScorecardSummaryDto {
++
++    private Long scorecardId;
++    private Long interviewerId;
++    private String interviewerName;   // resolved from employee service if needed
++    private Integer score;
++    private Recommendation recommendation;
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/controller/ScorecardController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/controller/ScorecardController.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/controller/ScorecardController.java
+new file mode 100644
+--- /dev/null	(date 1781263900389)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/controller/ScorecardController.java	(date 1781263900389)
+@@ -0,0 +1,78 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.controller;
++
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardRequestDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardResponseDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.dto.ScorecardSummaryDto;
++import com.forge.talentacquisitionengine.interviewService.scorecard.service.ScorecardService;
++import jakarta.validation.Valid;
++import lombok.RequiredArgsConstructor;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++import java.util.List;
++
++/**
++ * Handles scorecard endpoints as defined in the Forge OpenAPI spec:
++ *
++ *   POST  /interviews/{interviewId}/scorecards                          – Submit scorecard
++ *   GET   /interviews/{interviewId}/scorecards                          – List all scorecards for interview
++ *   GET   /interviews/{interviewId}/scorecards/interviewer/{interviewerId} – Single interviewer's scorecard
++ *   GET   /demands/{demandId}/scorecards                                – Demand-wide scorecards
++ */
++@RestController
++@RequiredArgsConstructor
++public class ScorecardController {
++
++    private final ScorecardService scorecardService;
++
++    /**
++     * POST /interviews/{interviewId}/scorecards
++     * Submit interview feedback / scorecard.
++     */
++    @PostMapping("/interviews/{interviewId}/scorecards")
++    public ResponseEntity<ScorecardResponseDto> submitScorecard(
++            @PathVariable Long interviewId,
++            @Valid @RequestBody ScorecardRequestDto requestDto) {
++
++        ScorecardResponseDto response = scorecardService.submitScorecard(interviewId, requestDto);
++        return ResponseEntity.status(HttpStatus.CREATED).body(response);
++    }
++
++    /**
++     * GET /interviews/{interviewId}/scorecards
++     * List all scorecards for a given interview.
++     */
++    @GetMapping("/interviews/{interviewId}/scorecards")
++    public ResponseEntity<List<ScorecardSummaryDto>> getScorecardsByInterview(
++            @PathVariable Long interviewId) {
++
++        List<ScorecardSummaryDto> scorecards = scorecardService.getScorecardsByInterview(interviewId);
++        return ResponseEntity.ok(scorecards);
++    }
++
++    /**
++     * GET /interviews/{interviewId}/scorecards/interviewer/{interviewerId}
++     * Fetch the scorecard submitted by a specific interviewer for an interview.
++     */
++    @GetMapping("/interviews/{interviewId}/scorecards/interviewer/{interviewerId}")
++    public ResponseEntity<ScorecardResponseDto> getScorecardByInterviewer(
++            @PathVariable Long interviewId,
++            @PathVariable Long interviewerId) {
++
++        ScorecardResponseDto scorecard = scorecardService.getScorecardByInterviewer(interviewId, interviewerId);
++        return ResponseEntity.ok(scorecard);
++    }
++
++    /**
++     * GET /demands/{demandId}/scorecards
++     * Retrieve all scorecards across applications for a demand.
++     */
++    @GetMapping("/demands/{demandId}/scorecards")
++    public ResponseEntity<List<ScorecardSummaryDto>> getScorecardsByDemand(
++            @PathVariable String demandId) {
++
++        List<ScorecardSummaryDto> scorecards = scorecardService.getScorecardsByDemand(demandId);
++        return ResponseEntity.ok(scorecards);
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/entity/Interview.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/entity/Interview.java b/services/interview-service/src/main/java/com/talentgrid/interview/entity/Interview.java
+new file mode 100644
+--- /dev/null	(date 1781263900367)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/entity/Interview.java	(date 1781263900367)
+@@ -0,0 +1,106 @@
++package com.forge.talentacquisitionengine.interviewService.interview.entity;
++
++import com.fasterxml.jackson.annotation.JsonFormat;
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Status;
++import com.forge.talentacquisitionengine.interviewService.interview.enums.Type;
++import com.forge.talentacquisitionengine.interviewService.scorecard.entity.Scorecard;
++import jakarta.persistence.*;
++import jakarta.validation.constraints.*;
++import lombok.Getter;
++import lombok.Setter;
++import org.hibernate.annotations.CreationTimestamp;
++import org.hibernate.annotations.UpdateTimestamp;
++
++import java.time.LocalDateTime;
++import java.util.List;
++
++@Getter
++@Setter
++@Entity
++@Table(name = "interview")
++public class Interview {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.AUTO)
++    @Column(name = "interview_id")
++    private Long id;
++
++    @NotNull(message = "Application is required")
++    @ManyToOne(fetch = FetchType.LAZY)
++    @JoinColumn(name = "application_id", nullable = false)
++    private Application application;
++
++    @NotEmpty(message = "At least one interviewer is required")
++    @Size(max = 5, message = "Maximum 5 interviewers are allowed")
++    @ElementCollection
++    @CollectionTable(
++            name = "interview_interviewers",
++            joinColumns = @JoinColumn(name = "interview_id")
++    )
++    @Column(name = "employee_id", nullable = false)
++    private List<
++            @NotNull(message = "Interviewer employee ID cannot be null")
++            @Positive(message = "Interviewer employee ID must be positive")
++                    Long
++            > interviewers;
++
++    @NotNull(message = "Interview type is required")
++    @Enumerated(EnumType.STRING)
++    @Column(name = "interview_type", nullable = false, length = 30)
++    private Type interviewType;
++
++    @NotNull(message = "Scheduled date and time is required")
++    @Future(message = "Interview scheduled time must be in the future")
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "scheduled_at", nullable = false)
++    private LocalDateTime scheduledAt;
++
++    @NotNull(message = "Duration is required")
++    @Min(value = 15, message = "Interview duration must be at least 15 minutes")
++    @Max(value = 240, message = "Interview duration must not exceed 240 minutes")
++    @Column(name = "duration_mins", nullable = false)
++    private Integer durationMins;
++
++    @NotBlank(message = "Time zone is required")
++    @Size(max = 100, message = "Time zone must not exceed 100 characters")
++    @Column(name = "time_zone", nullable = false, length = 100)
++    private String timeZone;
++
++    @Size(max = 500, message = "Meet link must not exceed 500 characters")
++    @Pattern(
++            regexp = "^(https?://.*)?$",
++            message = "Meet link must be a valid URL"
++    )
++    @Column(name = "meet_link", length = 500)
++    private String meetLink;
++
++    @NotNull(message = "Interview status is required")
++    @Enumerated(EnumType.STRING)
++    @Column(name = "status", nullable = false, length = 30)
++    private Status status;
++
++    @Size(max = 255, message = "Calendar event ID must not exceed 255 characters")
++    @Column(name = "calendar_event_id", length = 255)
++    private String calendarEventId;
++
++    @OneToMany(mappedBy = "interview")
++    private List<Scorecard> scorecards;
++
++    @CreationTimestamp
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "created_at", nullable = false, updatable = false)
++    private LocalDateTime createdAt;
++
++    @UpdateTimestamp
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "updated_at")
++    private LocalDateTime updatedAt;
++
++    @PrePersist
++    private void onCreate() {
++        if (this.status == null) {
++            this.status = Status.SCHEDULED;
++        }
++    }
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardRequestDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardRequestDto.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardRequestDto.java
+new file mode 100644
+--- /dev/null	(date 1781263900394)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardRequestDto.java	(date 1781263900394)
+@@ -0,0 +1,44 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.dto;
++
++import com.forge.talentacquisitionengine.interviewService.scorecard.enums.Recommendation;
++import jakarta.validation.constraints.*;
++import lombok.Getter;
++import lombok.Setter;
++
++@Getter
++@Setter
++public class ScorecardRequestDto {
++
++    @NotNull(message = "Application ID is required")
++    private Long applicationId;
++
++    @NotNull(message = "Interviewer ID is required")
++    @Positive(message = "Interviewer ID must be positive")
++    private Long interviewerId;
++
++    @NotNull(message = "Score is required")
++    @Min(value = 0, message = "Score must be at least 0")
++    @Max(value = 100, message = "Score must not exceed 100")
++    private Integer score;
++
++    @NotNull(message = "Overall score is required")
++    @Min(value = 0, message = "Overall score must be at least 0")
++    @Max(value = 100, message = "Overall score must not exceed 100")
++    private Integer overallScore;
++
++    @NotBlank(message = "Competency ratings are required")
++    private String competencyRatings;
++
++    @NotBlank(message = "Strengths are required")
++    @Size(min = 10, max = 2000, message = "Strengths must be between 10 and 2000 characters")
++    private String strengths;
++
++    @Size(max = 2000, message = "Concerns must not exceed 2000 characters")
++    private String concerns;
++
++    @Size(max = 3000, message = "Comments must not exceed 3000 characters")
++    private String comments;
++
++    @NotNull(message = "Recommendation is required")
++    private Recommendation recommendation;
++}
+\ No newline at end of file
+Index: services/offer-service/src/main/java/com/talentgrid/offer/entity/Offer.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/offer-service/src/main/java/com/talentgrid/offer/entity/Offer.java b/services/offer-service/src/main/java/com/talentgrid/offer/entity/Offer.java
+new file mode 100644
+--- /dev/null	(date 1781263900377)
++++ b/services/offer-service/src/main/java/com/talentgrid/offer/entity/Offer.java	(date 1781263900377)
+@@ -0,0 +1,117 @@
++package com.forge.talentacquisitionengine.offerService.offer.entity;
++
++import com.fasterxml.jackson.annotation.JsonFormat;
++import com.forge.talentacquisitionengine.applicationService.application.entity.Application;
++import com.forge.talentacquisitionengine.offerService.offer.enums.Status;
++import jakarta.persistence.*;
++import jakarta.validation.constraints.*;
++import lombok.Getter;
++import lombok.Setter;
++
++import java.math.BigDecimal;
++import java.time.LocalDate;
++import java.time.LocalDateTime;
++
++@Getter
++@Setter
++@Entity
++@Table(name = "offer")
++public class Offer {
++
++    @Id
++    @GeneratedValue(strategy = GenerationType.AUTO)
++    @Column(name = "offer_id")
++    private Long id;
++
++    @NotNull(message = "Application is required")
++    @OneToOne(fetch = FetchType.EAGER)
++    @JoinColumn(name = "application_id", nullable = false)
++    private Application application;
++
++    @NotBlank(message = "Role is required")
++    @Size(max = 100, message = "Role must not exceed 100 characters")
++    @Column(name = "role", nullable = false)
++    private String role;
++
++    @NotNull(message = "Base salary is required")
++    @DecimalMin(value = "0.0", inclusive = false, message = "Base salary must be greater than 0")
++    @Column(name = "base_salary", nullable = false)
++    private BigDecimal baseSalary;
++
++    @DecimalMin(value = "0.0", message = "Bonus cannot be negative")
++    @Column(name = "bonus")
++    private BigDecimal bonus;
++
++    @DecimalMin(value = "0.0", message = "Equity cannot be negative")
++    @Column(name = "equity")
++    private BigDecimal equity;
++
++    @NotNull(message = "Joining date is required")
++    @Future(message = "Joining date must be in the future")
++    @JsonFormat(pattern = "yyyy-MM-dd")
++    @Column(name = "joining_date", nullable = false)
++    private LocalDate joiningDate;
++
++    @NotNull(message = "Offer status is required")
++    @Enumerated(EnumType.STRING)
++    @Column(name = "offer_status", nullable = false)
++    private Status offerStatus;
++
++    @NotBlank(message = "Employment type is required")
++    @Size(max = 50, message = "Employment type must not exceed 50 characters")
++    @Column(name = "employment_type", nullable = false)
++    private String employmentType;
++
++//    @Size(max = 100, message = "Template ID must not exceed 100 characters")
++//    @Column(name = "template_id", length = 100)
++//    private String templateId;
++
++//    @NotBlank(message = "Offer template content is required")
++//    @Size(min = 50, max = 10000, message = "Offer template content must be between 50 and 10000 characters")
++//    @Column(name = "offer_template_content", nullable = false, columnDefinition = "TEXT")
++//    private String offerTemplateContent;
++
++//    @NotBlank(message = "Approval chain is required")
++//    @Column(name = "approval_chain", nullable = false, columnDefinition = "jsonb")
++//    private String approvalChain;
++
++    @Size(max = 100, message = "Approved by must not exceed 100 characters")
++    @Column(name = "approved_by")
++    private String approvedBy;
++
++    @Size(max = 100, message = "Rejected by must not exceed 100 characters")
++    @Column(name = "rejected_by")
++    private String rejectedBy;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "approved_at")
++    private LocalDateTime approvedAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "rejected_at")
++    private LocalDateTime rejectedAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "sent_at")
++    private LocalDateTime sentAt;
++
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "signed_at")
++    private LocalDateTime signedAt;
++
++    @Future(message = "Offer expiry date must be in the future")
++    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
++    @Column(name = "expires_at")
++    private LocalDateTime expiresAt;
++
++    @Size(max = 150, message = "DocuSign ID must not exceed 150 characters")
++    @Column(name = "docu_sign_id", length = 150)
++    private String docuSignId;
++
++    @PrePersist
++    private void onCreate() {
++        if (this.offerStatus == null) {
++            this.offerStatus = Status.DRAFT;
++        }
++    }
++}
+\ No newline at end of file
+Index: services/offer-service/src/main/java/com/talentgrid/offer/controller/OfferController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/offer-service/src/main/java/com/talentgrid/offer/controller/OfferController.java b/services/offer-service/src/main/java/com/talentgrid/offer/controller/OfferController.java
+new file mode 100644
+--- /dev/null	(date 1781263900380)
++++ b/services/offer-service/src/main/java/com/talentgrid/offer/controller/OfferController.java	(date 1781263900380)
+@@ -0,0 +1,160 @@
++package com.forge.talentacquisitionengine.offerService.offer.controller;
++
++import com.forge.talentacquisitionengine.offerService.offer.entity.Offer;
++import com.forge.talentacquisitionengine.offerService.offer.enums.Status;
++import com.forge.talentacquisitionengine.offerService.offer.service.OfferService;
++
++import jakarta.validation.Valid;
++import lombok.RequiredArgsConstructor;
++import org.springframework.data.domain.Page;
++import org.springframework.data.domain.Pageable;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++
++@RestController
++@RequestMapping("/api/offers")
++@RequiredArgsConstructor
++public class OfferController {
++
++    private final OfferService offerService;
++
++    /**
++     * Create Offer
++     */
++    @PostMapping
++    public ResponseEntity<Offer> createOffer(
++            @Valid @RequestBody Offer offer
++    ) {
++
++        Offer createdOffer =
++                offerService.createOffer(offer);
++
++        return ResponseEntity
++                .status(HttpStatus.CREATED)
++                .body(createdOffer);
++    }
++
++    /**
++     * Get Offer By ID
++     */
++    @GetMapping("/{id}")
++    public ResponseEntity<Offer> getOfferById(
++            @PathVariable Long id
++    ) {
++
++        Offer offer =
++                offerService.getOfferById(id);
++
++        return ResponseEntity.ok(offer);
++    }
++
++    /**
++     * Get All Offers
++     */
++    @GetMapping
++    public ResponseEntity<Page<Offer>> getAllOffers(
++            @RequestParam(required = false)
++            Long applicationId,
++
++            @RequestParam(required = false)
++            Status status,
++
++            Pageable pageable
++    ) {
++
++        Page<Offer> offers =
++                offerService.getAllOffers(
++                        applicationId,
++                        status,
++                        pageable
++                );
++
++        return ResponseEntity.ok(offers);
++    }
++
++    /**
++     * Update Offer
++     */
++    @PutMapping("/{id}")
++    public ResponseEntity<Offer> updateOffer(
++            @PathVariable Long id,
++            @Valid @RequestBody Offer offer
++    ) {
++
++        Offer updatedOffer =
++                offerService.updateOffer(id, offer);
++
++        return ResponseEntity.ok(updatedOffer);
++    }
++
++    /**
++     * Send Offer
++     */
++    @PatchMapping("/{id}/send")
++    public ResponseEntity<Offer> sendOffer(
++            @PathVariable Long id
++    ) {
++
++        Offer sentOffer =
++                offerService.sendOffer(id);
++
++        return ResponseEntity.ok(sentOffer);
++    }
++
++    /**
++     * Accept Offer
++     */
++    @PatchMapping("/{id}/accept")
++    public ResponseEntity<Offer> acceptOffer(
++            @PathVariable Long id
++    ) {
++
++        Offer acceptedOffer =
++                offerService.acceptOffer(id);
++
++        return ResponseEntity.ok(acceptedOffer);
++    }
++
++    /**
++     * Reject Offer
++     */
++    @PatchMapping("/{id}/reject")
++    public ResponseEntity<Offer> rejectOffer(
++            @PathVariable Long id
++    ) {
++
++        Offer rejectedOffer =
++                offerService.rejectOffer(id);
++
++        return ResponseEntity.ok(rejectedOffer);
++    }
++
++
++    /**
++     * Expire Offer
++     */
++    @PatchMapping("/{id}/expire")
++    public ResponseEntity<Offer> expireOffer(
++            @PathVariable Long id
++    ) {
++
++        Offer expiredOffer =
++                offerService.expireOffer(id);
++
++        return ResponseEntity.ok(expiredOffer);
++    }
++
++    /**
++     * Delete Offer
++     */
++    @DeleteMapping("/{id}")
++    public ResponseEntity<Void> deleteOffer(
++            @PathVariable Long id
++    ) {
++
++        offerService.deleteOffer(id);
++
++        return ResponseEntity.noContent().build();
++    }
++}
+\ No newline at end of file
+Index: services/offer-service/src/main/java/com/talentgrid/offer/integration/DocuSignClient.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/offer-service/src/main/java/com/talentgrid/offer/integration/DocuSignClient.java b/services/offer-service/src/main/java/com/talentgrid/offer/integration/DocuSignClient.java
+new file mode 100644
+--- /dev/null	(date 1781263900354)
++++ b/services/offer-service/src/main/java/com/talentgrid/offer/integration/DocuSignClient.java	(date 1781263900354)
+@@ -0,0 +1,4 @@
++package com.forge.talentacquisitionengine.offerService.offer.integration;
++
++public class DocuSignClient {
++}
+Index: services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardResponseDto.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardResponseDto.java b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardResponseDto.java
+new file mode 100644
+--- /dev/null	(date 1781263900362)
++++ b/services/interview-service/src/main/java/com/talentgrid/scorecard/dto/ScorecardResponseDto.java	(date 1781263900362)
+@@ -0,0 +1,27 @@
++package com.forge.talentacquisitionengine.interviewService.scorecard.dto;
++
++import com.forge.talentacquisitionengine.interviewService.scorecard.enums.Recommendation;
++import lombok.Builder;
++import lombok.Getter;
++import lombok.Setter;
++
++import java.time.LocalDateTime;
++
++@Getter
++@Setter
++@Builder
++public class ScorecardResponseDto {
++
++    private Long scorecardId;
++    private Long interviewId;
++    private Long applicationId;
++    private Long interviewerId;
++    private Integer score;
++    private Integer overallScore;
++    private String competencyRatings;
++    private String strengths;
++    private String concerns;
++    private String comments;
++    private Recommendation recommendation;
++    private LocalDateTime submittedAt;
++}
+\ No newline at end of file
+Index: services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarResponse.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarResponse.java b/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarResponse.java
+new file mode 100644
+--- /dev/null	(date 1781263900263)
++++ b/services/interview-service/src/main/java/com/talentgrid/interview/integration/GoogleCalendarResponse.java	(date 1781263900263)
+@@ -0,0 +1,13 @@
++package com.forge.talentacquisitionengine.interviewService.interview.integration;
++
++import lombok.AllArgsConstructor;
++import lombok.Getter;
++
++@Getter
++@AllArgsConstructor
++public class GoogleCalendarResponse {
++
++    private String eventId;
++
++    private String meetLink;
++}
+\ No newline at end of file
