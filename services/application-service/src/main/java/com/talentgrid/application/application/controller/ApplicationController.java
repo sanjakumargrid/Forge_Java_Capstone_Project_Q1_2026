@@ -6,6 +6,7 @@ import com.talentgrid.application.application.dto.request.StageMoveRequest;
 import com.talentgrid.application.application.service.ApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class ApplicationController {
         this.applicationService = applicationService;
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
     @PostMapping
     public ApplicationDto createApplication(
             @Valid @RequestBody ApplicationCreateRequest request
@@ -27,6 +29,7 @@ public class ApplicationController {
         return applicationService.createApplication(request);
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping
     public Page<ApplicationDto> getApplications(
             @RequestParam(required = false) Long demandId,
@@ -37,6 +40,7 @@ public class ApplicationController {
         return applicationService.getApplications(demandId, stage, page, size);
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping("/{applicationId}")
     public ApplicationDto getApplicationById(
             @PathVariable Long applicationId
@@ -44,6 +48,7 @@ public class ApplicationController {
         return applicationService.getApplicationById(applicationId);
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
     @PatchMapping("/{applicationId}/stage")
     public ApplicationDto moveStage(
             @PathVariable Long applicationId,
@@ -52,6 +57,7 @@ public class ApplicationController {
         return applicationService.moveStage(applicationId, request);
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping("/{applicationId}/timeline")
     public List<String> getTimeline(
             @PathVariable Long applicationId
@@ -59,6 +65,7 @@ public class ApplicationController {
         return applicationService.getTimeline(applicationId);
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping("/search")
     public Page<ApplicationDto> searchApplications(
             @RequestParam(required = false) Integer minScore,

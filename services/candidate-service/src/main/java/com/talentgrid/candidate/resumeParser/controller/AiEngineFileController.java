@@ -12,12 +12,12 @@ import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("api/v1/aiengine")
@@ -41,6 +41,7 @@ public class AiEngineFileController {
     }
 
 
+    @PreAuthorize("hasAuthority('CANDIDATE_CREATE')")
 
     @PostMapping
     public ResponseEntity<String> saveResume(@RequestParam("file") MultipartFile file) {
@@ -65,6 +66,7 @@ public class AiEngineFileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasAuthority('CANDIDATE_CREATE')")
     @PostMapping("/parse")
     public ResponseEntity<?> parseResume(@RequestParam("file") MultipartFile file) {
         try {
@@ -80,7 +82,7 @@ public class AiEngineFileController {
             ));
         }
     }
-
+    @PreAuthorize("hasAuthority('CANDIDATE_CREATE')")
     @PostMapping("/evaluate/{demandId}")
     public ResponseEntity<?> evaluate(
             @PathVariable Long demandId,

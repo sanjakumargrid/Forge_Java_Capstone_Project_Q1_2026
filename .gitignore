@@ -7,4 +7,7 @@ cat >> .gitignore <<'EOF'
 **/*.pem
 **/*.p12
 **/*.key
-EOF
+EOF.idea/
+target/
+kafka_data/
+*.iml

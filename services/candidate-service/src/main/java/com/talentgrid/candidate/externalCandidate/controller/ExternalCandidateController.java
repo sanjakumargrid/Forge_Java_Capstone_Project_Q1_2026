@@ -5,6 +5,7 @@ import com.talentgrid.candidate.externalCandidate.dto.ExternalCandidateDto;
 import com.talentgrid.candidate.externalCandidate.service.ExternalCandidateService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,7 +19,7 @@ public class ExternalCandidateController {
     ) {
         this.externalCandidateService = externalCandidateService;
     }
-
+    @PreAuthorize("hasAuthority('CANDIDATE_CREATE')")
     @PostMapping
     public ResponseEntity<CandidateResponse> createCandidate(
             @Valid @RequestBody ExternalCandidateDto externalCandidateDto
@@ -31,7 +32,7 @@ public class ExternalCandidateController {
                 .status(response.getStatus())
                 .body(response);
     }
-
+    @PreAuthorize("hasAuthority('CANDIDATE_UPDATE')")
     @PutMapping("/{candidateId}")
     public ResponseEntity<CandidateResponse> updateCandidate(
             @PathVariable Long candidateId,
@@ -46,7 +47,7 @@ public class ExternalCandidateController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('CANDIDATE_VIEW')")
     @GetMapping("/{candidateId}")
     public ResponseEntity<ExternalCandidateDto> getCandidateById(
             @PathVariable Long candidateId
@@ -57,7 +58,7 @@ public class ExternalCandidateController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('CANDIDATE_DELETE')")
     @DeleteMapping("/{candidateId}")
     public ResponseEntity<Void> deleteById(
             @PathVariable Long candidateId
