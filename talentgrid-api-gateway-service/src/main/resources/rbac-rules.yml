@@ -69,6 +69,10 @@ rbac:
       methods: [POST]
       allowed-scopes: [DEMAND_APPROVE]
 
+    - path: "/api/v1/demands/**/reject"
+      methods: [POST]
+      allowed-scopes: [DEMAND_APPROVE]
+
     - path: "/api/v1/demands/**/status"
       methods: [PATCH]
       allowed-scopes: [DEMAND_STATUS_TRANSITION]
