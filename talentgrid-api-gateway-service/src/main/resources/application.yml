@@ -181,10 +181,10 @@ spring:
             - "Path=/api/v1/ai/**, /talentgrid/ai/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
-        - id: engineer-service
+        - id: engineer-profile
           uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
           predicates:
-            - "Path=/api/v1/engineers/**, /talentgrid/engineers/**"
+            - "Path=/api/v1/engineer-profile/**, /talentgrid/engineer-profile/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
         - id: utilisation-service
@@ -196,7 +196,7 @@ spring:
         - id: nomination-service
           uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
           predicates:
-            - "Path=/api/v1/nominations/**, /talentgrid/nominations/**"
+            - "Path=/api/v1/rmg/nominations/**, /talentgrid/rmg/nominations/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
         - id: demand-embeddings
@@ -209,7 +209,6 @@ spring:
           uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
           predicates:
             - "Path=/api/v1/hris/**, /talentgrid/hris/**"
-            
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
         - id: workforce-match-analytics
@@ -230,6 +229,55 @@ spring:
             - "Path=/api/v1/health/**, /talentgrid/health/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: skill-gap-heatmap
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/skill-gap/**, /talentgrid/skill-gap/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: workforce-ai-upskilling
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/workforce/ai/upskilling/**, /talentgrid/workforce/ai/upskilling/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: rmg-analytics-dashboard
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/rmg-analytics-dashboard/**, /talentgrid/rmg-analytics-dashboard/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: rmg-demands
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/rmg/**, /talentgrid/rmg/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: bench-filter
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/bench-filter/**, /talentgrid/bench-filter/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
+        - id: rmg-search
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/rmg-search/**, /talentgrid/rmg-search/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: bench-report
+          uri: http://${WORKFORCE_SERVICE_HOST:localhost}:8091
+          predicates:
+            - "Path=/api/v1/bench-report, /talentgrid/bench-report"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+
   config:
     import: "classpath:rbac-rules.yml,optional:configserver:"
 ratelimit:

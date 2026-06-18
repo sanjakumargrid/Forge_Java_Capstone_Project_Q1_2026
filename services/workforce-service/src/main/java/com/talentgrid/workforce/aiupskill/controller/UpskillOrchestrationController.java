@@ -26,7 +26,7 @@ public class UpskillOrchestrationController {
      * against ALL open demands to compute and rank the top skill gaps.
      */
     @PostMapping("/generate")
-    @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_REFRESH')")
+    @PreAuthorize("hasAuthority('WORKFORCE_AI_UPSKILL_GENERATE')")
     public ResponseEntity<UpskillingRecommendationResponse> generateLearningPath(
             @RequestBody EmployeeAuditRequest request) {
         UpskillingRecommendationResponse response = orchestrationService
@@ -40,7 +40,7 @@ public class UpskillOrchestrationController {
      * Records are returned sorted by generation timestamp, newest first.
      */
     @GetMapping("/history")
-    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    @PreAuthorize("hasAuthority('WORKFORCE_AI_UPSKILL_VIEW')")
     public ResponseEntity<List<UpskillHistoryEntity>> getHistory(@RequestParam String employeeId) {
         List<UpskillHistoryEntity> historyLog = orchestrationService.getEmployeeAuditHistory(employeeId);
         return ResponseEntity.ok(historyLog);
