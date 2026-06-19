@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class DemandServiceClient {
 
-    // Define the base URL for the Demand Service in your application.properties
+
     @Value("${demand.service.url}")
     private String demandServiceBaseUrl;
 
