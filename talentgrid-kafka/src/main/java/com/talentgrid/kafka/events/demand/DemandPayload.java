@@ -53,4 +53,16 @@ public class DemandPayload {
     private Integer externalFilledCount;
     private Integer recruitedCount;
     private String closureReason;
+
+    // ─── PM notification routing fields ─────────────────────────────────────────
+    // These are populated transiently in Kafka events for notification routing.
+    // They are NOT stored on the Demand entity or its database table.
+    // Resolved at event-publish time via: Demand.projectId → Project → projectManagerId → User
+    private Long pmUserId;
+    private String pmName;
+    private String pmEmail;
+    private String pmSlackId;
+
+    // ─── SLA metadata ────────────────────────────────────────────────────────────
+    private Long elapsedHours;
 }

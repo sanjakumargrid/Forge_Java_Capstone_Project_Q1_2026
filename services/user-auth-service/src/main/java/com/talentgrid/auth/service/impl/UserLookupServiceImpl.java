@@ -29,6 +29,7 @@ public class UserLookupServiceImpl implements UserLookupService {
             .username(rmg.getUsername())
             .email(rmg.getEmail())
             .location(rmg.getLocation())
+            .slackId(rmg.getSlackId())
             .build();
   }
 }

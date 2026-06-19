@@ -15,4 +15,5 @@ public class UserSummaryResponse {
   private String username;
   private String email;
   private String location;
+  private String slackId;
 }

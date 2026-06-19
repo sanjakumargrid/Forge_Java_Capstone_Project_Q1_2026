@@ -173,7 +173,7 @@ Authenticates a user. Returns JWT access token in the response body and sets a r
 **Response:**
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+  "accessToken": ${jwt-token},
   "type": "Bearer",
   "email": "john@example.com",
   "roles": ["RECRUITER"]
