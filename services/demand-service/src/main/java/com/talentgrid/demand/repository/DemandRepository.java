@@ -22,7 +22,8 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
        /**
         * Finds a non-deleted demand by its ID.
         */
-       Optional<Demand> findByDemandIdAndIsDeletedFalse(Long demandId);
+       @Query("SELECT d FROM Demand d LEFT JOIN FETCH d.demandSkills ds LEFT JOIN FETCH ds.skill WHERE d.demandId = :demandId AND d.isDeleted = false")
+       Optional<Demand> findByDemandIdAndIsDeletedFalse(@Param("demandId") Long demandId);
 
     /**
      * Finds all non-deleted demands with the given status.
