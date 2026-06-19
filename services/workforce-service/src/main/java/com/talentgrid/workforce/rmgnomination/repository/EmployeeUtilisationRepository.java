@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeUtilisationRepository extends JpaRepository<EmployeeUtilisation, Long> {
@@ -16,4 +17,5 @@ public interface EmployeeUtilisationRepository extends JpaRepository<EmployeeUti
     int sumAllocatedPercentageByEmployeeId(@Param("employeeId") Long employeeId);
 
     List<EmployeeUtilisation> findByEmployee_IdAndIsDeletedFalse(Long employeeId);
+    Optional<EmployeeUtilisation> findByEmployee_IdAndDemandIdAndIsDeletedFalse(Long employeeId, Long demandId);
 }

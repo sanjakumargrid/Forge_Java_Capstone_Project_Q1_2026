@@ -11,6 +11,8 @@ public interface InternalMatchRepository extends JpaRepository<InternalMatch, Lo
 
     boolean existsByEmployee_IdAndDemandIdAndIsDeletedFalse(Long employeeId, Long demandId);
 
+    long countByEmployee_IdAndIsDeletedFalse(Long employeeId);
+
     List<InternalMatch> findByDemandIdAndIsDeletedFalse(Long demandId);
 
     List<InternalMatch> findByEmployee_IdAndIsDeletedFalse(Long employeeId);
