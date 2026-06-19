@@ -11,10 +11,9 @@ public class DemandDTO {
     private Long demandId;
     private String title;
     private String description;
-    private String level;
-    private String location;
-    private Long projectId;
-    private String businessUnit;
-    private List<String> skills;
 
+    private Integer yearsOfExperience;
+
+    private List<String> primarySkills;
+    private List<String> addOnSkills;
 }

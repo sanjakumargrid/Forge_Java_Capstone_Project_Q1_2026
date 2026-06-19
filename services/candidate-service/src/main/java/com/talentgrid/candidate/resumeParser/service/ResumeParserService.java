@@ -29,21 +29,23 @@ public class ResumeParserService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // 1. Declare the field without instantiating it
+
     private final ObjectMapper objectMapper;
 
-    // 2. Let Spring Boot automatically inject its pre-configured ObjectMapper
+
     public ResumeParserService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-    // Groq's API endpoint (which is OpenAI compatible)
+
     private static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
     public ParsedResumeDTO parseResume(MultipartFile file) throws IOException {
-        // 1. Extract text from PDF
-        String resumeText = extractTextFromFile(file);
 
-        // 2. Prepare the ATS parsing prompt
+        String resumeText = extractTextFromPdf(file);
+
+        String maskedText = maskPII(resumeText);
+
+
         String systemPrompt = """
             You are an expert ATS (Applicant Tracking System) parser. 
             Extract information from the provided resume text and return it strictly as a JSON object matching this schema:
@@ -81,55 +83,69 @@ public class ResumeParserService {
             If a field is missing in the resume, return null or an empty array for that field. Do not include any markdown formatting.
             """;
 
-        // 3. Groq (OpenAI-compatible) Payload structure
+
         Map<String, Object> requestBody = Map.of(
-                "model", "llama-3.3-70b-versatile", // Or use "llama-3.1-8b-instant"
-                "response_format", Map.of("type", "json_object"), // Enforces strict JSON output
-                "temperature", 0.1, // Low temperature for high accuracy data extraction
+                "model", "llama-3.3-70b-versatile",
+                "response_format", Map.of("type", "json_object"),
+                "temperature", 0.1,
                 "messages", List.of(
                         Map.of("role", "system", "content", systemPrompt),
-                        Map.of("role", "user", "content", "Here is the resume text:\n\n" + resumeText)
+                        Map.of("role", "user", "content", "Here is the resume text:\n\n" + maskedText)
                 )
         );
 
-        // 4. Set Headers (Groq requires Bearer Auth)
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        // 5. Call the Groq API
+
         ResponseEntity<String> response = restTemplate.postForEntity(GROQ_API_URL, entity, String.class);
 
-        // 6. Parse the LLM response into our DTO
+
         return parseLlmResponseToDTO(response.getBody());
     }
 
-    private String extractTextFromFile(MultipartFile file) throws IOException {
-        try {
-            Tika tika = new Tika();
-            // Tika automatically detects if it's a PDF, DOCX, TXT, etc., and pulls the text
-            String extractedText = tika.parseToString(file.getInputStream());
-
-            if (extractedText == null || extractedText.trim().isEmpty()) {
-                throw new IOException("The extracted document is empty or unreadable.");
-            }
-            return extractedText;
-
-        } catch (Exception e) {
-            throw new IOException("Failed to parse document. Unsupported or corrupted file.", e);
+    private String extractTextFromPdf(MultipartFile file) throws IOException {
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper stripper = new PDFTextStripper();
+            return stripper.getText(document);
         }
     }
 
     private ParsedResumeDTO parseLlmResponseToDTO(String responseBody) throws IOException {
-        // Navigate the standard OpenAI/Groq JSON structure
+
         JsonNode rootNode = objectMapper.readTree(responseBody);
         String jsonContent = rootNode.path("choices").get(0)
                 .path("message")
                 .path("content").asText();
 
-        // Deserialize the raw JSON string directly into the Java Record
+
         return objectMapper.readValue(jsonContent, ParsedResumeDTO.class);
+    }
+
+    private String maskPII(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+
+
+        String emailRegex = "([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})";
+        text = text.replaceAll(emailRegex, "[EMAIL REDACTED]");
+
+
+        String phoneRegex = "(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}";
+        text = text.replaceAll(phoneRegex, "[PHONE REDACTED]");
+
+
+        String linkedInRegex = "(https?://)?(www\\.)?(linkedin\\.com/in/[a-zA-Z0-9_-]+)";
+        text = text.replaceAll(linkedInRegex, "[LINKEDIN REDACTED]");
+
+        String generalUrlRegex = "(https?://\\S+)";
+        text = text.replaceAll(generalUrlRegex, "https://www.merriam-webster.com/dictionary/redacted");
+
+        return text;
     }
 }
