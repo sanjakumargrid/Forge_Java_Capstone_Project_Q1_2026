@@ -4,7 +4,12 @@ import com.talentgrid.audit.client.AuditLogClient;
 import com.talentgrid.audit.dto.AuditAction;
 import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.interview.client.ApplicationClient;
+import com.talentgrid.interview.client.CandidateClient;
+import com.talentgrid.interview.client.EmployeeClient;
+import com.talentgrid.interview.client.dto.CandidateDto;
+import com.talentgrid.interview.client.dto.EmployeeDto;
 import com.talentgrid.interview.exception.BusinessException;
+import com.talentgrid.clients.notification.NotificationEventPublisher;
 import com.talentgrid.interview.interview.dto.ApplicationDto;
 import com.talentgrid.interview.interview.dto.InterviewDto;
 import com.talentgrid.interview.interview.entity.Interview;
@@ -32,11 +37,17 @@ public class InterviewServiceImpl implements InterviewService {
 
     private final ApplicationClient applicationClient;
 
+    private final EmployeeClient employeeClient;
+
     private final GoogleCalendarClient googleCalendarClient;
 
     private final InterviewEventProducer interviewEventProducer;
 
     private final AuditLogClient auditLogClient;
+    
+    private final CandidateClient candidateClient;
+    
+    private final NotificationEventPublisher notificationEventPublisher;
 
     @Override
     @Transactional
@@ -68,6 +79,12 @@ public class InterviewServiceImpl implements InterviewService {
             );
         }
 
+        // REQ: Fetch Candidate early to avoid orphaned Calendar events if candidate fetch fails
+        if (applicationDto.getCandidateId() == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Application does not have an associated candidate");
+        }
+        CandidateDto candidate = candidateClient.getCandidate(applicationDto.getCandidateId());
+
         Interview interview =
                 InterviewMapper.dtoToEntity(interviewDto);
 
@@ -83,6 +100,34 @@ public class InterviewServiceImpl implements InterviewService {
 
         Interview savedInterview =
                 interviewRepository.save(interview);
+        
+        String interviewerName = "Our Team";
+        if (interview.getInterviewers() != null && !interview.getInterviewers().isEmpty()) {
+            EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0));
+            interviewerName = primaryInterviewer.getName();
+        }
+
+        String candidateName = candidate.getFirstName() + (candidate.getLastName() != null ? " " + candidate.getLastName() : "");
+        notificationEventPublisher.sendInAppAndEmail(
+                candidate.getCandidateId().toString(),
+                candidate.getEmail(),
+                "INTERVIEW_INVITATION",
+                "Interview Invitation from Grid Dynamics",
+                "You have been invited to an interview. Please join using the Google Meet link: " + response.getMeetLink(),
+                "interview-service",
+                savedInterview.getInterviewId().toString(),
+                "INTERVIEW",
+                "HIGH",
+                "interview-invitation",
+                Map.of(
+                        "candidateName", candidateName,
+                        "companyName", "Grid Dynamics",
+                        "interviewDate", savedInterview.getScheduledAt() != null ? savedInterview.getScheduledAt().toString() : "TBD",
+                        "meetLink", response.getMeetLink() != null ? response.getMeetLink() : "TBD",
+                        "interviewerName", interviewerName
+                ),
+                java.util.UUID.randomUUID().toString()
+        );
 
         interviewEventProducer.publishScheduled(savedInterview);
 

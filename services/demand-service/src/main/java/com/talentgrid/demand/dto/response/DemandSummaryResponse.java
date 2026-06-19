@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 
 /**
  * Lightweight demand projection for dashboard and list views.
@@ -22,6 +23,7 @@ public class DemandSummaryResponse {
 
     private Long demandId;
     private String title;
+    private List<String> skills;
     private String accountName;
     private String level;
     private String employmentType;

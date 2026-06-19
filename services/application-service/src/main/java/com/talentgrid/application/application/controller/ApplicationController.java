@@ -11,6 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import com.talentgrid.application.application.dto.request.BulkRejectRequest;
+import com.talentgrid.application.application.dto.request.BulkStageMoveRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/applications")
 public class ApplicationController {
@@ -73,5 +81,34 @@ public class ApplicationController {
             @RequestParam(defaultValue = "20") int size
     ) {
         return applicationService.searchApplications(minScore, page, size);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
+    @PostMapping("/bulk/stage")
+    public List<ApplicationDto> bulkMoveStage(
+            @Valid @RequestBody BulkStageMoveRequest request
+    ) {
+        return applicationService.bulkMoveStage(request);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
+    @PostMapping("/bulk/reject")
+    public List<ApplicationDto> bulkReject(
+            @Valid @RequestBody BulkRejectRequest request
+    ) {
+        return applicationService.bulkReject(request);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
+    @GetMapping(value = "/bulk/export", produces = "text/csv")
+    public ResponseEntity<String> exportToCsv(
+            @RequestParam(required = false) Long demandId,
+            @RequestParam(required = false) String stage
+    ) {
+        String csvData = applicationService.exportToCsv(demandId, stage);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"applications_export.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv"))
+                .body(csvData);
     }
 }

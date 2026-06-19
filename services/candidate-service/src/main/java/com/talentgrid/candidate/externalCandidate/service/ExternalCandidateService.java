@@ -75,6 +75,34 @@ public class ExternalCandidateService {
 
         if (duplicate) {
             candidate = existingCandidate.get();
+            
+            // Merge new data into existing profile
+            ExternalCandidateMapper.copyDtoToExistingEntity(dto, candidate);
+            
+            candidate.setEmail(email);
+            candidate.setPhoneNumber(phone);
+            candidate.setEmailHash(emailHash);
+            candidate.setPhoneHash(phoneHash);
+            
+            candidate = candidatePersistenceService.saveCandidate(candidate);
+            
+            auditLogClient.logAction(
+                    AuditLogPayload.builder()
+                            .entityType("CANDIDATE")
+                            .entityId(candidate.getCandidateId())
+                            .action(AuditAction.UPDATE)
+                            .afterState(Map.of(
+                                    "firstName", candidate.getFirstName(),
+                                    "lastName", candidate.getLastName(),
+                                    "email", candidate.getEmail(),
+                                    "isDuplicateMerge", true
+                            ))
+                            .serviceName("candidate-service")
+                            .endpoint("/api/candidates")
+                            .build()
+            );
+            
+            candidateEventProducer.publishUpdated(candidate);
         } else {
             candidate = ExternalCandidateMapper.dtoToEntity(dto);
 

@@ -30,6 +30,15 @@ public class WebClientConfig {
     }
 
     @Bean
+    public WebClient candidateWebClient(
+            @Value("${candidate.service.url:http://localhost:8084}") String candidateServiceUrl
+    ) {
+        return WebClient.builder()
+                .baseUrl(candidateServiceUrl)
+                .build();
+    }
+
+    @Bean
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());

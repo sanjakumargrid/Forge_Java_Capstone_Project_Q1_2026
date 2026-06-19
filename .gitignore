@@ -1,13 +1,19 @@
-cat >> .gitignore <<'EOF'
+# IDE and Project
+.idea/
+*.iml
+target/
+kafka_data/
 
-# Google / DocuSign secrets
+# Credentials and Secrets
 **/src/main/resources/google/service-account.json
 **/src/main/resources/google/oauth-client-secret.json
 **/src/main/resources/docusign/private.key
 **/*.pem
 **/*.p12
 **/*.key
-EOF.idea/
-target/
-kafka_data/
-*.iml
+.env
+
+# Logs and Scripts
+*.log
+pids.txt
+start_all.sh

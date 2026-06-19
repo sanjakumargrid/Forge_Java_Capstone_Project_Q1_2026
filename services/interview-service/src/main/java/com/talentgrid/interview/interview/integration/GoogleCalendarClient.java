@@ -14,6 +14,8 @@ import com.google.api.services.calendar.model.FreeBusyCalendar;
 import com.google.api.services.calendar.model.FreeBusyRequest;
 import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
+import com.talentgrid.interview.client.EmployeeClient;
+import com.talentgrid.interview.client.dto.EmployeeDto;
 import com.talentgrid.interview.config.GoogleOAuthTokenService;
 import com.talentgrid.interview.exception.BusinessException;
 import com.talentgrid.interview.interview.entity.Interview;
@@ -36,6 +38,7 @@ public class GoogleCalendarClient {
 
     private final ObjectProvider<Calendar> serviceAccountCalendarProvider;
     private final ObjectProvider<GoogleOAuthTokenService> googleOAuthTokenServiceProvider;
+    private final EmployeeClient employeeClient;
 
     @Value("${google.calendar.enabled:false}")
     private boolean googleCalendarEnabled;
@@ -51,10 +54,12 @@ public class GoogleCalendarClient {
 
     public GoogleCalendarClient(
             ObjectProvider<Calendar> serviceAccountCalendarProvider,
-            ObjectProvider<GoogleOAuthTokenService> googleOAuthTokenServiceProvider
+            ObjectProvider<GoogleOAuthTokenService> googleOAuthTokenServiceProvider,
+            EmployeeClient employeeClient
     ) {
         this.serviceAccountCalendarProvider = serviceAccountCalendarProvider;
         this.googleOAuthTokenServiceProvider = googleOAuthTokenServiceProvider;
+        this.employeeClient = employeeClient;
     }
 
     public GoogleCalendarResponse createEvent(Interview interview) {
@@ -288,8 +293,9 @@ public class GoogleCalendarClient {
         List<FreeBusyRequestItem> items = new ArrayList<>();
 
         for (Long interviewerId : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
             items.add(new FreeBusyRequestItem()
-                    .setId("interviewer-" + interviewerId + "@talentgrid.com"));
+                    .setId(employee.getEmail()));
         }
 
         FreeBusyRequest freeBusyRequest = new FreeBusyRequest()
@@ -305,14 +311,15 @@ public class GoogleCalendarClient {
         List<String> busyInterviewers = new ArrayList<>();
 
         for (Long interviewerId : interview.getInterviewers()) {
-            String calendarId = "interviewer-" + interviewerId + "@talentgrid.com";
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+            String calendarId = employee.getEmail();
             FreeBusyCalendar calendarBusy = freeBusyResponse.getCalendars().get(calendarId);
 
             if (calendarBusy != null
                     && calendarBusy.getBusy() != null
                     && !calendarBusy.getBusy().isEmpty()) {
 
-                busyInterviewers.add("Interviewer #" + interviewerId);
+                busyInterviewers.add(employee.getName() + " (" + employee.getEmail() + ")");
             }
         }
 
@@ -335,9 +342,10 @@ public class GoogleCalendarClient {
         List<EventAttendee> attendees = new ArrayList<>();
 
         for (Long interviewerId : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
             EventAttendee attendee = new EventAttendee();
-            attendee.setEmail("interviewer-" + interviewerId + "@talentgrid.com");
-            attendee.setDisplayName("Interviewer " + interviewerId);
+            attendee.setEmail(employee.getEmail());
+            attendee.setDisplayName(employee.getName());
             attendee.setResponseStatus("needsAction");
             attendees.add(attendee);
         }

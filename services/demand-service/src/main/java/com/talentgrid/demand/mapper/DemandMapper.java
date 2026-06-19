@@ -158,6 +158,7 @@ public class DemandMapper {
         DemandSummaryResponse response = new DemandSummaryResponse();
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
+        response.setSkills(demand.getSkills());
         response.setAccountName(demand.getAccountName());
         response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
         response.setEmploymentType(enumName(demand.getEmploymentType()));

@@ -703,6 +703,8 @@ public class OfferServiceImpl implements OfferService {
 
         if (savedOffer.getOfferStatus() == Status.APPROVED) {
             offerEventProducer.publishApproved(savedOffer);
+        } else if (savedOffer.getOfferStatus() == Status.PENDING_APPROVAL) {
+            offerEventProducer.publishPendingNextApproval(savedOffer);
         }
 
 
