@@ -43,9 +43,9 @@ public class InternalEmployeeController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Update own skills and availability",
-            description = "Authenticated engineers update their own skills and availability date. "
-                    + "Changes publish an employee.skills_updated event to refresh pgvector embeddings.")
+    @Operation(summary = "Update own skills, resume Drive link, and availability",
+            description = "Authenticated engineers update their own skills, resume Drive link, and availability date. "
+                    + "Changes publish an employee.profile_updated event.")
     @PatchMapping("/update")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_UPDATE')")
     public ResponseEntity<InternalEmployeeResponse> updateOwnProfile(

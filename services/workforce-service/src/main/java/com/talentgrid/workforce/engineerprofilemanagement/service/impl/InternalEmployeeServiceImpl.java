@@ -68,22 +68,39 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                         "Internal employee not found for id: " + employeeId));
 
         //Reject empty PATCH
-        if (request.getSkills() == null && request.getAvailabilityDate() == null) {
+        if (request.getSkills() == null
+                && request.getResumeDriveLink() == null
+                && request.getAvailabilityDate() == null) {
             throw new IllegalArgumentException("At least one field must be updated");
         }
 
         boolean skillsChanged = false;
+        boolean resumeDriveLinkChanged = false;
         boolean availabilityChanged = false;
 
         // Handle skills update safely
         if (request.getSkills() != null) {
-            String[] newSkills = request.getSkills().toArray(new String[0]);
+            String[] newSkills = request.getSkills().stream()
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .filter(skill -> !skill.isBlank())
+                    .distinct()
+                    .toArray(String[]::new);
             skillsChanged = !Arrays.equals(employee.getSkills(), newSkills);
 
             if (skillsChanged) {
                 employee.setSkills(newSkills);
                 employee.setSkillsVector(null);
                 employee.setLastEmbeddedAt(null);
+            }
+        }
+
+        if (request.getResumeDriveLink() != null) {
+            String resumeDriveLink = request.getResumeDriveLink().trim();
+            resumeDriveLinkChanged = !Objects.equals(employee.getResumeDriveLink(), resumeDriveLink);
+
+            if (resumeDriveLinkChanged) {
+                employee.setResumeDriveLink(resumeDriveLink);
             }
         }
 
@@ -100,7 +117,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         }
 
         // No actual changes
-        if (!skillsChanged && !availabilityChanged) {
+        if (!skillsChanged && !resumeDriveLinkChanged && !availabilityChanged) {
             return mapToResponse(employee);
         }
 
@@ -113,6 +130,9 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         if (skillsChanged) {
             updatedFields.add("skills");
         }
+        if (resumeDriveLinkChanged) {
+            updatedFields.add("resumeDriveLink");
+        }
         if (availabilityChanged) {
             updatedFields.add("availabilityDate");
         }
@@ -122,6 +142,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                         .employeeId(saved.getEmployeeId())
                         .updatedFields(updatedFields)
                         .skills(skillsChanged ? List.of(saved.getSkills()) : null)
+                        .resumeDriveLink(resumeDriveLinkChanged ? saved.getResumeDriveLink() : null)
                         .availabilityDate(availabilityChanged ? saved.getAvailabilityDate() : null)
                         .build(),
                 requestId
@@ -139,6 +160,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         response.setSkills(employee.getSkills());
         response.setSkillsVector(employee.getSkillsVector());
         response.setCurrentProject(employee.getCurrentProject());
+        response.setResumeDriveLink(employee.getResumeDriveLink());
         response.setAvailabilityDate(employee.getAvailabilityDate());
         response.setLocation(employee.getLocation());
         response.setContractType(employee.getContractType() != null ? employee.getContractType().name() : null);

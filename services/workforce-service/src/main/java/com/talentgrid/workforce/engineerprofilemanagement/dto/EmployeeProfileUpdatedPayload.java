@@ -13,6 +13,7 @@ public class EmployeeProfileUpdatedPayload {
     private Long employeeId;
     private List<String> updatedFields;
     private List<String> skills;
+    private String resumeDriveLink;
     private LocalDate availabilityDate;
 
 }

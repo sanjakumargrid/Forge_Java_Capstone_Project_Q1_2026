@@ -47,6 +47,9 @@ public class InternalEmployee {
     @Column(name = "current_project", length = 150)
     private String currentProject;
 
+    @Column(name = "resume_drive_link", length = 500)
+    private String resumeDriveLink;
+
     @Column(name = "availability_date")
     private LocalDate availabilityDate;
 

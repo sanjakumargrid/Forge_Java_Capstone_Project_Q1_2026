@@ -15,6 +15,7 @@ public class InternalEmployeeResponse {
     private String[] skills;
     private String skillsVector;
     private String currentProject;
+    private String resumeDriveLink;
     private LocalDate availabilityDate;
     private String location;
     private String contractType;
