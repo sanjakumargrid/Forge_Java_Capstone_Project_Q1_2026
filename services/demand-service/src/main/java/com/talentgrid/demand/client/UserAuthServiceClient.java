@@ -1,13 +1,17 @@
 package com.talentgrid.demand.client;
 
 import com.talentgrid.demand.client.dto.AccountDto;
+import com.talentgrid.demand.client.dto.ManagedProjectDto;
 import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.client.dto.UserDto;
 import com.talentgrid.demand.client.dto.UserSummaryResponse;
+import com.talentgrid.demand.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * Feign client for synchronous HTTP communication with the User/Auth Service.
@@ -19,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(
         name = "user-auth-service",
         url = "${user-auth-service.url:http://localhost:8080}",
-        path = "/api"
+        path = "/api",
+        configuration = FeignConfig.class
 )
 public interface UserAuthServiceClient {
 
@@ -40,6 +45,13 @@ public interface UserAuthServiceClient {
      */
     @GetMapping("/projects/{id}")
     ProjectDto getProjectById(@PathVariable("id") Long id);
+
+    /**
+     * Projects where the authenticated user (Bearer token) is PM.
+     * GET /api/projects/mine-as-pm
+     */
+    @GetMapping("/projects/mine-as-pm")
+    List<ManagedProjectDto> getMyProjectsAsPm();
 
     /**
      * Retrieves user details by ID.

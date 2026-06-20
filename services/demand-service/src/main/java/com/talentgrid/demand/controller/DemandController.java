@@ -8,6 +8,7 @@ import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.dto.response.DemandSummaryResponse;
 import com.talentgrid.demand.service.DemandQueryService;
 import com.talentgrid.demand.service.DemandService;
+import com.talentgrid.demand.service.PmDemandQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * <ul>
  * <li>{@code GET    /api/demands} — enterprise demand search with
  * filters/sorting</li>
+ * <li>{@code GET    /api/demands/pm} — demands on projects managed by the logged-in PM (optional {@code projectId})</li>
  * <li>{@code POST   /api/demands} — create a new workforce demand (status:
  * DRAFT)</li>
  * <li>{@code GET    /api/demands/{id}} — get detailed demand information</li>
@@ -38,6 +40,7 @@ public class DemandController {
 
     private final DemandService demandService;
     private final DemandQueryService demandQueryService;
+    private final PmDemandQueryService pmDemandQueryService;
 
     /**
      * Enterprise demand search with optional filters and pagination.
@@ -71,6 +74,24 @@ public class DemandController {
 
         Page<DemandSummaryResponse> result = demandQueryService.searchDemands(
                 status, priority, businessUnit, accountName, location, employmentType, sortBy, sortDir, page, size);
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Lists demands for projects where the current user is PM ({@code project_manager_id} in user-auth).
+     * Optional {@code projectId} restricts to one managed project; unknown or unmanaged ids yield an empty page.
+     */
+    @GetMapping("/pm")
+    @PreAuthorize("hasAuthority('DEMAND_VIEW')")
+    public ResponseEntity<Page<DemandSummaryResponse>> listDemandsForPm(
+            @RequestParam(required = false) Long projectId,
+            @RequestParam(required = false, defaultValue = "createdAt") String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String sortDir,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+
+        Page<DemandSummaryResponse> result =
+                pmDemandQueryService.searchForCurrentPm(projectId, sortBy, sortDir, page, size);
         return ResponseEntity.ok(result);
     }
 

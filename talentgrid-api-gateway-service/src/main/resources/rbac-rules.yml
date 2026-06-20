@@ -49,6 +49,10 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
+    - path: "/api/v1/demands/pm"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
     - path: "/api/v1/demands"
       methods: [POST]
       allowed-scopes: [DEMAND_CREATE]
