@@ -396,6 +396,10 @@ rbac:
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
 
+    - path: "/api/v1/rmg/nominations/recommendations/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
+
     - path: "/api/v1/nominations"
       methods: [GET]
       allowed-scopes: [NOMINATION_VIEW]

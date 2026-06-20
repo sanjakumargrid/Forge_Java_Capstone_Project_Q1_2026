@@ -33,6 +33,7 @@ public class DemandEmbeddingService {
 
     private final EmbeddingService embeddingService;
     private final DemandEmbeddingRepository demandEmbeddingRepository;
+    private final DemandRecommendationService demandRecommendationService;
 
     /**
      * Builds a demand summary, generates its embedding, and persists/updates the
@@ -75,6 +76,13 @@ public class DemandEmbeddingService {
 
         log.info("[DEMAND-EMBED] Embedding stored | demandId={} | dimensions={} | isUpdate={} | embeddings = {}",
                 demandId, vector.length, embedding.getId() != null,vector);
+
+        // Compute and store AI semantic matching engineers for this demand
+        try {
+            demandRecommendationService.calculateAndStoreRecommendations(demandId, vector);
+        } catch (Exception e) {
+            log.error("[DEMAND-EMBED] Failed to generate recommendations for demandId={} | error={}", demandId, e.getMessage(), e);
+        }
     }
 
     /**
