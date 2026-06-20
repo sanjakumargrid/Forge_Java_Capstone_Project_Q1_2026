@@ -20,7 +20,7 @@ public class WorkforceKafkaProducer {
     public void publishEmployeeProfileUpdated(EmployeeProfileUpdatedPayload payload, String requestId) {
         BaseEvent<EmployeeProfileUpdatedPayload> event = new BaseEvent<>();
         String key = UUID.randomUUID().toString();
-        event.setEventType("employee.profile_updated");
+        event.setEventType("EMPLOYEE_PROFILE_UPDATED");
         event.setSource("workforce-service");
 
         if (requestId != null) {

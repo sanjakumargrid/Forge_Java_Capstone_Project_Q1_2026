@@ -14,8 +14,8 @@ public class UpdateEngineerProfileRequest {
     private List<String> skills;
 
     @Pattern(
-            regexp = "^$|^https://drive\\.google\\.com/.+",
-            message = "resumeDriveLink must be a valid Google Drive URL"
+            regexp = "^$|^https://(drive|docs)\\.google\\.com/.+",
+            message = "resumeDriveLink must be a valid Google Drive or Docs URL"
     )
     private String resumeDriveLink;
 

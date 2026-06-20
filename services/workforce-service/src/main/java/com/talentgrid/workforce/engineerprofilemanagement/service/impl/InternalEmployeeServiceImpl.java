@@ -12,16 +12,21 @@ import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmp
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @Transactional(readOnly = true)
 public class InternalEmployeeServiceImpl implements InternalEmployeeService {
+
+    private static final Pattern MARKDOWN_LINK_PATTERN = Pattern.compile("^\\[(?:[^\\]]*)\\]\\((https?://[^)]+)\\)$");
 
     private final InternalEmployeeRepository repository;
     private final WorkforceKafkaProducer workforceKafkaProducer;
@@ -67,40 +72,26 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Internal employee not found for id: " + employeeId));
 
-        //Reject empty PATCH
+        // Reject empty PATCH
         if (request.getSkills() == null
-                && request.getResumeDriveLink() == null
-                && request.getAvailabilityDate() == null) {
+                && request.getAvailabilityDate() == null
+                && request.getResumeDriveLink() == null) {
             throw new IllegalArgumentException("At least one field must be updated");
         }
 
         boolean skillsChanged = false;
-        boolean resumeDriveLinkChanged = false;
         boolean availabilityChanged = false;
+        boolean resumeChanged = false;
 
         // Handle skills update safely
         if (request.getSkills() != null) {
-            String[] newSkills = request.getSkills().stream()
-                    .filter(Objects::nonNull)
-                    .map(String::trim)
-                    .filter(skill -> !skill.isBlank())
-                    .distinct()
-                    .toArray(String[]::new);
+            String[] newSkills = request.getSkills().toArray(new String[0]);
             skillsChanged = !Arrays.equals(employee.getSkills(), newSkills);
 
             if (skillsChanged) {
                 employee.setSkills(newSkills);
                 employee.setSkillsVector(null);
                 employee.setLastEmbeddedAt(null);
-            }
-        }
-
-        if (request.getResumeDriveLink() != null) {
-            String resumeDriveLink = request.getResumeDriveLink().trim();
-            resumeDriveLinkChanged = !Objects.equals(employee.getResumeDriveLink(), resumeDriveLink);
-
-            if (resumeDriveLinkChanged) {
-                employee.setResumeDriveLink(resumeDriveLink);
             }
         }
 
@@ -116,8 +107,20 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
             }
         }
 
+        if (request.getResumeDriveLink() != null) {
+            String newResumeDriveLink = sanitizeResumeDriveLink(request.getResumeDriveLink());
+            if (!StringUtils.hasText(newResumeDriveLink)) {
+                throw new IllegalArgumentException("resumeDriveLink cannot be blank when provided");
+            }
+
+            // Treat any provided resume link as a resume update so the Kafka event
+            // always carries the link for downstream parsing.
+            resumeChanged = true;
+            employee.setResumeDriveLink(newResumeDriveLink);
+        }
+
         // No actual changes
-        if (!skillsChanged && !resumeDriveLinkChanged && !availabilityChanged) {
+        if (!skillsChanged && !availabilityChanged && !resumeChanged) {
             return mapToResponse(employee);
         }
 
@@ -130,11 +133,11 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         if (skillsChanged) {
             updatedFields.add("skills");
         }
-        if (resumeDriveLinkChanged) {
-            updatedFields.add("resumeDriveLink");
-        }
         if (availabilityChanged) {
             updatedFields.add("availabilityDate");
+        }
+        if (resumeChanged) {
+            updatedFields.add("resumeDriveLink");
         }
 
         workforceKafkaProducer.publishEmployeeProfileUpdated(
@@ -142,13 +145,27 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                         .employeeId(saved.getEmployeeId())
                         .updatedFields(updatedFields)
                         .skills(skillsChanged ? List.of(saved.getSkills()) : null)
-                        .resumeDriveLink(resumeDriveLinkChanged ? saved.getResumeDriveLink() : null)
                         .availabilityDate(availabilityChanged ? saved.getAvailabilityDate() : null)
+                        .resumeDriveLink(resumeChanged ? saved.getResumeDriveLink() : null)
                         .build(),
                 requestId
         );
 
         return mapToResponse(saved);
+    }
+
+    private String sanitizeResumeDriveLink(String resumeDriveLink) {
+        String trimmed = resumeDriveLink == null ? "" : resumeDriveLink.trim();
+        if (!StringUtils.hasText(trimmed)) {
+            return "";
+        }
+
+        Matcher markdownMatcher = MARKDOWN_LINK_PATTERN.matcher(trimmed);
+        if (markdownMatcher.matches()) {
+            return markdownMatcher.group(1).trim();
+        }
+
+        return trimmed;
     }
 
     private InternalEmployeeResponse mapToResponse(InternalEmployee employee) {
@@ -160,8 +177,8 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         response.setSkills(employee.getSkills());
         response.setSkillsVector(employee.getSkillsVector());
         response.setCurrentProject(employee.getCurrentProject());
-        response.setResumeDriveLink(employee.getResumeDriveLink());
         response.setAvailabilityDate(employee.getAvailabilityDate());
+        response.setResumeDriveLink(employee.getResumeDriveLink());
         response.setLocation(employee.getLocation());
         response.setContractType(employee.getContractType() != null ? employee.getContractType().name() : null);
         response.setUtilisationPct(employee.getUtilisationPct());

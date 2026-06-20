@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.talentgrid.kafka.consumer.BaseKafkaConsumer;
 import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.topics.TalentGridTopics;
+import com.talentgrid.workforce.airmgnomination.services.ResumeParserService;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.EmployeeProfileUpdatedPayload;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
@@ -21,6 +23,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
 
     private final ObjectMapper objectMapper;
     private final InternalEmployeeService internalEmployeeService;
+    private final ResumeParserService resumeParserService;
 
     @KafkaListener(topics = TalentGridTopics.WORKFORCE_EVENTS, groupId = "${spring.kafka.consumer.group-id}")
     public void consume(BaseEvent<Map<String, Object>> event) {
@@ -31,6 +34,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
     protected void handleEvent(BaseEvent<Map<String, Object>> event) {
         switch (event.getEventType()) {
             case "USER_CREATED" -> handleUserCreated(event);
+            case "EMPLOYEE_PROFILE_UPDATED" -> handleEngineerResumeUpdated(event);
             default -> log.warn(
                     "[WORKFORCE-CONSUMER] Unsupported event type={} eventId={}",
                     event.getEventType(),
@@ -49,6 +53,31 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
 
     private void handleUserCreated(BaseEvent<Map<String, Object>> event) {
         syncInternalEmployee(event);
+    }
+
+    private void handleEngineerResumeUpdated(BaseEvent<Map<String, Object>> event) {
+        EmployeeProfileUpdatedPayload payload = objectMapper.convertValue(event.getPayload(), EmployeeProfileUpdatedPayload.class);
+
+        if (payload == null || payload.getEmployeeId() == null) {
+            log.warn("[WORKFORCE-CONSUMER] Invalid employee profile update payload | eventId={}", event.getEventId());
+            return;
+        }
+
+        if (payload.getResumeDriveLink() == null || payload.getResumeDriveLink().isBlank()) {
+            log.info("[WORKFORCE-CONSUMER] Profile update without resume link ignored for parsing | eventId={} | employeeId={}",
+                    event.getEventId(), payload.getEmployeeId());
+            return;
+        }
+
+        try {
+            String pastedText = resumeParserService.parseResumeText(payload);
+            log.info("[WORKFORCE-CONSUMER] Resume parsed | eventId={} | employeeId={} | textLength={}",
+                    event.getEventId(), payload.getEmployeeId(), pastedText.length());
+        } catch (Exception ex) {
+            log.error("[WORKFORCE-CONSUMER] Resume parsing failed | eventId={} | employeeId={} | resumeDriveLink={} | error={}",
+                    event.getEventId(), payload.getEmployeeId(), payload.getResumeDriveLink(), ex.getMessage(), ex);
+            throw ex;
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.talentgrid.workforce.rmgnomination.dto;
 
+import com.talentgrid.workforce.rmgnomination.enums.NominationType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -27,4 +28,6 @@ public class NominationRequest {
     private Integer allocationPercentage;
 
     private String notes;
+    private NominationType nominationType = NominationType.MANUAL;
+
 }

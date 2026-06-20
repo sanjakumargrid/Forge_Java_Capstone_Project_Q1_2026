@@ -10,11 +10,9 @@ import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
 import com.talentgrid.workforce.rmgdashboard.service.RmgService;
 import com.talentgrid.workforce.rmgnomination.dto.NominationRequest;
 import com.talentgrid.workforce.rmgnomination.dto.NominationResponse;
-import com.talentgrid.workforce.rmgnomination.entity.EmployeeUtilisation;
 import com.talentgrid.workforce.rmgnomination.entity.InternalMatch;
 import com.talentgrid.workforce.rmgnomination.enums.MatchStatus;
 import com.talentgrid.workforce.rmgnomination.enums.NominationType;
-import com.talentgrid.workforce.rmgnomination.repository.EmployeeUtilisationRepository;
 import com.talentgrid.workforce.rmgnomination.repository.InternalMatchRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -36,29 +33,39 @@ public class NominationService {
 
     private final InternalEmployeeRepository internalEmployeeRepository;
     private final InternalMatchRepository internalMatchRepository;
-    private final EmployeeUtilisationRepository employeeUtilisationRepository;
     private final DemandClient demandClient;
     private final DemandServiceClient demandServiceClient;
     private final RmgService rmgService;
-    private final NominationValidationService nominationValidationService;
+
     @Transactional
     public NominationResponse nominate(NominationRequest request) {
-        log.info("Processing nomination for employeeId={} on demandId={}",
-                request.getEmployeeId(), request.getDemandId());
+        log.info("Processing nomination for employeeId={} on demandId={}", request.getEmployeeId(), request.getDemandId());
 
-        // 1. Validate employee exists
+        // 1. Validate Employee Exists
         InternalEmployee employee = internalEmployeeRepository.findById(request.getEmployeeId())
                 .filter(e -> !e.getIsDeleted())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Engineer not found: " + request.getEmployeeId()
-                ));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Engineer not found: " + request.getEmployeeId()));
         Long employeeId = employee.getId();
 
-        // 2. Validate demand exists and status
+        // 2. Validate demand exists and is in nominatable state.
+        //    On first RM nomination from APPROVED, auto-transition to INTERNAL_SEARCH.
         DemandDto demand = demandClient.getDemandById(request.getDemandId());
         String currentStatus = normalizedStatus(demand.getStatus());
+
+        // 3. Check for duplicate nomination by the same engineer.
+        boolean alreadyNominated = internalMatchRepository.existsByEmployee_IdAndDemandIdAndIsDeletedFalse(
+                employeeId, request.getDemandId());
+
+        if (alreadyNominated) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Engineer already nominated for this demand");
+        }
+
+        // 4. One engineer can be nominated to maximum two active demands.
+        long activeDemandCount = internalMatchRepository.countByEmployee_IdAndIsDeletedFalse(employeeId);
+        if (activeDemandCount >= 2) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Engineer already has maximum 2 active demand nominations");
+        }
 
         if ("APPROVED".equals(currentStatus)) {
             demand = transitionApprovedToInternalSearch(request.getDemandId(), demand);
@@ -66,80 +73,44 @@ public class NominationService {
         }
 
         if (!"INTERNAL_SEARCH".equals(currentStatus)) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY,
                     "Demand is not available for nomination. Expected status APPROVED or INTERNAL_SEARCH, found: "
-                            + demand.getStatus()
-            );
+                            + demand.getStatus());
         }
 
-        // 3. Same engineer cannot be nominated twice for same demand
-        boolean alreadyNominated = internalMatchRepository
-                .existsByEmployee_IdAndDemandIdAndIsDeletedFalse(employeeId, request.getDemandId());
-
-        if (alreadyNominated) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Engineer already nominated for this demand"
-            );
-        }
-
-        // 4. One engineer can be nominated to maximum 2 active demands
-        long activeDemandCount = internalMatchRepository.countByEmployee_IdAndIsDeletedFalse(employeeId);
-
-        if (activeDemandCount >= 2) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Engineer already has maximum 2 active demand nominations"
-            );
-        }
-
-        // 5. Compute live utilisation
+        // 5. Validate against the engineer's current accepted utilisation.
+        // RMG only validates here; allocation is recorded later in HM acceptance flow.
         int liveUtil = safeInt(employee.getUtilisationPct());
         int requestedAllocation = request.getAllocationPercentage();
-
         if (liveUtil + requestedAllocation > 100) {
-            String errorMsg = String.format(
-                    "Engineer utilisation would exceed 100%%. Current: %d%%, Requested: %d%%, Total would be: %d%%",
-                    liveUtil,
-                    requestedAllocation,
-                    liveUtil + requestedAllocation
-            );
-
-            throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
-                    errorMsg
-            );
+            String errorMsg = String.format("Engineer utilisation would exceed 100%%. Current: %d%%, Requested: %d%%, Total would be: %d%%",
+                    liveUtil, requestedAllocation, liveUtil + requestedAllocation);
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, errorMsg);
         }
 
-        // 6. Store nomination in internal_matches
+        // 6. Write InternalMatch
+        NominationType nominationType = request.getNominationType() != null
+                ? request.getNominationType()
+                : NominationType.MANUAL;
+
         InternalMatch match = InternalMatch.builder()
                 .employee(employee)
                 .demandId(request.getDemandId())
                 .nominatedBy(request.getNominatedBy())
                 .nominationReasonByRmg(request.getNominationReasonByRmg())
                 .notes(request.getNotes())
-                .nominationType(NominationType.MANUAL)
+                .nominationType(nominationType)
                 .matchStatus(MatchStatus.PENDING_REVIEW)
                 .build();
 
         match = internalMatchRepository.save(match);
 
-        // 7. Store utilisation mapping
-        EmployeeUtilisation utilisation = EmployeeUtilisation.builder()
-                .employee(employee)
-                .demandId(request.getDemandId())
-                .allocatedPercentage(requestedAllocation)
-                .build();
+        // 7. Async Kafka Publish (NOT IMPLEMENTED NOW)
+        // TODO: After DB transaction commits, publish BaseEvent<MatchNominatedEvent>
+        //       with eventType="match.nominated" to topic "internal-match-events".
+        //       Keep publish async / fire-and-forget so HTTP response is not blocked.
 
-        employeeUtilisationRepository.save(utilisation);
-
-        // 8. Update employee utilisation percentage
-        int newUtilPct = liveUtil + requestedAllocation;
-        employee.setUtilisationPct(newUtilPct);
-        internalEmployeeRepository.save(employee);
-
-        // 9. Return response
+        // 8. Return NominationResponse
         return NominationResponse.builder()
                 .matchId(match.getId())
                 .employeeId(employee.getId())
@@ -155,9 +126,10 @@ public class NominationService {
                 .matchStatus(match.getMatchStatus().name())
                 .nominationType(match.getNominationType().name())
                 .nominatedAt(match.getNominatedAt())
-                .utilisationAfter(newUtilPct)
+                .utilisationAfter(liveUtil)
                 .build();
     }
+
     public List<NominationResponse> getNominationsByDemand(Long demandId) {
         return internalMatchRepository.findByDemandIdAndIsDeletedFalse(demandId).stream()
                 .map(this::mapToResponse)
@@ -224,8 +196,6 @@ public class NominationService {
                         + demand.getStatus()
         );
     }
-
-
 
     private int safeInt(Integer value) {
         return value == null ? 0 : value;
