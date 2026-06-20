@@ -66,6 +66,9 @@ public class InternalEmployee {
     @Column(name = "manager_id")
     private Long managerId;
 
+    @Column(name = "resume_embedding", columnDefinition = "float[]")
+    private float[] resumeEmbedding;
+
     @Column(name = "last_embedded_at")
     private LocalDateTime lastEmbeddedAt;
 

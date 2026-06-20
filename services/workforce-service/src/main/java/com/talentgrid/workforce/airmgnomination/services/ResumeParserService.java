@@ -1,6 +1,8 @@
 package com.talentgrid.workforce.airmgnomination.services;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.EmployeeProfileUpdatedPayload;
+import com.talentgrid.workforce.airmgnomination.dto.ResumeParsedPayload;
+import com.talentgrid.workforce.kafka.producer.WorkforceKafkaProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -23,6 +25,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +36,15 @@ public class ResumeParserService {
     private static final Pattern DRIVE_FILE_ID_PATTERN = Pattern.compile("/d/([^/]+)");
     private static final Pattern QUERY_ID_PATTERN = Pattern.compile("[?&]id=([^&]+)");
     private static final Pattern MARKDOWN_LINK_PATTERN = Pattern.compile("^\\[(?:[^\\]]*)\\]\\((https?://[^)]+)\\)$");
+
+    private final WorkforceKafkaProducer workforceKafkaProducer;
+    private final ResumeEmbeddingService resumeEmbeddingService;
+
+    public ResumeParserService(WorkforceKafkaProducer workforceKafkaProducer,
+                               ResumeEmbeddingService resumeEmbeddingService) {
+        this.workforceKafkaProducer = workforceKafkaProducer;
+        this.resumeEmbeddingService = resumeEmbeddingService;
+    }
 
     public String parseResumeText(EmployeeProfileUpdatedPayload payload) {
         if (payload == null || payload.getEmployeeId() == null) {
@@ -73,6 +85,21 @@ public class ResumeParserService {
                             payload.getEmployeeId(),
                             downloadedResume.sourceUrl(),
                             parsedText);
+
+                    // Generate embedding and store directly on InternalEmployee record
+                    resumeEmbeddingService.embedAndStore(payload.getEmployeeId(), parsedText);
+
+                    workforceKafkaProducer.publishEmployeeResumeParsed(
+                            ResumeParsedPayload.builder()
+                                    .employeeId(payload.getEmployeeId())
+                                    .resumeDriveLink(payload.getResumeDriveLink())
+                                    .parsedText(parsedText)
+                                    .sourceUrl(downloadedResume.sourceUrl())
+                                    .contentType(downloadedResume.contentType())
+                                    .parsedAt(Instant.now())
+                                    .build(),
+                            null
+                    );
 
                     return parsedText;
                 } catch (IOException ex) {
