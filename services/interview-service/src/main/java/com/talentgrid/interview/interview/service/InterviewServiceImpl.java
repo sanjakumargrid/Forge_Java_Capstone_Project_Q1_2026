@@ -108,6 +108,8 @@ public class InterviewServiceImpl implements InterviewService {
         }
 
         String candidateName = candidate.getFirstName() + (candidate.getLastName() != null ? " " + candidate.getLastName() : "");
+        
+        // Send email to Candidate
         notificationEventPublisher.sendInAppAndEmail(
                 candidate.getCandidateId().toString(),
                 candidate.getEmail(),
@@ -128,6 +130,40 @@ public class InterviewServiceImpl implements InterviewService {
                 ),
                 java.util.UUID.randomUUID().toString()
         );
+
+        // Send emails to all Interviewers
+        if (interview.getInterviewers() != null) {
+            for (Long interviewerId : interview.getInterviewers()) {
+                try {
+                    EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+                    if (employee != null && employee.getEmail() != null) {
+                        notificationEventPublisher.sendInAppAndEmail(
+                                String.valueOf(interviewerId),
+                                employee.getEmail(),
+                                "INTERVIEW_INVITATION",
+                                "Interview Scheduled: " + candidateName,
+                                "You have been scheduled to interview " + candidateName + ". Please join using the Google Meet link: " + response.getMeetLink(),
+                                "interview-service",
+                                savedInterview.getInterviewId().toString(),
+                                "INTERVIEW",
+                                "HIGH",
+                                "interview-invitation",
+                                Map.of(
+                                        "candidateName", candidateName,
+                                        "companyName", "Grid Dynamics",
+                                        "interviewDate", savedInterview.getScheduledAt() != null ? savedInterview.getScheduledAt().toString() : "TBD",
+                                        "meetLink", response.getMeetLink() != null ? response.getMeetLink() : "TBD",
+                                        "interviewerName", employee.getName()
+                                ),
+                                java.util.UUID.randomUUID().toString()
+                        );
+                    }
+                } catch (Exception e) {
+                    // Log error but don't fail the interview creation
+                    System.err.println("Failed to send email to interviewer " + interviewerId + ": " + e.getMessage());
+                }
+            }
+        }
 
         interviewEventProducer.publishScheduled(savedInterview);
 
