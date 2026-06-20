@@ -18,7 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import com.talentgrid.demand.domain.entity.JobTitle;
+import com.talentgrid.demand.domain.entity.Skill;
+import com.talentgrid.demand.domain.entity.DemandSkill;
+import com.talentgrid.demand.repository.DemandSkillRepository;
 
 /**
  * Handles demand CRUD operations (create, update, soft-delete).
@@ -43,6 +49,9 @@ public class DemandService {
     private final DemandValidationService validationService;
     private final AuditLogClient auditLogClient;
     private final UserAuthServiceClient userAuthServiceClient;
+    private final JobTitleLookupService jobTitleLookupService;
+    private final SkillLookupService skillLookupService;
+    private final DemandSkillRepository demandSkillRepository;
 
     /**
      * Creates a new workforce demand in {@code DRAFT} status.
@@ -55,6 +64,9 @@ public class DemandService {
         validationService.validateCreate(request);
         Demand demand = demandMapper.toEntity(request);
 
+        JobTitle jobTitle = jobTitleLookupService.resolveJobTitleId(request.getJobTitleId());
+        demand.setTitle(jobTitle.getTitleName());
+        System.out.println("\n\n"+demand.getTitle()+"\n\n");
         // Default onboarding date to target date if not provided
         if (demand.getOnboardingDate() == null) {
             demand.setOnboardingDate(demand.getTargetDate());
@@ -94,6 +106,13 @@ public class DemandService {
 
         Demand saved = demandRepository.save(demand);
 
+        // Persist DemandSkill mappings
+        List<DemandSkill> demandSkills = createDemandSkills(saved, request.getMandatorySkillIds(), request.getOptionalSkillIds());
+        if (!demandSkills.isEmpty()) {
+            demandSkillRepository.saveAll(demandSkills);
+            saved.setDemandSkills(demandSkills);
+        }
+
         // Publish audit event
         auditLogClient.logAction(AuditLogPayload.builder()
                 .entityType("DEMAND")
@@ -130,8 +149,25 @@ public class DemandService {
         Demand demand = findActiveOrThrow(id);
         requireDraftState(demand, "update");
 
+        if (request.getJobTitleId() != null) {
+            JobTitle jobTitle = jobTitleLookupService.resolveJobTitleId(request.getJobTitleId());
+            demand.setTitle(jobTitle.getTitleName());
+        }
+
         demandMapper.applyUpdate(request, demand);
         Demand saved = demandRepository.save(demand);
+
+        if (request.getMandatorySkillIds() != null || request.getOptionalSkillIds() != null) {
+            demandSkillRepository.deleteByDemandDemandId(saved.getDemandId());
+            List<DemandSkill> newSkills = createDemandSkills(saved, 
+                request.getMandatorySkillIds() != null ? request.getMandatorySkillIds() : getExistingSkillIds(saved, true),
+                request.getOptionalSkillIds() != null ? request.getOptionalSkillIds() : getExistingSkillIds(saved, false)
+            );
+            if (!newSkills.isEmpty()) {
+                demandSkillRepository.saveAll(newSkills);
+                saved.setDemandSkills(newSkills);
+            }
+        }
 
         // Publish audit event
         auditLogClient.logAction(AuditLogPayload.builder()
@@ -202,5 +238,38 @@ public class DemandService {
                     String.format("Cannot %s demand (id=%d): current status is %s, expected DRAFT.",
                             operation, demand.getDemandId(), demand.getStatus()));
         }
+    }
+
+    private List<DemandSkill> createDemandSkills(Demand demand, List<Long> mandatoryIds, List<Long> optionalIds) {
+        List<DemandSkill> demandSkills = new ArrayList<>();
+        if (mandatoryIds != null && !mandatoryIds.isEmpty()) {
+            List<Skill> mandatory = skillLookupService.resolveSkillIds(mandatoryIds);
+            for (Skill skill : mandatory) {
+                DemandSkill ds = new DemandSkill();
+                ds.setDemand(demand);
+                ds.setSkill(skill);
+                ds.setIsMandatory(true);
+                demandSkills.add(ds);
+            }
+        }
+        if (optionalIds != null && !optionalIds.isEmpty()) {
+            List<Skill> optional = skillLookupService.resolveSkillIds(optionalIds);
+            for (Skill skill : optional) {
+                DemandSkill ds = new DemandSkill();
+                ds.setDemand(demand);
+                ds.setSkill(skill);
+                ds.setIsMandatory(false);
+                demandSkills.add(ds);
+            }
+        }
+        return demandSkills;
+    }
+
+    private List<Long> getExistingSkillIds(Demand demand, boolean isMandatory) {
+        if (demand.getDemandSkills() == null) return List.of();
+        return demand.getDemandSkills().stream()
+                .filter(ds -> ds.getIsMandatory() == isMandatory)
+                .map(ds -> ds.getSkill().getSkillId())
+                .toList();
     }
 }

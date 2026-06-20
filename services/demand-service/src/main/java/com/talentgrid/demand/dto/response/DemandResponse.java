@@ -32,7 +32,9 @@ public class DemandResponse {
     private Long projectId;
     private String projectName;
     private String businessUnit;
-    private List<String> skills;
+    private Long jobTitleId;
+    private List<SkillDto> mandatorySkills;
+    private List<SkillDto> optionalSkills;
     private BigDecimal budget;
 
     /** Required utilization percentage (0–100) for this demand's project/account. */

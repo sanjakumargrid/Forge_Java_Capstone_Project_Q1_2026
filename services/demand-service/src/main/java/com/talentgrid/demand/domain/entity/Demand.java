@@ -72,12 +72,8 @@ public class Demand {
     @Column(name = "business_unit", nullable = false, length = 150)
     private String businessUnit;
 
-    /**
-     * Array of skill tags stored as a PostgreSQL {@code text[]} column.
-     */
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "skills", columnDefinition = "text[]", nullable = false)
-    private List<String> skills;//
+    @Column(name = "job_title_id")
+    private Long jobTitleId;
 
     @Column(name = "budget", precision = 15, scale = 2, nullable = false)
     private BigDecimal budget;
@@ -215,6 +211,9 @@ public class Demand {
     @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DemandStatusHistory> statusHistories;
 
+    @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DemandSkill> demandSkills;
+
     // ─── Lifecycle Callbacks ────────────────────────────────────────────────────
     @PrePersist
     protected void prePersist() {
@@ -324,12 +323,12 @@ public class Demand {
         this.businessUnit = businessUnit;
     }
 
-    public List<String> getSkills() {
-        return skills;
+    public Long getJobTitleId() {
+        return jobTitleId;
     }
 
-    public void setSkills(List<String> skills) {
-        this.skills = skills;
+    public void setJobTitleId(Long jobTitleId) {
+        this.jobTitleId = jobTitleId;
     }
 
     public BigDecimal getBudget() { return budget; }
@@ -551,6 +550,14 @@ public class Demand {
 
     public void setStatusHistories(List<DemandStatusHistory> statusHistories) {
         this.statusHistories = statusHistories;
+    }
+
+    public List<DemandSkill> getDemandSkills() {
+        return demandSkills;
+    }
+
+    public void setDemandSkills(List<DemandSkill> demandSkills) {
+        this.demandSkills = demandSkills;
     }
 
     public EmploymentType getEmploymentType() {

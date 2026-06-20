@@ -58,6 +58,10 @@ public class User implements Serializable {
     @Builder.Default
     private Set<UserAccountAssignment> assignments = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<UserAccountAssignment> assignments = new HashSet<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -40,7 +40,9 @@ public class DemandRequest {
     private Long accountId;
     private Long projectId;
     private String businessUnit;
-    private List<String> skills;
+    private Long jobTitleId;
+    private List<Long> mandatorySkillIds;
+    private List<Long> optionalSkillIds;
     private BigDecimal budget;
 
     /** Required utilization percentage (0–100). See {@code Demand.reqUtilPerc} for semantics. */

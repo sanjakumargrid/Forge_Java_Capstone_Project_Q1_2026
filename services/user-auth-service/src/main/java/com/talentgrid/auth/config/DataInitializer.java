@@ -178,14 +178,14 @@ public class DataInitializer
         // =========================================
 
         if (!userRepository.existsByEmail(
-                "<User-Name>@griddynamics.com"
+                "user@griddynamics.com"
         )) {
 
             User admin = User.builder()
-                    .username("<User-Name>")
-                    .email("<User-Name>@griddynamics.com")
+                    .username("user")
+                    .email("user@griddynamics.com")
                     .password(
-                            passwordEncoder.encode("<Password>")
+                            passwordEncoder.encode("admin@123")
                     )
                     .enabled(true)
                     .roles(Set.of(adminRole))

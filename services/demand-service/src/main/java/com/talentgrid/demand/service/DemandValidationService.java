@@ -18,7 +18,8 @@ import java.util.List;
  *   <li>{@code requiredCount} — required, must be &ge; 1</li>
  *   <li>{@code priority} — required</li>
  *   <li>{@code budget} — if provided, must be &ge; 0</li>
- *   <li>{@code skills} — if provided, must not be empty</li>
+ *   <li>{@code jobTitleId} — required</li>
+ *   <li>{@code skills} — at least one of mandatorySkillIds or optionalSkillIds must be non-empty</li>
  * </ul>
  *
  * @throws IllegalArgumentException if any validation rule is violated
@@ -35,11 +36,15 @@ public class DemandValidationService {
      */
     public void validateCreate(DemandRequest request) {
         List<String> errors = new ArrayList<>();
+//
+//        if (request.getTitle() == null || request.getTitle().isBlank()) {
+//            errors.add("title is required");
+//        } else if (request.getTitle().length() > 255) {
+//            errors.add("title must not exceed 255 characters");
+//        }
 
-        if (request.getTitle() == null || request.getTitle().isBlank()) {
-            errors.add("title is required");
-        } else if (request.getTitle().length() > 255) {
-            errors.add("title must not exceed 255 characters");
+        if (request.getJobTitleId() == null) {
+            errors.add("jobTitleId is required");
         }
 
         if (request.getLevel() == null) {
@@ -82,8 +87,14 @@ public class DemandValidationService {
             errors.add("targetDate is required");
         }
 
-        if (request.getSkills() == null || request.getSkills().isEmpty()) {
-            errors.add("skills list is required and must not be empty");
+        if (request.getJobTitleId() == null) {
+            errors.add("jobTitleId is required");
+        }
+
+        boolean hasMandatory = request.getMandatorySkillIds() != null && !request.getMandatorySkillIds().isEmpty();
+        boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
+        if (!hasMandatory && !hasOptional) {
+            errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty");
         }
 
         if (!errors.isEmpty()) {
@@ -118,8 +129,12 @@ public class DemandValidationService {
             errors.add("budget must be non-negative");
         }
 
-        if (request.getSkills() != null && request.getSkills().isEmpty()) {
-            errors.add("skills list must not be empty if provided");
+        if (request.getMandatorySkillIds() != null || request.getOptionalSkillIds() != null) {
+            boolean hasMandatory = request.getMandatorySkillIds() != null && !request.getMandatorySkillIds().isEmpty();
+            boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
+            if (!hasMandatory && !hasOptional) {
+                errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty when updating skills");
+            }
         }
 
         if (request.getLocation() != null && request.getLocation().length() > 150) {
