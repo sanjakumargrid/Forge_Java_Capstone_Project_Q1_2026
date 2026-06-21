@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -21,12 +22,14 @@ public class AtsEvaluationService {
     @Value("${llm.api.key}")
     private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
     private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-    public AtsEvaluationService() {
+
+    public AtsEvaluationService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
         this.objectMapper = new ObjectMapper()
                 .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
@@ -93,10 +96,11 @@ public class AtsEvaluationService {
         }
     }
 
+
     private String extractTextFromFile(MultipartFile file) {
-        try {
+        try (InputStream inputStream = file.getInputStream()) {
             Tika tika = new Tika();
-            String extractedText = tika.parseToString(file.getInputStream());
+            String extractedText = tika.parseToString(inputStream);
             if (extractedText == null || extractedText.trim().isEmpty()) {
                 throw new BusinessException(HttpStatus.BAD_REQUEST, "The uploaded document is empty or unreadable.");
             }
@@ -118,19 +122,17 @@ public class AtsEvaluationService {
             throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to parse AI output into valid format.");
         }
     }
+
     private String maskPII(String text) {
         if (text == null || text.isBlank()) {
             return text;
         }
 
-
         String emailRegex = "([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})";
         text = text.replaceAll(emailRegex, "[EMAIL REDACTED]");
 
-
         String phoneRegex = "(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}";
         text = text.replaceAll(phoneRegex, "[PHONE REDACTED]");
-
 
         String linkedInRegex = "(https?://)?(www\\.)?(linkedin\\.com/in/[a-zA-Z0-9_-]+)";
         text = text.replaceAll(linkedInRegex, "[LINKEDIN REDACTED]");
