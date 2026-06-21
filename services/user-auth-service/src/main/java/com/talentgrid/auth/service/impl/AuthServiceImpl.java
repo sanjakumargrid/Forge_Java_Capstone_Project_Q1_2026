@@ -13,6 +13,7 @@ import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AuthService;
+import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -20,11 +21,23 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Core business logic implementation for user authentication.
+ *
+ * <p>Responsibilities:
+ * <ul>
+ *   <li>Handle user registration and login</li>
+ *   <li>Enforce account locking after multiple failed attempts</li>
+ *   <li>Manage the lifecycle of access tokens and refresh tokens</li>
+ *   <li>Integrate with Redis caching for user context</li>
+ * </ul>
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -33,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private static final long LOCK_DURATION_MINUTES = 15;
 
     private final AuthenticationManager authenticationManager;
+    private final UserSecurityCacheService userSecurityCacheService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final JwtService jwtService;
@@ -41,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtBlacklistService jwtBlacklistService;
 
     @Override
+    @Transactional
     public RegisterResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -82,12 +97,20 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public LoginResponse login(LoginRequest request, HttpServletResponse response) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
                         new RuntimeException("User not found")
                 );
+
+        // ==============================
+        // ENABLED CHECK
+        // ==============================
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            throw new RuntimeException("Account disabled. Please contact administrator.");
+        }
 
         // ==============================
         // ACCOUNT LOCK CHECK
@@ -138,6 +161,8 @@ public class AuthServiceImpl implements AuthService {
         user.setLockTime(null);
         userRepository.save(user);
 
+        userSecurityCacheService.cacheUser(user);
+
         // ==============================
         // JWT + REFRESH TOKEN
         // ==============================
@@ -168,28 +193,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
-//    @Override
-//    public LoginResponse refreshToken(String refreshToken) {
-//
-//        RefreshToken storedToken =
-//                refreshTokenService.validateRefreshToken(refreshToken);
-//
-//        User user = storedToken.getUser();
-//
-//        String accessToken = jwtService.generateToken(user);
-//
-//        return LoginResponse.builder()
-//                .accessToken(accessToken)
-//                .type("Bearer")
-//                .email(user.getEmail())
-//                .roles(user.getRoles()
-//                        .stream()
-//                        .map(Role::getName)
-//                        .collect(Collectors.toSet()))
-//                .build();
-//    }
-
     @Override
+    @Transactional
     public LoginResponse refreshToken(
             String refreshToken,
             HttpServletResponse response
@@ -200,6 +205,18 @@ public class AuthServiceImpl implements AuthService {
                 refreshTokenService.validateRefreshToken(refreshToken);
 
         User user = storedToken.getUser();
+
+        // Check if user got disabled or locked while refresh token was alive
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            throw new RuntimeException("Account disabled. Please contact administrator.");
+        }
+        
+        if (Boolean.TRUE.equals(user.getAccountLocked())) {
+            throw new RuntimeException("Account locked. Try again later.");
+        }
+
+        // Ensure user is re-cached to keep TTL alive
+        userSecurityCacheService.cacheUser(user);
 
         // ROTATE TOKEN
         RefreshToken newRefreshToken =
@@ -230,4 +247,6 @@ public class AuthServiceImpl implements AuthService {
                         .collect(Collectors.toSet()))
                 .build();
     }
+
+
 }

@@ -1,7 +1,9 @@
 package com.talentgrid.auth.controller;
 
+import com.talentgrid.auth.dto.response.UserSummaryResponse;
 import com.talentgrid.auth.entity.User;
 import com.talentgrid.auth.repository.UserRepository;
+import com.talentgrid.auth.service.interfaces.UserLookupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.Map;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserLookupService userLookupService;
 
     /**
      * Returns user info including slackId by employee/user ID.
@@ -30,5 +33,31 @@ public class UserController {
                         "slackId", user.getSlackId() != null ? user.getSlackId() : ""
                 )))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Returns the active RMG assigned to the given location.
+     *
+     * Example:
+     * GET /api/users/rmg-by-location?location=Chennai
+     *
+     * Response:
+     * {
+     *   "id": 1,
+     *   "name": "Chennai RMG",
+     *   "email": "rmg.chennai@company.com",
+     *   "location": "Chennai"
+     * }
+     *
+     * @param location demand/project location
+     * @return RMG user summary
+     */
+    @GetMapping("/rmg-by-location")
+    public ResponseEntity<UserSummaryResponse> getRmgByLocation(
+            @RequestParam String location) {
+
+        return ResponseEntity.ok(
+                userLookupService.getRmgByLocation(location)
+        );
     }
 }
