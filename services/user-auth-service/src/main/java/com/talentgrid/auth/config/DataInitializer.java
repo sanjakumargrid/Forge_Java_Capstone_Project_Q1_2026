@@ -107,6 +107,13 @@
  .description("View demands pipeline")
  .build()));
 
+ Scope demandPmApprove = scopeRepository.findByName("DEMAND_PM_APPROVE")
+ .orElseGet(() -> scopeRepository.save(
+ Scope.builder()
+ .name("DEMAND_PM_APPROVE")
+ .description("Approve demands as owning project manager")
+ .build()));
+
  // =========================================
  // CREATE ADMIN ROLE
  // =========================================
@@ -134,6 +141,22 @@
  });
 
  // =========================================
+ // CREATE PROJECT_MANAGER ROLE (demand PM approval path)
+ // =========================================
+
+ Role projectManagerRole = roleRepository.findByName("PROJECT_MANAGER")
+ .orElseGet(() -> {
+ Role role = Role.builder()
+ .name("PROJECT_MANAGER")
+ .scopes(new HashSet<>())
+ .build();
+ role.getScopes().add(demandView);
+ role.getScopes().add(demandPmApprove);
+ role.getScopes().add(demandPipelineView);
+ return roleRepository.save(role);
+ });
+
+ // =========================================
  // CREATE ADMIN USER
  // =========================================
 
@@ -152,6 +175,23 @@
  userRepository.save(admin);
 
  log.info("Default admin user created.");
+ }
+
+ if (!userRepository.existsByEmail(
+ "projectmanager@griddynamics.com")) {
+
+ User pmUser = User.builder()
+ .username("PM-User")
+ .email("projectmanager@griddynamics.com")
+ .password(
+ passwordEncoder.encode("Password@123"))
+ .enabled(true)
+ .roles(Set.of(projectManagerRole))
+ .build();
+
+ userRepository.save(pmUser);
+
+ log.info("Default project manager user created (assign as project_manager_id on a Project to test PM approval).");
  }
  }
  }

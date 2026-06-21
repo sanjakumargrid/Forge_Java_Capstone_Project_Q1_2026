@@ -24,6 +24,16 @@ This service is built with Spring Boot, utilizes PostgreSQL for robust relationa
 - **PostgreSQL** running locally on port `5432`
 - **Apache Kafka & Zookeeper** running locally on port `9092`
 
+### Building (monorepo)
+
+This module depends on **`talentgrid-shared`**, **`talentgrid-kafka`**, and client jars from the parent reactor. From the **repository root** (`Forge_Java_Capstone_Project_Q1_2026_Services`), run:
+
+```bash
+mvn clean install -DskipTests
+```
+
+Then you can build or test inside `services/demand-service` alone. Running `mvn compile` only inside `user-auth-service` or `demand-service` **before** the root install can fail with missing classes (stale local `~/.m2` artifacts).
+
 ### Running the Application Locally
 
 1. **Start Infrastructure (Docker)**:

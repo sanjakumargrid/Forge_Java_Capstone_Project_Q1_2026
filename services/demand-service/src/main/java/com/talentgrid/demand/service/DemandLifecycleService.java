@@ -3,6 +3,7 @@ package com.talentgrid.demand.service;
 import com.talentgrid.demand.client.UserAuthServiceClient;
 import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.client.dto.UserDto;
+import feign.FeignException;
 import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.entity.DemandStatusHistory;
 import com.talentgrid.demand.domain.enums.ClosureReason;
@@ -50,13 +51,96 @@ public class DemandLifecycleService {
         }
 
         Demand demand = findActiveOrThrow(id);
+        assertPendingApprovalOrThrow(id, demand);
+        return executeApprovalDecision(demand, id, request, "/api/demands/" + id + "/approve");
+    }
 
+    /**
+     * PM path: same approval workflow as RMG/Admin for decisions that reach {@link DemandLifecycleService},
+     * but restricted to {@code APPROVED} and gated by project ownership (see user-auth Project.projectManagerId).
+     */
+    @Transactional
+    public DemandResponse approveAsProjectManager(Long id, ApprovalRequest request) {
+        Demand demand = findActiveOrThrow(id);
+        assertPendingApprovalOrThrow(id, demand);
+        assertCurrentUserIsProjectManagerForDemand(demand);
+        ApprovalRequest effective = normalizeProjectManagerApprovalRequest(request);
+        return executeApprovalDecision(demand, id, effective, "/api/project-manager/demands/" + id + "/approve");
+    }
+
+    private void assertPendingApprovalOrThrow(Long id, Demand demand) {
         if (demand.getStatus() != DemandStatus.PENDING_APPROVAL) {
             throw new InvalidDemandStateException(
                     String.format("Demand %d is in %s, expected PENDING_APPROVAL for approval.",
                             id, demand.getStatus()));
         }
+    }
 
+    /**
+     * Ensures the caller is the owning PM for the demand's project.
+     *
+     * <p>Note: There is no project membership table in user-auth today; only {@code projectManagerId}
+     * on Project is used. Delegating PM / team-member approval would require that data.
+     */
+    private void assertCurrentUserIsProjectManagerForDemand(Demand demand) {
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (demand.getProjectId() == null) {
+            throw new AccessDeniedException("Demand has no project; project manager approval is not available.");
+        }
+        try {
+            ProjectDto project = userAuthServiceClient.getProjectById(demand.getProjectId());
+            if (project == null || project.getProjectManagerId() == null) {
+                throw new AccessDeniedException("Project ownership cannot be verified for this demand.");
+            }
+            if (!project.getProjectManagerId().equals(currentUserId)) {
+                throw new AccessDeniedException("You are not the project manager for this demand's project.");
+            }
+        } catch (AccessDeniedException e) {
+            throw e;
+        } catch (FeignException e) {
+            int status = e.status();
+            if (status == 401 || status == 403) {
+                log.warn("PM approval: user-auth denied project lookup (status={}) for projectId={}",
+                        status, demand.getProjectId());
+            } else {
+                log.error("PM approval: user-auth error resolving projectId={}: {}", demand.getProjectId(), e.getMessage());
+            }
+            throw new AccessDeniedException("Unable to verify project ownership.");
+        } catch (Exception e) {
+            log.error("PM approval: failed to resolve project for demandId={} projectId={}",
+                    demand.getDemandId(), demand.getProjectId(), e);
+            throw new AccessDeniedException("Unable to verify project ownership.");
+        }
+    }
+
+    private ApprovalRequest normalizeProjectManagerApprovalRequest(ApprovalRequest request) {
+        DemandStatus decision = request != null ? request.getDecision() : null;
+        if (decision != null && decision != DemandStatus.APPROVED) {
+            throw new IllegalArgumentException(
+                    "Project manager approval endpoint only supports decision APPROVED.");
+        }
+        if (request == null) {
+            return ApprovalRequest.builder().decision(DemandStatus.APPROVED).build();
+        }
+        if (request.getDecision() == null) {
+            return ApprovalRequest.builder()
+                    .decision(DemandStatus.APPROVED)
+                    .comments(request.getComments())
+                    .assignedRecruiter(request.getAssignedRecruiter())
+                    .assignedRecruiterName(request.getAssignedRecruiterName())
+                    .assignedRm(request.getAssignedRm())
+                    .assignedRmName(request.getAssignedRmName())
+                    .build();
+        }
+        return request;
+    }
+
+    /**
+     * Shared approval/reject path for demands in {@code PENDING_APPROVAL} (state and transition rules
+     * already validated by callers where applicable).
+     */
+    private DemandResponse executeApprovalDecision(Demand demand, Long id, ApprovalRequest request,
+                                                   String auditEndpoint) {
         DemandStatus decision = request.getDecision();
         ClosureReason closureReason = mapDecisionToClosureReason(decision);
         transitionValidator.validate(demand, decision, closureReason);
@@ -121,7 +205,7 @@ public class DemandLifecycleService {
                 .beforeState(Map.of("status", fromStatus.name()))
                 .afterState(Map.of("status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id + "/approve")
+                .endpoint(auditEndpoint)
                 .build());
 
         log.info("Demand approval decision '{}' processed for id={}", decision, id);
