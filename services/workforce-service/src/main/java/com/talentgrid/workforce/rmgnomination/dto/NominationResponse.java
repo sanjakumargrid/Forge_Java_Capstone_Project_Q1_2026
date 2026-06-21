@@ -27,4 +27,6 @@ public class NominationResponse {
     private String nominationType;
     private LocalDateTime nominatedAt;
     private Integer utilisationAfter;
+    private java.math.BigDecimal matchScore;
+    private Integer fitPercentage;
 }

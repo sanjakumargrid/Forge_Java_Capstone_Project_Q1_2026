@@ -14,12 +14,15 @@ import com.talentgrid.workforce.rmgnomination.entity.InternalMatch;
 import com.talentgrid.workforce.rmgnomination.enums.MatchStatus;
 import com.talentgrid.workforce.rmgnomination.enums.NominationType;
 import com.talentgrid.workforce.rmgnomination.repository.InternalMatchRepository;
+import com.talentgrid.workforce.airmgnomination.repository.DemandRecommendationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +39,7 @@ public class NominationService {
     private final DemandClient demandClient;
     private final DemandServiceClient demandServiceClient;
     private final RmgService rmgService;
+    private final DemandRecommendationRepository demandRecommendationRepository;
 
     @Transactional
     public NominationResponse nominate(NominationRequest request) {
@@ -93,6 +97,26 @@ public class NominationService {
                 ? request.getNominationType()
                 : NominationType.MANUAL;
 
+        BigDecimal matchScore = null;
+        Integer fitPercentage = null;
+
+        if (nominationType == NominationType.AI_ASSISTED) {
+            log.info("[NOMINATION] AI_ASSISTED nomination — looking up recommendation for demandId={} employeeId={}",
+                    request.getDemandId(), employee.getId());
+            var recommendationOpt = demandRecommendationRepository.findByDemandIdAndEmployee_Id(
+                    request.getDemandId(), employee.getId());
+            if (recommendationOpt.isPresent()) {
+                double score = recommendationOpt.get().getAiScore();
+                matchScore = BigDecimal.valueOf(score);
+                fitPercentage = (int) Math.round(score);
+                log.info("[NOMINATION] Found AI recommendation — aiScore={}, matchScore={}, fitPercentage={}",
+                        score, matchScore, fitPercentage);
+            } else {
+                log.warn("[NOMINATION] No recommendation found in demand_recommendation table for demandId={} employeeId={}",
+                        request.getDemandId(), employee.getId());
+            }
+        }
+
         InternalMatch match = InternalMatch.builder()
                 .employee(employee)
                 .demandId(request.getDemandId())
@@ -101,6 +125,8 @@ public class NominationService {
                 .notes(request.getNotes())
                 .nominationType(nominationType)
                 .matchStatus(MatchStatus.PENDING_REVIEW)
+                .matchScore(matchScore)
+                .fitPercentage(fitPercentage)
                 .build();
 
         match = internalMatchRepository.save(match);
@@ -127,6 +153,8 @@ public class NominationService {
                 .nominationType(match.getNominationType().name())
                 .nominatedAt(match.getNominatedAt())
                 .utilisationAfter(liveUtil)
+                .matchScore(match.getMatchScore())
+                .fitPercentage(match.getFitPercentage())
                 .build();
     }
 
@@ -244,6 +272,8 @@ public class NominationService {
                 .nominationType(match.getNominationType().name())
                 .nominatedAt(match.getNominatedAt())
                 .utilisationAfter(utilisationAfter)
+                .matchScore(match.getMatchScore())
+                .fitPercentage(match.getFitPercentage())
                 .build();
     }
 }
