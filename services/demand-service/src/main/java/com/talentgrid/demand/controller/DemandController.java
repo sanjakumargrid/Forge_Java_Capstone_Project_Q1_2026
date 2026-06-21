@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * REST controller for demand CRUD operations.
  *
@@ -45,7 +47,10 @@ public class DemandController {
     /**
      * Enterprise demand search with optional filters and pagination.
      *
-     * @param status         optional filter by demand status
+     * <p>Supports filtering by one or more statuses:
+     * {@code GET /api/demands?status=APPROVED&status=INTERNAL_SEARCH}
+     *
+     * @param statuses       optional filter by one or more demand statuses
      * @param priority       optional filter by demand priority
      * @param businessUnit   optional filter by business unit
      * @param accountName    optional filter by account name
@@ -57,11 +62,10 @@ public class DemandController {
      * @param size           page size (default: 20, max: 100)
      * @return paginated list of demand summaries
      */
-
     @GetMapping
     @PreAuthorize("hasAuthority('DEMAND_VIEW')")
     public ResponseEntity<Page<DemandSummaryResponse>> searchDemands(
-            @RequestParam(required = false) DemandStatus status,
+            @RequestParam(required = false) List<DemandStatus> statuses,
             @RequestParam(required = false) DemandPriority priority,
             @RequestParam(required = false) String businessUnit,
             @RequestParam(required = false) String accountName,
@@ -73,7 +77,7 @@ public class DemandController {
             @RequestParam(required = false, defaultValue = "20") int size) {
 
         Page<DemandSummaryResponse> result = demandQueryService.searchDemands(
-                status, priority, businessUnit, accountName, location, employmentType, sortBy, sortDir, page, size);
+                statuses, priority, businessUnit, accountName, location, employmentType, sortBy, sortDir, page, size);
         return ResponseEntity.ok(result);
     }
 

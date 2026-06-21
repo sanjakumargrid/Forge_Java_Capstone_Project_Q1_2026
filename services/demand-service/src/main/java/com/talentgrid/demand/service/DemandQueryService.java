@@ -78,7 +78,7 @@ public class DemandQueryService {
      *   <li>Default: created_at descending (newest first)</li>
      * </ul>
      *
-     * @param status       optional status filter
+     * @param statuses     optional status filter — one or more values, e.g. APPROVED, INTERNAL_SEARCH
      * @param priority     optional priority filter
      * @param businessUnit optional business unit filter
      * @param sortBy       sort field: "age" or "priority" (default: created_at desc)
@@ -87,7 +87,7 @@ public class DemandQueryService {
      * @param size         page size (max 100)
      * @return page of demand summary responses
      */
-    public Page<DemandSummaryResponse> searchDemands(DemandStatus status,
+    public Page<DemandSummaryResponse> searchDemands(List<DemandStatus> statuses,
                                                       DemandPriority priority,
                                                       String businessUnit,
                                                       String accountName,
@@ -108,9 +108,9 @@ public class DemandQueryService {
             // Base filter
             predicates.add(cb.isFalse(root.get("isDeleted")));
 
-            // Optional filters
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
+            // Optional status filter — supports one or more statuses (IN predicate)
+            if (statuses != null && !statuses.isEmpty()) {
+                predicates.add(root.get("status").in(statuses));
             }
             if (priority != null) {
                 predicates.add(cb.equal(root.get("priority"), priority));
