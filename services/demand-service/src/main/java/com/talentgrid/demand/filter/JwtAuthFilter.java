@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +24,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
+
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -41,8 +44,20 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
+            // Step 1 - Validate JWT signature, expiry, token type
             JwtPrincipal principal = jwtAuthenticationProvider.authenticate(token);
 
+            // Step 2 - Check Redis cache (evicted by Kafka consumer when admin changes something)
+            String redisKey = "auth:user:" + principal.getUserId();
+            Boolean exists = objectRedisTemplate.hasKey(redisKey);
+            if (!Boolean.TRUE.equals(exists)) {
+                // Cache was evicted — admin changed something — force re-login
+                sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                        "Authorization changed. Please login again.");
+                return;
+            }
+
+            // Step 3 - Set security context
             List<SimpleGrantedAuthority> authorities = principal.getScopes()
                     .stream()
                     .map(SimpleGrantedAuthority::new)
@@ -55,13 +70,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         } catch (Exception e) {
             log.warn("JWT validation failed: {}", e.getMessage());
-            log.warn("JWT validation failed - Full exception: ", e);  // ADD THIS LINE
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write("{\"error\": \"Invalid or expired token\"}");
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Invalid or expired token");
             return;
         }
 
         filterChain.doFilter(request, response);
     }
+
+    private void sendError(HttpServletResponse response, int status, String message)
+            throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write("{\"error\": \"" + message + "\"}");
+    }
+
 }

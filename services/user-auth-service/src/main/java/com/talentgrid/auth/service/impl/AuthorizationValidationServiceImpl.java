@@ -1,6 +1,6 @@
 package com.talentgrid.auth.service.impl;
 
-import com.talentgrid.auth.dto.cache.CachedUserContext;
+import com.talentgrid.shared.auth.dto.CachedUserContext;
 import com.talentgrid.auth.service.interfaces.AuthorizationValidationService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
 import lombok.RequiredArgsConstructor;

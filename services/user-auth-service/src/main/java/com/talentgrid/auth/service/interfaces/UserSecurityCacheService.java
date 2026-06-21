@@ -1,6 +1,5 @@
 package com.talentgrid.auth.service.interfaces;
 
-import com.talentgrid.auth.dto.cache.CachedUserContext;
 import com.talentgrid.auth.entity.User;
 
 /**
@@ -28,7 +27,7 @@ public interface UserSecurityCacheService {
      * @param userId the user's database identifier
      * @return the cached context, or null if missing
      */
-    CachedUserContext getUser(Long userId);
+    com.talentgrid.shared.auth.dto.CachedUserContext getUser(Long userId);
 
     /**
      * Removes the user's authorization state from Redis.

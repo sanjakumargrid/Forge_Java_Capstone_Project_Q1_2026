@@ -1,6 +1,6 @@
 package com.talentgrid.auth.kafka;
 
-import com.talentgrid.kafka.events.auth.AuthUserPayload;
+import com.talentgrid.kafka.events.auth.UserCreatedPayload;
 import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.producer.KafkaProducerService;
 import com.talentgrid.kafka.topics.TalentGridTopics;
@@ -11,20 +11,20 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthUserEventPublisher {
+public class UserCreatedEventPublisher {
 
     private final KafkaProducerService kafkaProducerService;
 
-    public void publishUserUpdated(AuthUserPayload payload) {
+    public void publishUserCreated(UserCreatedPayload payload) {
 
-        BaseEvent<AuthUserPayload> event = BaseEvent.<AuthUserPayload>builder()
-                .eventType("AUTH_USER_UPDATED")
+        BaseEvent<UserCreatedPayload> event = BaseEvent.<UserCreatedPayload>builder()
+                .eventType("USER_CREATED")
                 .source("user-auth-service")
                 .payload(payload)
                 .build();
 
         kafkaProducerService.sendEvent(
-                TalentGridTopics.AUTH_USER_UPDATED,
+                TalentGridTopics.AUTH_USER_CREATED,
                 String.valueOf(payload.getUserId()),
                 event
         );

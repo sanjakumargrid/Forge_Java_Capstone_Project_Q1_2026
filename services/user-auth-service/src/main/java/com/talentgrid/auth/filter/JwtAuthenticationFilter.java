@@ -1,6 +1,6 @@
 package com.talentgrid.auth.filter;
 
-import com.talentgrid.auth.dto.cache.CachedUserContext;
+import com.talentgrid.shared.auth.dto.CachedUserContext;
 import com.talentgrid.auth.jwt.JwtBlacklistService;
 import com.talentgrid.auth.jwt.JwtService;
 import com.talentgrid.auth.security.CachedUserPrincipal;

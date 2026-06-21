@@ -244,7 +244,7 @@ public class DemandLifecycleService {
                 pmUserId = 99L;
                 pmName = "Project Manager";
                 pmEmail = "mmathiyalagan@griddynamics.com";
-                pmSlackId = "U12345678";
+                pmSlackId = "xyz";
                 // ----------------------------------------
             }
         } else {

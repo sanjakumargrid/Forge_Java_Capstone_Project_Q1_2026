@@ -8,18 +8,20 @@ import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
 import com.talentgrid.auth.kafka.AuthUserEventPublisher;
+import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.mapper.UserMapper;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AdminUserService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
-import com.talentgrid.shared.kafka.AuthUserUpdatedEvent;
+import com.talentgrid.kafka.events.auth.UserCreatedPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.talentgrid.kafka.events.auth.AuthUserPayload;
 
 import java.util.List;
 import java.util.Set;
@@ -40,6 +42,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final UserSecurityCacheService userSecurityCacheService;
     private final RefreshTokenService refreshTokenService;
     private final AuthUserEventPublisher authUserEventPublisher;
+    private final UserCreatedEventPublisher userCreatedEventPublisher;
 
     @Override
     @Transactional
@@ -69,6 +72,20 @@ public class AdminUserServiceImpl implements AdminUserService {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        UserCreatedPayload payload = UserCreatedPayload.builder()
+                .userId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .role(savedUser.getRoles().stream()
+                        .map(Role::getName)
+                        .findFirst()
+                        .orElse("EMPLOYEE"))
+                .location(savedUser.getLocation())
+                .source("ADMIN_CREATED")
+                .build();
+
+        userCreatedEventPublisher.publishUserCreated(payload);
 
         return userMapper.toAdminUserResponse(savedUser);
     }
@@ -183,7 +200,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         User savedUser = userRepository.save(user);
         userSecurityCacheService.cacheUser(savedUser);
 
-        AuthUserUpdatedEvent event = AuthUserUpdatedEvent.builder()
+        AuthUserPayload payload = AuthUserPayload.builder()
                 .userId(savedUser.getId())
                 .authVersion(savedUser.getAuthVersion())
                 .enabled(savedUser.getEnabled())
@@ -196,7 +213,7 @@ public class AdminUserServiceImpl implements AdminUserService {
                         .collect(Collectors.toSet()))
                 .build();
 
-        authUserEventPublisher.publishUserUpdated(event);
+        authUserEventPublisher.publishUserUpdated(payload);
         return savedUser;
     }
 }

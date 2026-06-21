@@ -1,7 +1,7 @@
-package com.talentgrid.shared.kafka;
+package com.talentgrid.shared.auth.dto;
 
 import lombok.*;
-
+import java.io.Serializable;
 import java.util.Set;
 
 @Getter
@@ -9,11 +9,12 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthUserUpdatedEvent {
+public class CachedUserContext implements Serializable {
 
     private Long userId;
-    private Long authVersion;
+    private String email;
     private Boolean enabled;
+    private Long authVersion;
     private Set<String> roles;
     private Set<String> scopes;
 }

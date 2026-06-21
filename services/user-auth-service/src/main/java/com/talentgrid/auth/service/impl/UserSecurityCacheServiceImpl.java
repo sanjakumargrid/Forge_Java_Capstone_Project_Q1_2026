@@ -1,7 +1,7 @@
 package com.talentgrid.auth.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.talentgrid.auth.dto.cache.CachedUserContext;
+import com.talentgrid.shared.auth.dto.CachedUserContext;
 import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
@@ -11,8 +11,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -80,20 +78,20 @@ public class UserSecurityCacheServiceImpl
 
     @Override
     public CachedUserContext getUser(Long userId) {
+        Object value = objectRedisTemplate.opsForValue().get(PREFIX + userId);
 
-        Object value =
-                objectRedisTemplate.opsForValue()
-                        .get(PREFIX + userId);
-
-        if (value == null) {
-            return null;
-        }
+        if (value == null) return null;
 
         if (value instanceof CachedUserContext) {
             return (CachedUserContext) value;
         }
 
-        return null;
+        // Fallback: Jackson deserialization if returned as Map
+        try {
+            return objectMapper.convertValue(value, CachedUserContext.class);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

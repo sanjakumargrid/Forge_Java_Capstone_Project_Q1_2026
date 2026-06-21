@@ -9,11 +9,13 @@ import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.User;
 import com.talentgrid.auth.jwt.JwtBlacklistService;
 import com.talentgrid.auth.jwt.JwtService;
+import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AuthService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
+import com.talentgrid.kafka.events.auth.UserCreatedPayload;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -53,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtBlacklistService jwtBlacklistService;
+    private final UserCreatedEventPublisher userCreatedEventPublisher;
+
 
     @Override
     @Transactional
@@ -86,7 +90,21 @@ public class AuthServiceImpl implements AuthService {
                 .accountLocked(false)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        UserCreatedPayload payload = UserCreatedPayload.builder()
+                .userId(savedUser.getId())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .role(savedUser.getRoles().stream()
+                        .map(Role::getName)
+                        .findFirst()
+                        .orElse("EMPLOYEE"))
+                .location(savedUser.getLocation())
+                .source("SELF_REGISTER")
+                .build();
+
+        userCreatedEventPublisher.publishUserCreated(payload);
 
         return RegisterResponse.builder()
                 .message("User registered successfully")

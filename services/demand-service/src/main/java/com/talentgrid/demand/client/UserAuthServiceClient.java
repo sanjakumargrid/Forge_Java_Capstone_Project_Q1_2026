@@ -5,7 +5,6 @@ import com.talentgrid.demand.client.dto.ManagedProjectDto;
 import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.client.dto.UserDto;
 import com.talentgrid.demand.client.dto.UserSummaryResponse;
-import com.talentgrid.demand.config.FeignConfig;
 import com.talentgrid.demand.config.UserAuthFeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
