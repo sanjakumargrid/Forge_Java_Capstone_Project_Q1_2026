@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Provides position-level demand analytics metrics for the dashboard.
@@ -120,4 +121,103 @@ public class DemandAnalyticsService {
         log.info("Successfully computed position-level demand analytics for window [{}, {}]", start, end);
         return response;
     }
+
+    /**
+     * Computes V1 analytics metrics with optional business unit filter.
+     * Metrics: fillRate, avgTimeToFillDays, internalVsExternalSplit, capacityByProjectClient.
+     *
+     * @param dateFrom optional start date filter (inclusive)
+     * @param dateTo optional end date filter (inclusive)
+     * @param businessUnit optional business unit filter
+     * @return V1 analytics response with all requested metrics
+     */
+    public com.talentgrid.demand.dto.response.DemandAnalyticsV1Response getAnalyticsV1(
+            LocalDate dateFrom, LocalDate dateTo, String businessUnit) {
+
+        // Default to last 30 days if not provided
+        LocalDate end = dateTo != null ? dateTo : LocalDate.now();
+        LocalDate start = dateFrom != null ? dateFrom : end.minusDays(30);
+
+        int windowDays = (int) java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
+
+        // ── Fill Rate ────────────────────────────────────────────────────────────────
+        long totalDemands = demandRepository.countNonCancelledDemands(start, end, businessUnit);
+        long filledDemands = demandRepository.countFilledDemands(start, end, businessUnit);
+
+        double fillRatePercent = 0.0;
+        if (totalDemands > 0) {
+            fillRatePercent = Math.round(((double) filledDemands / totalDemands * 100.0) * 100.0) / 100.0;
+        }
+
+        com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.FillRate fillRate =
+                com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.FillRate.builder()
+                        .totalDemands(totalDemands)
+                        .filledDemands(filledDemands)
+                        .percentageFilled(fillRatePercent)
+                        .build();
+
+        // ── Average Time-to-Fill Days ────────────────────────────────────────────────
+        double avgTimeToFillDays = demandRepository.getAverageTimeToFillDays(start, end, businessUnit);
+
+        // ── Internal vs External Split ───────────────────────────────────────────────
+        long filledInternal = demandRepository.countFilledInternalDemands(start, end, businessUnit);
+        long filledExternal = demandRepository.countFilledExternalDemands(start, end, businessUnit);
+
+        double percentageInternal = 0.0;
+        double percentageExternal = 0.0;
+        long totalFilledByReason = filledInternal + filledExternal;
+        if (totalFilledByReason > 0) {
+            percentageInternal = Math.round(((double) filledInternal / totalFilledByReason * 100.0) * 100.0) / 100.0;
+            percentageExternal = Math.round(((double) filledExternal / totalFilledByReason * 100.0) * 100.0) / 100.0;
+        }
+
+        com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.InternalVsExternalSplit split =
+                com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.InternalVsExternalSplit.builder()
+                        .filledInternal(filledInternal)
+                        .filledExternal(filledExternal)
+                        .percentageInternal(percentageInternal)
+                        .percentageExternal(percentageExternal)
+                        .build();
+
+        // ── Capacity by Project + Client ────────────────────────────────────────────
+        List<com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.CapacityByProjectClient> capacityList =
+                new java.util.ArrayList<>();
+
+        List<Object[]> capacityData = demandRepository.getCapacityByProjectClient(start, end, businessUnit);
+        for (Object[] row : capacityData) {
+            Long projectId = ((Number) row[0]).longValue();
+            Long clientId = ((Number) row[1]).longValue();
+            Long count = ((Number) row[2]).longValue();
+
+            capacityList.add(
+                    com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.CapacityByProjectClient.builder()
+                            .projectId(projectId)
+                            .clientId(clientId)
+                            .demandCount(count)
+                            .build());
+        }
+
+        // ── Metadata ─────────────────────────────────────────────────────────────────
+        com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.Metadata metadata =
+                com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.Metadata.builder()
+                        .dateFrom(start)
+                        .dateTo(end)
+                        .businessUnit(businessUnit)
+                        .windowDays(windowDays)
+                        .build();
+
+        // ── Build Response ───────────────────────────────────────────────────────────
+        com.talentgrid.demand.dto.response.DemandAnalyticsV1Response response =
+                com.talentgrid.demand.dto.response.DemandAnalyticsV1Response.builder()
+                        .metadata(metadata)
+                        .fillRate(fillRate)
+                        .avgTimeToFillDays(avgTimeToFillDays)
+                        .internalVsExternalSplit(split)
+                        .capacityByProjectClient(capacityList)
+                        .build();
+
+        log.info("Successfully computed V1 demand analytics for window [{}, {}] with businessUnit={}", start, end, businessUnit);
+        return response;
+    }
 }
+

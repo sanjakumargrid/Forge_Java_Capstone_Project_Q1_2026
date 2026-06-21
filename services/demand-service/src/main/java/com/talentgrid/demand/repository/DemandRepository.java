@@ -210,4 +210,115 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
             "FROM demands WHERE is_deleted = false AND status = 'CLOSED' " +
             "AND closure_reason IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL')", nativeQuery = true)
     double averageTimeToFillDays();
+
+    // ── V1 Analytics Endpoint Queries ────────────────────────────────────────────────
+
+    /**
+     * Count total non-cancelled demands (excludes CANCELLED, DUPLICATE).
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     */
+    @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
+            "WHERE d.is_deleted = false " +
+            "AND d.status NOT IN ('CANCELLED', 'DUPLICATE') " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
+            nativeQuery = true)
+    long countNonCancelledDemands(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
+
+    /**
+     * Count demands with FILLED status (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY).
+     * Uses status_history to find first transition to FILLED_* state.
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     */
+    @Query(value = "SELECT COUNT(DISTINCT d.demand_id) FROM demands d " +
+            "INNER JOIN demand_status_history h ON d.demand_id = h.demand_id " +
+            "WHERE d.is_deleted = false " +
+            "AND h.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+            "AND h.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id " +
+            "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY')) " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
+            nativeQuery = true)
+    long countFilledDemands(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
+
+    /**
+     * Average days to fill: avg(first_filled_status_transition - created_at) for filled demands.
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     */
+    @Query(value = "SELECT COALESCE(AVG(EXTRACT(EPOCH FROM (h.changed_at - d.created_at)) / 86400), 0) " +
+            "FROM demands d " +
+            "INNER JOIN demand_status_history h ON d.demand_id = h.demand_id " +
+            "WHERE d.is_deleted = false " +
+            "AND h.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+            "AND h.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id " +
+            "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY')) " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
+            nativeQuery = true)
+    double getAverageTimeToFillDays(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
+
+    /**
+     * Count demands with closureReason = 'FILLED_INTERNAL' (for internal vs external split).
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     */
+    @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
+            "WHERE d.is_deleted = false " +
+            "AND d.status IN ('FILLED_INTERNAL', 'FILLED_PARTIALLY', 'CLOSED') " +
+            "AND d.closure_reason = 'FILLED_INTERNAL' " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
+            nativeQuery = true)
+    long countFilledInternalDemands(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
+
+    /**
+     * Count demands with closureReason = 'FILLED_EXTERNAL' (for internal vs external split).
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     */
+    @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
+            "WHERE d.is_deleted = false " +
+            "AND d.status IN ('FILLED_EXTERNAL', 'FILLED_PARTIALLY', 'CLOSED') " +
+            "AND d.closure_reason = 'FILLED_EXTERNAL' " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
+            nativeQuery = true)
+    long countFilledExternalDemands(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
+
+    /**
+     * Capacity by project + client: counts demands grouped by projectId and accountId.
+     * Filters: optional dateFrom, dateTo, businessUnit.
+     * Returns result as List of Object arrays: [projectId, accountId (as clientId), count]
+     */
+    @Query(value = "SELECT d.project_id, d.account_id, COUNT(d.demand_id) " +
+            "FROM demands d " +
+            "WHERE d.is_deleted = false " +
+            "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
+            "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
+            "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit) " +
+            "GROUP BY d.project_id, d.account_id " +
+            "ORDER BY d.project_id, d.account_id",
+            nativeQuery = true)
+    List<Object[]> getCapacityByProjectClient(
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo,
+            @Param("businessUnit") String businessUnit);
 }
