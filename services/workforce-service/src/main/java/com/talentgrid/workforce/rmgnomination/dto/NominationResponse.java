@@ -29,4 +29,8 @@ public class NominationResponse {
     private Integer utilisationAfter;
     private java.math.BigDecimal matchScore;
     private Integer fitPercentage;
+    private String demandTitle;
+    private String projectName;
+    private String accountName;
+    private String demandStatus;
 }

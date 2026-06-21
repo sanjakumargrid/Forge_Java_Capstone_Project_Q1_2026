@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,5 +74,15 @@ public class NominationController {
             description = "Transitions demand from APPROVED to INTERNAL_SEARCH using demand-service transition API")
     public ResponseEntity<DemandDto> moveDemandToInternalSearch(@PathVariable Long demandId) {
         return ResponseEntity.ok(nominationService.moveDemandToInternalSearch(demandId));
+    }
+
+    @DeleteMapping("/{matchId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_NOMINATION_DELETE')")
+    @Operation(summary = "Withdraw/Delete a nomination by RMG",
+            description = "Soft-deletes/withdraws a nomination by ID by setting isDeleted to true")
+    public ResponseEntity<Void> withdrawNomination(@PathVariable Long matchId) {
+        log.info("Received request to withdraw nomination for matchId={}", matchId);
+        nominationService.withdrawNomination(matchId);
+        return ResponseEntity.noContent().build();
     }
 }

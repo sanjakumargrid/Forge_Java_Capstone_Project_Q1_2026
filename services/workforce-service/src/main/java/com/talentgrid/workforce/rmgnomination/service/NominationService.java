@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -170,6 +171,23 @@ public class NominationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void withdrawNomination(Long matchId) {
+        log.info("[NOMINATION] Withdrawing/Deleting nomination for matchId={}", matchId);
+        InternalMatch match = internalMatchRepository.findById(matchId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomination not found: " + matchId));
+
+        if (Boolean.TRUE.equals(match.getIsDeleted())) {
+            log.info("[NOMINATION] Nomination with matchId={} is already withdrawn/deleted", matchId);
+            return;
+        }
+
+        match.setIsDeleted(true);
+        match.setDeletedAt(LocalDateTime.now());
+        internalMatchRepository.save(match);
+        log.info("[NOMINATION] Soft-deleted nomination for matchId={}", matchId);
+    }
+
     public DemandServiceResponse getDemandDetailsById(Long demandId) {
         try {
             DemandServiceResponse demand = demandServiceClient.getDemandById(demandId);
@@ -256,6 +274,27 @@ public class NominationService {
     private NominationResponse mapToResponse(InternalMatch match) {
         InternalEmployee employee = match.getEmployee();
         Integer utilisationAfter = employee != null ? employee.getUtilisationPct() : null;
+
+        String demandTitle = null;
+        String projectName = null;
+        String accountName = null;
+        String demandStatus = null;
+
+        if (match.getDemandId() != null) {
+            try {
+                DemandDto demand = demandClient.getDemandById(match.getDemandId());
+                if (demand != null) {
+                    demandTitle = demand.getTitle();
+                    projectName = demand.getProjectName();
+                    accountName = demand.getAccountName();
+                    demandStatus = demand.getStatus();
+                }
+            } catch (Exception ex) {
+                log.error("[NOMINATION] Failed to fetch demand details for demandId={} during mapping: {}",
+                        match.getDemandId(), ex.getMessage());
+            }
+        }
+
         return NominationResponse.builder()
                 .matchId(match.getId())
                 .employeeId(employee != null ? employee.getId() : null)
@@ -274,6 +313,10 @@ public class NominationService {
                 .utilisationAfter(utilisationAfter)
                 .matchScore(match.getMatchScore())
                 .fitPercentage(match.getFitPercentage())
+                .demandTitle(demandTitle)
+                .projectName(projectName)
+                .accountName(accountName)
+                .demandStatus(demandStatus)
                 .build();
     }
 }
