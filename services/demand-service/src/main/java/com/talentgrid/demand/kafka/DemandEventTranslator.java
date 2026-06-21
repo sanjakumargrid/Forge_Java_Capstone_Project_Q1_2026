@@ -195,12 +195,9 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 String title = "External Hiring Opened: " + demand.getTitle();
                 String message = String.format(
                                 "Your demand for '%s' has been opened for external hiring. " +
-                                                "%s has been assigned to source candidates externally. " +
-                                                "Positions open: %d (internal filled: %d).",
+                                                "%s has been assigned to source candidates externally.",
                                 demand.getTitle(),
-                                recruiterInfo,
-                                demand.getRequiredCount() != null ? demand.getRequiredCount() : 0,
-                                demand.getInternalFilledCount() != null ? demand.getInternalFilledCount() : 0);
+                                recruiterInfo);
 
                 notificationEventPublisher.sendInAppAndEmail(
                                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
@@ -219,12 +216,6 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                                                 "raisedBy", safe(demand.getRaisedBy(), "Unknown"),
                                                 "recruiterName",
                                                 safe(demand.getAssignedRecruiterName(), "External Recruiter"),
-                                                "requiredCount", demand.getRequiredCount() != null
-                                                                ? demand.getRequiredCount().toString()
-                                                                : "0",
-                                                "internalFilledCount", demand.getInternalFilledCount() != null
-                                                                ? demand.getInternalFilledCount().toString()
-                                                                : "0",
                                                 "location", safe(demand.getLocation(), "Remote"),
                                                 "skills", formatSkills(demand)),
                                 correlationId);
@@ -237,10 +228,10 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 warnIfRecipientEmailMissing(demand, "DEMAND_CLOSED");
                 warnIfRecipientSlackIdMissing(demand, "DEMAND_CLOSED");
 
-                int required = demand.getRequiredCount() != null ? demand.getRequiredCount() : 0;
-                int internal = demand.getInternalFilledCount() != null ? demand.getInternalFilledCount() : 0;
-                int external = demand.getExternalFilledCount() != null ? demand.getExternalFilledCount() : 0;
-                int total = demand.getRecruitedCount() != null ? demand.getRecruitedCount() : (internal + external);
+                boolean filled = Boolean.TRUE.equals(demand.getIsFilled());
+                String fillType = filled
+                                ? (demand.getFillType() != null ? demand.getFillType() : "Unknown")
+                                : "Not filled";
 
                 String closureReason = demand.getClosureReason() != null
                                 ? demand.getClosureReason().replace("_", " ")
@@ -249,10 +240,11 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 String title = "Demand Closed: " + demand.getTitle();
                 String message = String.format(
                                 "Your demand for '%s' has been closed. Reason: %s. " +
-                                                "Total filled: %d of %d (Internal: %d, External: %d).",
+                                                "Filled: %s | Fill type: %s.",
                                 demand.getTitle(),
                                 closureReason,
-                                total, required, internal, external);
+                                filled ? "Yes" : "No",
+                                fillType);
 
                 notificationEventPublisher.sendInAppAndEmail(
                                 demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
@@ -270,10 +262,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                                                 "demandTitle", safe(demand.getTitle()),
                                                 "raisedBy", safe(demand.getRaisedBy(), "Unknown"),
                                                 "closureReason", closureReason,
-                                                "requiredCount", String.valueOf(required),
-                                                "internalFilled", String.valueOf(internal),
-                                                "externalFilled", String.valueOf(external),
-                                                "totalFilled", String.valueOf(total)),
+                                                "isFilled", filled ? "Yes" : "No",
+                                                "fillType", fillType),
                                 correlationId);
 
                 log.info("[DEMAND-TRANSLATOR] ✓ NOTIFICATION_SEND published | demandId={} | type=DEMAND_CLOSED",

@@ -153,8 +153,6 @@ public class DemandEventProducer {
 
     public void publishExternalOpened(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
         payload.setAssignedRecruiter(demand.getAssignedRecruiter());
         payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
         payload.setAssignedRm(demand.getAssignedRm());
@@ -178,9 +176,8 @@ public class DemandEventProducer {
     public void publishFilledInternal(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -195,8 +192,8 @@ public class DemandEventProducer {
 
     public void publishFilledPartially(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -212,10 +209,8 @@ public class DemandEventProducer {
     public void publishFilledExternal(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setExternalFilledCount(demand.getExternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -294,10 +289,8 @@ public class DemandEventProducer {
     public void publishClosed(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setExternalFilledCount(demand.getExternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());

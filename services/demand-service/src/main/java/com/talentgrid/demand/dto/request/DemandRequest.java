@@ -47,7 +47,6 @@ public class DemandRequest {
 
     /** Required utilization percentage (0–100). See {@code Demand.reqUtilPerc} for semantics. */
     private Integer reqUtilPerc;
-    private Integer requiredCount;
     private LocalDate targetDate;
     private DemandPriority priority;
     private EmploymentType employmentType;

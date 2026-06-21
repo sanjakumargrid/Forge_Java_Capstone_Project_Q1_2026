@@ -46,8 +46,11 @@ public class DemandAnalyticsResponse {
     private double fillRatePercent;
     private double avgTimeToFillDays;
 
-    // ── Internal vs external split ──────────────────────────────────────────────
-    private long totalInternalFilled;
-    private long totalExternalFilled;
+    // ── Fill split (single-person model) ───────────────────────────────────────
+    /** Number of demands filled from the internal bench. */
+    private long internalFilledCount;
+
+    /** Number of demands filled via external hire. */
+    private long externalFilledCount;
 
 }

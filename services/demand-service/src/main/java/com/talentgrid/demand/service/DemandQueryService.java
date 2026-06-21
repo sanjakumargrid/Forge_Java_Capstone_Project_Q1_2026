@@ -186,15 +186,8 @@ public class DemandQueryService {
         pipeline.setDemandId(demand.getDemandId());
         pipeline.setTitle(demand.getTitle());
         pipeline.setStatus(demand.getStatus() != null ? demand.getStatus().name() : null);
-        pipeline.setRequiredCount(demand.getRequiredCount());
-        pipeline.setInternalFilledCount(demand.getInternalFilledCount());
-        pipeline.setExternalFilledCount(demand.getExternalFilledCount());
-        pipeline.setRecruitedCount(demand.getRecruitedCount());
-
-        // Calculate remaining positions
-        int required = demand.getRequiredCount() != null ? demand.getRequiredCount() : 0;
-        int recruited = demand.getRecruitedCount() != null ? demand.getRecruitedCount() : 0;
-        pipeline.setRemainingCount(Math.max(0, required - recruited));
+        pipeline.setIsFilled(demand.getIsFilled());
+        pipeline.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
 
         // Map status history as the audit trail
         List<DemandStatusHistory> histories = demand.getStatusHistories();

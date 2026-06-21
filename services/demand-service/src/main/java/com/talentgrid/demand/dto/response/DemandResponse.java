@@ -55,11 +55,15 @@ public class DemandResponse {
     /** The target date for the candidate to be officially onboarded. */
     private LocalDate onboardingDate;
 
-    // Headcount
-    private Integer requiredCount;
-    private Integer recruitedCount;
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
+    // Fill tracking (single-person model)
+    /** Whether this demand has been filled by a matched employee. */
+    private Boolean isFilled;
+
+    /**
+     * How the demand was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} when the demand is not yet filled.
+     */
+    private String fillType;
 
     // Status
     private String status;

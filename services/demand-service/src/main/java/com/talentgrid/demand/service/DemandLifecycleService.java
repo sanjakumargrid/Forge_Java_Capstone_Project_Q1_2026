@@ -256,9 +256,6 @@ public class DemandLifecycleService {
 
         demand.setStatus(targetStatus);
 
-        demand.setRecruitedCount(
-                (demand.getInternalFilledCount() != null ? demand.getInternalFilledCount() : 0)
-                        + (demand.getExternalFilledCount() != null ? demand.getExternalFilledCount() : 0));
 
         writeHistory(demand, fromStatus, targetStatus,
                 closureReason != null ? closureReason.name() : null,
@@ -371,7 +368,6 @@ public class DemandLifecycleService {
         switch (targetStatus) {
             case OPEN_EXTERNAL -> eventProducer.publishExternalOpened(demand);
             case FILLED_INTERNAL -> eventProducer.publishFilledInternal(demand);
-            case FILLED_PARTIALLY -> eventProducer.publishFilledPartially(demand);
             case FILLED_EXTERNAL -> eventProducer.publishFilledExternal(demand);
             case CANCELLED -> eventProducer.publishCancelled(demand);
             case DUPLICATE -> eventProducer.publishDuplicate(demand);

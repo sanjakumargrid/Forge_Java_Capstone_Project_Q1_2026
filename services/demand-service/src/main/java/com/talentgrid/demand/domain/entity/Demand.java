@@ -4,6 +4,7 @@ import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.FillType;
 import com.talentgrid.demand.domain.enums.WorkMode;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -107,22 +108,21 @@ public class Demand {
     @Column(name = "onboarding_date")
     private LocalDate onboardingDate;
 
-    // ─── Headcount Tracking ─────────────────────────────────────────────────────
-    @Column(name = "required_count", nullable = false)
-    private Integer requiredCount;//
+    // ─── Fill Tracking (single-person model) ────────────────────────────────────
+    /**
+     * Whether this demand has been filled by a single matched employee.
+     * Defaults to {@code false} on creation.
+     */
+    @Column(name = "is_filled", nullable = false)
+    private Boolean isFilled;
 
     /**
-     * Derived field: {@code internalFilledCount + externalFilledCount}.
-     * Kept in sync by the service layer on every fill event.
+     * How the demand was filled — {@code INTERNAL} (from the bench) or
+     * {@code EXTERNAL} (externally hired). {@code null} until the demand is filled.
      */
-    @Column(name = "recruited_count")
-    private Integer recruitedCount;
-
-    @Column(name = "internal_filled_count")
-    private Integer internalFilledCount;
-
-    @Column(name = "external_filled_count")
-    private Integer externalFilledCount;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "fill_type")
+    private FillType fillType;
 
     // ─── Status & Priority ──────────────────────────────────────────────────────
     @Enumerated(EnumType.STRING)
@@ -223,14 +223,8 @@ public class Demand {
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
-        if (this.internalFilledCount == null) {
-            this.internalFilledCount = 0;
-        }
-        if (this.externalFilledCount == null) {
-            this.externalFilledCount = 0;
-        }
-        if (this.recruitedCount == null) {
-            this.recruitedCount = 0;
+        if (this.isFilled == null) {
+            this.isFilled = false;
         }
         if (this.approvalReminderSent == null) {
             this.approvalReminderSent = false;
@@ -352,37 +346,11 @@ public class Demand {
     public LocalDate getOnboardingDate() { return onboardingDate; }
     public void setOnboardingDate(LocalDate onboardingDate) { this.onboardingDate = onboardingDate; }
 
-    public Integer getRequiredCount() {
-        return requiredCount;
-    }
+    public Boolean getIsFilled() { return isFilled; }
+    public void setIsFilled(Boolean isFilled) { this.isFilled = isFilled; }
 
-    public void setRequiredCount(Integer requiredCount) {
-        this.requiredCount = requiredCount;
-    }
-
-    public Integer getRecruitedCount() {
-        return recruitedCount;
-    }
-
-    public void setRecruitedCount(Integer recruitedCount) {
-        this.recruitedCount = recruitedCount;
-    }
-
-    public Integer getInternalFilledCount() {
-        return internalFilledCount;
-    }
-
-    public void setInternalFilledCount(Integer internalFilledCount) {
-        this.internalFilledCount = internalFilledCount;
-    }
-
-    public Integer getExternalFilledCount() {
-        return externalFilledCount;
-    }
-
-    public void setExternalFilledCount(Integer externalFilledCount) {
-        this.externalFilledCount = externalFilledCount;
-    }
+    public FillType getFillType() { return fillType; }
+    public void setFillType(FillType fillType) { this.fillType = fillType; }
 
     public DemandStatus getStatus() {
         return status;
