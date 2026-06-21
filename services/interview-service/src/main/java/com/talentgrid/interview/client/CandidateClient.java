@@ -24,7 +24,7 @@ public class CandidateClient {
     public CandidateDto getCandidate(Long candidateId) {
         try {
             return webClient.get()
-                    .uri("/api/external-candidates/{id}", candidateId)
+                    .uri("/api/v1/external-candidates/{id}", candidateId)
                     .retrieve()
                     .bodyToMono(CandidateDto.class)
                     .block();

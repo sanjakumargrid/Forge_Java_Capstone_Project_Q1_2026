@@ -67,15 +67,10 @@ public class GoogleCalendarClient {
         Calendar calendarService = getCalendarServiceOrNull();
 
         if (!googleCalendarEnabled || calendarService == null) {
-            String eventId = "mock-calendar-event-" + UUID.randomUUID();
-            String meetLink = "https://meet.google.com/mock-local";
-
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Returning mock eventId={} meetLink={}",
-                    eventId,
-                    meetLink
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Google Calendar integration is currently disabled or unavailable. Cannot schedule interview."
             );
-
-            return new GoogleCalendarResponse(eventId, meetLink);
         }
 
         try {
@@ -131,12 +126,15 @@ public class GoogleCalendarClient {
             Event createdEvent = insertRequest.execute();
 
             String eventId = createdEvent.getId();
-
             String meetLink;
+
             if (googleMeetEnabled) {
                 meetLink = extractMeetLink(createdEvent);
             } else {
-                meetLink = "https://meet.google.com/mock-local";
+                throw new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "Google Meet generation is not enabled for this interview."
+                );
             }
 
             log.info("[GoogleCalendarClient] Calendar event created | eventId={} | meetLink={}",
@@ -164,13 +162,12 @@ public class GoogleCalendarClient {
 
         if (!googleCalendarEnabled
                 || calendarService == null
-                || eventId == null
-                || eventId.startsWith("mock-calendar-event-")) {
+                || eventId == null) {
 
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock update for eventId={}",
-                    eventId
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Cannot update interview: Google Calendar integration is disabled or eventId is missing."
             );
-            return;
         }
 
         try {
@@ -230,13 +227,12 @@ public class GoogleCalendarClient {
 
         if (!googleCalendarEnabled
                 || calendarService == null
-                || eventId == null
-                || eventId.startsWith("mock-calendar-event-")) {
+                || eventId == null) {
 
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock delete for eventId={}",
-                    eventId
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Cannot delete interview: Google Calendar integration is disabled or eventId is missing."
             );
-            return;
         }
 
         try {

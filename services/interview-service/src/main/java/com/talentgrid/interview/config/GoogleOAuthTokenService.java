@@ -87,6 +87,7 @@ public class GoogleOAuthTokenService {
             return credential != null
                     && (credential.getRefreshToken() != null || credential.getAccessToken() != null);
         } catch (Exception ex) {
+            log.error("[GoogleOAuthTokenService] isAuthorized failed: ", ex);
             return false;
         }
     }

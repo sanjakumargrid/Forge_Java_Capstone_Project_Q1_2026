@@ -18,6 +18,7 @@ public class ApplicationClient {
     public ApplicationDto getApplication(Long applicationId) {
 
         try {
+
             return applicationWebClient.get()
                     .uri("/applications/{applicationId}", applicationId)
                     .retrieve()
@@ -56,6 +57,7 @@ public class ApplicationClient {
         request.setReason(reason);
 
         try {
+
             return applicationWebClient.patch()
                     .uri("/applications/{applicationId}/stage", applicationId)
                     .bodyValue(request)

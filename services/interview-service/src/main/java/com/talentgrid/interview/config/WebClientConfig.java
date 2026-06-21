@@ -12,6 +12,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 import com.talentgrid.shared.auth.jwt.JwtTokenService;
+import java.util.List;
 
 @Configuration
 public class WebClientConfig {
@@ -58,6 +59,17 @@ public class WebClientConfig {
                 String authHeader = httpServletRequest.getHeader("Authorization");
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     token = authHeader.substring(7);
+                }
+            }
+
+            if (token == null) {
+                // Check if the header was manually set on the WebClient request
+                List<String> existingAuthHeaders = request.headers().get("Authorization");
+                if (existingAuthHeaders != null && !existingAuthHeaders.isEmpty()) {
+                    String existingHeader = existingAuthHeaders.get(0);
+                    if (existingHeader.startsWith("Bearer ")) {
+                        token = existingHeader.substring(7);
+                    }
                 }
             }
 

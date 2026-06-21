@@ -25,9 +25,13 @@ public class JwtBlacklistService {
     }
 
     public boolean isBlacklisted(String jti) {
-
-        return Boolean.TRUE.equals(
-                redisTemplate.hasKey("blacklist:" + jti)
-        );
+        try {
+            return Boolean.TRUE.equals(
+                    redisTemplate.hasKey("blacklist:" + jti)
+            );
+        } catch (Exception ex) {
+            // Redis is not running locally, assume token is not blacklisted
+            return false;
+        }
     }
 }

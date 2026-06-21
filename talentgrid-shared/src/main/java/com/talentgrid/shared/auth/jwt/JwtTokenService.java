@@ -37,6 +37,7 @@ public class JwtTokenService {
                         "OFFER_VIEW", "OFFER_CREATE", "OFFER_UPDATE",
                         "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE"
                 ))
+                .id(java.util.UUID.randomUUID().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5)) // 5 minutes
                 .signWith(getSigningKey())

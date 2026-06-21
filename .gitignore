@@ -17,3 +17,4 @@ kafka_data/
 *.log
 pids.txt
 start_all.sh
+google-oauth-tokens/

@@ -111,7 +111,7 @@ public class InterviewServiceImpl implements InterviewService {
         
         // Send email to Candidate
         notificationEventPublisher.sendInAppAndEmail(
-                candidate.getCandidateId().toString(),
+                applicationDto.getCandidateId().toString(),
                 candidate.getEmail(),
                 "INTERVIEW_INVITATION",
                 "Interview Invitation from Grid Dynamics",
