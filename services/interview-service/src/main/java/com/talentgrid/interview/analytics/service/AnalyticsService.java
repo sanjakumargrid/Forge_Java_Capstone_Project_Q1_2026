@@ -93,7 +93,44 @@ public class AnalyticsService {
     }
 
     public AnalyticsResponse getHistoricalSnapshot(Long demandId) {
-        // (Unchanged historical fallback implementation from earlier segment)
-        return null;
+        // Fetch the most recent pre-cached snapshot from the reporting table.
+        // Global view (demandId == null) → latest snapshot with NULL demand_id.
+        // Demand-specific view → latest snapshot for that demand.
+        java.util.Optional<com.talentgrid.interview.analytics.entity.RecruitmentAnalyticsSnapshot> snapshotOpt =
+                (demandId == null)
+                        ? snapshotRepository.findLatestGlobalSnapshot()
+                        : snapshotRepository.findFirstByDemandIdOrderByCalculatedAtDesc(demandId);
+
+        // If no snapshot has been pre-calculated yet, fall back to a live computation.
+        // This prevents NullPointerExceptions on the frontend dashboard.
+        if (snapshotOpt.isEmpty()) {
+            return calculateLiveMetrics(demandId);
+        }
+
+        com.talentgrid.interview.analytics.entity.RecruitmentAnalyticsSnapshot snapshot = snapshotOpt.get();
+
+        SummaryDto summary = new SummaryDto(
+                snapshot.getTotalApplications() != null ? snapshot.getTotalApplications() : 0,
+                snapshot.getOfferAcceptanceRatePct() != null ? snapshot.getOfferAcceptanceRatePct() : BigDecimal.ZERO
+        );
+
+        // Convert the stored PipelineConversionRate list to ConversionRateDto list
+        List<ConversionRateDto> pipelineRates = new ArrayList<>();
+        if (snapshot.getPipelineConversionRates() != null) {
+            for (com.talentgrid.interview.analytics.entity.PipelineConversionRate rate : snapshot.getPipelineConversionRates()) {
+                pipelineRates.add(new ConversionRateDto(
+                        rate.getStage(),
+                        rate.getCount() != null ? rate.getCount().longValue() : 0L,
+                        rate.getConversionFromPreviousPct() != null ? rate.getConversionFromPreviousPct() : 0.0,
+                        rate.getDropOffRatePct() != null ? rate.getDropOffRatePct() : 0.0
+                ));
+            }
+        }
+
+        Map<String, Double> avgTimes = snapshot.getAvgTimePerStageDays() != null
+                ? snapshot.getAvgTimePerStageDays()
+                : new LinkedHashMap<>();
+
+        return new AnalyticsResponse(summary, pipelineRates, avgTimes);
     }
 }

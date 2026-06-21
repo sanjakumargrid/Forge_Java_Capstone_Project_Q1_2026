@@ -99,6 +99,19 @@ public class ApplicationController {
         return applicationService.bulkReject(request);
     }
 
+    /**
+     * Bulk-reassigns applications to a new demand (e.g., when a demand is filled/cancelled
+     * and the recruiter wants to move remaining candidates to the next open demand).
+     * Candidates already on the target demand and terminal-stage candidates are silently skipped.
+     */
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
+    @PostMapping("/bulk/reassign-demand")
+    public List<ApplicationDto> bulkReassignDemand(
+            @Valid @RequestBody com.talentgrid.application.application.dto.request.BulkDemandReassignRequest request
+    ) {
+        return applicationService.bulkReassignDemand(request);
+    }
+
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping(value = "/bulk/export", produces = "text/csv")
     public ResponseEntity<String> exportToCsv(

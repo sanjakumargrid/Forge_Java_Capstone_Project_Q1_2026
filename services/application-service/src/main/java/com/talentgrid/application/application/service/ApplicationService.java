@@ -105,9 +105,9 @@ public class ApplicationService {
         if (applicationDto.getAiScore() < 50) {
             applicationDto.setCurrentStage(Stage.REJECTED);
             applicationDto.setRejectionReason(
-                    "Upon review, the resume score based on our automated ATS evaluation was below the threshold for this role.");
+                    "ATS score is below the minimum threshold for this role.");
         } else {
-            applicationDto.setCurrentStage(Stage.APPLIED);
+            applicationDto.setCurrentStage(Stage.SCREENING);
         }
         applicationDto.setBlockedFromReapply(false);
 
@@ -291,6 +291,71 @@ public class ApplicationService {
                 // Returning only successful DTOs
             }
         }
+        return results;
+    }
+
+    /**
+     * Bulk-reassigns a list of applications to a different demand.
+     * Skips any application where the candidate already has an existing application on
+     * the target demand (guards against the unique constraint on candidate_id + demand_id).
+     *
+     * @param request contains list of applicationIds and the targetDemandId
+     * @return list of successfully reassigned ApplicationDtos
+     */
+    @Transactional
+    public List<ApplicationDto> bulkReassignDemand(
+            com.talentgrid.application.application.dto.request.BulkDemandReassignRequest request) {
+
+        if (request == null || request.getApplicationIds() == null || request.getApplicationIds().isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "At least one application ID is required");
+        }
+        if (request.getTargetDemandId() == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Target demand ID is required");
+        }
+
+        // Validate target demand exists via DemandClient
+        DemandDto targetDemand = demandClient.getDemand(request.getTargetDemandId());
+        if (targetDemand == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND,
+                    "Target demand not found with id: " + request.getTargetDemandId());
+        }
+
+        List<Application> applications = applicationRepository.findAllByIdIn(request.getApplicationIds());
+        List<ApplicationDto> results = new ArrayList<>();
+
+        for (Application app : applications) {
+            // Skip if application is in a terminal state — do not move HIRED or REJECTED candidates
+            if (app.getCurrentStage() == Stage.HIRED || app.getCurrentStage() == Stage.REJECTED) {
+                continue;
+            }
+
+            // Skip if the candidate already has an active application on the target demand
+            // This protects the unique constraint (candidate_id, demand_id)
+            boolean alreadyAppliedToTarget = applicationRepository
+                    .existsByCandidateIdAndDemandId(app.getCandidateId(), request.getTargetDemandId());
+            if (alreadyAppliedToTarget) {
+                continue;
+            }
+
+            app.setDemandId(request.getTargetDemandId());
+            Application saved = applicationRepository.save(app);
+
+            auditLogClient.logAction(AuditLogPayload.builder()
+                    .entityType("APPLICATION")
+                    .entityId(saved.getId())
+                    .action(AuditAction.UPDATE)
+                    .beforeState(Map.of("demandId", app.getDemandId() != null ? app.getDemandId() : "null"))
+                    .afterState(Map.of("demandId", request.getTargetDemandId()))
+                    .serviceName("application-service")
+                    .endpoint("/api/applications/bulk/reassign-demand")
+                    .build());
+
+            // Fire event so downstream services (interview-service analytics etc.) stay in sync
+            applicationEventProducer.publishApplied(saved);
+
+            results.add(ApplicationMapper.applicationEntityToDto(saved));
+        }
+
         return results;
     }
 

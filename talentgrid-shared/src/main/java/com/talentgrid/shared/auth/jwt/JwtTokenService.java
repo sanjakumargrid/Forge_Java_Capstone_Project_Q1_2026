@@ -22,6 +22,27 @@ public class JwtTokenService {
         this.jwtSecret = jwtSecret;
     }
 
+    /**
+     * Generates a short-lived internal token for service-to-service communication
+     * where no user context exists (e.g., webhooks, Kafka consumers).
+     */
+    public String generateInternalServiceToken() {
+        return Jwts.builder()
+                .subject("system")
+                .claim(JwtConstants.EMAIL, "system@talentgrid.internal")
+                .claim(JwtConstants.ROLES, List.of("ROLE_SYSTEM"))
+                .claim(JwtConstants.SCOPES, List.of(
+                        "CANDIDATE_VIEW", "CANDIDATE_CREATE", "CANDIDATE_UPDATE",
+                        "APPLICATION_VIEW", "APPLICATION_CREATE", "APPLICATION_UPDATE",
+                        "OFFER_VIEW", "OFFER_CREATE", "OFFER_UPDATE",
+                        "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE"
+                ))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5)) // 5 minutes
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String extractEmail(String token) {
 
         return extractAllClaims(token)

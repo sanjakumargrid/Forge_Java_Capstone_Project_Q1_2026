@@ -39,7 +39,7 @@ public interface AnalyticsSnapshotRepository extends JpaRepository<RecruitmentAn
             AVG(EXTRACT(EPOCH FROM (offer_at - final_round_at))) / 86400 as avg_final_to_offer,
             AVG(EXTRACT(EPOCH FROM (hired_at - offer_at))) / 86400 as avg_offer_to_hired
         FROM application
-        WHERE (:demandId IS NULL OR 1=1) -- Note: If applications link to a demand via foreign key, replace 1=1 with structural relationship check
+        WHERE (:demandId IS NULL OR demand_id = :demandId)
     """, nativeQuery = true)
     Map<String, Object> getRawLiveApplicationMetrics(@Param("demandId") Long demandId);
 
@@ -52,7 +52,7 @@ public interface AnalyticsSnapshotRepository extends JpaRepository<RecruitmentAn
             COUNT(CASE WHEN offer_status = 'SIGNED' THEN 1 END) as signed_offers
         FROM offer o
         INNER JOIN application a ON o.application_id = a.application_id
-        WHERE (:demandId IS NULL OR 1=1)
+        WHERE (:demandId IS NULL OR a.demand_id = :demandId)
     """, nativeQuery = true)
     Map<String, Object> getRawLiveOfferMetrics(@Param("demandId") Long demandId);
 }

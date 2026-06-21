@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.lang.ScopedValue;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -73,4 +73,4 @@ public interface InterviewRepository extends JpaRepository<Interview, Long> {
     long countByApplicationId(Long applicationId);
 
     boolean existsByCalendarEventId(String calendarEventId);
-ScopedValue findById(Long id);}
+}
