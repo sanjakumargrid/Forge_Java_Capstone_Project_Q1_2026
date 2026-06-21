@@ -28,7 +28,7 @@ public class AiEngineFileController {
     private final ResumeStoreService resumeStoreService;
     private final RestTemplate restTemplate;
 
-    @Value("${application.service.url:http://localhost:8082}")
+    @Value("${application.service.url:http://localhost:8083}")
     private String applicationServiceBaseUrl;
 
     public AiEngineFileController(ResumeParserService resumeParserService,
@@ -124,7 +124,15 @@ public class AiEngineFileController {
 
             try {
                 String applicationServiceUrl = applicationServiceBaseUrl + "/api/applications/" + applicationId + "/ai-evaluation";
-                restTemplate.patchForObject(applicationServiceUrl, updatePayload, Void.class);
+                org.springframework.http.HttpHeaders fwdHeaders = new org.springframework.http.HttpHeaders();
+                jakarta.servlet.http.HttpServletRequest httpReq = ((org.springframework.web.context.request.ServletRequestAttributes)
+                        org.springframework.web.context.request.RequestContextHolder.getRequestAttributes()).getRequest();
+                String authHeader = httpReq.getHeader("Authorization");
+                if (authHeader != null) {
+                    fwdHeaders.set("Authorization", authHeader);
+                }
+                restTemplate.exchange(applicationServiceUrl, org.springframework.http.HttpMethod.PATCH,
+                        new org.springframework.http.HttpEntity<>(updatePayload, fwdHeaders), Void.class);
             } catch (Exception e) {
                 throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "Evaluation completed, but failed to save to Application DB: " + e.getMessage());
             }

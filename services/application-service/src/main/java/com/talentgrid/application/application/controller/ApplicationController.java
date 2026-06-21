@@ -12,15 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import com.talentgrid.application.application.dto.request.BulkRejectRequest;
+import com.talentgrid.application.application.dto.request.AtsEvaluationPayload;
 import com.talentgrid.application.application.dto.request.BulkStageMoveRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/applications")
+@RequestMapping("/api/applications")
 public class ApplicationController {
 
     private final ApplicationService applicationService;
@@ -49,6 +48,16 @@ public class ApplicationController {
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
+    @GetMapping("/search")
+    public Page<ApplicationDto> searchApplications(
+            @RequestParam(required = false) Integer minScore,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return applicationService.searchApplications(minScore, page, size);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping("/{applicationId}")
     public ApplicationDto getApplicationById(
             @PathVariable Long applicationId
@@ -73,16 +82,14 @@ public class ApplicationController {
         return applicationService.getTimeline(applicationId);
     }
 
-    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
-    @GetMapping("/search")
-    public Page<ApplicationDto> searchApplications(
-            @RequestParam(required = false) Integer minScore,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+    @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
+    @PatchMapping("/{applicationId}/ai-evaluation")
+    public void updateAiEvaluation(
+            @PathVariable Long applicationId,
+            @Valid @RequestBody AtsEvaluationPayload payload
     ) {
-        return applicationService.searchApplications(minScore, page, size);
+        applicationService.updateAiEvaluation(applicationId, payload);
     }
-
     @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
     @PostMapping("/bulk/stage")
     public List<ApplicationDto> bulkMoveStage(

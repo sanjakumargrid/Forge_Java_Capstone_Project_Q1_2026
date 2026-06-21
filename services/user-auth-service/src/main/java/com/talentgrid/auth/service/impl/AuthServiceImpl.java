@@ -31,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
 
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final long LOCK_DURATION_MINUTES = 15;
+    private static final Set<String> SELF_REGISTRATION_ROLES = Set.of("EMPLOYEE");
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -52,9 +53,16 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String requestedRole =
-                request.getRole() != null ? request.getRole() : "EMPLOYEE";
+                (request.getRole() != null ? request.getRole() : "EMPLOYEE").toUpperCase();
 
-        Role role = roleRepository.findByName(requestedRole.toUpperCase())
+        // Prevent privilege escalation: self-registration may only request
+        // non-privileged roles. Elevated roles (e.g. ADMIN) must be granted by an
+        // administrator, not minted through the public registration endpoint.
+        if (!SELF_REGISTRATION_ROLES.contains(requestedRole)) {
+            throw new RuntimeException("Role not allowed for self-registration: " + requestedRole);
+        }
+
+        Role role = roleRepository.findByName(requestedRole)
                 .orElseThrow(() ->
                         new RuntimeException("Role not found: " + requestedRole)
                 );

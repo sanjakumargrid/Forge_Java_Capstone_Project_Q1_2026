@@ -29,10 +29,11 @@ public class OAuthController {
 
     private final RefreshTokenService refreshTokenService;
 
-    @Deprecated
-    @GetMapping("/oauth-success")
-    public ResponseEntity<LoginResponse> oauthSuccess(
-            @RequestParam String email
+    // Internal helper: issues tokens only after the server-side /session flow has
+    // verified the OAuth login. Intentionally NOT a public endpoint — exposing it
+    // would let any caller mint a JWT for an arbitrary email.
+    private ResponseEntity<LoginResponse> oauthSuccess(
+            String email
     ) {
 
         User user = userRepository.findByEmail(email)

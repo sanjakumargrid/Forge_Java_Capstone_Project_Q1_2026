@@ -269,6 +269,9 @@ public class ApplicationService {
                 // Returning only successful DTOs
             }
         }
+        if (results.isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "All applications failed to move stage");
+        }
         return results;
     }
 
@@ -290,6 +293,9 @@ public class ApplicationService {
                 // In a partial failure scenario, log or ignore, continuing with others
                 // Returning only successful DTOs
             }
+        }
+        if (results.isEmpty()) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "All applications failed to reject");
         }
         return results;
     }
@@ -679,5 +685,14 @@ public class ApplicationService {
                     HttpStatus.BAD_REQUEST,
                     "Invalid stage: " + stage);
         }
+    }
+    @Transactional
+    public void updateAiEvaluation(Long applicationId, com.talentgrid.application.application.dto.request.AtsEvaluationPayload payload) {
+        Application application = getApplicationEntity(applicationId);
+        application.setAiScore(payload.getAiScore());
+        application.setMatchedSkills(payload.getMatchedSkills());
+        application.setMissingSkills(payload.getMissingSkills());
+        application.setOtherSkills(payload.getOtherSkills());
+        applicationRepository.save(application);
     }
 }

@@ -132,11 +132,26 @@ public class JwtTokenService {
     public JwtUserContext buildUserContext(String token) {
 
         return JwtUserContext.builder()
-                .userId(Long.valueOf(extractUserId(token)))
+                .userId(parseUserId(extractUserId(token)))
                 .email(extractEmail(token))
                 .roles(extractRoles(token))
                 .scopes(extractScopes(token))
                 .build();
-//        return null;
+    }
+
+    /**
+     * Parses the JWT subject into a numeric user id. Internal service tokens use a
+     * non-numeric subject ("system"), so fall back to a sentinel id instead of
+     * throwing NumberFormatException, which would reject every tokenless S2S call.
+     */
+    private Long parseUserId(String subject) {
+        if (subject == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(subject);
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
     }
 }

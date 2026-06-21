@@ -113,7 +113,11 @@ public class AtsEvaluationService {
     private AtsEvaluationDTO parseLlmResponseToDTO(String responseBody) {
         try {
             JsonNode rootNode = objectMapper.readTree(responseBody);
-            String jsonContent = rootNode.path("choices").get(0)
+            JsonNode choices = rootNode.path("choices");
+            if (choices.isMissingNode() || !choices.isArray() || choices.isEmpty()) {
+                throw new BusinessException(HttpStatus.BAD_GATEWAY, "LLM response missing 'choices' array (possible rate limit): " + responseBody);
+            }
+            String jsonContent = choices.get(0)
                     .path("message")
                     .path("content").asText();
 

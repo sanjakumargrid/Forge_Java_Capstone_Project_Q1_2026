@@ -21,6 +21,7 @@ import com.talentgrid.interview.interview.mapper.InterviewMapper;
 import com.talentgrid.interview.interview.repository.InterviewRepository;
 import com.talentgrid.interview.kafka.producer.InterviewEventProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InterviewServiceImpl implements InterviewService {
@@ -84,6 +86,9 @@ public class InterviewServiceImpl implements InterviewService {
             throw new BusinessException(HttpStatus.BAD_REQUEST, "Application does not have an associated candidate");
         }
         CandidateDto candidate = candidateClient.getCandidate(applicationDto.getCandidateId());
+        if (candidate == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "Candidate not found");
+        }
 
         Interview interview =
                 InterviewMapper.dtoToEntity(interviewDto);
@@ -92,19 +97,30 @@ public class InterviewServiceImpl implements InterviewService {
             interview.setStatus(Status.SCHEDULED);
         }
 
-        GoogleCalendarResponse response =
-                googleCalendarClient.createEvent(interview);
+        // Save first to avoid orphaned calendar events if DB save fails
+        Interview savedInterview = interviewRepository.save(interview);
 
-        interview.setCalendarEventId(response.getEventId());
-        interview.setMeetLink(response.getMeetLink());
-
-        Interview savedInterview =
-                interviewRepository.save(interview);
+        GoogleCalendarResponse response = new GoogleCalendarResponse(null, null);
+        try {
+            response = googleCalendarClient.createEvent(savedInterview);
+            savedInterview.setCalendarEventId(response.getEventId());
+            savedInterview.setMeetLink(response.getMeetLink());
+            savedInterview = interviewRepository.save(savedInterview);
+        } catch (Exception e) {
+            log.error("[InterviewService] Google Calendar creation failed. Continuing without Meet link: {}", e.getMessage());
+        }
         
         String interviewerName = "Our Team";
         if (interview.getInterviewers() != null && !interview.getInterviewers().isEmpty()) {
-            EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0));
-            interviewerName = primaryInterviewer.getName();
+            try {
+                EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0));
+                if (primaryInterviewer != null && primaryInterviewer.getName() != null) {
+                    interviewerName = primaryInterviewer.getName();
+                }
+            } catch (Exception e) {
+                log.warn("[InterviewService] Could not resolve primary interviewer name for id={}: {}",
+                        interview.getInterviewers().get(0), e.getMessage());
+            }
         }
 
         String candidateName = candidate.getFirstName() + (candidate.getLastName() != null ? " " + candidate.getLastName() : "");
@@ -160,7 +176,7 @@ public class InterviewServiceImpl implements InterviewService {
                     }
                 } catch (Exception e) {
                     // Log error but don't fail the interview creation
-                    System.err.println("Failed to send email to interviewer " + interviewerId + ": " + e.getMessage());
+                    log.error("[InterviewService] Failed to send email to interviewer {}: {}", interviewerId, e.getMessage());
                 }
             }
         }

@@ -87,6 +87,12 @@ public class OfferServiceImpl implements OfferService {
         }
 
 
+        if (offer.getOfferStatus() == null) {
+            offer.setOfferStatus(Status.DRAFT);
+        }
+
+        Offer savedOffer = offerRepository.save(offer);
+
         if ("FINAL_ROUND".equalsIgnoreCase(currentStage)) {
             applicationClient.moveApplicationStage(
                     offer.getApplicationId(),
@@ -95,17 +101,7 @@ public class OfferServiceImpl implements OfferService {
             );
         }
 
-
-        if (offer.getOfferStatus() == null) {
-            offer.setOfferStatus(Status.DRAFT);
-        }
-
-
-        Offer savedOffer = offerRepository.save(offer);
-
-
         offerEventProducer.publishCreated(savedOffer);
-
 
         auditLogClient.logAction(
                 AuditLogPayload.builder()
@@ -120,11 +116,6 @@ public class OfferServiceImpl implements OfferService {
                         .endpoint("/api/offers")
                         .build()
         );
-
-
-
-
-
 
         return savedOffer;
     }

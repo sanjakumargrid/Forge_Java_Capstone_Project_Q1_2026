@@ -105,6 +105,32 @@ public class DataInitializer
         Role savedAdminRole = roleRepository.save(adminRole);
 
         // =========================================
+        // CREATE OR UPDATE EMPLOYEE ROLE
+        // (default role for self-registration and Google OAuth sign-up)
+        // =========================================
+
+        Role employeeRole = roleRepository.findByName("EMPLOYEE")
+                .orElseGet(() -> Role.builder()
+                        .name("EMPLOYEE")
+                        .scopes(new HashSet<>())
+                        .build());
+
+        if (employeeRole.getScopes() == null) {
+            employeeRole.setScopes(new HashSet<>());
+        }
+
+        employeeRole.getScopes().addAll(Set.of(
+                demandView, demandPipelineView,
+                applicationView,
+                candidateView,
+                interviewView,
+                scorecardView,
+                offerView
+        ));
+
+        roleRepository.save(employeeRole);
+
+        // =========================================
         // CREATE ADMIN USER
         // =========================================
 

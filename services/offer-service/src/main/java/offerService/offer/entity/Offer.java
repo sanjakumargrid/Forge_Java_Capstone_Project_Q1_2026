@@ -60,7 +60,7 @@ public class Offer {
     private BigDecimal equity;
 
     @NotNull(message = "Joining date is required")
-    @Future(message = "Joining date must be in the future")
+    @FutureOrPresent(message = "Joining date must be today or in the future")
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "joining_date", nullable = false)
     private LocalDate joiningDate;

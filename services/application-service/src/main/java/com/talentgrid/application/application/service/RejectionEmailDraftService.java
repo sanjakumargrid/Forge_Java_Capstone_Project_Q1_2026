@@ -84,8 +84,11 @@ public class RejectionEmailDraftService {
         try {
             JsonNode root = objectMapper.readTree(response);
 
-            String text = root.path("candidates")
-                    .get(0)
+            JsonNode candidates = root.path("candidates");
+            if (candidates.isMissingNode() || !candidates.isArray() || candidates.isEmpty()) {
+                throw new IllegalStateException("Gemini response missing 'candidates' array (possible rate limit): " + response);
+            }
+            String text = candidates.get(0)
                     .path("content")
                     .path("parts")
                     .get(0)

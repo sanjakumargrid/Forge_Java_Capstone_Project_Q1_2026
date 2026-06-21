@@ -20,7 +20,7 @@ public class ApplicationClient {
         try {
 
             return applicationWebClient.get()
-                    .uri("/applications/{applicationId}", applicationId)
+                    .uri("/api/applications/{applicationId}", applicationId)
                     .retrieve()
                     .bodyToMono(ApplicationDto.class)
                     .block();
@@ -59,7 +59,7 @@ public class ApplicationClient {
         try {
 
             return applicationWebClient.patch()
-                    .uri("/applications/{applicationId}/stage", applicationId)
+                    .uri("/api/applications/{applicationId}/stage", applicationId)
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(ApplicationDto.class)
