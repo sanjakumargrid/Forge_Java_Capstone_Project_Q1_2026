@@ -4,6 +4,7 @@ import com.talentgrid.demand.client.dto.AccountDto;
 import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.client.dto.UserDto;
 import com.talentgrid.demand.client.dto.UserSummaryResponse;
+import com.talentgrid.demand.config.UserAuthFeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(
         name = "user-auth-service",
         url = "${user-auth-service.url:http://localhost:8080}",
-        path = "/api"
+        path = "/api",
+        configuration = UserAuthFeignConfig.class
 )
 public interface UserAuthServiceClient {
 

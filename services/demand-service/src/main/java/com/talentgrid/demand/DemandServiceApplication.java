@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
                 "com.talentgrid.clients"
         }
 )
-@EnableFeignClients(basePackages = {"com.talentgrid.demand.client"})
+@EnableFeignClients(basePackages = {"com.talentgrid.demand.client", "com.talentgrid.demand.ai"})
 public class DemandServiceApplication {
 
   public static void main(String[] args) {

@@ -84,7 +84,7 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:9093
 
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: talentgrid-postgres
     networks:
       - talentgrid-network
@@ -97,7 +97,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U talentgrid"]
+      test: [ "CMD-SHELL", "pg_isready -U talentgrid" ]
       interval: 10s
       timeout: 5s
       retries: 5

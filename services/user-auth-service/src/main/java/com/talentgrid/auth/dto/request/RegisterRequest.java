@@ -28,12 +28,6 @@ public class RegisterRequest {
     private String password;
 
     /**
-     * Employee full name.
-     */
-    @NotBlank(message = "Name is required")
-    private String name;
-
-    /**
      * Employee work location.
      * Used for RMG lookup and approval routing.
      */

@@ -1,9 +1,15 @@
 package com.talentgrid.auth.config;
 
 import com.talentgrid.auth.filter.JwtAuthenticationFilter;
+import com.talentgrid.auth.repository.UserRepository;
+import com.talentgrid.auth.repository.RoleRepository;
+import com.talentgrid.auth.jwt.JwtService;
+import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
+import com.talentgrid.auth.entity.User;
+import com.talentgrid.auth.entity.Role;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,13 +28,39 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 
+/**
+ * Core Spring Security configuration for the auth-service.
+ *
+ * <p>Responsibilities:
+ * <ul>
+ *   <li>Configure stateless JWT-based session management for API endpoints</li>
+ *   <li>Configure OAuth2 login with session support for browser-based SSO flows</li>
+ *   <li>Define CORS policies</li>
+ *   <li>Register the {@link JwtAuthenticationFilter} in the filter chain</li>
+ * </ul>
+ *
+ * <p>Note: The dual session creation policy (STATELESS globally, but using
+ * {@link HttpSession} during OAuth2 login) is an intentional design choice
+ * to support the OAuth2 callback flow while keeping API endpoints stateless.
+ */
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final JwtService jwtService;
+    private final UserSecurityCacheService userSecurityCacheService;
 
+    /**
+     * Configures the main security filter chain.
+     *
+     * @param http the HttpSecurity builder
+     * @return the configured security filter chain
+     * @throws Exception if configuration fails
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http
@@ -49,7 +81,6 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/api/users/**",
                                 "/oauth2/**",
                                 "/login/**",
                                 "/swagger-ui/**",
@@ -120,22 +151,24 @@ public class SecurityConfig {
                                 return;
                             }
 
-                            HttpSession session =
-                                    request.getSession();
+                            User user = userRepository.findByEmail(email).orElse(null);
+                            if (user == null) {
+                                Role role = roleRepository.findByName("EMPLOYEE").orElseThrow(() -> new RuntimeException("Role not found"));
+                                user = User.builder()
+                                        .username(email.substring(0, email.indexOf('@')))
+                                        .email(email)
+                                        .password("")
+                                        .enabled(true)
+                                        .roles(Set.of(role))
+                                        .build();
+                                userRepository.save(user);
+                            }
 
-                            session.setAttribute(
-                                    "oauth_email",
-                                    email
-                            );
-
-                            session.setAttribute(
-                                    "oauth_authenticated",
-                                    true
-                            );
-
+                            userSecurityCacheService.cacheUser(user);
+                            String token = jwtService.generateToken(user);
+                            
                             response.sendRedirect(
-                                    "http://localhost:4200/auth/callback"     // This is for Frontend Testing
-//                                    "http://localhost:8080/api/auth/session"    // This is for Backend Testing
+                                    "http://localhost:4200/auth/callback?token=" + token
                             );
                         })
                 )
@@ -148,12 +181,24 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Provides a BCrypt password encoder for hashing and verifying passwords.
+     *
+     * @return the configured password encoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
 
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Exposes the AuthenticationManager bean used by the AuthController.
+     *
+     * @param config the authentication configuration
+     * @return the authentication manager
+     * @throws Exception if configuration fails
+     */
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config
@@ -162,6 +207,11 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /**
+     * Configures CORS policies for local frontend development environments.
+     *
+     * @return the configured CORS source
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
