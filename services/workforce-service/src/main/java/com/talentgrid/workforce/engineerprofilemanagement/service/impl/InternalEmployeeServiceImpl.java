@@ -63,6 +63,14 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     }
 
     @Override
+    public org.springframework.data.domain.Page<InternalEmployeeResponse> getAllEngineers(int page, int size) {
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").ascending());
+        return repository.findByIsDeletedFalse(pageable)
+                .map(this::mapToResponse);
+    }
+
+    @Override
     @Transactional
     public InternalEmployeeResponse updateOwnProfile(Long employeeId,
                                                      UpdateEngineerProfileRequest request,

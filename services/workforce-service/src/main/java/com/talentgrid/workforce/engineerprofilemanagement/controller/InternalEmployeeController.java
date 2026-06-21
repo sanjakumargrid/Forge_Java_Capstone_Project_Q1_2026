@@ -60,8 +60,10 @@ public class InternalEmployeeController {
     @GetMapping("/engineers")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
     @Operation(summary = "Load all engineers",
-            description = "Returns all non-deleted engineers from internal_employees")
-    public ResponseEntity<List<InternalEmployeeResponse>> getAllEngineers() {
-        return ResponseEntity.ok(internalEmployeeService.getAllEngineers());
+            description = "Returns all non-deleted engineers from internal_employees with pagination")
+    public ResponseEntity<org.springframework.data.domain.Page<InternalEmployeeResponse>> getAllEngineers(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        return ResponseEntity.ok(internalEmployeeService.getAllEngineers(page, size));
     }
 }

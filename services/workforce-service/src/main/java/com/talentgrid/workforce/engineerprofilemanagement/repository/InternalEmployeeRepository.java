@@ -23,6 +23,8 @@ public interface InternalEmployeeRepository extends JpaRepository<InternalEmploy
 
     List<InternalEmployee> findByIsDeletedFalseOrderByIdAsc();
 
+    org.springframework.data.domain.Page<InternalEmployee> findByIsDeletedFalse(org.springframework.data.domain.Pageable pageable);
+
     /**
      * Efficiently updates only the resume embedding and timestamp on an employee
      * without loading the full entity. Returns 1 if the employee was found and updated.

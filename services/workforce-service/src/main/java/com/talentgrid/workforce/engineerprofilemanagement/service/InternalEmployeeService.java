@@ -16,6 +16,8 @@ public interface InternalEmployeeService {
 
     List<InternalEmployeeResponse> getAllEngineers();
 
+    org.springframework.data.domain.Page<InternalEmployeeResponse> getAllEngineers(int page, int size);
+
     InternalEmployeeResponse updateOwnProfile(Long employeeId, UpdateEngineerProfileRequest request, String requestId);
 
     InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto);
