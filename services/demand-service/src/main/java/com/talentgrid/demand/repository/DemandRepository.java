@@ -34,16 +34,17 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
     /**
      * Enterprise search with optional filters on status, priority, and business unit.
      * Excludes soft-deleted records. Supports pagination and sorting.
+     * Pass multiple {@code statuses} values to filter with an IN clause.
      */
     @Query("SELECT d FROM Demand d WHERE d.isDeleted = false " +
-            "AND (:status IS NULL OR d.status = :status) " +
+            "AND (:statuses IS NULL OR d.status IN :statuses) " +
             "AND (:priority IS NULL OR d.priority = :priority) " +
             "AND (:businessUnit IS NULL OR d.businessUnit = :businessUnit) " +
             "AND (:accountName IS NULL OR d.accountName = :accountName) " +
             "AND (:location IS NULL OR d.location = :location) " +
             "AND (:employmentType IS NULL OR d.employmentType = :employmentType)")
     Page<Demand> searchDemands(
-            @Param("status") DemandStatus status,
+            @Param("statuses") List<DemandStatus> statuses,
             @Param("priority") DemandPriority priority,
             @Param("businessUnit") String businessUnit,
             @Param("accountName") String accountName,

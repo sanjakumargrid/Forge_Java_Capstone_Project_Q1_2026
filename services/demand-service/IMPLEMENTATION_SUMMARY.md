@@ -108,7 +108,7 @@ GET /api/v1/demands/analytics
 1. **Controller Enhancement**
    - File: `/services/demand-service/src/main/java/com/talentgrid/demand/controller/DemandAnalyticsController.java`
    - Changes: Added `getDemandAnalyticsV1()` method with OpenAPI annotations (@Operation, @ApiResponse, @Parameter)
-   - Existing: `GET /api/analytics/demands` unchanged (legacy endpoint preserved)
+   - Existing: `GET /api/v1/analytics/demands` unchanged (legacy endpoint preserved)
    - New: `GET /api/v1/demands/analytics` (new V1 endpoint)
 
 2. **Service Enhancement**
@@ -330,7 +330,7 @@ Method decorated with:
 
 ### Backward Compatibility
 ✅ **Maintained**: All existing endpoints and classes remain unchanged.
-- `/api/analytics/demands` still works (legacy endpoint)
+- `/api/v1/analytics/demands` still works (legacy endpoint)
 - New endpoint at `/api/v1/demands/analytics` (versioned)
 
 ---

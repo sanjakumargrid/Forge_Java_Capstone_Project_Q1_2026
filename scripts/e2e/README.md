@@ -232,9 +232,9 @@ The script prints HTTP bodies and the **HTTP status** for the approve call.
 `POST /api/v1/demands/{id}/approve` requires:
 
 1. A valid **PM** JWT with scope **`DEMAND_PM_APPROVE`** (seeded PM user has this).
-2. demand-service calls **user-auth** with Feign: **`GET /api/projects/{projectId}`** and expects `projectManagerId` to equal the PM user’s id (JWT claim **`sub`**, same as user id in the database).
+2. demand-service calls **user-auth** with Feign: **`GET /api/v1/projects/{projectId}`** and expects `projectManagerId` to equal the PM user’s id (JWT claim **`sub`**, same as user id in the database).
 
-If user-auth does **not** implement `GET /api/projects/{id}` yet, or the row for `PROJECT_ID` does not exist / `projectManagerId` does not match the PM user, demand-service returns **403** with a message about project ownership.
+If user-auth does **not** implement `GET /api/v1/projects/{id}` yet, or the row for `PROJECT_ID` does not exist / `projectManagerId` does not match the PM user, demand-service returns **403** with a message about project ownership.
 
 **What still works without that API:** login, lookups, create demand, submit (steps up to approve). **Approve** succeeds only once project data in user-auth matches the PM.
 
@@ -272,7 +272,7 @@ docker stop talentgrid-redis 2>/dev/null || true
 
 ## Gateway path mapping
 
-The gateway rewrites external **`/api/v1/...`** URLs to the paths each Spring service mounts (for example `/api/demands/**`, `/api/auth/**`). See `talentgrid-api-gateway-service/src/main/resources/application.yml`.
+The gateway rewrites external **`/api/v1/...`** URLs to the paths each Spring service mounts (for example `/api/v1/demands/**`, `/api/v1/auth/**`). See `talentgrid-api-gateway-service/src/main/resources/application.yml`.
 
 ---
 

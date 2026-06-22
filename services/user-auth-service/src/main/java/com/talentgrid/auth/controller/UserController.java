@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -39,7 +39,7 @@ public class UserController {
      * Returns the active RMG assigned to the given location.
      *
      * Example:
-     * GET /api/users/rmg-by-location?location=Chennai
+     * GET /api/v1/users/rmg-by-location?location=Chennai
      *
      * Response:
      * {

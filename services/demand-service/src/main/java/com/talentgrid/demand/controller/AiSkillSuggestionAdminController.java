@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/admin/ai-skill-suggestion-config")
+@RequestMapping("/api/v1/admin/ai-skill-suggestion-config")
 @RequiredArgsConstructor
 public class AiSkillSuggestionAdminController {
 

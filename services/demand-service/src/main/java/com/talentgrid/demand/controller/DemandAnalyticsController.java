@@ -25,40 +25,20 @@ import java.time.LocalDate;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code GET /api/analytics/demands} — demand fill rate (position-level),
+ * <li>{@code GET /api/v1/analytics/demands} — demand fill rate (position-level),
  * average time-to-fill, and internal vs external split. Default window: last 30 days.
  * <li>{@code GET /api/v1/demands/analytics} — V1 analytics with business unit filter,
  * fill rate, time-to-fill, internal vs external split, and capacity by project-client.
  * </ul>
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Demand Analytics", description = "Demand metrics and analytics endpoints")
 public class DemandAnalyticsController {
 
     private final DemandAnalyticsService analyticsService;
-
-    /**
-     * Returns position-level demand analytics metrics.
-     *
-     * @param startDate start of analytics window (optional, format: yyyy-MM-dd); default = 30 days ago
-     * @param endDate   end of analytics window (optional, format: yyyy-MM-dd); default = today
-     * @return analytics response with fill rate (position-level), avg time-to-fill, and split
-     */
-    @GetMapping("/analytics/demands")
-    @PreAuthorize("hasAuthority('ANALYTICS_DEMAND_VIEW')")
-    public ResponseEntity<DemandAnalyticsMetricsResponse> getDemandAnalytics(
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate startDate,
-            @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate endDate) {
-        DemandAnalyticsMetricsResponse response = analyticsService.getAnalytics(startDate, endDate);
-        return ResponseEntity.ok(response);
-    }
-
+    
     /**
      * Returns V1 demand analytics metrics with optional filters and project-client capacity data.
      * Consumed by dashboard team; read-only aggregate data (no auth changes needed).
@@ -79,7 +59,7 @@ public class DemandAnalyticsController {
      * @param businessUnit optional business unit filter
      * @return V1 analytics response with metrics and capacity data
      */
-    @GetMapping("/v1/demands/analytics")
+    @GetMapping("/demands/analytics")
     @PreAuthorize("hasAuthority('ANALYTICS_DEMAND_VIEW')")
     @Operation(
             summary = "Get demand analytics with capacity metrics",

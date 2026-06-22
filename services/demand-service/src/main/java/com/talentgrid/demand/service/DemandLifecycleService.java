@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -49,16 +50,16 @@ public class DemandLifecycleService {
      * Approve or reject a demand in {@code PENDING_APPROVAL}.
      * Only the {@linkplain #assertCurrentUserIsProjectManagerForDemand project manager} for the demand's
      * {@code projectId} may act — same rules as {@link #approveAsProjectManager(Long, ApprovalRequest)}.
-     * <p>Convenience alias for {@code POST /api/demands/{id}/approve}; prefer {@code PUT /api/project-manager/demands/{id}/approve} if you split routes by persona.
+     * <p>Convenience alias for {@code POST /api/v1/demands/{id}/approve}; prefer {@code PUT /api/v1/project-manager/demands/{id}/approve} if you split routes by persona.
      */
     @Transactional
     public DemandResponse approve(Long id, ApprovalRequest request) {
-        return approveAsProjectManager(id, request, "/api/demands/" + id + "/approve");
+        return approveAsProjectManager(id, request, "/api/v1/demands/" + id + "/approve");
     }
 
     @Transactional
     public DemandResponse approveAsProjectManager(Long id, ApprovalRequest request) {
-        return approveAsProjectManager(id, request, "/api/project-manager/demands/" + id + "/approve");
+        return approveAsProjectManager(id, request, "/api/v1/project-manager/demands/" + id + "/approve");
     }
 
     @Transactional
@@ -86,7 +87,7 @@ public class DemandLifecycleService {
         if (SecurityUtils.hasAnyRole("PROJECT_MANAGER")) {
             assertCurrentUserIsProjectManagerForDemand(demand);
             transitionValidator.validate(demand, DemandStatus.APPROVED, null);
-            applyPostApprovalRouting(demand, from, comments, true);
+            applyPostApprovalRouting(demand, from, comments);
         } else if (SecurityUtils.isHiringManager()) {
             if (!SecurityUtils.getCurrentUserId().equals(demand.getCreatedBy())) {
                 throw new AccessDeniedException("Only the demand owner can submit for approval.");
@@ -96,14 +97,14 @@ public class DemandLifecycleService {
             writeHistory(demand, from, DemandStatus.PENDING_APPROVAL, null, comments);
             Demand saved = demandRepository.save(demand);
             publishPendingApprovalWithPm(saved);
-            auditStatusChange(saved, from, DemandStatus.PENDING_APPROVAL, "/api/demands/" + id + "/submit");
+            auditStatusChange(saved, from, DemandStatus.PENDING_APPROVAL, "/api/v1/demands/" + id + "/submit");
             return demandMapper.toResponse(saved);
         } else {
             throw new AccessDeniedException("Only HM or PM may submit a demand from draft.");
         }
 
         Demand saved = demandRepository.save(demand);
-        auditStatusChange(saved, from, saved.getStatus(), "/api/demands/" + id + "/submit");
+        auditStatusChange(saved, from, saved.getStatus(), "/api/v1/demands/" + id + "/submit");
         return demandMapper.toResponse(saved);
     }
 
@@ -204,7 +205,7 @@ public class DemandLifecycleService {
                 demand.setAssignedRm(request.getAssignedRm());
                 demand.setAssignedRmName(request.getAssignedRmName());
             }
-            applyPostApprovalRouting(demand, fromStatus, request.getComments(), true);
+            applyPostApprovalRouting(demand, fromStatus, request.getComments());
         } else {
             demand.setClosureReason(request.getClosureReason().name());
             demand.setStatus(DemandStatus.CLOSED);
@@ -230,33 +231,86 @@ public class DemandLifecycleService {
         return demandMapper.toResponse(saved);
     }
 
-    private void applyPostApprovalRouting(Demand demand, DemandStatus fromStatus, String comments, boolean publishEvents) {
+    /**
+     * Marks a demand as {@code APPROVED} after PM sign-off. Search activation
+     * ({@code APPROVED} → {@code INTERNAL_SEARCH} or bench {@code OPEN_EXTERNAL})
+     * is performed asynchronously by {@link com.talentgrid.demand.scheduler.SearchActivationScheduler}.
+     */
+    private void applyPostApprovalRouting(Demand demand, DemandStatus fromStatus, String comments) {
         demand.setApprovedAt(OffsetDateTime.now());
         demand.setApprovedBy(SecurityUtils.getCurrentUserId());
         demand.setApproverName(SecurityUtils.getCurrentUserName());
 
         demand.setStatus(DemandStatus.APPROVED);
         writeHistory(demand, fromStatus, DemandStatus.APPROVED, null, comments);
+    }
 
-        if (Boolean.TRUE.equals(demand.getBenchHiring())) {
-            demand.setStatus(DemandStatus.OPEN_EXTERNAL);
-            writeHistory(demand, DemandStatus.APPROVED, DemandStatus.OPEN_EXTERNAL, null,
-                    "Bench hiring: skip internal search");
-            if (publishEvents) {
-                eventProducer.publishApproved(demand);
-                eventProducer.publishExternalOpened(demand);
-            }
-        } else {
-            demand.setStatus(DemandStatus.INTERNAL_SEARCH);
-            if (demand.getSearchStartAt() == null) {
-                demand.setSearchStartAt(OffsetDateTime.now());
-            }
-            writeHistory(demand, DemandStatus.APPROVED, DemandStatus.INTERNAL_SEARCH, null,
-                    "Auto-transition on approval");
-            if (publishEvents) {
-                eventProducer.publishApproved(demand);
+    /**
+     * Activates all approved demands: {@code INTERNAL_SEARCH} by default, or
+     * {@code OPEN_EXTERNAL} when {@code benchHiring} is true.
+     *
+     * @return number of demands transitioned
+     */
+    @Transactional
+    public int activateApprovedDemands() {
+        List<Demand> approvedDemands =
+                demandRepository.findByStatusAndIsDeletedFalse(DemandStatus.APPROVED);
+
+        if (approvedDemands.isEmpty()) {
+            return 0;
+        }
+
+        int activated = 0;
+        for (Demand demand : approvedDemands) {
+            try {
+                if (activateApprovedDemand(demand)) {
+                    activated++;
+                }
+            } catch (Exception ex) {
+                log.error("[SEARCH-ACTIVATION] Failed for demandId={}", demand.getDemandId(), ex);
             }
         }
+        return activated;
+    }
+
+    /**
+     * Transitions a single {@code APPROVED} demand into active search.
+     */
+    @Transactional
+    public boolean activateApprovedDemand(Demand demand) {
+        if (demand.getStatus() != DemandStatus.APPROVED) {
+            log.debug("[SEARCH-ACTIVATION] demandId={} is {} — skipping",
+                    demand.getDemandId(), demand.getStatus());
+            return false;
+        }
+
+        DemandStatus targetStatus = Boolean.TRUE.equals(demand.getBenchHiring())
+                ? DemandStatus.OPEN_EXTERNAL
+                : DemandStatus.INTERNAL_SEARCH;
+
+        transitionValidator.validate(demand, targetStatus, null);
+
+        DemandStatus fromStatus = demand.getStatus();
+        if (targetStatus == DemandStatus.INTERNAL_SEARCH && demand.getSearchStartAt() == null) {
+            demand.setSearchStartAt(OffsetDateTime.now());
+        }
+
+        demand.setStatus(targetStatus);
+        String activationComment = targetStatus == DemandStatus.OPEN_EXTERNAL
+                ? "Bench hiring: skip internal search (auto-activated)"
+                : "Auto-activated internal search";
+        writeHistory(demand, fromStatus, targetStatus, null, activationComment, 0L);
+
+        demandRepository.save(demand);
+
+        eventProducer.publishApproved(demand);
+        if (targetStatus == DemandStatus.OPEN_EXTERNAL) {
+            eventProducer.publishExternalOpened(demand);
+        }
+
+        log.info("[SEARCH-ACTIVATION] demandId={} transitioned {} → {}",
+                demand.getDemandId(), fromStatus, targetStatus);
+        return true;
     }
 
     @Transactional
@@ -316,7 +370,7 @@ public class DemandLifecycleService {
                 .beforeState(Map.of("status", fromStatus.name()))
                 .afterState(Map.of("status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id + "/status")
+                .endpoint("/api/v1/demands/" + id + "/status")
                 .build());
 
         log.info("Demand transitioned from {} to {} for id={}", fromStatus, targetStatus, id);
@@ -360,7 +414,7 @@ public class DemandLifecycleService {
                 .beforeState(Map.of("status", fromStatus.name()))
                 .afterState(Map.of("status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id + "/status")
+                .endpoint("/api/v1/demands/" + id + "/status")
                 .build());
 
         log.info("Demand {} filled and auto-closed from {}", id, fromStatus);
@@ -504,6 +558,11 @@ public class DemandLifecycleService {
 
     private void writeHistory(Demand demand, DemandStatus from, DemandStatus to,
                               String closureReason, String comments) {
+        writeHistory(demand, from, to, closureReason, comments, SecurityUtils.getCurrentUserId());
+    }
+
+    private void writeHistory(Demand demand, DemandStatus from, DemandStatus to,
+                              String closureReason, String comments, Long changedBy) {
         DemandStatusHistory history = new DemandStatusHistory();
         history.setDemand(demand);
         history.setFromStatus(from);
@@ -511,7 +570,7 @@ public class DemandLifecycleService {
         history.setClosureReason(closureReason);
         history.setComments(comments != null ? comments : "");
         history.setChangedAt(OffsetDateTime.now());
-        history.setChangedBy(SecurityUtils.getCurrentUserId());
+        history.setChangedBy(changedBy);
         historyRepository.save(history);
     }
 

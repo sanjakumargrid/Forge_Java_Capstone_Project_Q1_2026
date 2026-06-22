@@ -23,7 +23,7 @@ import java.util.List;
 @FeignClient(
         name = "user-auth-service",
         url = "${user-auth-service.url:http://localhost:8081}",
-        path = "/api",
+        path = "/api/v1",
         configuration = UserAuthFeignConfig.class
 )
 public interface UserAuthServiceClient {
@@ -48,7 +48,7 @@ public interface UserAuthServiceClient {
 
     /**
      * Projects where the authenticated user (Bearer token) is PM.
-     * GET /api/projects/mine-as-pm
+     * GET /api/v1/projects/mine-as-pm
      */
     @GetMapping("/projects/mine-as-pm")
     List<ManagedProjectDto> getMyProjectsAsPm();
@@ -66,7 +66,7 @@ public interface UserAuthServiceClient {
      * Retrieves the active RMG responsible for a given location.
      *
      * Example:
-     * GET /api/users/rmg-by-location?location=Chennai
+     * GET /api/v1/users/rmg-by-location?location=Chennai
      *
      * @param location demand location
      * @return RMG summary

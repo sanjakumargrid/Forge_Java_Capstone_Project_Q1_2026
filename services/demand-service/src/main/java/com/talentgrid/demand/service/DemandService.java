@@ -124,7 +124,7 @@ public class DemandService {
                         "title", saved.getTitle(),
                         "status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands")
+                .endpoint("/api/v1/demands")
                 .build());
 
         log.info("Demand created successfully with id={}", saved.getDemandId());
@@ -179,7 +179,7 @@ public class DemandService {
                         "title", saved.getTitle(),
                         "status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id)
+                .endpoint("/api/v1/demands/" + id)
                 .build());
 
         log.info("Demand updated successfully with id={}", saved.getDemandId());
@@ -212,7 +212,7 @@ public class DemandService {
                 .actorId(SecurityUtils.getCurrentUserId())
                 .afterState(Map.of("isDeleted", true))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id)
+                .endpoint("/api/v1/demands/" + id)
                 .build());
 
         log.info("Demand soft-deleted successfully with id={}", id);

@@ -62,14 +62,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         // PUBLIC ENDPOINTS
-        if (
-                path.equals("/api/auth/login")
-                        || path.equals("/api/auth/register")
-                        || path.equals("/api/auth/refresh")
-                        || path.startsWith("/oauth2/")
-                        || path.startsWith("/login/oauth2/")
-                        || path.startsWith("/swagger-ui")
-                        || path.startsWith("/v3/api-docs")
+        if (path.equals("/api/v1/auth/login")
+                || path.equals("/api/v1/auth/register")
+                || path.equals("/api/v1/auth/refresh")
+                || path.startsWith("/oauth2/")
+                || path.startsWith("/login/oauth2/")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
         ) {
 
             filterChain.doFilter(request, response);

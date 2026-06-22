@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/demands/ai-skill-suggestion")
+@RequestMapping("/api/v1/demands/ai-skill-suggestion")
 @RequiredArgsConstructor
 public class AiSkillSuggestionController {
 

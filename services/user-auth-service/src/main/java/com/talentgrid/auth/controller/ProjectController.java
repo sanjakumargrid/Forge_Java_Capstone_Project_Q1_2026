@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * project manager ID during demand creation and SLA processing.
  */
 @RestController
-@RequestMapping("/api/projects")
+@RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -36,7 +36,7 @@ public class ProjectController {
      *
      * <p>Declared before {@code /{id}} so the path is not captured as a numeric id.
      *
-     * GET /api/projects/mine-as-pm
+     * GET /api/v1/projects/mine-as-pm
      */
     @GetMapping("/mine-as-pm")
     public ResponseEntity<List<Map<String, Object>>> myProjectsAsPm() {
@@ -54,7 +54,7 @@ public class ProjectController {
     /**
      * Returns project details including the project manager ID.
      *
-     * GET /api/projects/{id}
+     * GET /api/v1/projects/{id}
      * Response: { "id": 1, "name": "Alpha", "accountId": 2, "projectManagerId": 5 }
      */
     @GetMapping("/{id}")

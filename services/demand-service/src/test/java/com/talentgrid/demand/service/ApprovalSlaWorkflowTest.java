@@ -147,7 +147,7 @@ public class ApprovalSlaWorkflowTest {
             lifecycleService.approveAsProjectManager(2L, ApprovalRequest.builder().decision(DemandStatus.APPROVED).build());
         });
 
-        // Scenario 2: Actual PM approves -> transitions to INTERNAL_SEARCH/APPROVED
+        // Scenario 2: Actual PM approves -> remains APPROVED until SearchActivationScheduler runs
         login(20L, "PROJECT_MANAGER");
         doNothing().when(transitionValidator).validate(any(Demand.class), any(DemandStatus.class), any());
         when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -157,7 +157,7 @@ public class ApprovalSlaWorkflowTest {
         });
 
         DemandResponse response = lifecycleService.approveAsProjectManager(2L, ApprovalRequest.builder().decision(DemandStatus.APPROVED).build());
-        assertEquals("INTERNAL_SEARCH", response.getStatus());
+        assertEquals("APPROVED", response.getStatus());
     }
 
     @Test
@@ -244,8 +244,8 @@ public class ApprovalSlaWorkflowTest {
 
         DemandResponse response = lifecycleService.submitDemand(5L, "Auto-approve PM created demand");
 
-        // Verify that PM created demand transitioned directly to INTERNAL_SEARCH/APPROVED
-        assertEquals("INTERNAL_SEARCH", response.getStatus());
-        verify(eventProducer).publishApproved(any(Demand.class));
+        // PM submit leaves demand APPROVED; SearchActivationScheduler activates search
+        assertEquals("APPROVED", response.getStatus());
+        verifyNoInteractions(eventProducer);
     }
 }

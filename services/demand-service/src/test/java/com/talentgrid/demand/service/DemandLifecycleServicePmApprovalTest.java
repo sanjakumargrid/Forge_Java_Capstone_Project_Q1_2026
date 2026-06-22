@@ -115,12 +115,12 @@ class DemandLifecycleServicePmApprovalTest {
 
         DemandResponse response = lifecycleService.approveAsProjectManager(7L, body);
 
-        assertEquals("INTERNAL_SEARCH", response.getStatus());
-        verify(eventProducer, times(1)).publishApproved(any(Demand.class));
+        assertEquals("APPROVED", response.getStatus());
+        verifyNoInteractions(eventProducer);
 
         ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
         verify(auditLogClient).logAction(auditCap.capture());
-        assertTrue(auditCap.getValue().getEndpoint().contains("/api/project-manager/demands/7/approve"));
+        assertTrue(auditCap.getValue().getEndpoint().contains("/api/v1/project-manager/demands/7/approve"));
     }
 
     @Test
@@ -146,10 +146,12 @@ class DemandLifecycleServicePmApprovalTest {
 
         DemandResponse response = lifecycleService.approve(7L, body);
 
-        assertEquals("INTERNAL_SEARCH", response.getStatus());
+        assertEquals("APPROVED", response.getStatus());
+        verifyNoInteractions(eventProducer);
+
         ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
         verify(auditLogClient).logAction(auditCap.capture());
-        assertTrue(auditCap.getValue().getEndpoint().contains("/api/demands/7/approve"));
+        assertTrue(auditCap.getValue().getEndpoint().contains("/api/v1/demands/7/approve"));
     }
 
     @Test
@@ -202,7 +204,7 @@ class DemandLifecycleServicePmApprovalTest {
 
         DemandResponse response = lifecycleService.approveAsProjectManager(7L, null);
 
-        assertEquals("INTERNAL_SEARCH", response.getStatus());
-        verify(eventProducer).publishApproved(any(Demand.class));
+        assertEquals("APPROVED", response.getStatus());
+        verifyNoInteractions(eventProducer);
     }
 }

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Project-manager scoped demand actions (separate from RMG/Admin lifecycle APIs).
  */
 @RestController
-@RequestMapping("/api/project-manager/demands")
+@RequestMapping("/api/v1/project-manager/demands")
 @RequiredArgsConstructor
 @Tag(name = "Project Manager Demands", description = "PM-scoped demand operations")
 public class ProjectManagerDemandController {

@@ -209,7 +209,7 @@ The default `userKeyResolver` applies intelligent key resolution:
 1. **Authenticated users** → Rate limited by `X-User-Id` (per-user fairness)
 2. **Unauthenticated requests** → Falls back to client IP address (per-IP protection)
 
-Rate limit headers are exposed in every response: `X-RateLimit-Remaining`, `X-RateLimit-Limit`.
+Rate limit headers are exposed on **gateway-routed** responses (not on `/actuator/**`): `X-RateLimit-Remaining`, `X-RateLimit-Burst-Capacity`, `X-RateLimit-Replenish-Rate`, `X-RateLimit-Requested-Tokens`.
 
 ### Payload Size Validation
 
@@ -360,19 +360,30 @@ curl http://localhost:8080/actuator/health
 
 ## Configuration Reference
 
-All configuration is managed via `application.properties` with environment variable overrides for production deployment.
+All configuration is managed via `application.yml` with environment variable overrides for production deployment.
 
 ### Core Settings
 
 | Property / Environment Variable | Description | Default |
 |---|---|---|
 | `server.port` | Gateway listen port | `8080` |
-| `JWT_SECRET` | HMAC-SHA256 signing key (min 256-bit) | `changeme-replace-in-production-immediately` |
+| `server.shutdown` | Shutdown mode (`graceful` recommended in K8s) | `graceful` |
+| `JWT_SECRET` | HMAC-SHA256 signing key (min 32 bytes / 256-bit) | `changeme-replace-in-production-immediately` |
 | `jwt.issuer` | Expected JWT issuer claim | `talentgrid-auth-service` |
 | `CORS_ALLOWED_ORIGINS` | Global CORS allowed origins | `*` |
 | `RATE_LIMIT_REPLENISH` | Steady-state request rate per user/IP | `30` |
 | `RATE_LIMIT_BURST` | Maximum burst size allowed | `60` |
 | `RATE_LIMIT_TOKENS` | Tokens consumed per request | `1` |
+
+### Gateway runtime & resilience
+
+| Property / Environment Variable | Description | Default |
+|---|---|---|
+| `talentgrid.gateway.request-logging-enabled` / `GATEWAY_REQUEST_LOGGING_ENABLED` | Log every request at INFO (prefer DEBUG on `RequestLoggingFilter` in prod) | `false` |
+| `GATEWAY_SHUTDOWN_TIMEOUT` | Max time for graceful shutdown (`spring.lifecycle.timeout-per-shutdown-phase`) | `30s` |
+| `GATEWAY_MAX_IN_MEMORY` | Max buffered body size (`spring.codec.max-in-memory-size`) | `10MB` |
+| `GATEWAY_HTTP_CONNECT_TIMEOUT` | Downstream connect timeout in ms (`spring.cloud.gateway.server.webflux.httpclient.connect-timeout`) | `5000` |
+| `GATEWAY_HTTP_RESPONSE_TIMEOUT` | Downstream response timeout (`spring.cloud.gateway.server.webflux.httpclient.response-timeout`) | `60s` |
 
 ### Infrastructure
 

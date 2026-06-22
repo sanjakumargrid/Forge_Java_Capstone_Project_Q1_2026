@@ -133,29 +133,29 @@ Role names used in code checks include `ADMIN`, `RMG`, `PROJECT_MANAGER`, **`HIR
 
 | Method | Endpoint | Description |
 |:---|:---|:---|
-| `GET` | `/api/demands` | Enterprise demand search (Filters: status, priority, business unit, etc.) |
-| `POST` | `/api/demands` | Create a new workforce demand. Status initializes as `DRAFT`. |
-| `GET` | `/api/demands/{id}` | Fetch granular details for a specific demand. |
-| `PATCH`| `/api/demands/{id}` | Update editable fields. **Restricted to DRAFT state only.** |
-| `DELETE`| `/api/demands/{id}`| Soft delete (`is_deleted = true`). **Restricted to DRAFT state only.** |
+| `GET` | `/api/v1/demands` | Enterprise demand search (Filters: status, priority, business unit, etc.) |
+| `POST` | `/api/v1/demands` | Create a new workforce demand. Status initializes as `DRAFT`. |
+| `GET` | `/api/v1/demands/{id}` | Fetch granular details for a specific demand. |
+| `PATCH`| `/api/v1/demands/{id}` | Update editable fields. **Restricted to DRAFT state only.** |
+| `DELETE`| `/api/v1/demands/{id}`| Soft delete (`is_deleted = true`). **Restricted to DRAFT state only.** |
 
 ### Demand Workflow & Lifecycle
 
 | Method | Endpoint | Description |
 |:---|:---|:---|
-| `POST` | `/api/demands/{id}/submit` | HM submits for PM approval, or PM auto-approves from `DRAFT`. |
-| `POST` | `/api/demands/{id}/approve` | Project **PM** for that demand's `projectId` only (`DEMAND_PM_APPROVE`); same checks as `PUT /api/project-manager/demands/{id}/approve`. |
-| `PATCH` | `/api/demands/{id}/status` | Trigger a state transition. Expects `targetStatus` and optional `comments`/`closureReason`. |
-| `GET` | `/api/demands/{id}/pipeline` | Retrieves the real-time split of internal/external recruiting counts and status audit trails. |
-| `GET` | `/api/demands/{id}/history` | Retrieves the chronological timeline (audit trail) of status modifications. |
-| `POST` | `/api/demands/{id}/nominations` | RM creates an internal nomination (INTERNAL_SEARCH only). |
-| `POST` | `/api/demands/{id}/nominations/{nid}/hm-decision` | HM accepts or rejects a nomination (`accept` query param). |
+| `POST` | `/api/v1/demands/{id}/submit` | HM submits for PM approval, or PM auto-approves from `DRAFT`. |
+| `POST` | `/api/v1/demands/{id}/approve` | Project **PM** for that demand's `projectId` only (`DEMAND_PM_APPROVE`); same checks as `PUT /api/v1/project-manager/demands/{id}/approve`. |
+| `PATCH` | `/api/v1/demands/{id}/status` | Trigger a state transition. Expects `targetStatus` and optional `comments`/`closureReason`. |
+| `GET` | `/api/v1/demands/{id}/pipeline` | Retrieves the real-time split of internal/external recruiting counts and status audit trails. |
+| `GET` | `/api/v1/demands/{id}/history` | Retrieves the chronological timeline (audit trail) of status modifications. |
+| `POST` | `/api/v1/demands/{id}/nominations` | RM creates an internal nomination (INTERNAL_SEARCH only). |
+| `POST` | `/api/v1/demands/{id}/nominations/{nid}/hm-decision` | HM accepts or rejects a nomination (`accept` query param). |
 
 ### Analytics
 
 | Method | Endpoint | Description |
 |:---|:---|:---|
-| `GET` | `/api/analytics/demands` | Comprehensive analytics: total demands, active searches, fill rates, avg time-to-fill, and internal vs. external ratios. |
+| `GET` | `/api/v1/analytics/demands` | Comprehensive analytics: total demands, active searches, fill rates, avg time-to-fill, and internal vs. external ratios. |
 
 ---
 
@@ -284,7 +284,7 @@ These single-line terminal commands ensure your shell parses the JSON string sea
 This maps strictly to your service's data contract constraints (`clientInterview`, `businessUnit`, `budget`, `targetDate`) and specific granular enterprise grade enum definitions (`T3_SENIOR`, `FULL_TIME`).
 
 ```bash
-curl -X POST http://localhost:8082/api/demands -H "Content-Type: application/json" -d '{"title": "Senior Java Developer", "description": "Experienced Java/Spring Boot developer needed for TalentGrid platform", "level": "T3_SENIOR", "skills": ["Java", "Spring Boot", "Kafka", "PostgreSQL"], "location": "Chennai", "workMode": "HYBRID", "experience": 5, "department": "Engineering", "employmentType": "FULL_TIME", "requiredCount": 2, "priority": "HIGH", "accountId": 1, "projectId": 1, "businessUnit": "Enterprise Applications", "budget": 150000.00, "targetDate": "2026-08-31", "clientInterview": true}'
+curl -X POST http://localhost:8082/api/v1/demands -H "Content-Type: application/json" -d '{"title": "Senior Java Developer", "description": "Experienced Java/Spring Boot developer needed for TalentGrid platform", "level": "T3_SENIOR", "skills": ["Java", "Spring Boot", "Kafka", "PostgreSQL"], "location": "Chennai", "workMode": "HYBRID", "experience": 5, "department": "Engineering", "employmentType": "FULL_TIME", "requiredCount": 2, "priority": "HIGH", "accountId": 1, "projectId": 1, "businessUnit": "Enterprise Applications", "budget": 150000.00, "targetDate": "2026-08-31", "clientInterview": true}'
 
 ```
 
@@ -315,7 +315,7 @@ UPDATE demands SET creator_email = 'your-email@griddynamics.com' WHERE demand_id
 Transition the demand out of a draft status using a `PATCH` payload:
 
 ```bash
-curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "PENDING_APPROVAL", "comments": "Submitting verification run"}'
+curl -i -X PATCH http://localhost:8082/api/v1/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "PENDING_APPROVAL", "comments": "Submitting verification run"}'
 
 ```
 
@@ -333,7 +333,7 @@ curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: ap
 Enforce managerial signature clearing to release the demand to sourcing teams via a `POST` mapping:
 
 ```bash
-curl -i -X POST http://localhost:8082/api/demands/3/approve -H "Content-Type: application/json" -d '{"decision": "APPROVED", "comments": "Approved", "assignedRm": 101, "assignedRmName": "Rahul Mehta"}'
+curl -i -X POST http://localhost:8082/api/v1/demands/3/approve -H "Content-Type: application/json" -d '{"decision": "APPROVED", "comments": "Approved", "assignedRm": 101, "assignedRmName": "Rahul Mehta"}'
 
 ```
 
@@ -362,7 +362,7 @@ UPDATE demands SET search_start_at = NOW() - INTERVAL '6 days' WHERE demand_id =
 With the 5-day security check cleared, release the specification externally using a `PATCH` payload:
 
 ```bash
-curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "OPEN_EXTERNAL", "comments": "Opening up to external agencies"}'
+curl -i -X PATCH http://localhost:8082/api/v1/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "OPEN_EXTERNAL", "comments": "Opening up to external agencies"}'
 
 ```
 
@@ -378,7 +378,7 @@ curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: ap
 The state machine strictly bars moving directly from searching to archiving without intermediate fulfillment logging. Transition to the completed milestone flag first:
 
 ```bash
-curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "FILLED_EXTERNAL", "closureReason": "FILLED_EXTERNAL", "comments": "All positions filled successfully via external tracking."}'
+curl -i -X PATCH http://localhost:8082/api/v1/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "FILLED_EXTERNAL", "closureReason": "FILLED_EXTERNAL", "comments": "All positions filled successfully via external tracking."}'
 
 ```
 
@@ -391,7 +391,7 @@ curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: ap
 Now that the positions have been marked as fulfilled, permanently lock and complete the lifecycle file record:
 
 ```bash
-curl -i -X PATCH http://localhost:8082/api/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "CLOSED", "closureReason": "FILLED_EXTERNAL", "comments": "Closing out the demand record permanently."}'
+curl -i -X PATCH http://localhost:8082/api/v1/demands/3/status -H "Content-Type: application/json" -d '{"targetStatus": "CLOSED", "closureReason": "FILLED_EXTERNAL", "comments": "Closing out the demand record permanently."}'
 
 ```
 

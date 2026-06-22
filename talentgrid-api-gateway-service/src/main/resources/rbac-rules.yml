@@ -20,9 +20,29 @@ rbac:
     # ═══════════════════════════════════════════
 
     # --- Admin / User Management ---
+    - path: "/api/v1/admin/users"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW]
+
+    - path: "/api/v1/admin/users"
+      methods: [POST]
+      allowed-scopes: [USER_CREATE]
+
     - path: "/api/v1/admin/users/**"
       methods: [GET]
       allowed-scopes: [USER_VIEW]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [PUT]
+      allowed-scopes: [USER_UPDATE]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [PATCH]
+      allowed-scopes: [USER_UPDATE]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [DELETE]
+      allowed-scopes: [USER_DELETE]
 
     - path: "/api/v1/admin/users/**/roles"
       methods: [PUT]
@@ -346,6 +366,22 @@ rbac:
     # ═══════════════════════════════════════════
 
     # --- Engineers ---
+    - path: "/api/v1/engineer-profile/employees/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineer-profile/update"
+      methods: [ PATCH ]
+      allowed-scopes: [ WORKFORCE_PROFILE_UPDATE ]
+
+    - path: "/api/v1/engineer-profile/engineers"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineer-profile/employees-by-id/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
     - path: "/api/v1/engineers"
       methods: [GET]
       allowed-scopes: [ENGINEER_VIEW]
@@ -404,6 +440,18 @@ rbac:
       allowed-scopes: [UTILISATION_ALERTS_VIEW]
 
     # --- Nominations ---
+    - path: "/api/v1/rmg/nominations"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_CREATE ]
+
+    - path: "/api/v1/rmg/nominations/demand/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
+
+    - path: "/api/v1/rmg/nominations/engineer/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
+
     - path: "/api/v1/nominations"
       methods: [GET]
       allowed-scopes: [NOMINATION_VIEW]
@@ -454,13 +502,77 @@ rbac:
       allowed-scopes: [DEMAND_EMBEDDING_DELETE]
 
     # --- HRIS Import ---
-    - path: "/api/v1/hris/import"
-      methods: [POST]
-      allowed-scopes: [HRIS_IMPORT]
+    - path: "/api/v1/engineer-profile/hris-import"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_HRIS_IMPORT ]
 
-    - path: "/api/v1/hris/import/*"
+      # ═══════════════════════════════════════════
+      # TEAM 6 — RMG-facing UI and the AI upskilling
+      # ═══════════════════════════════════════════
+
+      # --- Skill Gap Heatmap ---
+    - path: "/api/v1/skill-gap/heatmap"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/summary"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/trends"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/refresh"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_REFRESH ]
+
+    # --- AI Upskilling Recommendations ---
+    - path: "/api/v1/workforce/ai/upskilling/recommendations/generate"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_AI_UPSKILL_GENERATE ]
+
+    - path: "/api/v1/workforce/ai/upskilling/recommendations/history"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_AI_UPSKILL_VIEW ]
+
+    # --- RMG Analytics Dashboard ---
+    - path: "/api/v1/rmg-analytics-dashboard/**"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_ANALYTICS_VIEW ]
+
+    # --- RMG Demand Management ---
+    - path: "/api/v1/rmg/demands"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
+
+    - path: "/api/v1/rmg/demands/**/cancel"
+      methods: [ PATCH ]
+      allowed-scopes: [ DEMAND_STATUS_TRANSITION ]
+
+    - path: "/api/v1/rmg/demands/**/status"
+      methods: [ PATCH ]
+      allowed-scopes: [ DEMAND_STATUS_TRANSITION ]
+
+    # --- Bench Filter & CSV Export ---
+    - path: "/api/v1/bench-filter/search"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH ]
+
+    - path: "/api/v1/bench-filter/export/csv"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_REPORT_EXPORT ]
+
+    # --- RMG Search ---
+    - path: "/api/v1/rmg-search/search"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH ]
+
+    # --- Bench Report ---
+    - path: "/api/v1/bench-report"
       methods: [GET]
-      allowed-scopes: [HRIS_IMPORT_STATUS]
+      allowed-scopes: [WORKFORCE_BENCH_SEARCH]
+
 
     # ═══════════════════════════════════════════
     # ANALYTICS (cross-team)
@@ -481,4 +593,3 @@ rbac:
     - path: "/api/v1/analytics/utilisation-summary"
       methods: [GET]
       allowed-scopes: [ANALYTICS_UTILISATION_VIEW]
-

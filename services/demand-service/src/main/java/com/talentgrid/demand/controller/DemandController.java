@@ -36,7 +36,7 @@ import java.util.List;
  * </ul>
  */
 @RestController
-@RequestMapping("/api/demands")
+@RequestMapping("/api/v1/demands")
 @RequiredArgsConstructor
 public class DemandController {
 
@@ -48,9 +48,9 @@ public class DemandController {
      * Enterprise demand search with optional filters and pagination.
      *
      * <p>Supports filtering by one or more statuses:
-     * {@code GET /api/demands?status=APPROVED&status=INTERNAL_SEARCH}
+     * {@code GET /api/v1/demands?status=APPROVED&status=INTERNAL_SEARCH}
      *
-     * @param statuses       optional filter by one or more demand statuses
+     * @param statuses       optional filter by one or more demand statuses (repeat {@code status} query param)
      * @param priority       optional filter by demand priority
      * @param businessUnit   optional filter by business unit
      * @param accountName    optional filter by account name

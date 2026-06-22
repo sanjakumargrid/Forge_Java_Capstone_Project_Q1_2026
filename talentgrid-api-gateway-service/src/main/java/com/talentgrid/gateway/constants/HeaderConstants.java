@@ -1,5 +1,11 @@
 package com.talentgrid.gateway.constants;
 
+/**
+ * Centralized constant definitions for HTTP headers used throughout the API Gateway.
+ * 
+ * <p>Includes both custom internal identity headers (injected by the Gateway for downstream consumption)
+ * and standard OWASP-recommended security headers.</p>
+ */
 public final class HeaderConstants {
     public static final String USER_ID = "X-User-Id";
     public static final String USER_ROLES = "X-User-Roles";
@@ -14,6 +20,7 @@ public final class HeaderConstants {
     public static final String STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
     public static final String CONTENT_SECURITY_POLICY = "Content-Security-Policy";
     public static final String X_XSS_PROTECTION = "X-XSS-Protection";
+    public static final String REFERRER_POLICY = "Referrer-Policy";
 
     private HeaderConstants() {
         // Utility class
