@@ -3,6 +3,10 @@ package com.talentgrid.auth.config;
 import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
+import com.talentgrid.auth.entity.Account;
+import com.talentgrid.auth.entity.Project;
+import com.talentgrid.auth.repository.AccountRepository;
+import com.talentgrid.auth.repository.ProjectRepository;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.ScopeRepository;
 import com.talentgrid.auth.repository.UserRepository;
@@ -28,6 +32,8 @@ public class DataInitializer implements CommandLineRunner {
     private final RoleRepository roleRepository;
     private final ScopeRepository scopeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final ProjectRepository projectRepository;
 
     @Override
     public void run(String... args) {
@@ -114,6 +120,33 @@ public class DataInitializer implements CommandLineRunner {
                     .roles(Set.of(resourceManagerRole))
                     .build());
             log.info("Default resource manager user created.");
+        }
+
+        // Create Default Account
+        Account account = null;
+        if (accountRepository.count() == 0) {
+            account = Account.builder()
+                    .name("Mock Account")
+                    .accountManagerId(1L) // Admin user
+                    .build();
+            account = accountRepository.save(account);
+            log.info("Default account created.");
+        } else {
+            account = accountRepository.findAll().get(0);
+        }
+
+        // Create Default Project
+        if (projectRepository.count() == 0) {
+            User pmUser = userRepository.findByEmail("projectmanager@griddynamics.com").orElse(null);
+            if (pmUser != null) {
+                Project project = Project.builder()
+                        .name("Unknown Project")
+                        .account(account)
+                        .projectManagerId(pmUser.getId())
+                        .build();
+                projectRepository.save(project);
+                log.info("Default project created.");
+            }
         }
     }
 

@@ -4,10 +4,8 @@ package com.talentgrid.demand.domain.enums;
  * Reasons recorded on transitions and on {@code demands.closure_reason}.
  */
 public enum ClosureReason {
-    /** Demand reached FILLED from internal nomination / bench. */
-    FILLED_INTERNAL,
-    /** Demand reached FILLED from external / TA offer path. */
-    FILLED_EXTERNAL,
+    /** Demand reached FILLED. */
+    FILLED,
     /** Entered ON_HOLD. */
     ON_HOLD,
     /** PM rejected demand while PENDING_APPROVAL. */

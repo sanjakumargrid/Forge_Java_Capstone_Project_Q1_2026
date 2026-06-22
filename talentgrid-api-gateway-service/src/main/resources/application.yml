@@ -2,7 +2,7 @@ server:
   port: ${PORT:8080}
 spring:
   config:
-    import: optional:file:../../.env
+    import: "optional:file:../../.env,classpath:rbac-rules.yml,optional:configserver:"
   application:
     name: talentgrid-api-gateway-service
   data:
@@ -244,8 +244,7 @@ spring:
             - "Path=/api/v1/health/**, /talentgrid/health/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
-  config:
-    import: "classpath:rbac-rules.yml,optional:configserver:"
+
 ratelimit:
   default:
     replenishRate: ${RATE_LIMIT_REPLENISH:30}
@@ -266,8 +265,8 @@ management:
     health:
       show-details: always
 jwt:
-  secret: ${JWT_SECRET:changeme-replace-in-production-immediately}
-  issuer: talentgrid-auth-service
+  secret: ${JWT_SECRET}
+  issuer: auth-service
 logging:
   level:
     com:

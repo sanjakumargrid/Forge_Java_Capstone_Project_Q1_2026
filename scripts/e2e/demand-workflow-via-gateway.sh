@@ -82,6 +82,7 @@ CREATE_PAYLOAD="$(cat <<JSON
   "accountId": ${ACCOUNT_ID},
   "projectId": ${PROJECT_ID},
   "businessUnit": "Engineering",
+  "department": "Software Engineering",
   "jobTitleId": ${JOB_TITLE_ID},
   "mandatorySkillIds": [${SKILL_ID}],
   "budget": 150000,

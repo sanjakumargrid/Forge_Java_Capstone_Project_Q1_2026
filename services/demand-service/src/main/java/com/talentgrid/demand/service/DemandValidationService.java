@@ -60,6 +60,12 @@ public class DemandValidationService {
             errors.add("location must not exceed 150 characters");
         }
 
+        if (request.getDepartment() == null || request.getDepartment().isBlank()) {
+            errors.add("department is required");
+        } else if (request.getDepartment().length() > 150) {
+            errors.add("department must not exceed 150 characters");
+        }
+
         if (request.getProjectId() == null) {
             errors.add("projectId is required");
         }

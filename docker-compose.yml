@@ -99,6 +99,7 @@ services:
       POSTGRES_PASSWORD: talentgrid
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U talentgrid" ]
       interval: 10s

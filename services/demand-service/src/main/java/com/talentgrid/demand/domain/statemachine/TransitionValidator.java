@@ -91,10 +91,9 @@ public class TransitionValidator {
     private void validateClosureReason(DemandStatus fromStatus, DemandStatus targetStatus,
                                        ClosureReason closureReason) {
         if (targetStatus == DemandStatus.FILLED) {
-            if (closureReason != ClosureReason.FILLED_INTERNAL
-                    && closureReason != ClosureReason.FILLED_EXTERNAL) {
+            if (closureReason != ClosureReason.FILLED) {
                 throw new IllegalDemandTransitionException(
-                        String.format("Transition to FILLED requires closureReason FILLED_INTERNAL or FILLED_EXTERNAL, got %s.",
+                        String.format("Transition to FILLED requires closureReason FILLED, got %s.",
                                 closureReason));
             }
             return;

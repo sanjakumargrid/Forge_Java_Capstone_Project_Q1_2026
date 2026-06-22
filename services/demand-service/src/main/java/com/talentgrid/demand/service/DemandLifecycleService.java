@@ -329,15 +329,15 @@ public class DemandLifecycleService {
     @Transactional
     public DemandResponse fillDemandInternally(Long demandId, String comments) {
         Demand demand = findActiveOrThrow(demandId);
-        assertTransitionPermissions(demand, DemandStatus.FILLED, ClosureReason.FILLED_INTERNAL);
-        transitionValidator.validate(demand, DemandStatus.FILLED, ClosureReason.FILLED_INTERNAL);
-        return applyFilledWithAutoClose(demand, demand.getStatus(), ClosureReason.FILLED_INTERNAL, comments, demandId);
+        assertTransitionPermissions(demand, DemandStatus.FILLED, ClosureReason.FILLED);
+        transitionValidator.validate(demand, DemandStatus.FILLED, ClosureReason.FILLED);
+        return applyFilledWithAutoClose(demand, demand.getStatus(), ClosureReason.FILLED, comments, demandId);
     }
 
     private DemandResponse applyFilledWithAutoClose(Demand demand, DemandStatus fromStatus,
                                                     ClosureReason fillReason, String comments, Long id) {
         demand.setIsFilled(true);
-        demand.setFillType(fillReason == ClosureReason.FILLED_INTERNAL ? FillType.INTERNAL : FillType.EXTERNAL);
+        demand.setFillType(fromStatus == DemandStatus.INTERNAL_SEARCH ? FillType.INTERNAL : FillType.EXTERNAL);
         demand.setClosureReason(fillReason.name());
         demand.setStatus(DemandStatus.FILLED);
         writeHistory(demand, fromStatus, DemandStatus.FILLED, fillReason.name(), comments);
@@ -415,8 +415,8 @@ public class DemandLifecycleService {
                 if (!SecurityUtils.hasAnyRole("TA_MANAGER", "ADMIN", "RMG")) {
                     throw new AccessDeniedException("Only TA Manager (or admin) may approve external offer (FILLED).");
                 }
-                if (closureReason != ClosureReason.FILLED_EXTERNAL) {
-                    throw new AccessDeniedException("External fill requires closureReason=FILLED_EXTERNAL.");
+                if (closureReason != ClosureReason.FILLED) {
+                    throw new AccessDeniedException("External fill requires closureReason=FILLED.");
                 }
             } else {
                 throw new AccessDeniedException("FILLED is only valid from INTERNAL_SEARCH or OPEN_EXTERNAL.");
