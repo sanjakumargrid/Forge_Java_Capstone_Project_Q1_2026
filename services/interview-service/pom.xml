@@ -154,7 +154,6 @@
 
     <build>
         <plugins>
-            <!-- This IS a runnable service — spring-boot-maven-plugin belongs here -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
