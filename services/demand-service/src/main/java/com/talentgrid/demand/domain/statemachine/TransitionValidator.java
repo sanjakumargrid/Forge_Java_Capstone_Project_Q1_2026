@@ -9,43 +9,18 @@ import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Enforces all business rules governing demand state transitions.
- *
- * <p>Three categories of validation are applied in order:
- * <ol>
- *   <li><b>Matrix check</b> — transition must be present in {@link DemandStateMachine}.</li>
- *   <li><b>RMG 5-business-day gate</b> — {@code INTERNAL_SEARCH → OPEN_EXTERNAL} is blocked
- *       until at least 5 business days have elapsed since {@code searchStartAt}.</li>
- *   <li><b>Closure reason enforcement</b> — the {@code closureReason} supplied must match
- *       the target state.</li>
- *   <li><b>ON_HOLD resume guard</b> — when resuming from {@code ON_HOLD}, the target must
- *       equal the demand's {@code previousStatus}.</li>
- * </ol>
- *
- * <p>All violations throw {@link IllegalDemandTransitionException} which maps to HTTP 400.
+ * Validates demand transitions: matrix, internal-search gate, closure reasons, ON_HOLD resume.
  */
 @Component
 public class TransitionValidator {
 
-    /**
-     * Maps each target {@link DemandStatus} to the only {@link ClosureReason} that is
-     * valid for that target.  States without a required reason are not present in the map.
-     */
-    private static final Map<DemandStatus, ClosureReason> REQUIRED_REASON_BY_TARGET;
-
-    static {
-        REQUIRED_REASON_BY_TARGET = new EnumMap<>(DemandStatus.class);
-        REQUIRED_REASON_BY_TARGET.put(DemandStatus.FILLED_INTERNAL, ClosureReason.FILLED_INTERNAL);
-        REQUIRED_REASON_BY_TARGET.put(DemandStatus.FILLED_EXTERNAL, ClosureReason.FILLED_EXTERNAL);
-        REQUIRED_REASON_BY_TARGET.put(DemandStatus.CANCELLED,       ClosureReason.CANCELLED);
-        REQUIRED_REASON_BY_TARGET.put(DemandStatus.ON_HOLD,         ClosureReason.ON_HOLD);
-        REQUIRED_REASON_BY_TARGET.put(DemandStatus.DUPLICATE,       ClosureReason.DUPLICATE);
-    }
+    private static final Set<ClosureReason> EARLY_OPEN_EXTERNAL_REASONS = EnumSet.of(
+            ClosureReason.NO_INTERNAL_MATCH,
+            ClosureReason.HM_REJECTED_NOMINATION);
 
     private final DemandStateMachine stateMachine;
 
@@ -53,18 +28,9 @@ public class TransitionValidator {
         this.stateMachine = stateMachine;
     }
 
-    /**
-     * Validates a requested status transition against all business rules.
-     *
-     * @param demand        the demand being transitioned (must not be {@code null})
-     * @param targetStatus  the desired next status
-     * @param closureReason the closure/transition reason supplied by the caller (may be {@code null})
-     * @throws IllegalDemandTransitionException if any rule is violated
-     */
     public void validate(Demand demand, DemandStatus targetStatus, ClosureReason closureReason) {
         DemandStatus currentStatus = demand.getStatus();
 
-        // ── 1. Matrix check ─────────────────────────────────────────────────────
         if (!stateMachine.canTransition(currentStatus, targetStatus)) {
             Set<DemandStatus> allowed = stateMachine.getAllowedTransitions(currentStatus);
             throw new IllegalDemandTransitionException(
@@ -72,27 +38,25 @@ public class TransitionValidator {
                             currentStatus, targetStatus, allowed));
         }
 
-        // ── 2. RMG 5-business-day internal-first gate ────────────────────────────
         if (currentStatus == DemandStatus.INTERNAL_SEARCH
                 && targetStatus == DemandStatus.OPEN_EXTERNAL) {
-            validateRmgFiveDayGate(demand);
+            validateInternalSearchToOpenExternal(demand, closureReason);
         }
 
-        // ── 3. Closure reason enforcement ────────────────────────────────────────
-        validateClosureReason(targetStatus, closureReason);
+        validateClosureReason(currentStatus, targetStatus, closureReason);
 
-        // ── 4. ON_HOLD resume guard ──────────────────────────────────────────────
         if (currentStatus == DemandStatus.ON_HOLD) {
             validateOnHoldResume(demand, targetStatus);
         }
     }
 
-    // ─── Private helpers ────────────────────────────────────────────────────────
+    private void validateInternalSearchToOpenExternal(Demand demand, ClosureReason closureReason) {
+        if (closureReason != null && EARLY_OPEN_EXTERNAL_REASONS.contains(closureReason)) {
+            return;
+        }
+        validateRmgFiveDayGate(demand);
+    }
 
-    /**
-     * Blocks {@code INTERNAL_SEARCH → OPEN_EXTERNAL} if fewer than 5 business days
-     * have elapsed since {@code searchStartAt}.  Weekends are excluded from the count.
-     */
     private void validateRmgFiveDayGate(Demand demand) {
         OffsetDateTime searchStartAt = demand.getSearchStartAt();
         if (searchStartAt == null) {
@@ -104,16 +68,13 @@ public class TransitionValidator {
         if (businessDaysElapsed < 5) {
             throw new IllegalDemandTransitionException(
                     String.format(
-                            "RMG internal-first gate: OPEN_EXTERNAL transition requires 5 business days " +
-                            "since internal search started. Only %d business day(s) have elapsed.",
+                            "Internal search gate: OPEN_EXTERNAL requires 5 business days since search started "
+                                    + "unless closureReason is NO_INTERNAL_MATCH or HM_REJECTED_NOMINATION. "
+                                    + "Only %d business day(s) have elapsed.",
                             businessDaysElapsed));
         }
     }
 
-    /**
-     * Counts the number of business days (Mon–Fri) between {@code startInclusive}
-     * and {@code endExclusive} (exclusive of the end date).
-     */
     private int countBusinessDays(LocalDate start, LocalDate end) {
         int count = 0;
         LocalDate current = start;
@@ -127,17 +88,61 @@ public class TransitionValidator {
         return count;
     }
 
-    /**
-     * Validates that the provided {@code closureReason} matches the expected reason
-     * for the given {@code targetStatus}.  If the target state requires a specific reason
-     * and none (or a mismatched one) is supplied, an exception is thrown.
-     */
-    private void validateClosureReason(DemandStatus targetStatus, ClosureReason closureReason) {
-        ClosureReason required = REQUIRED_REASON_BY_TARGET.get(targetStatus);
-        if (required == null) {
-            // Target state does not require a reason — any value (including null) is fine.
+    private void validateClosureReason(DemandStatus fromStatus, DemandStatus targetStatus,
+                                       ClosureReason closureReason) {
+        if (targetStatus == DemandStatus.FILLED) {
+            if (closureReason != ClosureReason.FILLED_INTERNAL
+                    && closureReason != ClosureReason.FILLED_EXTERNAL) {
+                throw new IllegalDemandTransitionException(
+                        String.format("Transition to FILLED requires closureReason FILLED_INTERNAL or FILLED_EXTERNAL, got %s.",
+                                closureReason));
+            }
             return;
         }
+
+        if (targetStatus == DemandStatus.ON_HOLD) {
+            requireExact(closureReason, ClosureReason.ON_HOLD, DemandStatus.ON_HOLD);
+            return;
+        }
+
+        if (targetStatus == DemandStatus.CLOSED) {
+            validateClosedReason(fromStatus, closureReason);
+            return;
+        }
+
+    }
+
+    private void validateClosedReason(DemandStatus fromStatus, ClosureReason closureReason) {
+        if (closureReason == null) {
+            throw new IllegalDemandTransitionException(
+                    "Transition to CLOSED requires a closureReason.");
+        }
+        switch (fromStatus) {
+            case FILLED -> {
+                if (closureReason != ClosureReason.AUTO_CLOSED_AFTER_FILL) {
+                    throw new IllegalDemandTransitionException(
+                            "Transition from FILLED to CLOSED requires closureReason=AUTO_CLOSED_AFTER_FILL.");
+                }
+            }
+            case PENDING_APPROVAL -> {
+                if (closureReason != ClosureReason.PM_REJECTED
+                        && closureReason != ClosureReason.SLA_APPROVAL_BREACH) {
+                    throw new IllegalDemandTransitionException(
+                            "Transition from PENDING_APPROVAL to CLOSED requires closureReason=PM_REJECTED or SLA_APPROVAL_BREACH.");
+                }
+            }
+            case ON_HOLD -> {
+                if (closureReason != ClosureReason.RM_CLOSED_ON_HOLD) {
+                    throw new IllegalDemandTransitionException(
+                            "Transition from ON_HOLD to CLOSED requires closureReason=RM_CLOSED_ON_HOLD.");
+                }
+            }
+            default -> throw new IllegalDemandTransitionException(
+                    "Unsupported transition to CLOSED from status: " + fromStatus);
+        }
+    }
+
+    private void requireExact(ClosureReason closureReason, ClosureReason required, DemandStatus targetStatus) {
         if (closureReason == null) {
             throw new IllegalDemandTransitionException(
                     String.format("Transition to %s requires closureReason=%s, but none was provided.",
@@ -150,15 +155,9 @@ public class TransitionValidator {
         }
     }
 
-    /**
-     * When resuming from {@code ON_HOLD}, ensures the target status matches
-     * the demand's {@code previousStatus} to prevent illegal state jumps.
-     */
     private void validateOnHoldResume(Demand demand, DemandStatus targetStatus) {
-        // Resuming = transitioning back to an active search state
         if (targetStatus != DemandStatus.INTERNAL_SEARCH
                 && targetStatus != DemandStatus.OPEN_EXTERNAL) {
-            // Not a resume — cancel/close from ON_HOLD requires no extra guard.
             return;
         }
 
@@ -170,8 +169,7 @@ public class TransitionValidator {
         if (targetStatus != previous) {
             throw new IllegalDemandTransitionException(
                     String.format(
-                            "ON_HOLD resume guard: demand was in %s before being held. " +
-                            "It can only resume to %s, not %s.",
+                            "ON_HOLD resume guard: demand was in %s before being held. It can only resume to %s, not %s.",
                             previous, previous, targetStatus));
         }
     }

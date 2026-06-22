@@ -162,7 +162,7 @@ class DemandMapperFillTest {
         Demand demand = new Demand();
         demand.setDemandId(1L);
         demand.setTitle("Senior Java Developer");
-        demand.setStatus(isFilled ? DemandStatus.FILLED_INTERNAL : DemandStatus.INTERNAL_SEARCH);
+        demand.setStatus(isFilled ? DemandStatus.CLOSED : DemandStatus.INTERNAL_SEARCH);
         demand.setIsFilled(isFilled);
         demand.setFillType(fillType);
         demand.setIsDeleted(false);

@@ -22,6 +22,10 @@ public class GeminiEmbeddingService {
     private String embeddingModel;
 
     public float[] embedContent(String text) {
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Gemini API key is not set (GEMINI_API_KEY); skipping embedding");
+            return new float[0];
+        }
         log.debug("Calling Gemini API to embed text: {}", text.substring(0, Math.min(50, text.length())));
         
         EmbedContentRequest request = EmbedContentRequest.of(embeddingModel, text);

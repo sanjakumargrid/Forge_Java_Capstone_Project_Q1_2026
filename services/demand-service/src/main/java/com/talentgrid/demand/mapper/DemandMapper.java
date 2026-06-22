@@ -60,6 +60,7 @@ public class DemandMapper {
         // Defaults set by business rule
         demand.setStatus(DemandStatus.DRAFT);
         demand.setIsFilled(false);
+        demand.setBenchHiring(Boolean.TRUE.equals(request.getBenchHiring()));
         demand.setIsDeleted(false);
         return demand;
     }
@@ -93,6 +94,7 @@ public class DemandMapper {
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
         if (request.getSearchStartAt() != null) demand.setSearchStartAt(request.getSearchStartAt());
+        if (request.getBenchHiring() != null) demand.setBenchHiring(request.getBenchHiring());
     }
 
     // ─── Demand → DemandResponse ────────────────────────────────────────────────
@@ -138,6 +140,7 @@ public class DemandMapper {
         response.setOnboardingDate(demand.getOnboardingDate());
         response.setIsFilled(demand.getIsFilled());
         response.setFillType(enumName(demand.getFillType()));
+        response.setBenchHiring(demand.getBenchHiring());
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setPreviousStatus(enumName(demand.getPreviousStatus()));

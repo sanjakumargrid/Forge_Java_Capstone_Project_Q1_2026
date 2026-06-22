@@ -24,10 +24,14 @@
 | GET | `/demands/{id}` | `DEMAND_VIEW` | Get demand detail |
 | PATCH | `/demands/{id}` | `DEMAND_UPDATE` | Update editable demand fields |
 | DELETE | `/demands/{id}` | `DEMAND_DELETE` | Soft delete draft demand |
-| POST | `/demands/{id}/approve` | `DEMAND_APPROVE` | Approve or reject demand |
+| POST | `/demands/{id}/submit` | `DEMAND_SUBMIT` or `DEMAND_PM_APPROVE` | Submit from draft (HM vs PM auto-approve) |
+| POST | `/demands/{id}/approve` | `DEMAND_PM_APPROVE` | PM for the demand's project approves or rejects (`CLOSED` + `PM_REJECTED`) |
 | PUT | `/project-manager/demands/{demandId}/approve` | `DEMAND_PM_APPROVE` | PM approves pending demand for own project |
 | PATCH | `/demands/{id}/status` | `DEMAND_STATUS_TRANSITION` | Perform legal workflow transition |
 | GET | `/demands/{id}/pipeline` | `DEMAND_PIPELINE_VIEW` | Unified hiring pipeline view |
+| GET | `/demands/{id}/history` | `DEMAND_VIEW` | Status history audit trail |
+| POST | `/demands/{id}/nominations` | `DEMAND_NOMINATE` or `DEMAND_STATUS_TRANSITION` | RM internal nomination |
+| POST | `/demands/{id}/nominations/{nid}/hm-decision` | `DEMAND_HM_NOMINATION_DECIDE` or `DEMAND_STATUS_TRANSITION` | HM accept/reject nomination |
 | GET | `/analytics/demands` | `ANALYTICS_DEMAND_VIEW` | Demand analytics dashboard |
 | GET | `/audit/logs` | `AUDIT_VIEW` | Search audit logs |
 | GET | `/notifications` | `NOTIFICATION_VIEW` | Get user notifications |

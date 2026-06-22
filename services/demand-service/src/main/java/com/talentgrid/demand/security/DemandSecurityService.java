@@ -12,10 +12,6 @@ import java.util.Optional;
 
 /**
  * Custom Spring Security component for evaluating data-level (scoped) permissions.
- * Evaluates rules defined in the demand-permissions.md matrix.
- * 
- * Used in @PreAuthorize annotations, e.g.:
- * @PreAuthorize("hasAuthority('DEMAND_UPDATE') and @demandSecurity.isOwnerOrAdmin(#id)")
  */
 @Component("demandSecurity")
 public class DemandSecurityService {
@@ -27,32 +23,25 @@ public class DemandSecurityService {
         this.demandRepository = demandRepository;
     }
 
-    /**
-     * Checks if the currently authenticated user is the creator of the specified demand.
-     * Used for scoped permissions (⚡) where HMs can only edit/delete their own demands.
-     *
-     * @param demandId the ID of the demand
-     * @return true if the current user created the demand, false otherwise
-     */
     public boolean isOwner(Long demandId) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         if (currentUserId == null) {
             return false;
         }
 
-        Optional<Demand> demandOpt = demandRepository.findById(demandId);
+        Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
         if (demandOpt.isEmpty()) {
-            return false; // Let the controller throw 404
+            return false;
         }
 
         Demand demand = demandOpt.get();
         boolean isOwner = currentUserId.equals(demand.getCreatedBy());
-        
+
         if (!isOwner) {
-            log.warn("User {} denied scoped access to demand {} (owner: {})", 
+            log.warn("User {} denied scoped access to demand {} (owner: {})",
                     currentUserId, demandId, demand.getCreatedBy());
         }
-        
+
         return isOwner;
     }
 
@@ -63,15 +52,12 @@ public class DemandSecurityService {
         return isOwner(demandId);
     }
 
-    /**
-     * Checks if the user can view the demand based on their role and the demand's status.
-     */
     public boolean canView(Long demandId) {
         if (isOwnerOrHasGlobalAccess(demandId)) {
             return true;
         }
 
-        Optional<Demand> demandOpt = demandRepository.findById(demandId);
+        Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
         if (demandOpt.isEmpty()) {
             return false;
         }
@@ -80,17 +66,16 @@ public class DemandSecurityService {
         DemandStatus status = demand.getStatus();
 
         if (SecurityUtils.hasAnyRole("RECRUITER")) {
-            return status == DemandStatus.OPEN_EXTERNAL ||
-                   status == DemandStatus.FILLED_PARTIALLY ||
-                   status == DemandStatus.FILLED_EXTERNAL ||
-                   status == DemandStatus.CLOSED;
+            return status == DemandStatus.OPEN_EXTERNAL
+                    || status == DemandStatus.FILLED
+                    || status == DemandStatus.CLOSED;
         }
 
         if (SecurityUtils.hasAnyRole("EMPLOYEE")) {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        if (SecurityUtils.hasAnyRole("HM")) {
+        if (SecurityUtils.isHiringManager()) {
             Long userAccountId = SecurityUtils.getCurrentUserAccountId();
             if (userAccountId != null && userAccountId.equals(demand.getAccountId())) {
                 return true;
@@ -98,36 +83,48 @@ public class DemandSecurityService {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        // Default fallback
         return status == DemandStatus.OPEN_EXTERNAL;
     }
 
     /**
-     * Checks if the user is authorized to perform state transitions on the demand.
+     * True when the caller may call PATCH /status for this demand (fine-grained checks also run in service).
      */
     public boolean canTransition(Long demandId) {
         if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
             return true;
         }
+        Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
+        if (demandOpt.isEmpty()) {
+            return false;
+        }
+        Demand demand = demandOpt.get();
+        DemandStatus status = demand.getStatus();
+
+        if (isOwner(demandId) && status != DemandStatus.CLOSED) {
+            return true;
+        }
+
+        if (SecurityUtils.hasAnyRole("PROJECT_MANAGER")) {
+            return true;
+        }
+
+        if (SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM")) {
+            return status == DemandStatus.INTERNAL_SEARCH
+                    || status == DemandStatus.ON_HOLD
+                    || status == DemandStatus.OPEN_EXTERNAL;
+        }
+
+        if (SecurityUtils.hasAnyRole("TA_MANAGER")) {
+            return status == DemandStatus.OPEN_EXTERNAL;
+        }
 
         if (SecurityUtils.hasAnyRole("RECRUITER")) {
-            Optional<Demand> demandOpt = demandRepository.findById(demandId);
-            if (demandOpt.isEmpty()) {
-                return false;
-            }
-            DemandStatus status = demandOpt.get().getStatus();
-            // Recruiters can transition demands that are actively recruiting externally
-            return status == DemandStatus.OPEN_EXTERNAL ||
-                   status == DemandStatus.FILLED_PARTIALLY;
+            return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.ON_HOLD;
         }
 
         return false;
     }
 
-    /**
-     * Checks if the user is authorized to close or cancel a demand.
-     * Only RMG and ADMIN roles have this permission.
-     */
     public boolean canCloseOrCancel() {
         return SecurityUtils.hasAnyRole("ADMIN", "RMG");
     }

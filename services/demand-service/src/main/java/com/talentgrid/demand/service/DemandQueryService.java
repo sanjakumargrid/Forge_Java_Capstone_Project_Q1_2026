@@ -132,12 +132,11 @@ public class DemandQueryService {
             if (!SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
                 if (SecurityUtils.hasAnyRole("RECRUITER")) {
                     predicates.add(root.get("status").in(
-                        DemandStatus.OPEN_EXTERNAL, 
-                        DemandStatus.FILLED_PARTIALLY, 
-                        DemandStatus.FILLED_EXTERNAL, 
+                        DemandStatus.OPEN_EXTERNAL,
+                        DemandStatus.FILLED,
                         DemandStatus.CLOSED
                     ));
-                } else if (SecurityUtils.hasAnyRole("HM")) {
+                } else if (SecurityUtils.isHiringManager()) {
                     Long userAccountId = SecurityUtils.getCurrentUserAccountId();
                     if (userAccountId != null) {
                         predicates.add(cb.or(

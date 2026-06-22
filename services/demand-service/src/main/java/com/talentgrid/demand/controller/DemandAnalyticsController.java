@@ -66,7 +66,7 @@ public class DemandAnalyticsController {
      *
      * <p>Metrics returned:
      * <ul>
-     *   <li>fillRate: % of filled demands (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY) / total non-cancelled</li>
+     *   <li>fillRate: % of demands that reached {@code FILLED} / demands created in window</li>
      *   <li>avgTimeToFillDays: average days from creation to first FILLED_* status transition</li>
      *   <li>internalVsExternalSplit: counts and % breakdown by closure reason</li>
      *   <li>capacityByProjectClient: demand counts grouped by projectId + clientId</li>

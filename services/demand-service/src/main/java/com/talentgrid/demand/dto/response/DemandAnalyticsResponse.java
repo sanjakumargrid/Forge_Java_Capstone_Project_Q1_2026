@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
  *   <li>{@code draftCount}              — demands in DRAFT status</li>
  *   <li>{@code pendingApprovalCount}    — demands awaiting approval</li>
  *   <li>{@code activeSearchCount}       — demands in INTERNAL_SEARCH or OPEN_EXTERNAL</li>
- *   <li>{@code filledCount}             — demands in FILLED_INTERNAL/EXTERNAL/PARTIALLY</li>
- *   <li>{@code cancelledCount}          — cancelled demands</li>
+ *   <li>{@code filledCount}             — demands that reached {@code FILLED} / terminal filled closure</li>
+ *   <li>{@code cancelledCount}        — legacy counter (often zero; withdrawn flows use CLOSED)</li>
  *   <li>{@code onHoldCount}             — demands on hold</li>
  *   <li>{@code closedCount}             — closed (terminal) demands</li>
- *   <li>{@code fillRatePercent}         — percentage of demands reaching FILLED states</li>
+ *   <li>{@code fillRatePercent}         — percentage of demands reaching a filled outcome</li>
  *   <li>{@code avgTimeToFillDays}       — average days from creation to filled closure</li>
  *   <li>{@code totalInternalFilled}     — aggregate internal filled positions</li>
  *   <li>{@code totalExternalFilled}     — aggregate external filled positions</li>

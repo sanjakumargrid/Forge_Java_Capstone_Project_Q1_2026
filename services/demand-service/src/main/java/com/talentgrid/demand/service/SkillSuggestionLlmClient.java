@@ -41,6 +41,11 @@ public class SkillSuggestionLlmClient {
         String systemPrompt = promptBuilder.buildSystemPrompt();
         String userPrompt = promptBuilder.buildUserPrompt(jobDescriptionText, jobTitle, level, experienceYears, candidates);
 
+        if (apiKey == null || apiKey.isBlank()) {
+            log.warn("Gemini API key is not set (GEMINI_API_KEY); returning empty skill suggestions");
+            return new AiSkillSuggestionResponse(new ArrayList<>(), new ArrayList<>());
+        }
+
         GenerateContentRequest request = new GenerateContentRequest();
         
         GenerateContentRequest.Content systemInstruction = new GenerateContentRequest.Content(

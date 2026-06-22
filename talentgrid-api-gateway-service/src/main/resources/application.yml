@@ -1,6 +1,8 @@
 server:
   port: ${PORT:8080}
 spring:
+  config:
+    import: optional:file:../../.env
   application:
     name: talentgrid-api-gateway-service
   data:
@@ -30,25 +32,25 @@ spring:
           predicates:
             - "Path=/api/v1/auth/**, /talentgrid/auth/**"
           filters:
-            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - "RewritePath=/(api/v1|talentgrid)/auth(?<rest>/?.*), /api/auth${rest}"
         - id: user-auth-service-frontend-rewrite
           uri: http://${USER_AUTH_SERVICE_HOST:localhost}:8081
           predicates:
             - "Path=/talentgrid/login, /talentgrid/register, /talentgrid/logout, /talentgrid/refresh"
           filters:
-            - "RewritePath=/talentgrid/(?<segment>.*), /api/v1/auth/${segment}"
+            - "RewritePath=/talentgrid/(?<segment>.*), /api/auth/${segment}"
         - id: user-auth-admin
           uri: http://${USER_AUTH_SERVICE_HOST:localhost}:8081
           predicates:
             - "Path=/api/v1/admin/**, /talentgrid/admin/**"
           filters:
-            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - "RewritePath=/(api/v1|talentgrid)/(?<segment>admin/.*), /api/${segment}"
         - id: demand-analytics
           uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
           predicates:
             - "Path=/api/v1/analytics/demands, /talentgrid/analytics/demands"
           filters:
-            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - "RewritePath=/(api/v1|talentgrid)/analytics/demands, /api/analytics/demands"
         - id: demand-scorecards-to-interview
           uri: http://${INTERVIEW_SERVICE_HOST:localhost}:8087
           predicates:
@@ -61,14 +63,20 @@ spring:
             - "Path=/api/v1/project-manager/**, /talentgrid/project-manager/**"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/project-manager/(?<segment>.*), /api/project-manager/${segment}"
+        - id: demand-service-lookups
+          uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
+          predicates:
+            - "Path=/api/v1/lookups/**, /talentgrid/lookups/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/lookups(?<rest>/?.*), /api/lookups${rest}"
         - id: demand-service
           uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
           predicates:
             - "Path=/api/v1/demands/**, /talentgrid/demands/**"
           filters:
-            - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - "RewritePath=/(api/v1|talentgrid)/demands(?<rest>/?.*), /api/demands${rest}"
         - id: notification-service
-          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:8083
+          uri: http://${NOTIFICATION_SERVICE_HOST:localhost}:8085
           predicates:
             - "Path=/api/v1/notifications/**, /talentgrid/notifications/**"
           filters:

@@ -15,9 +15,9 @@ import java.util.List;
  *
  * <p>Metrics returned:
  * <ul>
- *   <li>fillRate: % of filled demands (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY) / total non-cancelled</li>
- *   <li>avgTimeToFillDays: average days from creation to first FILLED_* status transition</li>
- *   <li>internalVsExternalSplit: counts and % breakdown by closure reason</li>
+ *   <li>fillRate: % of demands that reached {@code FILLED} at least once / total demands created in window</li>
+ *   <li>avgTimeToFillDays: average days from creation to first {@code FILLED} status transition</li>
+ *   <li>internalVsExternalSplit: counts by persisted {@code fill_type} ({@code INTERNAL} vs {@code EXTERNAL})</li>
  *   <li>capacityByProjectClient: demand counts grouped by projectId + clientId (account)</li>
  * </ul>
  *
@@ -66,10 +66,10 @@ public class DemandAnalyticsV1Response {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class FillRate {
-        /** Total non-cancelled demands (excludes CANCELLED, DUPLICATE) */
+        /** Total demands created in the window (non-deleted). */
         private long totalDemands;
 
-        /** Demands with status in (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY) */
+        /** Demands that reached {@code FILLED} at least once (first history transition). */
         private long filledDemands;
 
         /** Percentage filled: (filledDemands / totalDemands) * 100; 0 if totalDemands == 0 */
@@ -81,10 +81,10 @@ public class DemandAnalyticsV1Response {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class InternalVsExternalSplit {
-        /** Count of demands with closureReason = 'FILLED_INTERNAL' */
+        /** Count of filled demands with {@code fill_type = INTERNAL}. */
         private long filledInternal;
 
-        /** Count of demands with closureReason = 'FILLED_EXTERNAL' */
+        /** Count of filled demands with {@code fill_type = EXTERNAL}. */
         private long filledExternal;
 
         /** Percentage internal: (filledInternal / (filledInternal + filledExternal)) * 100 */

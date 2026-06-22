@@ -55,7 +55,7 @@ class DemandQueryServicePipelineTest {
 
     @Test
     void getPipeline_isFilledTrueWithInternalFillType() {
-        Demand demand = buildDemand(2L, true, FillType.INTERNAL, DemandStatus.FILLED_INTERNAL);
+        Demand demand = buildDemand(2L, true, FillType.INTERNAL, DemandStatus.CLOSED);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(2L)).thenReturn(Optional.of(demand));
 
         DemandPipelineResponse pipeline = queryService.getPipeline(2L);
@@ -66,7 +66,7 @@ class DemandQueryServicePipelineTest {
 
     @Test
     void getPipeline_isFilledTrueWithExternalFillType() {
-        Demand demand = buildDemand(3L, true, FillType.EXTERNAL, DemandStatus.FILLED_EXTERNAL);
+        Demand demand = buildDemand(3L, true, FillType.EXTERNAL, DemandStatus.CLOSED);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(3L)).thenReturn(Optional.of(demand));
 
         DemandPipelineResponse pipeline = queryService.getPipeline(3L);

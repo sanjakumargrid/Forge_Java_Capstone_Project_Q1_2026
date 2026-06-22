@@ -67,7 +67,8 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                         case "DEMAND_EXTERNAL_OPENED" -> translateDemandExternalOpened(demand, correlationId);
                         case "DEMAND_CLOSED" -> translateDemandClosed(demand, correlationId);
                         case "DEMAND_APPROVAL_REMINDER" -> translateApprovalReminder(demand, correlationId);
-                        case "DEMAND_AUTO_CANCELLED" -> translateAutoCancelled(demand, correlationId);
+                        case "DEMAND_APPROVAL_SLA_CLOSED", "DEMAND_AUTO_CANCELLED" -> translateApprovalSlaClosed(demand, correlationId);
+                        case "DEMAND_FILLED" -> translateDemandFilled(demand, correlationId);
                         default -> log.debug(
                                         "[DEMAND-TRANSLATOR] No notification mapping for eventType='{}' — skipping",
                                         eventType);
@@ -442,30 +443,29 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
         }
 
         /**
-         * DEMAND_AUTO_CANCELLED (72h): sends cancellation notification to PM and
-         * Creator.
+         * 72h approval SLA: demand auto-closed (CLOSED + SLA_APPROVAL_BREACH).
          */
-        private void translateAutoCancelled(DemandPayload demand, String correlationId) {
+        private void translateApprovalSlaClosed(DemandPayload demand, String correlationId) {
                 // ── PM ───────────────────────────────────────────────────────────────────
                 if (demand.getPmUserId() != null && demand.getPmEmail() != null) {
                         notificationEventPublisher.sendInAppAndEmail(
                                         String.valueOf(demand.getPmUserId()),
                                         demand.getPmEmail(),
                                         demand.getPmSlackId(),
-                                        "DEMAND_AUTO_CANCELLED",
-                                        "Demand Auto-Cancelled (72h SLA Breach): " + demand.getTitle(),
+                                        "DEMAND_APPROVAL_SLA_CLOSED",
+                                        "Demand Auto-Closed (72h Approval SLA): " + demand.getTitle(),
                                         String.format(
-                                                        "Demand '%s' (ID: %d) was automatically cancelled because it remained "
+                                                        "Demand '%s' (ID: %d) was automatically closed because it remained "
                                                                         +
                                                                         "in PENDING_APPROVAL for more than 72 hours without a decision. "
                                                                         +
-                                                                        "Reason: SLA Auto-Cancellation.",
+                                                                        "Reason: SLA approval breach (terminal CLOSED).",
                                                         safe(demand.getTitle()), demand.getDemandId()),
                                         "demand-service",
                                         demand.getDemandId() != null ? demand.getDemandId().toString() : null,
                                         "DEMAND",
                                         "HIGH",
-                                        "demand-auto-cancelled",
+                                        "demand-approval-sla-closed",
                                         Map.of(
                                                         "demandId",
                                                         safe(demand.getDemandId() != null
@@ -484,20 +484,20 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                                         demand.getCreatedBy().toString(),
                                         demand.getRecipientEmail(),
                                         demand.getRecipientSlackId(),
-                                        "DEMAND_AUTO_CANCELLED",
-                                        "Your Demand Was Auto-Cancelled (72h SLA Breach): " + demand.getTitle(),
+                                        "DEMAND_APPROVAL_SLA_CLOSED",
+                                        "Your Demand Was Auto-Closed (72h Approval SLA): " + demand.getTitle(),
                                         String.format(
-                                                        "Your demand '%s' (ID: %d) was automatically cancelled because it "
+                                                        "Your demand '%s' (ID: %d) was automatically closed because it "
                                                                         +
-                                                                        "remained in PENDING_APPROVAL for over 72 hours. "
+                                                                        "remained in PENDING_APPROVAL for over 72 hours without PM action. "
                                                                         +
-                                                                        "You may re-create the demand if still needed.",
+                                                                        "You may submit again if still needed.",
                                                         safe(demand.getTitle()), demand.getDemandId()),
                                         "demand-service",
                                         demand.getDemandId() != null ? demand.getDemandId().toString() : null,
                                         "DEMAND",
                                         "HIGH",
-                                        "demand-auto-cancelled",
+                                        "demand-approval-sla-closed",
                                         Map.of(
                                                         "demandId",
                                                         safe(demand.getDemandId() != null
@@ -510,7 +510,41 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                                         correlationId);
                 }
 
-                log.info("[DEMAND-TRANSLATOR] ✓ AUTO_CANCELLED notifications published | demandId={}",
+                log.info("[DEMAND-TRANSLATOR] ✓ APPROVAL_SLA_CLOSED notifications published | demandId={}",
+                                demand.getDemandId());
+        }
+
+        private void translateDemandFilled(DemandPayload demand, String correlationId) {
+                warnIfRecipientEmailMissing(demand, "DEMAND_FILLED");
+                warnIfRecipientSlackIdMissing(demand, "DEMAND_FILLED");
+
+                String fillType = demand.getFillType() != null ? demand.getFillType() : "Unknown";
+                String title = "Demand Filled: " + demand.getTitle();
+                String message = String.format(
+                                "Your demand '%s' (ID: %d) has been filled (%s). It will auto-close in the workflow.",
+                                safe(demand.getTitle()),
+                                demand.getDemandId(),
+                                fillType);
+
+                notificationEventPublisher.sendInAppAndEmail(
+                                demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : demand.getRaisedBy(),
+                                demand.getRecipientEmail(),
+                                demand.getRecipientSlackId(),
+                                "DEMAND_FILLED",
+                                title,
+                                message,
+                                "demand-service",
+                                demand.getDemandId() != null ? demand.getDemandId().toString() : null,
+                                "DEMAND",
+                                "NORMAL",
+                                "demand-filled",
+                                Map.of(
+                                                "demandTitle", safe(demand.getTitle()),
+                                                "fillType", fillType,
+                                                "closureReason", safe(demand.getClosureReason(), "")),
+                                correlationId);
+
+                log.info("[DEMAND-TRANSLATOR] ✓ DEMAND_FILLED notification published | demandId={}",
                                 demand.getDemandId());
         }
 

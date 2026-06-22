@@ -124,6 +124,35 @@ class DemandLifecycleServicePmApprovalTest {
     }
 
     @Test
+    void approve_whenUserIsProjectManager_sameAsPmRoute_usesDemandsAuditEndpoint() {
+        login(42L);
+        Demand demand = pendingDemand(7L, 100L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(7L)).thenReturn(Optional.of(demand));
+        when(userAuthServiceClient.getProjectById(100L)).thenReturn(
+                ProjectDto.builder().id(100L).projectManagerId(42L).build());
+        doNothing().when(transitionValidator).validate(any(Demand.class), any(DemandStatus.class), any());
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder()
+                    .demandId(saved.getDemandId())
+                    .status(saved.getStatus().name())
+                    .build();
+        });
+
+        ApprovalRequest body = ApprovalRequest.builder()
+                .decision(DemandStatus.APPROVED)
+                .build();
+
+        DemandResponse response = lifecycleService.approve(7L, body);
+
+        assertEquals("INTERNAL_SEARCH", response.getStatus());
+        ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
+        verify(auditLogClient).logAction(auditCap.capture());
+        assertTrue(auditCap.getValue().getEndpoint().contains("/api/demands/7/approve"));
+    }
+
+    @Test
     void approveAsProjectManager_whenDifferentProjectManager_throwsAccessDenied() {
         login(1L);
         Demand demand = pendingDemand(7L, 100L);

@@ -2,6 +2,7 @@ package com.talentgrid.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -59,7 +60,12 @@ public class User implements Serializable {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @Column(nullable = false)
+    /**
+     * Incremented when permissions change; embedded in JWT for invalidation.
+     * DB default avoids failed {@code ddl-auto=update} when adding NOT NULL to a non-empty {@code users} table.
+     */
+    @Column(name = "auth_version", nullable = false)
+    @ColumnDefault("1")
     @Builder.Default
     private Long authVersion = 1L;
 

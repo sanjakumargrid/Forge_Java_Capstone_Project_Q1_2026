@@ -61,25 +61,6 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
         */
        long countByStatusAndIsDeletedFalse(DemandStatus status);
 
-       /**
-        * Sums internal filled counts across all non-deleted demands.
-        */
-       @Query("SELECT COALESCE(SUM(d.internalFilledCount), 0) FROM Demand d WHERE d.isDeleted = false")
-       long sumInternalFilledCount();
-
-       /**
-        * Sums external filled counts across all non-deleted demands.
-        */
-       @Query("SELECT COALESCE(SUM(d.externalFilledCount), 0) FROM Demand d WHERE d.isDeleted = false")
-       long sumExternalFilledCount();
-
-       /**
-        * Average time-to-fill in days for CLOSED demands that have a closureReason of
-        * FILLED_*.
-        * Calculated as the difference between createdAt and updatedAt (closure
-        * timestamp).
-        */
-
        // ─── Position-Level Analytics Queries (for Dashboard Metrics)
        // ──────────────────
 
@@ -141,10 +122,9 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
        /**
         * Average time-to-fill in days for demands that have filled positions in the
         * given date range.
-        * Time-to-fill = (earliest FILLED_* status transition timestamp -
+        * Time-to-fill = (earliest transition to {@code FILLED} timestamp -
         * demand.created_at)
-        * Uses demand_status_history to find the exact timestamp of the first FILLED_*
-        * transition.
+        * Uses demand_status_history to find the exact timestamp of the first transition to {@code FILLED}.
         */
        @Query(value = "SELECT COALESCE(AVG(EXTRACT(EPOCH FROM (history.changed_at - d.created_at)) / 86400), 0) " +
                      "FROM demands d " +
@@ -152,10 +132,10 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
                      "WHERE d.is_deleted = false " +
                      "AND CAST(d.created_at AS DATE) >= CAST(:startDate AS DATE) " +
                      "AND CAST(d.created_at AS DATE) <= CAST(:endDate AS DATE) " +
-                     "AND history.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+                     "AND history.to_status = 'FILLED' " +
                      "AND history.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id "
                      +
-                     "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY'))", nativeQuery = true)
+                     "  AND h2.to_status = 'FILLED')", nativeQuery = true)
        double averageTimeToFillBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
        /**
@@ -168,10 +148,10 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
                      "WHERE d.is_deleted = false " +
                      "AND CAST(d.created_at AS DATE) >= CAST(:startDate AS DATE) " +
                      "AND CAST(d.created_at AS DATE) <= CAST(:endDate AS DATE) " +
-                     "AND history.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+                     "AND history.to_status = 'FILLED' " +
                      "AND history.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id "
                      +
-                     "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY'))", nativeQuery = true)
+                     "  AND h2.to_status = 'FILLED')", nativeQuery = true)
        double minTimeToFillBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
        /**
@@ -184,10 +164,10 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
                      "WHERE d.is_deleted = false " +
                      "AND CAST(d.created_at AS DATE) >= CAST(:startDate AS DATE) " +
                      "AND CAST(d.created_at AS DATE) <= CAST(:endDate AS DATE) " +
-                     "AND history.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+                     "AND history.to_status = 'FILLED' " +
                      "AND history.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id "
                      +
-                     "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY'))", nativeQuery = true)
+                     "  AND h2.to_status = 'FILLED')", nativeQuery = true)
        double maxTimeToFillBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
     /**
@@ -208,18 +188,16 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
      */
     @Query(value = "SELECT COALESCE(AVG(EXTRACT(EPOCH FROM (updated_at - created_at)) / 86400), 0) " +
             "FROM demands WHERE is_deleted = false AND status = 'CLOSED' " +
-            "AND closure_reason IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL')", nativeQuery = true)
+            "AND is_filled = true AND fill_type IS NOT NULL", nativeQuery = true)
     double averageTimeToFillDays();
 
     // ── V1 Analytics Endpoint Queries ────────────────────────────────────────────────
 
     /**
-     * Count total non-cancelled demands (excludes CANCELLED, DUPLICATE).
-     * Filters: optional dateFrom, dateTo, businessUnit.
+     * Count demands in scope for fill-rate denominator (non-deleted, created in window).
      */
     @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
             "WHERE d.is_deleted = false " +
-            "AND d.status NOT IN ('CANCELLED', 'DUPLICATE') " +
             "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
             "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
             "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
@@ -230,16 +208,14 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
             @Param("businessUnit") String businessUnit);
 
     /**
-     * Count demands with FILLED status (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY).
-     * Uses status_history to find first transition to FILLED_* state.
-     * Filters: optional dateFrom, dateTo, businessUnit.
+     * Count demands that reached {@code FILLED} at least once (first transition in history).
      */
     @Query(value = "SELECT COUNT(DISTINCT d.demand_id) FROM demands d " +
             "INNER JOIN demand_status_history h ON d.demand_id = h.demand_id " +
             "WHERE d.is_deleted = false " +
-            "AND h.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+            "AND h.to_status = 'FILLED' " +
             "AND h.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id " +
-            "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY')) " +
+            "  AND h2.to_status = 'FILLED') " +
             "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
             "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
             "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
@@ -257,9 +233,9 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
             "FROM demands d " +
             "INNER JOIN demand_status_history h ON d.demand_id = h.demand_id " +
             "WHERE d.is_deleted = false " +
-            "AND h.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY') " +
+            "AND h.to_status = 'FILLED' " +
             "AND h.id = (SELECT MIN(h2.id) FROM demand_status_history h2 WHERE h2.demand_id = d.demand_id " +
-            "  AND h2.to_status IN ('FILLED_INTERNAL', 'FILLED_EXTERNAL', 'FILLED_PARTIALLY')) " +
+            "  AND h2.to_status = 'FILLED') " +
             "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
             "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
             "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
@@ -270,13 +246,11 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
             @Param("businessUnit") String businessUnit);
 
     /**
-     * Count demands with closureReason = 'FILLED_INTERNAL' (for internal vs external split).
-     * Filters: optional dateFrom, dateTo, businessUnit.
+     * Filled internally: terminal closed row with {@code fill_type = INTERNAL}.
      */
     @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
             "WHERE d.is_deleted = false " +
-            "AND d.status IN ('FILLED_INTERNAL', 'FILLED_PARTIALLY', 'CLOSED') " +
-            "AND d.closure_reason = 'FILLED_INTERNAL' " +
+            "AND d.is_filled = true AND d.fill_type = 'INTERNAL' " +
             "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
             "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
             "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",
@@ -287,13 +261,11 @@ public interface DemandRepository extends JpaRepository<Demand, Long>, JpaSpecif
             @Param("businessUnit") String businessUnit);
 
     /**
-     * Count demands with closureReason = 'FILLED_EXTERNAL' (for internal vs external split).
-     * Filters: optional dateFrom, dateTo, businessUnit.
+     * Filled externally: terminal closed row with {@code fill_type = EXTERNAL}.
      */
     @Query(value = "SELECT COUNT(d.demand_id) FROM demands d " +
             "WHERE d.is_deleted = false " +
-            "AND d.status IN ('FILLED_EXTERNAL', 'FILLED_PARTIALLY', 'CLOSED') " +
-            "AND d.closure_reason = 'FILLED_EXTERNAL' " +
+            "AND d.is_filled = true AND d.fill_type = 'EXTERNAL' " +
             "AND (:dateFrom IS NULL OR CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE)) " +
             "AND (:dateTo IS NULL OR CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)) " +
             "AND (:businessUnit IS NULL OR d.business_unit = :businessUnit)",

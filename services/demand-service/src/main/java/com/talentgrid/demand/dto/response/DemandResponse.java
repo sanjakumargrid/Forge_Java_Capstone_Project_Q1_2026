@@ -65,6 +65,8 @@ public class DemandResponse {
      */
     private String fillType;
 
+    private Boolean benchHiring;
+
     // Status
     private String status;
     private String priority;

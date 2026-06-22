@@ -1,21 +1,31 @@
 package com.talentgrid.demand.domain.enums;
 
 /**
- * Reasons for closing or transitioning a demand.
- * Each reason code maps to one or more valid target states per the transition matrix.
- *
- * <ul>
- *   <li>{@code FILLED_INTERNAL}  — Valid for target states: FILLED_INTERNAL, CLOSED (from FILLED_PARTIALLY)</li>
- *   <li>{@code FILLED_EXTERNAL}  — Valid for target states: FILLED_EXTERNAL, CLOSED (from FILLED_PARTIALLY)</li>
- *   <li>{@code CANCELLED}        — Valid for target state:  CANCELLED</li>
- *   <li>{@code ON_HOLD}          — Valid for target state:  ON_HOLD</li>
- *   <li>{@code DUPLICATE}        — Valid for target state:  DUPLICATE</li>
- * </ul>
+ * Reasons recorded on transitions and on {@code demands.closure_reason}.
  */
 public enum ClosureReason {
+    /** Demand reached FILLED from internal nomination / bench. */
     FILLED_INTERNAL,
+    /** Demand reached FILLED from external / TA offer path. */
     FILLED_EXTERNAL,
-    CANCELLED,
+    /** Entered ON_HOLD. */
     ON_HOLD,
-    DUPLICATE
+    /** PM rejected demand while PENDING_APPROVAL. */
+    PM_REJECTED,
+    /** 72h approval SLA — auto CLOSED. */
+    SLA_APPROVAL_BREACH,
+    /** RM declared no internal match — move to OPEN_EXTERNAL. */
+    NO_INTERNAL_MATCH,
+    /** HM rejected internal nomination — move to OPEN_EXTERNAL. */
+    HM_REJECTED_NOMINATION,
+    /** RM closed demand while ON_HOLD. */
+    RM_CLOSED_ON_HOLD,
+    /** Duplicate demand — CLOSED. */
+    DUPLICATE,
+    /** Withdrawn / user cancelled before fill — CLOSED. */
+    WITHDRAWN,
+    /** System auto-close immediately after FILLED. */
+    AUTO_CLOSED_AFTER_FILL,
+    /** Generic terminal reason. */
+    OTHER
 }

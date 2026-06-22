@@ -70,4 +70,10 @@ public class DemandPayload {
 
     // ─── SLA metadata ────────────────────────────────────────────────────────────
     private Long elapsedHours;
+
+    /** Internal nomination id (nomination workflow events only). */
+    private Long nominationId;
+
+    /** Nominee user id for internal nomination events. */
+    private Long nomineeUserId;
 }

@@ -57,4 +57,8 @@ public class DemandRequest {
     private Boolean clientInterview;
     private LocalDate onboardingDate;
 
+    /** When true, post-approval flow skips internal search (bench hiring). */
+    private Boolean benchHiring;
+
 }
+

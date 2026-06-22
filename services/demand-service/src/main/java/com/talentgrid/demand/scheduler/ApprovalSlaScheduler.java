@@ -5,6 +5,7 @@ import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.client.dto.UserDto;
 import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.entity.DemandStatusHistory;
+import com.talentgrid.demand.domain.enums.ClosureReason;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.kafka.producer.DemandEventProducer;
 import com.talentgrid.demand.repository.DemandRepository;
@@ -27,15 +28,13 @@ import java.util.Optional;
  * <p>Runs every hour and checks all active PENDING_APPROVAL demands:
  * <ul>
  *   <li>≥ 24h: Send one-time reminder to PM (action required) and Creator (info).</li>
- *   <li>≥ 72h: Auto-cancel the demand, write history, publish DEMAND_AUTO_CANCELLED
- *               event, and notify PM + Creator via all channels.</li>
+ *   <li>≥ 72h: Auto-close the demand (CLOSED), publish DEMAND_APPROVAL_SLA_CLOSED, notify PM + Creator.</li>
  * </ul>
  *
  * <p>Both actions are idempotent:
  * <ul>
  *   <li>Reminder: guarded by {@code Demand.approvalReminderSent} flag.</li>
- *   <li>Auto-cancel: guarded by status check — once CANCELLED, demand is
- *       no longer in PENDING_APPROVAL and scheduler skips it.</li>
+ *   <li>Auto-close: once CLOSED, demand is no longer in PENDING_APPROVAL.</li>
  * </ul>
  */
 @Component
@@ -101,10 +100,10 @@ public class ApprovalSlaScheduler {
     // ── Resolve PM ────────────────────────────────────────────────────────────
     PmInfo pm = resolvePm(demand);
 
-    // ── 72h AUTO-CANCELLATION ─────────────────────────────────────────────────
+    // ── 72h AUTO-CLOSE ───────────────────────────────────────────────────────
     if (elapsedHours >= CANCELLATION_HOURS) {
-      autoCancelDemand(demand, pm, elapsedHours);
-      return; // once cancelled, no need to also send a reminder
+      autoCloseDemandAfterSla(demand, pm, elapsedHours);
+      return;
     }
 
     // ── 24h REMINDER (once only) ──────────────────────────────────────────────
@@ -130,34 +129,31 @@ public class ApprovalSlaScheduler {
   }
 
   /**
-   * Auto-cancels the demand after 72 hours in PENDING_APPROVAL.
-   * Writes history, persists the status change, and publishes DEMAND_AUTO_CANCELLED.
+   * Auto-closes the demand after 72 hours in PENDING_APPROVAL (SLA breach).
    */
-  private void autoCancelDemand(Demand demand, PmInfo pm, long elapsedHours) {
-    log.warn("[SLA-SCHEDULER] 72h SLA breached for demandId={} — auto-cancelling", demand.getDemandId());
+  private void autoCloseDemandAfterSla(Demand demand, PmInfo pm, long elapsedHours) {
+    log.warn("[SLA-SCHEDULER] 72h SLA breached for demandId={} — auto-closing", demand.getDemandId());
 
     DemandStatus previousStatus = demand.getStatus();
-    demand.setStatus(DemandStatus.CANCELLED);
-    demand.setClosureReason("SLA_AUTO_CANCELLED");
+    demand.setStatus(DemandStatus.CLOSED);
+    demand.setClosureReason(ClosureReason.SLA_APPROVAL_BREACH.name());
 
-    // Write status history (changedBy = 0 = system)
     DemandStatusHistory history = new DemandStatusHistory();
     history.setDemand(demand);
     history.setFromStatus(previousStatus);
-    history.setToStatus(DemandStatus.CANCELLED);
-    history.setClosureReason("SLA_AUTO_CANCELLED");
-    history.setComments("Automatically cancelled after " + elapsedHours + " hours in PENDING_APPROVAL (72h SLA breach)");
+    history.setToStatus(DemandStatus.CLOSED);
+    history.setClosureReason(ClosureReason.SLA_APPROVAL_BREACH.name());
+    history.setComments("Automatically closed after " + elapsedHours + " hours in PENDING_APPROVAL (72h SLA breach)");
     history.setChangedAt(OffsetDateTime.now());
-    history.setChangedBy(0L); // 0 = system actor
+    history.setChangedBy(0L);
     historyRepository.save(history);
 
     demandRepository.save(demand);
 
-    log.info("[SLA-SCHEDULER] demandId={} auto-cancelled after {}h — publishing DEMAND_AUTO_CANCELLED",
+    log.info("[SLA-SCHEDULER] demandId={} auto-closed after {}h — publishing DEMAND_APPROVAL_SLA_CLOSED",
             demand.getDemandId(), elapsedHours);
 
-    // Publish event — DemandEventTranslator will trigger notifications for both PM + Creator
-    eventProducer.publishAutoCancelled(
+    eventProducer.publishApprovalSlaClosed(
             demand,
             pm.userId(),
             pm.name(),

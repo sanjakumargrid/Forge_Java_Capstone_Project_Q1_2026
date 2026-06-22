@@ -7,6 +7,7 @@ import com.talentgrid.demand.domain.enums.EmploymentType;
 import com.talentgrid.demand.domain.enums.FillType;
 import com.talentgrid.demand.domain.enums.WorkMode;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -114,6 +115,7 @@ public class Demand {
      * Defaults to {@code false} on creation.
      */
     @Column(name = "is_filled", nullable = false)
+    @ColumnDefault("false")
     private Boolean isFilled;
 
     /**
@@ -123,6 +125,13 @@ public class Demand {
     @Enumerated(EnumType.STRING)
     @Column(name = "fill_type")
     private FillType fillType;
+
+    /**
+     * Bench hiring: after approval, skip internal search and go straight to external hiring.
+     */
+    @Column(name = "bench_hiring", nullable = false)
+    @ColumnDefault("false")
+    private Boolean benchHiring;
 
     // ─── Status & Priority ──────────────────────────────────────────────────────
     @Enumerated(EnumType.STRING)
@@ -228,6 +237,9 @@ public class Demand {
         }
         if (this.approvalReminderSent == null) {
             this.approvalReminderSent = false;
+        }
+        if (this.benchHiring == null) {
+            this.benchHiring = false;
         }
     }
 
@@ -351,6 +363,14 @@ public class Demand {
 
     public FillType getFillType() { return fillType; }
     public void setFillType(FillType fillType) { this.fillType = fillType; }
+
+    public Boolean getBenchHiring() {
+        return benchHiring;
+    }
+
+    public void setBenchHiring(Boolean benchHiring) {
+        this.benchHiring = benchHiring;
+    }
 
     public DemandStatus getStatus() {
         return status;

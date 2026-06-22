@@ -109,28 +109,15 @@ public class DemandEventProducer {
     }
 
     /**
-     * Published by the SLA scheduler after auto-cancellation at 72h.
-     * Contains PM and creator fields for cancellation notification.
+     * @deprecated Use {@link #publishApprovalSlaClosed}; kept as a delegate for backward compatibility.
      */
+    @Deprecated
     public void publishAutoCancelled(Demand demand,
                                      Long pmUserId,
                                      String pmName,
                                      String pmEmail,
                                      String pmSlackId) {
-        DemandPayload payload = buildBasePayload(demand);
-        payload.setClosureReason(demand.getClosureReason());
-        payload.setCreatedBy(demand.getCreatedBy());
-        payload.setCreatorName(demand.getCreatorName());
-        payload.setRecipientEmail(demand.getCreatorEmail());
-        payload.setRecipientSlackId(demand.getCreatorSlackId());
-        payload.setRaisedBy(demand.getCreatorName() != null
-                ? demand.getCreatorName()
-                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
-        payload.setPmUserId(pmUserId);
-        payload.setPmName(pmName);
-        payload.setPmEmail(pmEmail);
-        payload.setPmSlackId(pmSlackId);
-        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_AUTO_CANCELLED", demand.getDemandId(), payload);
+        publishApprovalSlaClosed(demand, pmUserId, pmName, pmEmail, pmSlackId);
     }
 
     public void publishApproved(Demand demand) {
@@ -171,6 +158,52 @@ public class DemandEventProducer {
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_EXTERNAL_OPENED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * Unified fill event (internal vs external distinguished by {@code fillType} / closure_reason).
+     */
+    public void publishDemandFilled(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * 72h approval SLA auto-close (terminal CLOSED).
+     */
+    public void publishApprovalSlaClosed(Demand demand,
+                                         Long pmUserId,
+                                         String pmName,
+                                         String pmEmail,
+                                         String pmSlackId) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_SLA_CLOSED", demand.getDemandId(), payload);
     }
 
     public void publishFilledInternal(Demand demand) {

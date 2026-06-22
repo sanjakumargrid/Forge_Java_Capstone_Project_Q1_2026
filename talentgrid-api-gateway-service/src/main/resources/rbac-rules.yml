@@ -71,7 +71,7 @@ rbac:
 
     - path: "/api/v1/demands/**/approve"
       methods: [POST]
-      allowed-scopes: [DEMAND_APPROVE]
+      allowed-scopes: [DEMAND_PM_APPROVE]
 
     - path: "/api/v1/project-manager/**"
       methods: [PUT]
@@ -79,7 +79,7 @@ rbac:
 
     - path: "/api/v1/demands/**/reject"
       methods: [POST]
-      allowed-scopes: [DEMAND_APPROVE]
+      allowed-scopes: [DEMAND_PM_APPROVE]
 
     - path: "/api/v1/demands/**/status"
       methods: [PATCH]
@@ -88,6 +88,30 @@ rbac:
     - path: "/api/v1/demands/**/pipeline"
       methods: [GET]
       allowed-scopes: [DEMAND_PIPELINE_VIEW]
+
+    - path: "/api/v1/demands/**/history"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/**/submit"
+      methods: [POST]
+      allowed-scopes: [DEMAND_SUBMIT, DEMAND_PM_APPROVE]
+
+    - path: "/api/v1/lookups/job-titles"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/lookups/skills"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/**/nominations"
+      methods: [POST]
+      allowed-scopes: [DEMAND_NOMINATE, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/demands/**/nominations/**/hm-decision"
+      methods: [POST]
+      allowed-scopes: [DEMAND_HM_NOMINATION_DECIDE, DEMAND_STATUS_TRANSITION]
 
     # --- Notifications ---
     - path: "/api/v1/notifications"
