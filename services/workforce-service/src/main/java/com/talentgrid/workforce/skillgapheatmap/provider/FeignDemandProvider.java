@@ -143,8 +143,15 @@ public class FeignDemandProvider implements DemandProvider {
                 return null;
             }
 
-            List<String> skills = full.getSkills();
-            if (skills == null || skills.isEmpty()) {
+            List<String> skills = new ArrayList<>();
+            if (full.getMandatorySkills() != null) {
+                skills.addAll(full.getMandatorySkills());
+            }
+            if (full.getOptionalSkills() != null) {
+                skills.addAll(full.getOptionalSkills());
+            }
+
+            if (skills.isEmpty()) {
                 log.debug("[SKILL-GAP] Demand {} has no skills — skipping.", summary.getDemandId());
                 return null;
             }

@@ -94,7 +94,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 demand.getLevel() != null ? demand.getLevel() : "N/A",
                 demand.getLocation() != null ? demand.getLocation() : "Remote",
                 demand.getRaisedBy() != null ? demand.getRaisedBy() : "Unknown",
-                demand.getSkills() != null ? String.join(", ", demand.getSkills()) : "Not specified"
+                formatSkills(demand)
         );
 
         notificationEventPublisher.sendInAppAndEmail(
@@ -114,8 +114,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                         "demandLevel",    safe(demand.getLevel(), "N/A"),
                         "demandLocation", safe(demand.getLocation(), "Remote"),
                         "raisedBy",       safe(demand.getRaisedBy(), "Unknown"),
-                        "skills",         demand.getSkills() != null
-                                ? String.join(", ", demand.getSkills()) : "N/A"
+                        "skills",         formatSkills(demand)
                 ),
                 correlationId
         );
@@ -135,7 +134,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                 demand.getTitle(),
                 demand.getLevel() != null ? demand.getLevel() : "N/A",
                 demand.getLocation() != null ? demand.getLocation() : "Remote",
-                demand.getSkills() != null ? String.join(", ", demand.getSkills()) : "Not specified"
+                formatSkills(demand)
         );
 
         notificationEventPublisher.sendInAppAndEmail(
@@ -155,8 +154,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                         "demandLevel",    safe(demand.getLevel(), "N/A"),
                         "demandLocation", safe(demand.getLocation(), "Remote"),
                         "raisedBy",       safe(demand.getRaisedBy(), "Unknown"),
-                        "skills",         demand.getSkills() != null
-                                ? String.join(", ", demand.getSkills()) : "N/A"
+                        "skills",         formatSkills(demand)
                 ),
                 correlationId
         );
@@ -243,8 +241,7 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
                         "internalFilledCount",   demand.getInternalFilledCount() != null
                                 ? demand.getInternalFilledCount().toString() : "0",
                         "location",              safe(demand.getLocation(), "Remote"),
-                        "skills",                demand.getSkills() != null
-                                ? String.join(", ", demand.getSkills()) : "N/A"
+                        "skills",                formatSkills(demand)
                 ),
                 correlationId
         );
@@ -341,6 +338,21 @@ public class DemandEventTranslator extends BaseKafkaConsumer<DemandPayload> {
     /** Returns the value or the fallback if null/blank. */
     private String safe(String value, String fallback) {
         return (value != null && !value.isBlank()) ? value : fallback;
+    }
+
+    private String formatSkills(DemandPayload demand) {
+        StringBuilder skills = new StringBuilder();
+        if (demand.getMandatorySkills() != null && !demand.getMandatorySkills().isEmpty()) {
+            skills.append(String.join(", ", demand.getMandatorySkills()));
+            if (demand.getOptionalSkills() != null && !demand.getOptionalSkills().isEmpty()) {
+                skills.append(" (Preferred: ").append(String.join(", ", demand.getOptionalSkills())).append(")");
+            }
+        } else if (demand.getOptionalSkills() != null && !demand.getOptionalSkills().isEmpty()) {
+            skills.append("Preferred: ").append(String.join(", ", demand.getOptionalSkills()));
+        } else {
+            skills.append("Not specified");
+        }
+        return skills.toString();
     }
 
     // ─────────────────────────────────────────────────────────────────────────────

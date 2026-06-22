@@ -20,7 +20,8 @@ public class DemandPayload {
     private String title;
     private String status;
     private String level;
-    private List<String> skills;
+    private List<String> mandatorySkills;
+    private List<String> optionalSkills;
     private String location;
     private String accountName;
     private String projectName;

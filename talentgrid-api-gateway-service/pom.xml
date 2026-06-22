@@ -7,14 +7,12 @@
     <parent>
         <groupId>com.talentgrid</groupId>
         <artifactId>talentgrid-parent</artifactId>
-        <!-- Align parent version with root pom (1.0.0-SNAPSHOT) to resolve reactor build lookup -->
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>com.talentgrid</groupId>
     <artifactId>talentgrid-api-gateway-service</artifactId>
-    <!-- Use unified version consistent with parent/root pom -->
     <version>1.0.0-SNAPSHOT</version>
     <name>talentgrid-api-gateway-service</name>
 

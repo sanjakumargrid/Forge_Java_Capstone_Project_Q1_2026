@@ -9,6 +9,7 @@ import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.dto.response.DemandStatusHistoryResponse;
 import com.talentgrid.demand.dto.response.DemandSummaryResponse;
+import com.talentgrid.demand.dto.response.SkillDto;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -45,7 +46,7 @@ public class DemandMapper {
         demand.setAccountId(request.getAccountId());
         demand.setProjectId(request.getProjectId());
         demand.setBusinessUnit(request.getBusinessUnit());
-        demand.setSkills(request.getSkills());
+        demand.setJobTitleId(request.getJobTitleId());
         demand.setBudget(request.getBudget());
         demand.setReqUtilPerc(request.getReqUtilPerc());
         demand.setWorkMode(request.getWorkMode());
@@ -84,7 +85,7 @@ public class DemandMapper {
         if (request.getAccountId() != null)    demand.setAccountId(request.getAccountId());
         if (request.getProjectId() != null)    demand.setProjectId(request.getProjectId());
         if (request.getBusinessUnit() != null) demand.setBusinessUnit(request.getBusinessUnit());
-        if (request.getSkills() != null)       demand.setSkills(request.getSkills());
+        if (request.getJobTitleId() != null)   demand.setJobTitleId(request.getJobTitleId());
         if (request.getBudget() != null)       demand.setBudget(request.getBudget());
         if (request.getReqUtilPerc() != null)  demand.setReqUtilPerc(request.getReqUtilPerc());
         if (request.getWorkMode() != null)     demand.setWorkMode(request.getWorkMode());
@@ -121,7 +122,17 @@ public class DemandMapper {
         response.setProjectId(demand.getProjectId());
         response.setProjectName(demand.getProjectName());
         response.setBusinessUnit(demand.getBusinessUnit());
-        response.setSkills(demand.getSkills());
+        response.setJobTitleId(demand.getJobTitleId());
+        if (demand.getDemandSkills() != null) {
+            response.setMandatorySkills(demand.getDemandSkills().stream()
+                    .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+            response.setOptionalSkills(demand.getDemandSkills().stream()
+                    .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+        }
         response.setBudget(demand.getBudget());
         response.setReqUtilPerc(demand.getReqUtilPerc());
         response.setWorkMode(enumName(demand.getWorkMode()));

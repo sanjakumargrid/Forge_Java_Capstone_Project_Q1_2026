@@ -45,5 +45,6 @@ public class DemandServiceResponse {
     private Boolean isDeleted;
     private Integer version;
     private Integer requiredCount;
-    private List<String> skills;
+    private List<String> mandatorySkills;
+    private List<String> optionalSkills;
 }

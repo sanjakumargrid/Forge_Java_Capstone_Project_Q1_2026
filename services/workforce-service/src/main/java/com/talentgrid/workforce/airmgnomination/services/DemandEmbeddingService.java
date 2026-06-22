@@ -105,8 +105,15 @@ public class DemandEmbeddingService {
             sb.append("Level: ").append(payload.getLevel().trim());
         }
 
-        List<String> skills = payload.getSkills();
-        if (skills != null && !skills.isEmpty()) {
+        List<String> skills = new java.util.ArrayList<>();
+        if (payload.getMandatorySkills() != null) {
+            skills.addAll(payload.getMandatorySkills());
+        }
+        if (payload.getOptionalSkills() != null) {
+            skills.addAll(payload.getOptionalSkills());
+        }
+        
+        if (!skills.isEmpty()) {
             String skillList = skills.stream()
                     .filter(StringUtils::hasText)
                     .collect(Collectors.joining(", "));
