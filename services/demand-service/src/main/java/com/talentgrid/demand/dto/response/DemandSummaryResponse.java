@@ -38,9 +38,8 @@ public class DemandSummaryResponse {
     /** Age of the demand in days from creation to now — computed by the mapper. */
     private Long ageInDays;
 
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
-    private Integer requiredCount;
+    /** Whether this demand has been filled by a matched employee. */
+    private Boolean isFilled;
 
     private OffsetDateTime createdAt;
 

@@ -49,10 +49,14 @@ public class DemandPayload {
     private OffsetDateTime searchStartAt;
     private Long assignedRecruiter;
     private String assignedRecruiterName;
-    private Integer requiredCount;
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
-    private Integer recruitedCount;
+    /** Whether this demand has been filled. */
+    private Boolean isFilled;
+
+    /**
+     * How it was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} until the demand is filled.
+     */
+    private String fillType;
     private String closureReason;
 
     // ─── PM notification routing fields ─────────────────────────────────────────

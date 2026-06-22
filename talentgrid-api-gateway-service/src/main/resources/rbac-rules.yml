@@ -73,6 +73,10 @@ rbac:
       methods: [POST]
       allowed-scopes: [DEMAND_APPROVE]
 
+    - path: "/api/v1/project-manager/**"
+      methods: [PUT]
+      allowed-scopes: [DEMAND_PM_APPROVE]
+
     - path: "/api/v1/demands/**/reject"
       methods: [POST]
       allowed-scopes: [DEMAND_APPROVE]

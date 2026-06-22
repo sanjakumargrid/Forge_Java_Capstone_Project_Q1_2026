@@ -55,6 +55,12 @@ spring:
             - "Path=/api/v1/demands/*/scorecards, /talentgrid/demands/*/scorecards"
           filters:
             - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+        - id: demand-service-project-manager
+          uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
+          predicates:
+            - "Path=/api/v1/project-manager/**, /talentgrid/project-manager/**"
+          filters:
+            - "RewritePath=/(api/v1|talentgrid)/project-manager/(?<segment>.*), /api/project-manager/${segment}"
         - id: demand-service
           uri: http://${DEMAND_SERVICE_HOST:localhost}:8082
           predicates:

@@ -25,6 +25,7 @@
 | PATCH | `/demands/{id}` | `DEMAND_UPDATE` | Update editable demand fields |
 | DELETE | `/demands/{id}` | `DEMAND_DELETE` | Soft delete draft demand |
 | POST | `/demands/{id}/approve` | `DEMAND_APPROVE` | Approve or reject demand |
+| PUT | `/project-manager/demands/{demandId}/approve` | `DEMAND_PM_APPROVE` | PM approves pending demand for own project |
 | PATCH | `/demands/{id}/status` | `DEMAND_STATUS_TRANSITION` | Perform legal workflow transition |
 | GET | `/demands/{id}/pipeline` | `DEMAND_PIPELINE_VIEW` | Unified hiring pipeline view |
 | GET | `/analytics/demands` | `ANALYTICS_DEMAND_VIEW` | Demand analytics dashboard |
@@ -151,7 +152,7 @@
 
 ---
 
-## 2. Complete Permissions List (75 permissions)
+## 2. Complete Permissions List (76 permissions)
 
 | # | Permission | Domain |
 |---|------------|--------|
@@ -166,80 +167,81 @@
 | 9 | `DEMAND_UPDATE` | Demand |
 | 10 | `DEMAND_DELETE` | Demand |
 | 11 | `DEMAND_APPROVE` | Demand Workflow |
-| 12 | `DEMAND_STATUS_TRANSITION` | Demand Workflow |
-| 13 | `DEMAND_PIPELINE_VIEW` | Demand Workflow |
-| 14 | `ANALYTICS_DEMAND_VIEW` | Analytics |
-| 15 | `AUDIT_VIEW` | Governance |
-| 16 | `NOTIFICATION_VIEW` | Notifications |
-| 17 | `AI_SKILL_SUGGEST` | AI |
-| 18 | `CANDIDATE_VIEW` | Candidate |
-| 19 | `CANDIDATE_CREATE` | Candidate |
-| 20 | `CANDIDATE_UPDATE` | Candidate |
-| 21 | `CANDIDATE_NOTE_CREATE` | Candidate |
-| 22 | `RESUME_UPLOAD` | Candidate |
-| 23 | `AI_CANDIDATE_SCORE` | AI |
-| 24 | `AI_REJECTION_EMAIL_GENERATE` | AI |
-| 25 | `AI_REJECTION_EMAIL_SEND` | AI |
-| 26 | `AI_INTERVIEW_QUESTIONS` | AI |
-| 27 | `ASYNC_JOB_VIEW` | System |
-| 28 | `APPLICATION_VIEW` | Application |
-| 29 | `APPLICATION_CREATE` | Application |
-| 30 | `APPLICATION_BULK_ACTION` | Application |
-| 31 | `APPLICATION_STAGE_MOVE` | Application |
-| 32 | `INTERVIEW_VIEW` | Interview |
-| 33 | `INTERVIEW_SCHEDULE` | Interview |
-| 34 | `INTERVIEW_CALENDAR_VIEW` | Interview |
-| 35 | `INTERVIEW_UPDATE` | Interview |
-| 36 | `SCORECARD_SUBMIT` | Scorecard |
-| 37 | `SCORECARD_VIEW` | Scorecard |
-| 38 | `OFFER_CREATE` | Offer |
-| 39 | `OFFER_VIEW` | Offer |
-| 40 | `OFFER_APPROVE` | Offer |
-| 41 | `OFFER_REJECT` | Offer |
-| 42 | `ANALYTICS_PIPELINE_VIEW` | Analytics |
-| 43 | `GDPR_EXPORT` | GDPR |
-| 44 | `GDPR_DELETE` | GDPR |
-| 45 | `JOB_POSTING_VIEW` | Job Posting |
-| 46 | `JOB_POSTING_CREATE` | Job Posting |
-| 47 | `JOB_POSTING_UPDATE` | Job Posting |
-| 48 | `JOB_POSTING_DELETE` | Job Posting |
-| 49 | `JOB_POSTING_APPROVE` | Job Posting |
-| 50 | `JOB_POSTING_PUBLISH` | Job Posting |
-| 51 | `JOB_POSTING_UNPUBLISH` | Job Posting |
-| 52 | `ANALYTICS_POSTING_VIEW` | Analytics |
-| 53 | `BRANDING_UPDATE` | Branding |
-| 54 | `REFERRAL_CREATE` | Referral |
-| 55 | `AI_JD_GENERATE` | AI |
-| 56 | `AI_CAREERS_CHAT` | AI |
-| 57 | `AI_CHANNEL_RECOMMEND` | AI |
-| 58 | `AI_INTERACTION_CREATE` | AI |
-| 59 | `AI_INTERACTION_VIEW` | AI |
-| 60 | `ENGINEER_VIEW` | Workforce |
-| 61 | `ENGINEER_CREATE` | Workforce |
-| 62 | `ENGINEER_UPDATE` | Workforce |
-| 63 | `ENGINEER_DELETE` | Workforce |
-| 64 | `ENGINEER_SELF_UPDATE` | Workforce |
-| 65 | `ENGINEER_SEARCH` | Workforce |
-| 66 | `BENCH_VIEW` | Workforce |
-| 67 | `UTILISATION_VIEW` | Utilisation |
-| 68 | `UTILISATION_CREATE` | Utilisation |
-| 69 | `UTILISATION_UPDATE` | Utilisation |
-| 70 | `UTILISATION_DELETE` | Utilisation |
-| 71 | `UTILISATION_ALERTS_VIEW` | Utilisation |
-| 72 | `NOMINATION_VIEW` | Nomination |
-| 73 | `NOMINATION_CREATE` | Nomination |
-| 74 | `NOMINATION_ACCEPT` | Nomination |
-| 75 | `NOMINATION_REJECT` | Nomination |
-| 76 | `AI_MATCH_VIEW` | AI |
-| 77 | `AI_EMBEDDING_REFRESH` | AI |
-| 78 | `DEMAND_EMBEDDING_VIEW` | Demand Embedding |
-| 79 | `DEMAND_EMBEDDING_CREATE` | Demand Embedding |
-| 80 | `DEMAND_EMBEDDING_UPDATE` | Demand Embedding |
-| 81 | `DEMAND_EMBEDDING_DELETE` | Demand Embedding |
-| 82 | `HRIS_IMPORT` | HRIS |
-| 83 | `HRIS_IMPORT_STATUS` | HRIS |
-| 84 | `ANALYTICS_MATCH_VIEW` | Analytics |
-| 85 | `ANALYTICS_UTILISATION_VIEW` | Analytics |
+| 12 | `DEMAND_PM_APPROVE` | Demand Workflow (PM-owned project) |
+| 13 | `DEMAND_STATUS_TRANSITION` | Demand Workflow |
+| 14 | `DEMAND_PIPELINE_VIEW` | Demand Workflow |
+| 15 | `ANALYTICS_DEMAND_VIEW` | Analytics |
+| 16 | `AUDIT_VIEW` | Governance |
+| 17 | `NOTIFICATION_VIEW` | Notifications |
+| 18 | `AI_SKILL_SUGGEST` | AI |
+| 19 | `CANDIDATE_VIEW` | Candidate |
+| 20 | `CANDIDATE_CREATE` | Candidate |
+| 21 | `CANDIDATE_UPDATE` | Candidate |
+| 22 | `CANDIDATE_NOTE_CREATE` | Candidate |
+| 23 | `RESUME_UPLOAD` | Candidate |
+| 24 | `AI_CANDIDATE_SCORE` | AI |
+| 25 | `AI_REJECTION_EMAIL_GENERATE` | AI |
+| 26 | `AI_REJECTION_EMAIL_SEND` | AI |
+| 27 | `AI_INTERVIEW_QUESTIONS` | AI |
+| 28 | `ASYNC_JOB_VIEW` | System |
+| 29 | `APPLICATION_VIEW` | Application |
+| 30 | `APPLICATION_CREATE` | Application |
+| 31 | `APPLICATION_BULK_ACTION` | Application |
+| 32 | `APPLICATION_STAGE_MOVE` | Application |
+| 33 | `INTERVIEW_VIEW` | Interview |
+| 34 | `INTERVIEW_SCHEDULE` | Interview |
+| 35 | `INTERVIEW_CALENDAR_VIEW` | Interview |
+| 36 | `INTERVIEW_UPDATE` | Interview |
+| 37 | `SCORECARD_SUBMIT` | Scorecard |
+| 38 | `SCORECARD_VIEW` | Scorecard |
+| 39 | `OFFER_CREATE` | Offer |
+| 40 | `OFFER_VIEW` | Offer |
+| 41 | `OFFER_APPROVE` | Offer |
+| 42 | `OFFER_REJECT` | Offer |
+| 43 | `ANALYTICS_PIPELINE_VIEW` | Analytics |
+| 44 | `GDPR_EXPORT` | GDPR |
+| 45 | `GDPR_DELETE` | GDPR |
+| 46 | `JOB_POSTING_VIEW` | Job Posting |
+| 47 | `JOB_POSTING_CREATE` | Job Posting |
+| 48 | `JOB_POSTING_UPDATE` | Job Posting |
+| 49 | `JOB_POSTING_DELETE` | Job Posting |
+| 50 | `JOB_POSTING_APPROVE` | Job Posting |
+| 51 | `JOB_POSTING_PUBLISH` | Job Posting |
+| 52 | `JOB_POSTING_UNPUBLISH` | Job Posting |
+| 53 | `ANALYTICS_POSTING_VIEW` | Analytics |
+| 54 | `BRANDING_UPDATE` | Branding |
+| 55 | `REFERRAL_CREATE` | Referral |
+| 56 | `AI_JD_GENERATE` | AI |
+| 57 | `AI_CAREERS_CHAT` | AI |
+| 58 | `AI_CHANNEL_RECOMMEND` | AI |
+| 59 | `AI_INTERACTION_CREATE` | AI |
+| 60 | `AI_INTERACTION_VIEW` | AI |
+| 61 | `ENGINEER_VIEW` | Workforce |
+| 62 | `ENGINEER_CREATE` | Workforce |
+| 63 | `ENGINEER_UPDATE` | Workforce |
+| 64 | `ENGINEER_DELETE` | Workforce |
+| 65 | `ENGINEER_SELF_UPDATE` | Workforce |
+| 66 | `ENGINEER_SEARCH` | Workforce |
+| 67 | `BENCH_VIEW` | Workforce |
+| 68 | `UTILISATION_VIEW` | Utilisation |
+| 69 | `UTILISATION_CREATE` | Utilisation |
+| 70 | `UTILISATION_UPDATE` | Utilisation |
+| 71 | `UTILISATION_DELETE` | Utilisation |
+| 72 | `UTILISATION_ALERTS_VIEW` | Utilisation |
+| 73 | `NOMINATION_VIEW` | Nomination |
+| 74 | `NOMINATION_CREATE` | Nomination |
+| 75 | `NOMINATION_ACCEPT` | Nomination |
+| 76 | `NOMINATION_REJECT` | Nomination |
+| 77 | `AI_MATCH_VIEW` | AI |
+| 78 | `AI_EMBEDDING_REFRESH` | AI |
+| 79 | `DEMAND_EMBEDDING_VIEW` | Demand Embedding |
+| 80 | `DEMAND_EMBEDDING_CREATE` | Demand Embedding |
+| 81 | `DEMAND_EMBEDDING_UPDATE` | Demand Embedding |
+| 82 | `DEMAND_EMBEDDING_DELETE` | Demand Embedding |
+| 83 | `HRIS_IMPORT` | HRIS |
+| 84 | `HRIS_IMPORT_STATUS` | HRIS |
+| 85 | `ANALYTICS_MATCH_VIEW` | Analytics |
+| 86 | `ANALYTICS_UTILISATION_VIEW` | Analytics |
 
 ---
 
