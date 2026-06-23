@@ -57,8 +57,8 @@ public class DataInitializer implements CommandLineRunner {
                 demandView, demandStatusTransition, demandPipelineView, demandPmApprove,
                 demandSubmit, demandNominate, demandHmNominationDecide);
 
-        Role projectManagerRole = upsertRole("PROJECT_MANAGER");
-        addScopes(projectManagerRole, demandView, demandPipelineView, demandPmApprove,
+        Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
+        addScopes(portfolioManagerRole, demandView, demandPipelineView, demandPmApprove,
                 demandStatusTransition, demandSubmit);
 
         Role hiringManagerRole = upsertRole("HIRING_MANAGER");
@@ -66,7 +66,8 @@ public class DataInitializer implements CommandLineRunner {
                 demandStatusTransition, demandPipelineView, demandHmNominationDecide);
 
         Role resourceManagerRole = upsertRole("RESOURCE_MANAGER");
-        addScopes(resourceManagerRole, demandView, demandStatusTransition, demandNominate, demandPipelineView);
+        addScopes(resourceManagerRole, demandView, demandStatusTransition, demandNominate, demandPipelineView,
+                demandCreate, demandUpdate);
 
         Role recruiterRole = upsertRole("RECRUITER");
         addScopes(recruiterRole, demandView, demandStatusTransition, demandPipelineView);
@@ -74,9 +75,8 @@ public class DataInitializer implements CommandLineRunner {
         Role taManagerRole = upsertRole("TA_MANAGER");
         addScopes(taManagerRole, demandView, demandStatusTransition, demandPipelineView);
 
-        Role rmgRole = upsertRole("RMG");
-        addScopes(rmgRole, demandView, demandStatusTransition, demandPipelineView,
-                demandNominate, demandCreate, demandUpdate);
+        Role employeeRole = upsertRole("EMPLOYEE");
+        addScopes(employeeRole, demandView);
 
         if (!userRepository.existsByEmail("username@griddynamics.com")) {
             userRepository.save(User.builder()
@@ -95,9 +95,9 @@ public class DataInitializer implements CommandLineRunner {
                     .email("projectmanager@griddynamics.com")
                     .password(passwordEncoder.encode("Password@123"))
                     .enabled(true)
-                    .roles(Set.of(projectManagerRole))
+                    .roles(Set.of(portfolioManagerRole))
                     .build());
-            log.info("Default project manager user created.");
+            log.info("Default portfolio manager user created.");
         }
 
         if (!userRepository.existsByEmail("hm@griddynamics.com")) {
@@ -115,6 +115,7 @@ public class DataInitializer implements CommandLineRunner {
             userRepository.save(User.builder()
                     .username("RM-User")
                     .email("rm@griddynamics.com")
+                    .location("Chennai")
                     .password(passwordEncoder.encode("Password@123"))
                     .enabled(true)
                     .roles(Set.of(resourceManagerRole))

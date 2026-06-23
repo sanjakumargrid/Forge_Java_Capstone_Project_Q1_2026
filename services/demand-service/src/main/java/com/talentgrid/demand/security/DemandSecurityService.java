@@ -79,7 +79,7 @@ public class DemandSecurityService {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole(SecurityUtils.ROLE_RECRUITER)) {
+        if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL
                     || status == DemandStatus.FILLED
                     || status == DemandStatus.CLOSED;

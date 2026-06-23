@@ -72,6 +72,7 @@ public class AuthServiceImpl implements AuthService {
 
         String requestedRole =
                 request.getRole() != null ? request.getRole() : "EMPLOYEE";
+        Role.requireAllowedName(requestedRole);
 
         Role role = roleRepository.findByName(requestedRole.toUpperCase())
                 .orElseThrow(() ->
