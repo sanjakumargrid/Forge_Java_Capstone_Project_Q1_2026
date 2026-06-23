@@ -2,6 +2,8 @@ package com.talentgrid.demand.service;
 
 import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.enums.DemandStatus;
+import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.exception.DemandNotFoundException;
@@ -72,26 +74,8 @@ public class DemandService {
             demand.setOnboardingDate(demand.getTargetDate());
         }
 
-        // Fetch Account and Project info from UserAuthService
-        if (request.getAccountId() != null) {
-            try {
-                var account = userAuthServiceClient.getAccountById(request.getAccountId());
-                if (account != null) demand.setAccountName(account.getName());
-            } catch (Exception e) {
-                log.warn("Could not fetch account details for id={}: {}", request.getAccountId(), e.getMessage());
-                demand.setAccountName("Unknown Account");
-            }
-        }
-        
-        if (request.getProjectId() != null) {
-            try {
-                var project = userAuthServiceClient.getProjectById(request.getProjectId());
-                if (project != null) demand.setProjectName(project.getName());
-            } catch (Exception e) {
-                log.warn("Could not fetch project details for id={}: {}", request.getProjectId(), e.getMessage());
-                demand.setProjectName("Unknown Project");
-            }
-        }
+        enrichDemandFromReferences(demand, request);
+        applyCreateDefaults(demand);
 
         // Extract the user ID, email, and name from the security context and set it as
         // the creator
@@ -271,5 +255,65 @@ public class DemandService {
                 .filter(ds -> ds.getIsMandatory() == isMandatory)
                 .map(ds -> ds.getSkill().getSkillId())
                 .toList();
+    }
+
+    private void enrichDemandFromReferences(Demand demand, DemandRequest request) {
+        if (request.getProjectId() != null) {
+            try {
+                var project = userAuthServiceClient.getProjectById(request.getProjectId());
+                if (project != null) {
+                    if (project.getName() != null) {
+                        demand.setProjectName(project.getName());
+                    }
+                    if (demand.getAccountId() == null
+                            && project.getAccountId() != null
+                            && project.getAccountId() > 0) {
+                        demand.setAccountId(project.getAccountId());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch project details for id={}: {}", request.getProjectId(), e.getMessage());
+            }
+        }
+        if (demand.getProjectName() == null) {
+            demand.setProjectName("Unknown Project");
+        }
+
+        Long accountId = demand.getAccountId();
+        if (accountId != null) {
+            try {
+                var account = userAuthServiceClient.getAccountById(accountId);
+                if (account != null && account.getName() != null) {
+                    demand.setAccountName(account.getName());
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch account details for id={}: {}", accountId, e.getMessage());
+            }
+        }
+        if (demand.getAccountName() == null) {
+            demand.setAccountName("Unknown Account");
+        }
+        if (demand.getAccountId() == null) {
+            throw new IllegalArgumentException(
+                    "accountId is required (provide accountId or a projectId linked to an account)");
+        }
+    }
+
+    private void applyCreateDefaults(Demand demand) {
+        if (demand.getEmploymentType() == null) {
+            demand.setEmploymentType(EmploymentType.FULL_TIME);
+        }
+        if (demand.getWorkMode() == null) {
+            demand.setWorkMode(WorkMode.REMOTE);
+        }
+        if (demand.getExperience() == null) {
+            demand.setExperience(0L);
+        }
+        if (demand.getClientInterview() == null) {
+            demand.setClientInterview(Boolean.FALSE);
+        }
+        if (demand.getRequiredCount() == null) {
+            demand.setRequiredCount(1);
+        }
     }
 }

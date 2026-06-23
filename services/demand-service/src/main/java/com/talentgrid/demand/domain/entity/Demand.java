@@ -133,6 +133,11 @@ public class Demand {
     @ColumnDefault("false")
     private Boolean benchHiring;
 
+    /** Legacy headcount column; single-person model always persists {@code 1}. */
+    @Column(name = "required_count", nullable = false)
+    @ColumnDefault("1")
+    private Integer requiredCount;
+
     // ─── Status & Priority ──────────────────────────────────────────────────────
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
@@ -240,6 +245,9 @@ public class Demand {
         }
         if (this.benchHiring == null) {
             this.benchHiring = false;
+        }
+        if (this.requiredCount == null) {
+            this.requiredCount = 1;
         }
     }
 
@@ -370,6 +378,14 @@ public class Demand {
 
     public void setBenchHiring(Boolean benchHiring) {
         this.benchHiring = benchHiring;
+    }
+
+    public Integer getRequiredCount() {
+        return requiredCount;
+    }
+
+    public void setRequiredCount(Integer requiredCount) {
+        this.requiredCount = requiredCount;
     }
 
     public DemandStatus getStatus() {
