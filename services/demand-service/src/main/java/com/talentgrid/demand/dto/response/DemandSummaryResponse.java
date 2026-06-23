@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import com.talentgrid.demand.dto.response.SkillDto;
 
 /**
  * Lightweight demand projection for dashboard and list views.
@@ -42,5 +44,7 @@ public class DemandSummaryResponse {
     private Boolean isFilled;
 
     private OffsetDateTime createdAt;
+    private List<SkillDto> mandatorySkills;
+    private List<SkillDto> optionalSkills;
 
 }
