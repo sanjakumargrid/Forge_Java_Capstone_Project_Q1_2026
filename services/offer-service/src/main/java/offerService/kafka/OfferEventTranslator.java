@@ -498,6 +498,7 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
                         ? offer.getApplicationId().toString()
                         : null,
                 recipientEmail,
+                null,
                 notificationType,
                 title,
                 message,

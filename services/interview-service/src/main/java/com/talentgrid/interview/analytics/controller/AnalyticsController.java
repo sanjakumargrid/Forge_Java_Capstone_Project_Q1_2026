@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/analytics")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Allows seamless frontend connection for BL Team 4 dashboards
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;

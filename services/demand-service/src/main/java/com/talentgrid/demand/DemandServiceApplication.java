@@ -14,14 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * for Kafka configuration, Audit client integration, and Feign clients.
  */
 @EnableScheduling
-@SpringBootApplication(
-        scanBasePackages = {
-                "com.talentgrid.demand",
-                "com.talentgrid.kafka",
-                "com.talentgrid.audit",
-                "com.talentgrid.clients"
-        }
-)
+@SpringBootApplication(scanBasePackages = {"com.talentgrid"})
 @EnableFeignClients(basePackages = {"com.talentgrid.demand.client", "com.talentgrid.demand.ai"})
 public class DemandServiceApplication {
 

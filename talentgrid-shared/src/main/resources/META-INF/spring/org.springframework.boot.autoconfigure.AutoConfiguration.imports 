@@ -1,1 +1,2 @@
 com.talentgrid.shared.config.JwtAutoConfiguration
+com.talentgrid.shared.config.CorsAutoConfiguration

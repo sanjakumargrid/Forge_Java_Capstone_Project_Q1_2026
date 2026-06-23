@@ -129,6 +129,7 @@ public class InterviewServiceImpl implements InterviewService {
         notificationEventPublisher.sendInAppAndEmail(
                 applicationDto.getCandidateId().toString(),
                 candidate.getEmail(),
+                null,
                 "INTERVIEW_INVITATION",
                 "Interview Invitation from Grid Dynamics",
                 "You have been invited to an interview. Please join using the Google Meet link: " + response.getMeetLink(),
@@ -156,6 +157,7 @@ public class InterviewServiceImpl implements InterviewService {
                         notificationEventPublisher.sendInAppAndEmail(
                                 String.valueOf(interviewerId),
                                 employee.getEmail(),
+                                null,
                                 "INTERVIEW_INVITATION",
                                 "Interview Scheduled: " + candidateName,
                                 "You have been scheduled to interview " + candidateName + ". Please join using the Google Meet link: " + response.getMeetLink(),

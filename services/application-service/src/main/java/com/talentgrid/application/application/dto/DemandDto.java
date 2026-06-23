@@ -15,6 +15,6 @@ public class DemandDto {
     private String location;
     private Long projectId;
     private String businessUnit;
-    private List<String> skills;
-
+    private List<com.talentgrid.application.application.dto.candidate.SkillDetailDto> mandatorySkills;
+    private List<com.talentgrid.application.application.dto.candidate.SkillDetailDto> optionalSkills;
 }

@@ -200,6 +200,7 @@ public class ApplicationEventTranslator extends BaseKafkaConsumer<ApplicationPay
       notificationEventPublisher.sendInAppAndEmail(
               application.getCandidateId().toString(),
               candidateEmail,
+              null,
               "APPLICATION_REJECTED",
               title,
               message,

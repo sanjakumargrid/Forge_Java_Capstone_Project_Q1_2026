@@ -20,9 +20,19 @@ public class DemandServiceClient {
     }
 
     public DemandDTO fetchDemandById(Long demandId) {
-        String url = demandServiceBaseUrl + "/api/demands/" + demandId;
+        String url = demandServiceBaseUrl + "/api/v1/demands/" + demandId;
         try {
-            ResponseEntity<DemandDTO> response = restTemplate.getForEntity(url, DemandDTO.class);
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            org.springframework.web.context.request.RequestAttributes requestAttributes = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();
+            if (requestAttributes instanceof org.springframework.web.context.request.ServletRequestAttributes attributes) {
+                jakarta.servlet.http.HttpServletRequest request = attributes.getRequest();
+                String authHeader = request.getHeader("Authorization");
+                if (authHeader != null) {
+                    headers.set("Authorization", authHeader);
+                }
+            }
+            org.springframework.http.HttpEntity<Void> entity = new org.springframework.http.HttpEntity<>(headers);
+            ResponseEntity<DemandDTO> response = restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, entity, DemandDTO.class);
             return response.getBody();
         } catch (HttpClientErrorException.NotFound e) {
             return null;

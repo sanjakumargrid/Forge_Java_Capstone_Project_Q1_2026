@@ -40,3 +40,10 @@ kafka_data/*
 
 echo ".DS_Store" >> .gitignore
 git add .gitignore
+
+# DocuSign Private Key
+**/docusign/private.key
+
+# Secrets
+**/application-secret.properties
+**/google/*.json

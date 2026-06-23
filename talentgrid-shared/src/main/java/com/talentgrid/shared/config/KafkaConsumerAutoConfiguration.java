@@ -43,7 +43,7 @@ public class KafkaConsumerAutoConfiguration {
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, AuthUserUpdatedEvent>
-    kafkaListenerContainerFactory() {
+    authUserKafkaListenerContainerFactory() {
 
         ConcurrentKafkaListenerContainerFactory<String, AuthUserUpdatedEvent> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();

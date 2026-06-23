@@ -586,7 +586,11 @@ public class ApplicationService {
             ExternalCandidateDto candidateDto,
             DemandDto demandDto) {
 
-        List<String> requiredSkills = normalizeSkills(demandDto.getSkills());
+        List<String> requiredSkills = demandDto.getMandatorySkills() == null 
+                ? List.of() 
+                : normalizeSkills(demandDto.getMandatorySkills().stream()
+                        .map(com.talentgrid.application.application.dto.candidate.SkillDetailDto::getSkillName)
+                        .collect(Collectors.toList()));
 
         List<String> candidateSkills = candidateDto.getSkills() == null
                 ? List.of()

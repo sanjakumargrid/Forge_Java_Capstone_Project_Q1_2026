@@ -17,7 +17,7 @@ public class Skill {
     @Column(name = "skill_name", nullable = false, unique = true, length = 255)
     private String skillName;
 
-    @Column(name = "embedding", columnDefinition = "public.vector(768)")
+    @Column(name = "embedding", columnDefinition = "real[]")
     private float[] embedding;
 
     @Column(name = "embedding_updated_at")

@@ -7,14 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@SpringBootApplication(
-        scanBasePackages = {
-                "offerService",
-                "com.talentgrid.kafka",
-                "com.talentgrid.clients.notification",
-                "com.talentgrid.audit"
-        }
-)
+@SpringBootApplication(scanBasePackages = {"offerService", "com.talentgrid"})
 @EnableConfigurationProperties({
         GeminiProperties.class,
         DocuSignProperties.class,

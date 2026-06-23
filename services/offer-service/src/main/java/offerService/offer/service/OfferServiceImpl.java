@@ -851,6 +851,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("completed".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.SIGNED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.SIGNED);
             offer.setSignedAt(LocalDateTime.now());
@@ -889,6 +892,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("declined".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.REJECTED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.REJECTED);
             offer.setRejectedAt(LocalDateTime.now());
@@ -923,6 +929,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("voided".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.EXPIRED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.EXPIRED);
 

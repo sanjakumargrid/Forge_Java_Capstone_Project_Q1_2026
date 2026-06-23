@@ -4743,3 +4743,714 @@ org.apache.kafka.common.errors.DisconnectException: null
 2026-06-23T13:48:59.506+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
 2026-06-23T13:48:59.622+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
 2026-06-23T13:49:27.386+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=3m9s255ms).
+2026-06-23T16:35:10.655+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=12
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T16:35:10.836+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=194 | entityType=DEMAND | entityId=12 | action=CREATE
+2026-06-23T16:35:10.836+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=497cf412-a44c-4f01-a6d5-3886527a889b
+2026-06-23T16:37:14.263+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=12
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T16:37:14.321+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=195 | entityType=DEMAND | entityId=12 | action=UPDATE
+2026-06-23T16:37:14.321+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=1cf2a85e-6993-496e-aad4-ae94af216ba8
+2026-06-23T16:38:22.819+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=13
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T16:38:22.836+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=196 | entityType=CANDIDATE | entityId=13 | action=CREATE
+2026-06-23T16:38:22.837+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=f1301753-faae-4aff-a814-954b5f089bbf
+2026-06-23T16:48:41.585+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=13
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T16:48:41.635+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=197 | entityType=CANDIDATE | entityId=13 | action=UPDATE
+2026-06-23T16:48:41.635+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=8dc3cc84-b92d-49bc-a521-4cf4bd85f6c3
+2026-06-23T16:48:42.322+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=352
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T16:48:42.349+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=198 | entityType=APPLICATION | entityId=352 | action=CREATE
+2026-06-23T16:48:42.349+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=61aad94b-c685-42ea-8ced-6667e3910854
+2026-06-23T17:21:40.258+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=13
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:21:40.275+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=199 | entityType=DEMAND | entityId=13 | action=CREATE
+2026-06-23T17:21:40.275+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=9656cb99-695d-4393-b9f9-41a04f3c84f1
+2026-06-23T17:22:13.932+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=13
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:22:13.946+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=200 | entityType=DEMAND | entityId=13 | action=UPDATE
+2026-06-23T17:22:13.946+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=0f765c77-afd6-4b2e-ac9f-952b16fa016c
+2026-06-23T17:28:25.112+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=14
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:28:25.124+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=201 | entityType=CANDIDATE | entityId=14 | action=CREATE
+2026-06-23T17:28:25.125+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=d71942f2-546d-456f-aa3d-be2c4d355ce4
+2026-06-23T17:28:25.395+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=353
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:28:25.406+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=202 | entityType=APPLICATION | entityId=353 | action=CREATE
+2026-06-23T17:28:25.406+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=c24ec5ee-0e2d-4cb0-982c-c28cabc87853
+2026-06-23T17:39:47.643+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=14
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:39:47.669+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=203 | entityType=CANDIDATE | entityId=14 | action=UPDATE
+2026-06-23T17:39:47.669+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=57e579c0-f1b8-4269-a28a-dc1b16a65bc4
+2026-06-23T17:49:26.630+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=15
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:49:26.679+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=204 | entityType=CANDIDATE | entityId=15 | action=CREATE
+2026-06-23T17:49:26.679+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=10548444-eee5-47b1-9ee2-79fb97cfbb11
+2026-06-23T17:49:26.768+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=354
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:49:26.773+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=205 | entityType=APPLICATION | entityId=354 | action=CREATE
+2026-06-23T17:49:26.774+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=382556b3-a9b2-4d11-98ea-43bed54cf934
+2026-06-23T17:49:49.586+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=15
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:49:49.598+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=206 | entityType=CANDIDATE | entityId=15 | action=UPDATE
+2026-06-23T17:49:49.598+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=a2673470-eb78-4adc-867f-a42a480d8939
+2026-06-23T17:55:45.374+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=16
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:55:45.415+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=207 | entityType=CANDIDATE | entityId=16 | action=CREATE
+2026-06-23T17:55:45.415+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=ed1208e9-d02f-4421-a85c-8ece4e8ed01b
+2026-06-23T17:55:45.593+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=355
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T17:55:45.596+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=208 | entityType=APPLICATION | entityId=355 | action=CREATE
+2026-06-23T17:55:45.596+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=75ba158c-fb10-4669-8b8b-e9b84c4545f8
+2026-06-23T18:06:31.544+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=14
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:06:31.557+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=209 | entityType=DEMAND | entityId=14 | action=CREATE
+2026-06-23T18:06:31.557+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=28a99daf-a378-4dc0-8b54-96c1f2a5cbf4
+2026-06-23T18:06:48.247+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=14
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:06:48.257+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=210 | entityType=DEMAND | entityId=14 | action=UPDATE
+2026-06-23T18:06:48.257+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=000ca0ee-2b32-4b50-a4e0-606423ceca1f
+2026-06-23T18:07:06.525+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=16
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:07:06.538+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=211 | entityType=CANDIDATE | entityId=16 | action=UPDATE
+2026-06-23T18:07:06.538+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=aaaee871-8668-4600-a206-a5c885d0806e
+2026-06-23T18:07:07.345+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:07:07.352+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=212 | entityType=APPLICATION | entityId=402 | action=CREATE
+2026-06-23T18:07:07.352+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=58390724-d122-4eb8-85db-2fa6878c9d6c
+2026-06-23T18:07:41.764+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=16
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:07:41.792+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=213 | entityType=CANDIDATE | entityId=16 | action=UPDATE
+2026-06-23T18:07:41.792+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=1820753d-571f-47e9-a800-c31b6213a2b3
+2026-06-23T18:09:41.572+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:09:41.587+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=214 | entityType=APPLICATION | entityId=402 | action=STATUS_CHANGE
+2026-06-23T18:09:41.587+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=b9d1b02a-9174-4db1-bc5d-7bbab6672c7c
+2026-06-23T18:18:07.003+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=15
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:18:07.015+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=215 | entityType=DEMAND | entityId=15 | action=CREATE
+2026-06-23T18:18:07.015+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=b066a814-86e5-4e38-868b-a234f58efc43
+2026-06-23T18:18:24.734+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=17
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:18:24.768+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=216 | entityType=CANDIDATE | entityId=17 | action=CREATE
+2026-06-23T18:18:24.768+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=13e65088-5b91-404b-a594-fca4b18cac74
+2026-06-23T18:18:24.855+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=403
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:18:24.858+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=217 | entityType=APPLICATION | entityId=403 | action=CREATE
+2026-06-23T18:18:24.858+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=65ff0ae1-868f-4b15-b7cb-e40aa57c870d
+2026-06-23T18:18:38.572+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=17
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:18:38.595+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=218 | entityType=CANDIDATE | entityId=17 | action=UPDATE
+2026-06-23T18:18:38.595+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=409d9673-cd7b-47d1-9e59-9027618af780
+2026-06-23T18:19:10.837+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=18
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:19:10.852+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=219 | entityType=CANDIDATE | entityId=18 | action=CREATE
+2026-06-23T18:19:10.852+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=cb8000f0-06b5-4262-9451-bbd51bf74a42
+2026-06-23T18:19:10.898+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:19:10.904+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=220 | entityType=APPLICATION | entityId=404 | action=CREATE
+2026-06-23T18:19:10.904+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=27e84c8c-8b96-4239-912a-b41642de0485
+2026-06-23T18:22:41.344+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:22:41.391+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=221 | entityType=APPLICATION | entityId=404 | action=STATUS_CHANGE
+2026-06-23T18:22:41.391+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=a6d46ffc-9c01-4c56-825e-022c1aa1bc98
+2026-06-23T18:43:46.731+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T18:43:46.740+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T18:43:46.759+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T18:43:46.797+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T18:43:46.797+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T18:43:46.797+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T18:43:46.942+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T18:44:07.862+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=5m27s525ms).
+2026-06-23T18:44:57.242+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:44:57.278+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=222 | entityType=APPLICATION | entityId=404 | action=STATUS_CHANGE
+2026-06-23T18:44:57.279+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=78619576-0a0a-4768-a26c-57963df69e92
+2026-06-23T18:44:58.946+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=302
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:44:59.035+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=223 | entityType=INTERVIEW | entityId=302 | action=CREATE
+2026-06-23T18:44:59.035+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=6d4ea34d-43a7-4e62-8c21-d70e43bd9bef
+2026-06-23T18:45:54.548+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=302
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:45:54.573+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=224 | entityType=INTERVIEW | entityId=302 | action=UPDATE
+2026-06-23T18:45:54.573+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=c34d89ca-8dcd-4c68-af03-0e7d141a4da2
+2026-06-23T18:54:20.428+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=302
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:54:20.448+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=225 | entityType=INTERVIEW | entityId=302 | action=UPDATE
+2026-06-23T18:54:20.448+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=8d0136af-be48-40c6-b7ea-cce3d88e8bc0
+2026-06-23T18:54:43.870+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=302
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:54:43.915+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=226 | entityType=INTERVIEW | entityId=302 | action=UPDATE
+2026-06-23T18:54:43.915+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=07a50a8b-1317-4b17-913b-e894e93d19ef
+2026-06-23T18:55:08.682+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T18:55:08.703+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=227 | entityType=APPLICATION | entityId=404 | action=STATUS_CHANGE
+2026-06-23T18:55:08.703+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=67edaafc-ffb5-4f04-9560-d875ca6034fd
+2026-06-23T19:06:53.378+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:06:53.395+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=228 | entityType=APPLICATION | entityId=404 | action=STATUS_CHANGE
+2026-06-23T19:06:53.395+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=982adb86-6ae8-4441-8456-e841d091b18a
+2026-06-23T19:06:53.434+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:06:53.436+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=229 | entityType=OFFER | entityId=402 | action=CREATE
+2026-06-23T19:06:53.436+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=dec40aea-dbfd-4397-9655-30623ef5c1a7
+2026-06-23T19:09:51.162+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:09:51.178+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=230 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:09:51.178+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=216317f4-1dd0-44b7-bc1d-87bdd98f2b1c
+2026-06-23T19:09:58.837+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:09:58.842+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=231 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:09:58.842+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=c028eb3a-5cba-4ba8-b28f-17d84e2cea07
+2026-06-23T19:11:08.498+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:11:08.515+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=232 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:11:08.515+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=3324166d-652a-4b77-a718-9ba892fbdd48
+2026-06-23T19:11:16.160+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:11:16.163+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=233 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:11:16.163+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=ec6a50fa-a891-4f5a-a424-250d9955d7a5
+2026-06-23T19:11:23.699+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:11:23.703+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=234 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:11:23.703+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=0c68600a-a2a9-4095-bf11-a6752a6a89f1
+2026-06-23T19:12:13.853+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:12:13.867+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=235 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:12:13.867+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=96a752c4-0ccf-4e8a-a104-ceb49a622d2c
+2026-06-23T19:12:32.895+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=402
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:12:32.917+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=236 | entityType=OFFER | entityId=402 | action=UPDATE
+2026-06-23T19:12:32.917+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=6d2d8848-e5c8-4343-9e63-cba1f128afbe
+2026-06-23T19:12:32.921+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=404
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:12:32.923+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=237 | entityType=APPLICATION | entityId=404 | action=STATUS_CHANGE
+2026-06-23T19:12:32.924+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=876ef633-ff2b-492c-b9b1-21c9134515cd
+2026-06-23T19:13:30.499+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=152
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T19:13:30.512+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=238 | entityType=OFFER | entityId=152 | action=UPDATE
+2026-06-23T19:13:30.512+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=bfafa62b-ec49-436e-84cd-40e2d7d123c3
+2026-06-23T19:54:48.817+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T19:54:48.891+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T19:54:48.891+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T19:54:48.905+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T19:54:48.905+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T19:54:48.905+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T19:54:49.027+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T19:55:06.440+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m22s768ms).
+2026-06-23T20:10:37.347+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:10:37.429+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:10:37.432+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T20:10:37.462+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:10:37.463+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:10:37.463+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:10:37.589+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:10:38.056+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m31s617ms).
+2026-06-23T20:27:14.400+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:27:14.433+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:27:14.433+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T20:27:14.441+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:27:14.442+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:27:14.442+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:27:14.538+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:43:01.350+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:43:01.350+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:43:01.351+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T20:43:01.356+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:43:01.356+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:43:01.356+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:43:01.449+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:57:26.143+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:57:26.143+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:57:26.144+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T20:57:26.147+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:57:26.147+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:57:26.147+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:57:26.273+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:57:41.282+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=47m3s159ms).
+2026-06-23T20:59:20.954+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-23T20:59:21.140+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:59:21.254+05:30  INFO 80682 --- [talentgrid-audit-service] [t-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Client requested disconnect from node 2147483646
+2026-06-23T20:59:21.386+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-audit-service-group-1, groupId=audit-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T20:59:49.115+05:30  WARN 80682 --- [talentgrid-audit-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m37s540ms).
+2026-06-23T21:54:18.767+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=16
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:54:18.856+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=239 | entityType=DEMAND | entityId=16 | action=CREATE
+2026-06-23T21:54:18.856+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=ba2d1478-eb5d-41c0-bc9a-0c98e412e202
+2026-06-23T21:54:56.250+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=DEMAND | entityId=16
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:54:56.259+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=240 | entityType=DEMAND | entityId=16 | action=UPDATE
+2026-06-23T21:54:56.259+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=b101b0ad-7e4d-439c-92b1-3695255f6a2f
+2026-06-23T21:56:11.563+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=19
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:56:11.623+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=241 | entityType=CANDIDATE | entityId=19 | action=CREATE
+2026-06-23T21:56:11.623+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=5015578d-1e38-4539-89d4-36e7f841f78f
+2026-06-23T21:56:12.708+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:56:12.711+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=242 | entityType=APPLICATION | entityId=452 | action=CREATE
+2026-06-23T21:56:12.711+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=218b2626-f142-4d2c-9510-1a02b43599b4
+2026-06-23T21:57:40.477+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=CANDIDATE | entityId=19
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:57:40.492+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=243 | entityType=CANDIDATE | entityId=19 | action=UPDATE
+2026-06-23T21:57:40.492+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=c3fac2f4-f037-4a80-abb3-d285de960f7e
+2026-06-23T21:58:46.412+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T21:58:46.430+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=244 | entityType=APPLICATION | entityId=452 | action=STATUS_CHANGE
+2026-06-23T21:58:46.430+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=2375cb06-bd07-43e5-961c-6d78d5603a96
+2026-06-23T22:01:15.646+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:01:15.686+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=245 | entityType=APPLICATION | entityId=452 | action=STATUS_CHANGE
+2026-06-23T22:01:15.687+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=8e1107d0-14dc-456e-b2af-66ea06435757
+2026-06-23T22:01:17.941+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=352
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:01:17.947+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=246 | entityType=INTERVIEW | entityId=352 | action=CREATE
+2026-06-23T22:01:17.947+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=bd01c4bf-e1c1-4583-911a-6e0193b2346e
+2026-06-23T22:02:13.618+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=352
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:02:13.645+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=247 | entityType=INTERVIEW | entityId=352 | action=UPDATE
+2026-06-23T22:02:13.645+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=ed1f0f5f-3f9a-4db4-8b7e-b770581cee85
+2026-06-23T22:02:23.403+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=INTERVIEW | entityId=352
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:02:23.407+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=248 | entityType=INTERVIEW | entityId=352 | action=UPDATE
+2026-06-23T22:02:23.407+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=6311bbf4-d250-4b62-bcbf-5b0004aee3c4
+2026-06-23T22:02:37.411+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:02:37.432+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=249 | entityType=APPLICATION | entityId=452 | action=STATUS_CHANGE
+2026-06-23T22:02:37.432+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=2b3f2c4c-1ce9-4115-9d35-41716dfc02c6
+2026-06-23T22:06:50.868+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:06:50.887+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=250 | entityType=APPLICATION | entityId=452 | action=STATUS_CHANGE
+2026-06-23T22:06:50.887+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=93edd6ee-4541-4cbd-a38a-fc4140cb9185
+2026-06-23T22:06:50.911+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:06:50.913+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=251 | entityType=OFFER | entityId=452 | action=CREATE
+2026-06-23T22:06:50.913+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=1a044de2-c493-41b5-980d-a553d7f70b22
+2026-06-23T22:07:22.807+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:07:22.823+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=252 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:07:22.823+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=37530548-1544-427b-adef-da01304a2649
+2026-06-23T22:08:12.367+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:08:12.387+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=253 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:08:12.389+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=24a57691-1c60-4398-9af2-39a7a47bb518
+2026-06-23T22:08:38.223+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:08:38.233+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=254 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:08:38.233+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=a3b6a0f3-6e33-4ac8-8642-0243fdd25ff6
+2026-06-23T22:09:40.545+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:09:40.559+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=255 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:09:40.559+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=cb35c576-0d33-4881-ab17-c12dbfaff504
+2026-06-23T22:09:46.975+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:09:46.980+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=256 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:09:46.981+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=36cea4b3-466f-4fd6-9d6e-3c1389fe54ad
+2026-06-23T22:10:00.290+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:10:00.316+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=257 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:10:00.316+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=b533d997-c471-4fcf-90a1-cefbc82bf270
+2026-06-23T22:19:45.015+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=OFFER | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:19:45.075+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=258 | entityType=OFFER | entityId=452 | action=UPDATE
+2026-06-23T22:19:45.075+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=ca462871-0c14-4e60-a5f0-87cc832d7262
+2026-06-23T22:19:45.080+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Received audit event | eventType=AUDIT_LOG_ENTRY | entityType=APPLICATION | entityId=452
+Hibernate: 
+    insert 
+    into
+        audit_logs
+        (action, actor_id, after_state, before_state, created_at, endpoint, entity_id, entity_type, ip_address, service_name, trace_id, user_agent) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+2026-06-23T22:19:45.083+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.audit.AuditLogService   : Audit log persisted successfully | auditId=259 | entityType=APPLICATION | entityId=452 | action=STATUS_CHANGE
+2026-06-23T22:19:45.083+05:30  INFO 80682 --- [talentgrid-audit-service] [ntainer#0-0-C-1] c.t.auditservice.kafka.AuditLogConsumer  : Audit event processed successfully | eventId=6cee3d9a-02e6-4df3-a684-c9b12d572e66

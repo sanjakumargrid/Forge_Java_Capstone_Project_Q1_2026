@@ -223,6 +223,7 @@ public class InterviewEventTranslator extends BaseKafkaConsumer<InterviewPayload
                         ? interview.getApplicationId().toString()
                         : null,
                 recipientEmail,
+                null,
                 notificationType,
                 title,
                 message,
