@@ -5,11 +5,19 @@ import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
 import com.talentgrid.auth.entity.Account;
 import com.talentgrid.auth.entity.Project;
+import com.talentgrid.auth.entity.BusinessUnit;
+import com.talentgrid.auth.entity.AccountBusinessUnitMapping;
+import com.talentgrid.auth.entity.Location;
+import com.talentgrid.auth.entity.Department;
 import com.talentgrid.auth.repository.AccountRepository;
 import com.talentgrid.auth.repository.ProjectRepository;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.ScopeRepository;
 import com.talentgrid.auth.repository.UserRepository;
+import com.talentgrid.auth.repository.BusinessUnitRepository;
+import com.talentgrid.auth.repository.AccountBusinessUnitMappingRepository;
+import com.talentgrid.auth.repository.LocationRepository;
+import com.talentgrid.auth.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -34,6 +42,10 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
     private final ProjectRepository projectRepository;
+    private final BusinessUnitRepository businessUnitRepository;
+    private final AccountBusinessUnitMappingRepository accountBusinessUnitMappingRepository;
+    private final LocationRepository locationRepository;
+    private final DepartmentRepository departmentRepository;
 
     @Override
     public void run(String... args) {
@@ -148,6 +160,52 @@ public class DataInitializer implements CommandLineRunner {
                 projectRepository.save(project);
                 log.info("Default project created.");
             }
+        }
+
+        // ── Seed Business Units ───────────────────────────────────────────────────
+        if (businessUnitRepository.count() == 0) {
+            BusinessUnit engBu = businessUnitRepository.save(
+                    BusinessUnit.builder().businessUnitName("Engineering").build());
+            BusinessUnit hrBu  = businessUnitRepository.save(
+                    BusinessUnit.builder().businessUnitName("Human Resources").build());
+            BusinessUnit finBu = businessUnitRepository.save(
+                    BusinessUnit.builder().businessUnitName("Finance").build());
+            BusinessUnit opsBu = businessUnitRepository.save(
+                    BusinessUnit.builder().businessUnitName("Operations").build());
+
+            // Map BUs to the default account (account variable is already declared above)
+            accountBusinessUnitMappingRepository.save(
+                    AccountBusinessUnitMapping.builder().account(account).businessUnit(engBu).build());
+            accountBusinessUnitMappingRepository.save(
+                    AccountBusinessUnitMapping.builder().account(account).businessUnit(hrBu).build());
+            accountBusinessUnitMappingRepository.save(
+                    AccountBusinessUnitMapping.builder().account(account).businessUnit(finBu).build());
+            accountBusinessUnitMappingRepository.save(
+                    AccountBusinessUnitMapping.builder().account(account).businessUnit(opsBu).build());
+            log.info("Default business units seeded.");
+        }
+
+        // ── Seed Locations ────────────────────────────────────────────────────────
+        if (locationRepository.count() == 0) {
+            locationRepository.save(Location.builder().country("India").locationName("Chennai").build());
+            locationRepository.save(Location.builder().country("India").locationName("Bengaluru").build());
+            locationRepository.save(Location.builder().country("India").locationName("Hyderabad").build());
+            locationRepository.save(Location.builder().country("USA").locationName("Atlanta").build());
+            locationRepository.save(Location.builder().country("USA").locationName("New York").build());
+            locationRepository.save(Location.builder().country("UK").locationName("London").build());
+            log.info("Default locations seeded.");
+        }
+
+        // ── Seed Departments ──────────────────────────────────────────────────────
+        if (departmentRepository.count() == 0) {
+            departmentRepository.save(Department.builder().departmentName("Software Engineering").build());
+            departmentRepository.save(Department.builder().departmentName("Quality Assurance").build());
+            departmentRepository.save(Department.builder().departmentName("DevOps").build());
+            departmentRepository.save(Department.builder().departmentName("Product Management").build());
+            departmentRepository.save(Department.builder().departmentName("Data Science").build());
+            departmentRepository.save(Department.builder().departmentName("Human Resources").build());
+            departmentRepository.save(Department.builder().departmentName("Finance").build());
+            log.info("Default departments seeded.");
         }
     }
 
