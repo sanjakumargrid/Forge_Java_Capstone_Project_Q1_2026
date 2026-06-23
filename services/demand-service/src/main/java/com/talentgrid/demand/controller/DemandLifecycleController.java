@@ -20,17 +20,17 @@ import java.util.List;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code POST  /api/demands/{id}/approve} — approve or reject a pending
- * demand</li>
- * <li>{@code PATCH /api/demands/{id}/status} — perform a legal status
- * transition</li>
- * <li>{@code GET   /api/demands/{id}/pipeline} — unified internal + external hiring
- * pipeline</li>
- * <li>{@code GET   /api/demands/{id}/history} — full audit trail of status transitions</li>
+ * <li>{@code POST  /api/v1/demands/{id}/submit} — HM submits for PM approval, or PM auto-approves from draft</li>
+ * <li>{@code POST  /api/v1/demands/{id}/approve} — project manager approves or rejects (same rules as PM route below)</li>
+ * <li>{@code PATCH /api/v1/demands/{id}/status} — perform a legal status
+ * transition (e.g., APPROVED -> INTERNAL_SEARCH)</li>
+ * <li>{@code GET   /api/v1/demands/{id}/pipeline} — unified internal + external hiring
+ * pipeline view</li>
+ * <li>{@code GET   /api/v1/demands/{id}/history} — full audit trail of status transitions</li>
  * </ul>
  */
 @RestController
-@RequestMapping("/api/demands")
+@RequestMapping("/api/v1/demands")
 @RequiredArgsConstructor
 public class DemandLifecycleController {
 
@@ -38,19 +38,35 @@ public class DemandLifecycleController {
     private final DemandQueryService queryService;
 
     /**
-     * Approve or reject a workforce demand that is in {@code PENDING_APPROVAL}
-     * status.
+     * Submit from {@code DRAFT}: HM → {@code PENDING_APPROVAL}; PM on same project → auto post-approval routing.
+     */
+    @PostMapping("/{id}/submit")
+    @PreAuthorize("hasAuthority('DEMAND_SUBMIT') or hasAuthority('DEMAND_PM_APPROVE')")
+    public ResponseEntity<DemandResponse> submitDemand(
+            @PathVariable Long id,
+            @RequestParam(required = false) String comments) {
+        DemandResponse response = lifecycleService.submitDemand(id, comments);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Approve or reject a demand in {@code PENDING_APPROVAL}.
+     * Only the user who is {@code project_manager_id} for the demand's project may call this
+     * (scope {@code DEMAND_PM_APPROVE}; enforced in service via user-auth project lookup).
+     *
+     * <p>Same behavior as {@code PUT /api/v1/project-manager/demands/{id}/approve}; offered as a
+     * convenience alias if UI doesn't segment PM persona.</p> single demand URL prefix.
      *
      * <p>
-     * Valid decisions: APPROVED, DRAFT (reject), DUPLICATE, ON_HOLD, CANCELLED.
-     * On APPROVED, auto-cascades to INTERNAL_SEARCH with approval timestamps set.
+     * Valid decisions: {@code APPROVED} (async activation to internal search or bench external via scheduler),
+     * or {@code CLOSED} with {@code closureReason=PM_REJECTED}.
      *
      * @param id      the demand ID
      * @param request the approval request with decision and optional comments
      * @return 200 OK
      */
     @PostMapping("/{id}/approve")
-    @PreAuthorize("hasAuthority('DEMAND_APPROVE') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
+    @PreAuthorize("hasAuthority('DEMAND_PM_APPROVE')")
     public ResponseEntity<DemandResponse> approveDemand(
             @PathVariable Long id, @RequestBody ApprovalRequest request) {
         DemandResponse response = lifecycleService.approve(id, request);

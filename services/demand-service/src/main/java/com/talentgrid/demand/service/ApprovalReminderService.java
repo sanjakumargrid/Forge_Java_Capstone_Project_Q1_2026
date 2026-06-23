@@ -6,8 +6,8 @@ import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.clients.notification.NotificationEventPublisher;
 import com.talentgrid.demand.client.UserAuthServiceClient;
 import com.talentgrid.demand.client.dto.UserDto;
-import com.talentgrid.demand.client.dto.UserSummaryResponse;
 import com.talentgrid.demand.domain.entity.Demand;
+import com.talentgrid.demand.scheduler.ApprovalSlaScheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,13 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Handles approval SLA reminder notifications.
+ * Sends approval SLA reminder notifications (24-hour mark).
  *
- * Sends reminders when a demand remains in
- * PENDING_APPROVAL for more than 72 hours.
+ * Notifies:
+ * - Project Manager (action required) — resolved via projectId → Project → projectManagerId → User
+ * - Demand Creator (information)
+ *
+ * Channels: Email, In-App, Slack (Slack is feature-toggled).
  */
 @Service
 @RequiredArgsConstructor
@@ -31,138 +34,126 @@ public class ApprovalReminderService {
   private final AuditLogClient auditLogClient;
 
   /**
-   * Sends approval reminder notifications to:
-   * 1. RMG responsible for the demand location
-   * 2. Hiring Manager (creator)
+   * Sends 24-hour reminder to PM (action required) and Creator (information).
+   *
+   * @param demand      the demand in PENDING_APPROVAL
+   * @param pm          pre-resolved PM info (from ApprovalSlaScheduler)
+   * @param elapsedHours hours elapsed since entering PENDING_APPROVAL
+   * @return true if at least one notification was dispatched without exception
    */
   public boolean sendApprovalReminder(
           Demand demand,
+          ApprovalSlaScheduler.PmInfo pm,
           long elapsedHours) {
 
-    try {
+    boolean anySent = false;
+    String correlationId = UUID.randomUUID().toString();
 
-      String correlationId = UUID.randomUUID().toString();
-
-      /*
-       * =====================================================
-       * Notify RMG
-       * =====================================================
-       */
-      UserSummaryResponse rmg =
-              userAuthServiceClient.getRmgByLocation(
-                      demand.getLocation());
-
-      if (rmg != null) {
-
+    // ── Notify PM (Action Required) ──────────────────────────────────────────
+    if (pm.userId() != null && pm.email() != null) {
+      try {
         notificationEventPublisher.sendInAppAndEmail(
-                String.valueOf(rmg.getId()),
-                rmg.getEmail(),
-                rmg.getSlackId(),   // <-- NEW PARAMETER
-                "DEMAND_APPROVAL_SLA_REMINDER",
-                "Demand Approval Pending",
+                String.valueOf(pm.userId()),
+                pm.email(),
+                pm.slackId(),
+                "DEMAND_APPROVAL_REMINDER",
+                "Action Required: Demand Approval Pending",
                 String.format(
-                        "Demand '%s' has been awaiting approval for %d hours.",
+                        "Demand '%s' (ID: %d) has been awaiting your approval for %d hours. " +
+                                "Please review and approve or reject it at the earliest.",
                         demand.getTitle(),
+                        demand.getDemandId(),
                         elapsedHours),
                 "demand-service",
                 String.valueOf(demand.getDemandId()),
                 "DEMAND",
                 "HIGH",
-                null,
+                "demand-approval-reminder",
                 Map.of(
-                        "demandId", String.valueOf(demand.getDemandId()),
-                        "demandTitle", demand.getTitle(),
-                        "elapsedHours", String.valueOf(elapsedHours)
+                        "demandId",       String.valueOf(demand.getDemandId()),
+                        "demandTitle",    demand.getTitle() != null ? demand.getTitle() : "",
+                        "elapsedHours",   String.valueOf(elapsedHours),
+                        "creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown",
+                        "recipientRole",  "Project Manager",
+                        "projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""
                 ),
                 correlationId
         );
-
-        log.info(
-                "Approval SLA reminder sent to RMG {} for demand {}",
-                rmg.getEmail(),
-                demand.getDemandId());
+        log.info("[REMINDER] 24h reminder sent to PM userId={} for demandId={}",
+                pm.userId(), demand.getDemandId());
+        anySent = true;
+      } catch (Exception e) {
+        log.error("[REMINDER] Failed to notify PM for demandId={}: {}",
+                demand.getDemandId(), e.getMessage(), e);
       }
+    } else {
+      log.warn("[REMINDER] PM info not available for demandId={} — PM reminder skipped",
+              demand.getDemandId());
+    }
 
-      /*
-       * =====================================================
-       * Notify Hiring Manager
-       * =====================================================
-       */
-      if (demand.getCreatedBy() != null) {
-
-        UserDto hm =
-                userAuthServiceClient.getUserById(
-                        demand.getCreatedBy());
-
-        if (hm != null) {
-
+    // ── Notify Creator (Information) ─────────────────────────────────────────
+    if (demand.getCreatedBy() != null) {
+      try {
+        UserDto creator = userAuthServiceClient.getUserById(demand.getCreatedBy());
+        if (creator != null && creator.getEmail() != null) {
           notificationEventPublisher.sendInAppAndEmail(
-                  String.valueOf(hm.getId()),
-                  hm.getEmail(),
-                  hm.getSlackId(),    // <-- NEW PARAMETER
-                  "DEMAND_APPROVAL_SLA_REMINDER",
-                  "Demand Approval Delayed",
+                  String.valueOf(creator.getId()),
+                  creator.getEmail(),
+                  creator.getSlackId(),
+                  "DEMAND_APPROVAL_REMINDER",
+                  "Your Demand is Still Awaiting Approval",
                   String.format(
-                          "Your demand '%s' is still awaiting approval after %d hours.",
+                          "Your demand '%s' (ID: %d) has been in PENDING_APPROVAL for %d hours. " +
+                                  "The project manager has been notified.",
                           demand.getTitle(),
+                          demand.getDemandId(),
                           elapsedHours),
                   "demand-service",
                   String.valueOf(demand.getDemandId()),
                   "DEMAND",
-                  "HIGH",
-                  null,
+                  "NORMAL",
+                  "demand-approval-reminder",
                   Map.of(
-                          "demandId", String.valueOf(demand.getDemandId()),
-                          "demandTitle", demand.getTitle(),
-                          "elapsedHours", String.valueOf(elapsedHours)
+                          "demandId",       String.valueOf(demand.getDemandId()),
+                          "demandTitle",    demand.getTitle() != null ? demand.getTitle() : "",
+                          "elapsedHours",   String.valueOf(elapsedHours),
+                          "creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown",
+                          "recipientRole",  "Demand Creator",
+                          "projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""
                   ),
                   correlationId
           );
-
-          log.info(
-                  "Approval SLA reminder sent to Hiring Manager {} for demand {}",
-                  hm.getEmail(),
-                  demand.getDemandId());
+          log.info("[REMINDER] 24h reminder sent to Creator userId={} for demandId={}",
+                  creator.getId(), demand.getDemandId());
+          anySent = true;
         }
+      } catch (Exception e) {
+        log.error("[REMINDER] Failed to notify Creator for demandId={}: {}",
+                demand.getDemandId(), e.getMessage(), e);
       }
-
-      /*
-       * =====================================================
-       * Audit Log
-       * =====================================================
-       */
-      auditLogClient.logAction(
-              AuditLogPayload.builder()
-                      .entityType("DEMAND")
-                      .entityId(demand.getDemandId())
-                      .action(AuditAction.STATUS_CHANGE)
-                      .actorId(0L)
-                      .beforeState(null)
-                      .afterState(Map.of(
-                              "event", "APPROVAL_SLA_REMINDER",
-                              "status", demand.getStatus().name(),
-                              "demandId", demand.getDemandId(),
-                              "elapsedHours", elapsedHours
-                      ))
-                      .serviceName("demand-service")
-                      .endpoint("/scheduler/approval-sla")
-                      .build()
-      );
-
-      log.info(
-              "Approval SLA audit recorded for demand {}",
-              demand.getDemandId());
-
-      return true;
-
-    } catch (Exception ex) {
-
-      log.error(
-              "Failed to process SLA reminder for demand {}",
-              demand.getDemandId(),
-              ex);
-
-      return false;
     }
+
+    // ── Audit ─────────────────────────────────────────────────────────────────
+    try {
+      auditLogClient.logAction(AuditLogPayload.builder()
+              .entityType("DEMAND")
+              .entityId(demand.getDemandId())
+              .action(AuditAction.STATUS_CHANGE)
+              .actorId(0L) // 0 = system
+              .beforeState(null)
+              .afterState(Map.of(
+                      "event",        "APPROVAL_SLA_24H_REMINDER",
+                      "status",       demand.getStatus().name(),
+                      "demandId",     demand.getDemandId(),
+                      "elapsedHours", elapsedHours
+              ))
+              .serviceName("demand-service")
+              .endpoint("/scheduler/approval-sla")
+              .build());
+    } catch (Exception e) {
+      log.warn("[REMINDER] Audit log failed for demandId={}: {}", demand.getDemandId(), e.getMessage());
+    }
+
+    return anySent;
   }
 }

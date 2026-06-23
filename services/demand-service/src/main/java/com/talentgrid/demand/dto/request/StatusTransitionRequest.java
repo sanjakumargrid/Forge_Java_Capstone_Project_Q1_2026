@@ -25,8 +25,8 @@ public class StatusTransitionRequest {
 
     /**
      * Closure or transition reason code.
-     * Required when transitioning to: {@code FILLED_INTERNAL}, {@code FILLED_EXTERNAL},
-     * {@code CANCELLED}, {@code ON_HOLD}, {@code DUPLICATE}.
+     * Required for several targets (for example {@code FILLED}, {@code CLOSED}, {@code ON_HOLD})
+     * as enforced by {@code TransitionValidator}.
      */
     private ClosureReason closureReason;
 

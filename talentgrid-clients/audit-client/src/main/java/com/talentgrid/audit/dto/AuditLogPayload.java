@@ -60,7 +60,7 @@ public class AuditLogPayload {
 
   /**
    * Endpoint that triggered the action.
-   * Example: /api/demands
+   * Example: /api/v1/demands
    */
   private String endpoint;
 

@@ -2,6 +2,7 @@ package com.talentgrid.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -59,9 +60,14 @@ public class User implements Serializable {
     )
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    /**
+     * Incremented when permissions change; embedded in JWT for invalidation.
+     * DB default avoids failed {@code ddl-auto=update} when adding NOT NULL to a non-empty {@code users} table.
+     */
+    @Column(name = "auth_version", nullable = false)
+    @ColumnDefault("1")
     @Builder.Default
-    private Set<UserAccountAssignment> assignments = new HashSet<>();
+    private Long authVersion = 1L;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -72,6 +78,9 @@ public class User implements Serializable {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.authVersion == null) {
+            this.authVersion = 1L;
+        }
     }
 
     @PreUpdate

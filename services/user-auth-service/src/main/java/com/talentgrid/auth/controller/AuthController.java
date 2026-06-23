@@ -1,11 +1,14 @@
 package com.talentgrid.auth.controller;
 
-import com.talentgrid.auth.dto.request.RegisterRequest;
-import com.talentgrid.auth.dto.response.RegisterResponse;
 import com.talentgrid.auth.dto.request.LoginRequest;
+import com.talentgrid.auth.dto.request.RegisterRequest;
 import com.talentgrid.auth.dto.response.LoginResponse;
+import com.talentgrid.auth.dto.response.RegisterResponse;
 import com.talentgrid.auth.entity.User;
+import com.talentgrid.auth.jwt.JwtBlacklistService;
+import com.talentgrid.auth.jwt.JwtService;
 import com.talentgrid.auth.repository.UserRepository;
+import com.talentgrid.auth.security.CachedUserPrincipal;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AuthService;
 import jakarta.servlet.http.Cookie;
@@ -20,13 +23,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.talentgrid.auth.jwt.JwtBlacklistService;
-import com.talentgrid.auth.jwt.JwtService;
 
 import java.util.Map;
 
+/**
+ * REST controller for handling user authentication endpoints.
+ *
+ * <p>Responsibilities:
+ * <ul>
+ *   <li>Expose endpoints for registration, login, token refresh, and logout</li>
+ *   <li>Manage HTTP-only secure cookies for refresh tokens</li>
+ *   <li>Integrate with authentication and JWT services</li>
+ * </ul>
+ */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -34,14 +45,18 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final JwtBlacklistService jwtBlacklistService;
-
     private final RefreshTokenService refreshTokenService;
 
+    /**
+     * Registers a new user.
+     *
+     * @param request the registration details
+     * @return response indicating success and assigned role
+     */
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(
             @Valid @RequestBody RegisterRequest request
     ) {
-        System.out.println("REGISTER API HIT");
 
         RegisterResponse response =
                 authService.register(request);
@@ -49,6 +64,13 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Authenticates a user and issues JWT and refresh tokens.
+     *
+     * @param request  the login credentials
+     * @param response HTTP response to attach the refresh token cookie
+     * @return response containing the JWT access token and user roles
+     */
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request,
@@ -61,6 +83,13 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    /**
+     * Issues a new JWT access token using a valid refresh token.
+     *
+     * @param request  HTTP request to extract the refresh token cookie
+     * @param response HTTP response to attach the newly rotated refresh token cookie
+     * @return response containing the new JWT access token
+     */
     @PostMapping("/refresh")
     public ResponseEntity<LoginResponse> refreshToken(
             HttpServletRequest request,
@@ -91,6 +120,15 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    /**
+     * Logs out the user by revoking their refresh token and blacklisting
+     * their current access token.
+     *
+     * @param request        HTTP request to extract the JWT from the Authorization header
+     * @param response       HTTP response to clear the refresh token cookie
+     * @param authentication the current Spring Security authentication
+     * @return success message
+     */
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(
             HttpServletRequest request,
@@ -115,9 +153,10 @@ public class AuthController {
         // =========================================
         // REVOKE REFRESH TOKEN + BLACKLIST JWT
         // =========================================
-        if (authentication != null) {
+        if (authentication != null && authentication.getPrincipal() instanceof CachedUserPrincipal) {
 
-            String email = authentication.getName();
+            CachedUserPrincipal principal = (CachedUserPrincipal) authentication.getPrincipal();
+            String email = principal.getEmail();
 
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() ->

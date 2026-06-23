@@ -1,0 +1,189 @@
+{
+  "_metadata": {
+    "endpoint": "GET /api/v1/demands/analytics",
+    "version": "1.0",
+    "description": "Demand analytics with capacity metrics for dashboard consumption",
+    "authentication": "JWT Bearer token required (ANALYTICS_DEMAND_VIEW authority)",
+    "query_parameters": {
+      "dateFrom": "Optional; ISO 8601 date format (yyyy-MM-dd); defaults to 30 days before dateTo",
+      "dateTo": "Optional; ISO 8601 date format (yyyy-MM-dd); defaults to today",
+      "businessUnit": "Optional; filters demands by business unit code"
+    },
+    "performance_characteristics": {
+      "target_p95_response_time_ms": 500,
+      "indexes_applied": [
+        "idx_demands_filter: (status, priority, business_unit, account_name, location, employment_type, is_deleted) - existing",
+        "idx_demands_sort: (created_at, priority) - existing",
+        "idx_demands_closure_reason: (closure_reason) - recommended for FILLED_INTERNAL/EXTERNAL filtering",
+        "idx_demands_project_client: (project_id, account_id) - recommended for capacity grouping",
+        "idx_demands_business_unit_created: (business_unit, created_at) - composite for date+BU filtering"
+      ]
+    }
+  },
+  "sample_request": {
+    "example_1_basic": {
+      "description": "Basic request with default date range (last 30 days)",
+      "url": "GET /api/v1/demands/analytics",
+      "query_params": {}
+    },
+    "example_2_with_dates": {
+      "description": "Request with explicit date range and business unit filter",
+      "url": "GET /api/v1/demands/analytics?dateFrom=2026-01-01&dateTo=2026-06-21&businessUnit=Finance",
+      "query_params": {
+        "dateFrom": "2026-01-01",
+        "dateTo": "2026-06-21",
+        "businessUnit": "Finance"
+      }
+    }
+  },
+  "sample_response": {
+    "metadata": {
+      "dateFrom": "2026-05-22",
+      "dateTo": "2026-06-21",
+      "businessUnit": null,
+      "windowDays": 31
+    },
+    "fillRate": {
+      "totalDemands": 250,
+      "filledDemands": 185,
+      "percentageFilled": 74.0
+    },
+    "avgTimeToFillDays": 12.5,
+    "internalVsExternalSplit": {
+      "filledInternal": 110,
+      "filledExternal": 75,
+      "percentageInternal": 59.46,
+      "percentageExternal": 40.54
+    },
+    "capacityByProjectClient": [
+      {
+        "projectId": 1001,
+        "clientId": 5001,
+        "demandCount": 15
+      },
+      {
+        "projectId": 1001,
+        "clientId": 5002,
+        "demandCount": 8
+      },
+      {
+        "projectId": 1002,
+        "clientId": 5003,
+        "demandCount": 22
+      },
+      {
+        "projectId": 1002,
+        "clientId": 5001,
+        "demandCount": 12
+      },
+      {
+        "projectId": 1003,
+        "clientId": 5004,
+        "demandCount": 31
+      }
+    ]
+  },
+  "sample_response_with_bu_filter": {
+    "description": "Response when filtering by Business Unit 'Engineering'",
+    "metadata": {
+      "dateFrom": "2026-05-22",
+      "dateTo": "2026-06-21",
+      "businessUnit": "Engineering",
+      "windowDays": 31
+    },
+    "fillRate": {
+      "totalDemands": 120,
+      "filledDemands": 95,
+      "percentageFilled": 79.17
+    },
+    "avgTimeToFillDays": 10.2,
+    "internalVsExternalSplit": {
+      "filledInternal": 62,
+      "filledExternal": 33,
+      "percentageInternal": 65.26,
+      "percentageExternal": 34.74
+    },
+    "capacityByProjectClient": [
+      {
+        "projectId": 2001,
+        "clientId": 6001,
+        "demandCount": 28
+      },
+      {
+        "projectId": 2001,
+        "clientId": 6002,
+        "demandCount": 15
+      },
+      {
+        "projectId": 2002,
+        "clientId": 6001,
+        "demandCount": 19
+      }
+    ]
+  },
+  "metric_definitions": {
+    "fillRate": {
+      "description": "Percentage of filled demands relative to total non-cancelled demands",
+      "formula": "(filledDemands / totalDemands) * 100",
+      "numerator": "Count of demands with status in (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY). Determined by first transition to FILLED_* in demand_status_history.",
+      "denominator": "Count of demands with status NOT IN (CANCELLED, DUPLICATE, ON_HOLD). Includes DRAFT, PENDING_APPROVAL, APPROVED, INTERNAL_SEARCH, OPEN_EXTERNAL, FILLED_*, CLOSED.",
+      "zero_denominator_handling": "Returns 0.0 if totalDemands is 0"
+    },
+    "avgTimeToFillDays": {
+      "description": "Average number of days from demand creation to first FILLED_* status transition",
+      "formula": "AVG(EXTRACT(EPOCH FROM (first_filled_transition_timestamp - created_at)) / 86400)",
+      "numerator": "Sum of (changed_at - created_at) in seconds for first FILLED_* transition, divided by 86400 to convert to days",
+      "calculation_method": "Uses demand_status_history table; identifies first transition to any FILLED_* status (FILLED_INTERNAL, FILLED_EXTERNAL, FILLED_PARTIALLY)",
+      "zero_denominator_handling": "Returns 0.0 if no filled demands exist in the window"
+    },
+    "internalVsExternalSplit": {
+      "description": "Count and percentage breakdown of filled demands by closure reason (internal vs external)",
+      "filledInternal": "Count of demands where status IN (FILLED_INTERNAL, FILLED_PARTIALLY, CLOSED) AND closure_reason = 'FILLED_INTERNAL'",
+      "filledExternal": "Count of demands where status IN (FILLED_EXTERNAL, FILLED_PARTIALLY, CLOSED) AND closure_reason = 'FILLED_EXTERNAL'",
+      "percentages": "Calculated as (count / (filledInternal + filledExternal)) * 100 for each; returns 0.0 if denominator is 0"
+    },
+    "capacityByProjectClient": {
+      "description": "Demand count grouped by project ID and client (account) ID for capacity planning",
+      "grouping": "GROUP BY project_id, account_id",
+      "ordering": "Results ordered by project_id ASC, account_id ASC",
+      "includes": "All non-deleted demands matching date and businessUnit filters",
+      "use_case": "Capacity reporting - shows which projects/clients have open demands and how many"
+    }
+  },
+  "filtering_logic": {
+    "date_range": {
+      "description": "Filters based on demand creation date (created_at)",
+      "logic": "CAST(d.created_at AS DATE) >= CAST(:dateFrom AS DATE) AND CAST(d.created_at AS DATE) <= CAST(:dateTo AS DATE)",
+      "default_if_not_provided": "dateFrom defaults to 30 days before dateTo; dateTo defaults to TODAY()"
+    },
+    "business_unit": {
+      "description": "Optional filter by business unit code",
+      "logic": "d.business_unit = :businessUnit (exact match, case-sensitive)",
+      "default_if_not_provided": "No filtering; includes all business units"
+    },
+    "soft_delete": {
+      "description": "Always excludes soft-deleted records",
+      "logic": "d.is_deleted = false"
+    },
+    "cancelled_duplicates": {
+      "description": "Excluded from fillRate denominator (totalDemands count) but included in numerator if applicable",
+      "logic": "status NOT IN ('CANCELLED', 'DUPLICATE') for non-cancelled count",
+      "rationale": "Analytics should reflect active demand pipeline"
+    }
+  },
+  "http_status_codes": {
+    "200": "Success - analytics computed successfully",
+    "400": "Bad Request - invalid date format (must be yyyy-MM-dd) or other parameter validation failure",
+    "401": "Unauthorized - missing or invalid JWT token",
+    "403": "Forbidden - JWT token valid but user lacks ANALYTICS_DEMAND_VIEW authority",
+    "500": "Internal Server Error - database query or processing error"
+  },
+  "implementation_notes": {
+    "no_pii_in_response": "Response contains only aggregated counts, IDs, and calculated metrics. No user names, emails, or other PII is included.",
+    "single_query_per_metric": "Each metric is computed using a single native SQL aggregate query (no in-memory processing of full demand lists)",
+    "read_only": "Endpoint is read-only; no modifications to demands made",
+    "caching": "Consider caching metrics if business unit has > 10k demands and query approaches 500ms target",
+    "indexing": "Existing indexes in idx_demands_filter cover status and business_unit. Consider composite index on (business_unit, created_at) and separate index on closure_reason for optimal performance"
+  }
+}
+

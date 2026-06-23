@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>A New Resource Demand is Created</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; }
+        .header { background: #1a56db; color: #fff; padding: 24px 32px; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .badge { display: inline-block; background: #fde68a; color: #92400e;
+            padding: 4px 12px; border-radius: 12px; font-size: 13px; margin-top: 8px; }
+        .body { padding: 24px 32px; }
+        .field { margin-bottom: 12px; }
+        .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+        .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
+        .action-box { background: #eff6ff; border-left: 4px solid #1a56db;
+            padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
+        .info-box  { background: #f0fdf4; border-left: 4px solid #16a34a;
+            padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
+        .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>A New Resource Demand is Created</h1>
+        <span class="badge" th:text="${recipientRole == 'Project Manager'} ? 'Action Required' : 'For Your Information'">Action Required</span>
+    </div>
+    <div class="body">
+
+        <!-- PM Messaging -->
+        <div th:if="${recipientRole == 'Project Manager'}" class="action-box">
+            <strong>Action Required:</strong> Please review and approve the following request for your project.
+        </div>
+
+        <!-- Creator Messaging -->
+        <div th:if="${recipientRole != 'Project Manager'}" class="info-box">
+            <strong>Update:</strong> This request is now in the queue awaiting formal approval from the Project Manager.
+        </div>
+
+        <div class="field">
+            <label>Demand</label>
+            <p th:text="${demandTitle}">—</p>
+        </div>
+        <div class="field">
+            <label>Demand ID</label>
+            <p th:text="${demandId}">—</p>
+        </div>
+        <div class="field">
+            <label>Project</label>
+            <p th:text="${projectName}">—</p>
+        </div>
+        <div class="field">
+            <label>Submitted By</label>
+            <p th:text="${creatorName}">—</p>
+        </div>
+        <div class="field">
+            <label>Location</label>
+            <p th:text="${location}">—</p>
+        </div>
+        <div class="field">
+            <label>Skills Required</label>
+            <p th:text="${skills}">—</p>
+        </div>
+    </div>
+    <div class="footer">TalentGrid · This is an automated notification.</div>
+</div>
+</body>
+</html>

@@ -76,7 +76,7 @@ public DemandAnalyticsMetricsResponse getAnalytics(LocalDate startDate, LocalDat
 **File:** `DemandAnalyticsController.java`
 
 ```
-GET /api/analytics/demands?startDate=2026-05-15&endDate=2026-06-14
+GET /api/v1/analytics/demands?startDate=2026-05-15&endDate=2026-06-14
 ```
 
 **Parameters:**
@@ -110,17 +110,17 @@ All tests passing ✅
 
 **1. Get analytics for last 30 days (default):**
 ```
-GET /api/analytics/demands
+GET /api/v1/analytics/demands
 ```
 
 **2. Get analytics for specific period:**
 ```
-GET /api/analytics/demands?startDate=2026-05-01&endDate=2026-05-31
+GET /api/v1/analytics/demands?startDate=2026-05-01&endDate=2026-05-31
 ```
 
 **3. Get analytics for May 2026:**
 ```
-GET /api/analytics/demands?startDate=2026-05-01&endDate=2026-05-31
+GET /api/v1/analytics/demands?startDate=2026-05-01&endDate=2026-05-31
 ```
 
 ---

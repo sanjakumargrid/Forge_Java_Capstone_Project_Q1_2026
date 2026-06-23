@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/lookups/job-titles")
+@RequestMapping("/api/v1/lookups/job-titles")
 @RequiredArgsConstructor
 public class JobTitleLookupController {
 

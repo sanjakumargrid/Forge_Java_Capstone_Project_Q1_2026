@@ -113,4 +113,21 @@ public class TalentGridTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+
+    @Bean
+    public NewTopic authUserUpdatedTopic() {
+        return TopicBuilder.name(TalentGridTopics.AUTH_USER_UPDATED)
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic authUserCreatedTopic() {
+        return TopicBuilder.name(TalentGridTopics.AUTH_USER_CREATED)
+                .partitions(1)
+                .replicas(1)
+                .build();
+    }
 }

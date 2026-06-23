@@ -54,15 +54,13 @@ public class DemandMapper {
         demand.setDepartment(request.getDepartment());
         demand.setClientInterview(request.getClientInterview());
         demand.setOnboardingDate(request.getOnboardingDate());
-        demand.setRequiredCount(request.getRequiredCount());
         demand.setTargetDate(request.getTargetDate());
         demand.setPriority(request.getPriority());
         demand.setSearchStartAt(request.getSearchStartAt());
         // Defaults set by business rule
         demand.setStatus(DemandStatus.DRAFT);
-        demand.setInternalFilledCount(0);
-        demand.setExternalFilledCount(0);
-        demand.setRecruitedCount(0);
+        demand.setIsFilled(false);
+        demand.setBenchHiring(Boolean.TRUE.equals(request.getBenchHiring()));
         demand.setIsDeleted(false);
         return demand;
     }
@@ -93,10 +91,10 @@ public class DemandMapper {
         if (request.getDepartment() != null)   demand.setDepartment(request.getDepartment());
         if (request.getClientInterview() != null) demand.setClientInterview(request.getClientInterview());
         if (request.getOnboardingDate() != null) demand.setOnboardingDate(request.getOnboardingDate());
-        if (request.getRequiredCount() != null) demand.setRequiredCount(request.getRequiredCount());
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
         if (request.getSearchStartAt() != null) demand.setSearchStartAt(request.getSearchStartAt());
+        if (request.getBenchHiring() != null) demand.setBenchHiring(request.getBenchHiring());
     }
 
     // ─── Demand → DemandResponse ────────────────────────────────────────────────
@@ -140,10 +138,9 @@ public class DemandMapper {
         response.setDepartment(demand.getDepartment());
         response.setClientInterview(demand.getClientInterview());
         response.setOnboardingDate(demand.getOnboardingDate());
-        response.setRequiredCount(demand.getRequiredCount());
-        response.setRecruitedCount(demand.getRecruitedCount());
-        response.setInternalFilledCount(demand.getInternalFilledCount());
-        response.setExternalFilledCount(demand.getExternalFilledCount());
+        response.setIsFilled(demand.getIsFilled());
+        response.setFillType(enumName(demand.getFillType()));
+        response.setBenchHiring(demand.getBenchHiring());
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setPreviousStatus(enumName(demand.getPreviousStatus()));
@@ -191,9 +188,7 @@ public class DemandMapper {
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setBusinessUnit(demand.getBusinessUnit());
-        response.setInternalFilledCount(demand.getInternalFilledCount());
-        response.setExternalFilledCount(demand.getExternalFilledCount());
-        response.setRequiredCount(demand.getRequiredCount());
+        response.setIsFilled(demand.getIsFilled());
         response.setCreatedAt(demand.getCreatedAt());
 
         // Compute age in days

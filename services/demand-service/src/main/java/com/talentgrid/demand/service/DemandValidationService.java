@@ -15,7 +15,6 @@ import java.util.List;
  * <ul>
  *   <li>{@code title} — required, max 255 characters</li>
  *   <li>{@code level} — required (seniority level)</li>
- *   <li>{@code requiredCount} — required, must be &ge; 1</li>
  *   <li>{@code priority} — required</li>
  *   <li>{@code budget} — if provided, must be &ge; 0</li>
  *   <li>{@code jobTitleId} — required</li>
@@ -51,12 +50,6 @@ public class DemandValidationService {
             errors.add("level (seniority level) is required");
         }
 
-        if (request.getRequiredCount() == null) {
-            errors.add("requiredCount is required");
-        } else if (request.getRequiredCount() < 1) {
-            errors.add("requiredCount must be at least 1");
-        }
-
         if (request.getPriority() == null) {
             errors.add("priority is required");
         }
@@ -65,6 +58,12 @@ public class DemandValidationService {
             errors.add("location is required");
         } else if (request.getLocation().length() > 150) {
             errors.add("location must not exceed 150 characters");
+        }
+
+        if (request.getDepartment() == null || request.getDepartment().isBlank()) {
+            errors.add("department is required");
+        } else if (request.getDepartment().length() > 150) {
+            errors.add("department must not exceed 150 characters");
         }
 
         if (request.getProjectId() == null) {
@@ -119,10 +118,6 @@ public class DemandValidationService {
             } else if (request.getTitle().length() > 255) {
                 errors.add("title must not exceed 255 characters");
             }
-        }
-
-        if (request.getRequiredCount() != null && request.getRequiredCount() < 1) {
-            errors.add("requiredCount must be at least 1");
         }
 
         if (request.getBudget() != null && request.getBudget().signum() < 0) {

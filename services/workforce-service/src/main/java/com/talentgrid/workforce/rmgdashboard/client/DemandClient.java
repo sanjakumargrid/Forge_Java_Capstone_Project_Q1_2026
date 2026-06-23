@@ -11,21 +11,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "demand-service",
-        url = "${demand-service.url:http://localhost:8081}",
+        url = "${demand-service.url:http://localhost:8082}",
         configuration = FeignAuthConfig.class)
 public interface DemandClient {
 
-    @GetMapping("/api/demands")
+    @GetMapping("/api/v1/demands")
     DemandSummaryPageResponse getDemandsByStatus(
             @RequestParam("status") String status,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "500") int size
     );
 
-    @GetMapping("/api/demands/{id}")
+    @GetMapping("/api/v1/demands/{id}")
     DemandDto getDemandById(@PathVariable("id") Long demandId);
 
-    @PatchMapping("/api/demands/{id}/status")
+    @PatchMapping("/api/v1/demands/{id}/status")
     DemandDto updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest statusUpdate);
 
 }

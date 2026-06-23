@@ -17,6 +17,12 @@ public class Skill {
     @Column(name = "skill_name", nullable = false, unique = true, length = 255)
     private String skillName;
 
+    @Column(name = "embedding", columnDefinition = "public.vector(768)")
+    private float[] embedding;
+
+    @Column(name = "embedding_updated_at")
+    private java.time.LocalDateTime embeddingUpdatedAt;
+
     public Long getSkillId() {
         return skillId;
     }
@@ -31,5 +37,21 @@ public class Skill {
 
     public void setSkillName(String skillName) {
         this.skillName = skillName;
+    }
+
+    public float[] getEmbedding() {
+        return embedding;
+    }
+
+    public void setEmbedding(float[] embedding) {
+        this.embedding = embedding;
+    }
+
+    public java.time.LocalDateTime getEmbeddingUpdatedAt() {
+        return embeddingUpdatedAt;
+    }
+
+    public void setEmbeddingUpdatedAt(java.time.LocalDateTime embeddingUpdatedAt) {
+        this.embeddingUpdatedAt = embeddingUpdatedAt;
     }
 }

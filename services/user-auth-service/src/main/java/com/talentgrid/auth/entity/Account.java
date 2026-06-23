@@ -3,7 +3,6 @@ package com.talentgrid.auth.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Account implements Serializable {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +21,12 @@ public class Account implements Serializable {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
+
+    /**
+     * The User ID of the Account Manager responsible for this account.
+     */
+    @Column(name = "account_manager_id")
+    private Long accountManagerId;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default

@@ -48,9 +48,31 @@ public class DemandPayload {
     private OffsetDateTime searchStartAt;
     private Long assignedRecruiter;
     private String assignedRecruiterName;
-    private Integer requiredCount;
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
-    private Integer recruitedCount;
+    /** Whether this demand has been filled. */
+    private Boolean isFilled;
+
+    /**
+     * How it was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} until the demand is filled.
+     */
+    private String fillType;
     private String closureReason;
+
+    // ─── PM notification routing fields ─────────────────────────────────────────
+    // These are populated transiently in Kafka events for notification routing.
+    // They are NOT stored on the Demand entity or its database table.
+    // Resolved at event-publish time via: Demand.projectId → Project → projectManagerId → User
+    private Long pmUserId;
+    private String pmName;
+    private String pmEmail;
+    private String pmSlackId;
+
+    // ─── SLA metadata ────────────────────────────────────────────────────────────
+    private Long elapsedHours;
+
+    /** Internal nomination id (nomination workflow events only). */
+    private Long nominationId;
+
+    /** Nominee user id for internal nomination events. */
+    private Long nomineeUserId;
 }

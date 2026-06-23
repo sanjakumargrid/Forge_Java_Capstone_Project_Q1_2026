@@ -1,0 +1,89 @@
+package com.talentgrid.demand.config;
+
+import com.talentgrid.demand.domain.entity.JobTitle;
+import com.talentgrid.demand.domain.entity.Skill;
+import com.talentgrid.demand.repository.JobTitleRepository;
+import com.talentgrid.demand.repository.SkillRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class SkillDataInitializer implements CommandLineRunner {
+
+    private final SkillRepository skillRepository;
+    private final JobTitleRepository jobTitleRepository;
+
+    @Override
+    @Transactional
+    public void run(String... args) throws Exception {
+        long skillCount = skillRepository.count();
+        log.info("=================================================");
+        log.info("SKILLS TABLE COUNT ACCORDING TO SPRING BOOT: {}", skillCount);
+        log.info("=================================================");
+
+        if (skillCount == 0) {
+            log.info("No skills found. Seeding initial skills...");
+            skillRepository.saveAll(List.of(
+                    createSkill(1L, "Java"),
+                    createSkill(2L, "Spring Boot"),
+                    createSkill(3L, "Kafka"),
+                    createSkill(4L, "PostgreSQL"),
+                    createSkill(5L, "Microservices"),
+                    createSkill(6L, "Docker"),
+                    createSkill(7L, "Kubernetes"),
+                    createSkill(8L, "AWS"),
+                    createSkill(9L, "Azure"),
+                    createSkill(10L, "REST API"),
+                    createSkill(11L, "Hibernate"),
+                    createSkill(12L, "JUnit"),
+                    createSkill(13L, "React"),
+                    createSkill(14L, "Angular"),
+                    createSkill(15L, "Python")
+            ));
+            log.info("Initial skills seeded.");
+        }
+
+        if (jobTitleRepository.count() == 0) {
+            log.info("No job titles found. Seeding initial job titles...");
+            jobTitleRepository.saveAll(List.of(
+                    createJobTitle(1L, "Software Engineer"),
+                    createJobTitle(2L, "Senior Software Engineer"),
+                    createJobTitle(3L, "Lead Software Engineer"),
+                    createJobTitle(4L, "Staff Engineer"),
+                    createJobTitle(5L, "Principal Engineer"),
+                    createJobTitle(6L, "Engineering Manager"),
+                    createJobTitle(7L, "Technical Architect"),
+                    createJobTitle(8L, "Backend Engineer"),
+                    createJobTitle(9L, "Frontend Engineer"),
+                    createJobTitle(10L, "Full Stack Engineer"),
+                    createJobTitle(11L, "DevOps Engineer"),
+                    createJobTitle(12L, "Cloud Engineer"),
+                    createJobTitle(13L, "Data Engineer"),
+                    createJobTitle(14L, "QA Engineer"),
+                    createJobTitle(15L, "SDET")
+            ));
+            log.info("Initial job titles seeded.");
+        }
+    }
+
+    private Skill createSkill(Long id, String name) {
+        Skill skill = new Skill();
+        skill.setSkillId(id);
+        skill.setSkillName(name);
+        return skill;
+    }
+
+    private JobTitle createJobTitle(Long id, String name) {
+        JobTitle jobTitle = new JobTitle();
+        jobTitle.setJobTitleId(id);
+        jobTitle.setTitleName(name);
+        return jobTitle;
+    }
+}

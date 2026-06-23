@@ -52,6 +52,74 @@ public class DemandEventProducer {
         send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_SUBMITTED", demand.getDemandId(), payload);
     }
 
+    /**
+     * Published when a demand enters PENDING_APPROVAL.
+     * Payload contains BOTH creator fields (for creator notification)
+     * and PM fields (for PM action-required notification).
+     * PM info is resolved by the caller — it is NOT stored on the Demand entity.
+     */
+    public void publishPendingApproval(Demand demand,
+                                       Long pmUserId,
+                                       String pmName,
+                                       String pmEmail,
+                                       String pmSlackId) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        // PM routing fields (transient — not on Demand entity)
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        payload.setBudget(demand.getBudget());
+        payload.setTargetDate(demand.getTargetDate());
+        payload.setDescription(demand.getDescription());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_PENDING_APPROVAL", demand.getDemandId(), payload);
+    }
+
+    /**
+     * Published by the SLA scheduler at the 24-hour mark.
+     * Contains PM and creator fields for dual notification.
+     */
+    public void publishApprovalReminder(Demand demand,
+                                        Long pmUserId,
+                                        String pmName,
+                                        String pmEmail,
+                                        String pmSlackId,
+                                        long elapsedHours) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        payload.setElapsedHours(elapsedHours);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_REMINDER", demand.getDemandId(), payload);
+    }
+
+    /**
+     * @deprecated Use {@link #publishApprovalSlaClosed}; kept as a delegate for backward compatibility.
+     */
+    @Deprecated
+    public void publishAutoCancelled(Demand demand,
+                                     Long pmUserId,
+                                     String pmName,
+                                     String pmEmail,
+                                     String pmSlackId) {
+        publishApprovalSlaClosed(demand, pmUserId, pmName, pmEmail, pmSlackId);
+    }
+
     public void publishApproved(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setApprovedBy(demand.getApprovedBy());
@@ -72,8 +140,6 @@ public class DemandEventProducer {
 
     public void publishExternalOpened(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
         payload.setAssignedRecruiter(demand.getAssignedRecruiter());
         payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
         payload.setAssignedRm(demand.getAssignedRm());
@@ -84,8 +150,6 @@ public class DemandEventProducer {
         payload.setDepartment(demand.getDepartment());
         payload.setEmploymentType(demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
         payload.setOnboardingDate(demand.getOnboardingDate());
-        // FIX: recipientEmail and raisedBy were missing — causing email notifications
-        // to be skipped
         payload.setRecipientEmail(demand.getCreatorEmail());
         payload.setRecipientSlackId(demand.getCreatorSlackId());
         payload.setRaisedBy(demand.getCreatorName() != null
@@ -96,12 +160,57 @@ public class DemandEventProducer {
         send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_EXTERNAL_OPENED", demand.getDemandId(), payload);
     }
 
+    /**
+     * Unified fill event (internal vs external distinguished by {@code fillType} / closure_reason).
+     */
+    public void publishDemandFilled(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * 72h approval SLA auto-close (terminal CLOSED).
+     */
+    public void publishApprovalSlaClosed(Demand demand,
+                                         Long pmUserId,
+                                         String pmName,
+                                         String pmEmail,
+                                         String pmSlackId) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_SLA_CLOSED", demand.getDemandId(), payload);
+    }
+
     public void publishFilledInternal(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -116,8 +225,8 @@ public class DemandEventProducer {
 
     public void publishFilledPartially(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -133,10 +242,8 @@ public class DemandEventProducer {
     public void publishFilledExternal(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setExternalFilledCount(demand.getExternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
@@ -215,15 +322,12 @@ public class DemandEventProducer {
     public void publishClosed(Demand demand) {
         DemandPayload payload = buildBasePayload(demand);
         payload.setClosureReason(demand.getClosureReason());
-        payload.setRequiredCount(demand.getRequiredCount());
-        payload.setInternalFilledCount(demand.getInternalFilledCount());
-        payload.setExternalFilledCount(demand.getExternalFilledCount());
-        payload.setRecruitedCount(demand.getRecruitedCount());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
         payload.setCreatedBy(demand.getCreatedBy());
         payload.setCreatorName(demand.getCreatorName());
         payload.setRecipientEmail(demand.getCreatorEmail());
         payload.setRecipientSlackId(demand.getCreatorSlackId());
-        // FIX: raisedBy was missing — notification message body showed null
         payload.setRaisedBy(demand.getCreatorName() != null
                 ? demand.getCreatorName()
                 : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
@@ -249,7 +353,6 @@ public class DemandEventProducer {
                         .map(ds -> ds.getSkill().getSkillName())
                         .toList() : null)
                 .location(demand.getLocation())
-                // Context fields present on every event
                 .accountName(demand.getAccountName())
                 .projectName(demand.getProjectName())
                 .businessUnit(demand.getBusinessUnit())

@@ -17,4 +17,5 @@ public class ProjectDto {
     private Long id;
     private Long accountId;
     private String name;
+    private Long projectManagerId;
 }

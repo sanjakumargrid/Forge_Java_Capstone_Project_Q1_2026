@@ -8,7 +8,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import jakarta.servlet.http.HttpServletRequest;
 
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
@@ -17,12 +16,16 @@ import java.util.Map;
 /**
  * Utility class to extract user details from the Spring Security Context
  * or the HTTP Request's Authorization Header (JWT).
- * 
- * <p>
- * This class implements a lightweight manual Base64 JWT decoder
- * mapping to the nested 'user' object structure.
+ *
+ * <p>Role checks should use the same role names as {@code user-auth-service} puts on the JWT
+ * (see {@code JwtService}: {@code role.getName()}), e.g. {@code HIRING_MANAGER}. The alias
+ * {@code HM} is still accepted for backward compatibility with older tokens or data.
  */
 public class SecurityUtils {
+
+    /** Canonical JWT role from user-auth; {@code HM} kept as legacy alias. */
+    public static final String ROLE_HIRING_MANAGER = "HIRING_MANAGER";
+    public static final String ROLE_HIRING_MANAGER_ALIAS = "HM";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -93,6 +96,10 @@ public class SecurityUtils {
 
     @SuppressWarnings("unchecked")
     public static List<String> getCurrentUserRoles() {
+        JwtPrincipal principal = getPrincipal();
+        if (principal != null && principal.getRoles() != null && !principal.getRoles().isEmpty()) {
+            return principal.getRoles();
+        }
         Map<String, Object> user = getUserObject();
         if (user != null && user.containsKey("roles")) {
             Object rolesObj = user.get("roles");
@@ -106,7 +113,9 @@ public class SecurityUtils {
 
     public static boolean hasAnyRole(String... roles) {
         List<String> userRoles = getCurrentUserRoles();
-        if (userRoles == null) return false;
+        if (userRoles == null) {
+            return false;
+        }
 
         for (String role : roles) {
             if (userRoles.contains(role)) {
@@ -114,6 +123,14 @@ public class SecurityUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Hiring Manager per workflow: matches JWT role {@link #ROLE_HIRING_MANAGER} (issued by user-auth)
+     * or legacy alias {@link #ROLE_HIRING_MANAGER_ALIAS}.
+     */
+    public static boolean isHiringManager() {
+        return hasAnyRole(ROLE_HIRING_MANAGER, ROLE_HIRING_MANAGER_ALIAS);
     }
 
     public static Long getCurrentUserAccountId() {

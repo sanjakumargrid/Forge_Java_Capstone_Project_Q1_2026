@@ -51,6 +51,12 @@ public class DemandExceptionHandler {
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 
+    @ExceptionHandler(org.springframework.dao.InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccess(org.springframework.dao.InvalidDataAccessApiUsageException ex) {
+        log.warn("Invalid data access: {}", ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid input data provided (e.g. null IDs).");
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleMessageNotReadable(HttpMessageNotReadableException ex) {
         log.warn("Malformed JSON request: {}", ex.getMessage());
@@ -66,7 +72,7 @@ public class DemandExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getClass().getName() + " - " + ex.getMessage());
     }
 
     // ─── Private helper ─────────────────────────────────────────────────────────
