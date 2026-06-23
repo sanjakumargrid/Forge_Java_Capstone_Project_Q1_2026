@@ -132,7 +132,7 @@ public class ApprovalSlaWorkflowTest {
     @Test
     void testPmApproveDemand_allowedOnlyForPm() {
         // Scenario 1: Non-PM tries to approve -> throws AccessDenied
-        login(30L, "PROJECT_MANAGER");
+        login(30L, "PORTFOLIO_MANAGER");
         Demand demand = new Demand();
         demand.setDemandId(2L);
         demand.setStatus(DemandStatus.PENDING_APPROVAL);
@@ -148,7 +148,7 @@ public class ApprovalSlaWorkflowTest {
         });
 
         // Scenario 2: Actual PM approves -> remains APPROVED until SearchActivationScheduler runs
-        login(20L, "PROJECT_MANAGER");
+        login(20L, "PORTFOLIO_MANAGER");
         doNothing().when(transitionValidator).validate(any(Demand.class), any(DemandStatus.class), any());
         when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
         when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
@@ -228,7 +228,7 @@ public class ApprovalSlaWorkflowTest {
     @Test
     void testPmSubmitsDemand_autoApprovesDirectly() {
         // Log in as Project Manager (creator and PM of project)
-        login(20L, "PROJECT_MANAGER");
+        login(20L, "PORTFOLIO_MANAGER");
 
         Demand demand = draftDemand(5L, 100L, 20L);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(5L)).thenReturn(Optional.of(demand));

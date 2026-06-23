@@ -46,7 +46,7 @@ public class DemandSecurityService {
     }
 
     public boolean isOwnerOrHasGlobalAccess(Long demandId) {
-        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+        if (SecurityUtils.isPlatformAdmin()) {
             return true;
         }
         return isOwner(demandId);
@@ -65,13 +65,13 @@ public class DemandSecurityService {
         Demand demand = demandOpt.get();
         DemandStatus status = demand.getStatus();
 
-        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+        if (SecurityUtils.hasAnyRole(SecurityUtils.ROLE_RECRUITER)) {
             return status == DemandStatus.OPEN_EXTERNAL
                     || status == DemandStatus.FILLED
                     || status == DemandStatus.CLOSED;
         }
 
-        if (SecurityUtils.hasAnyRole("EMPLOYEE")) {
+        if (SecurityUtils.isEmployee()) {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
@@ -90,7 +90,7 @@ public class DemandSecurityService {
      * True when the caller may call PATCH /status for this demand (fine-grained checks also run in service).
      */
     public boolean canTransition(Long demandId) {
-        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+        if (SecurityUtils.isPlatformAdmin()) {
             return true;
         }
         Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
@@ -104,21 +104,21 @@ public class DemandSecurityService {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole("PROJECT_MANAGER")) {
+        if (SecurityUtils.isPortfolioManager()) {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM")) {
+        if (SecurityUtils.isResourceManager()) {
             return status == DemandStatus.INTERNAL_SEARCH
                     || status == DemandStatus.ON_HOLD
                     || status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        if (SecurityUtils.hasAnyRole("TA_MANAGER")) {
+        if (SecurityUtils.isTaManager()) {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+        if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.ON_HOLD;
         }
 
@@ -126,6 +126,6 @@ public class DemandSecurityService {
     }
 
     public boolean canCloseOrCancel() {
-        return SecurityUtils.hasAnyRole("ADMIN", "RMG");
+        return SecurityUtils.isPlatformAdmin();
     }
 }

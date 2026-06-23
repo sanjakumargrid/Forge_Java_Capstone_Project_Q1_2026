@@ -7,6 +7,7 @@ import com.talentgrid.demand.domain.enums.ClosureReason;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.statemachine.DemandStateMachine;
 import com.talentgrid.demand.domain.statemachine.TransitionValidator;
+import com.talentgrid.demand.dto.request.ApprovalRequest;
 import com.talentgrid.demand.dto.request.StatusTransitionRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.exception.IllegalDemandTransitionException;
@@ -364,5 +365,120 @@ public class DemandStateRbacWorkflowTest {
                 .closureReason(ClosureReason.NO_INTERNAL_MATCH)
                 .build());
         assertEquals("OPEN_EXTERNAL", response.getStatus());
+    }
+
+    @Test
+    void adminMayPerformAnyLegalTransition_withoutRoleSpecificOwnership() {
+        Demand demand = createDemand(10L, DemandStatus.INTERNAL_SEARCH, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(10L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(99L, "ADMIN");
+        DemandResponse response = lifecycleService.transitionStatus(10L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.ON_HOLD)
+                .closureReason(ClosureReason.ON_HOLD)
+                .build());
+
+        assertEquals("ON_HOLD", response.getStatus());
+    }
+
+    @Test
+    void adminMayApprovePendingDemand_withoutProjectManagerCheck() {
+        Demand demand = createDemand(11L, DemandStatus.PENDING_APPROVAL, 10L);
+        demand.setProjectId(100L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(11L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(99L, "ADMIN");
+        DemandResponse response = lifecycleService.approve(11L, ApprovalRequest.builder()
+                .decision(DemandStatus.APPROVED)
+                .build());
+
+        assertEquals("APPROVED", response.getStatus());
+        verify(userAuthServiceClient, never()).getProjectById(any());
+    }
+
+    @Test
+    void adminMaySubmitDraftAndAutoApprove() {
+        Demand demand = createDemand(12L, DemandStatus.DRAFT, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(12L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(99L, "ADMIN");
+        DemandResponse response = lifecycleService.submitDemand(12L, "Admin override");
+
+        assertEquals("APPROVED", response.getStatus());
+    }
+
+    @Test
+    void hmMayRejectNominationAndOpenExternal() {
+        Demand demand = createDemand(14L, DemandStatus.INTERNAL_SEARCH, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(14L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(10L, "HIRING_MANAGER");
+        DemandResponse response = lifecycleService.transitionStatus(14L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.OPEN_EXTERNAL)
+                .closureReason(ClosureReason.HM_REJECTED_NOMINATION)
+                .build());
+
+        assertEquals("OPEN_EXTERNAL", response.getStatus());
+    }
+
+    @Test
+    void hmRejectNomination_deniedForRm() {
+        Demand demand = createDemand(15L, DemandStatus.INTERNAL_SEARCH, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(15L)).thenReturn(Optional.of(demand));
+
+        login(40L, "RESOURCE_MANAGER");
+        assertThrows(AccessDeniedException.class, () -> {
+            lifecycleService.transitionStatus(15L, StatusTransitionRequest.builder()
+                    .targetStatus(DemandStatus.OPEN_EXTERNAL)
+                    .closureReason(ClosureReason.HM_REJECTED_NOMINATION)
+                    .build());
+        });
+    }
+
+    @Test
+    void portfolioManagerPatchStatus_deniedForNonAdminTransition() {
+        Demand demand = createDemand(16L, DemandStatus.INTERNAL_SEARCH, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(16L)).thenReturn(Optional.of(demand));
+
+        login(20L, "PORTFOLIO_MANAGER");
+        assertThrows(AccessDeniedException.class, () -> {
+            lifecycleService.transitionStatus(16L, StatusTransitionRequest.builder()
+                    .targetStatus(DemandStatus.ON_HOLD)
+                    .closureReason(ClosureReason.ON_HOLD)
+                    .build());
+        });
+    }
+
+    @Test
+    void adminStillBlockedByIllegalStateMachineTransition() {
+        Demand demand = createDemand(13L, DemandStatus.CLOSED, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(13L)).thenReturn(Optional.of(demand));
+
+        login(99L, "ADMIN");
+        assertThrows(IllegalDemandTransitionException.class, () -> {
+            lifecycleService.transitionStatus(13L, StatusTransitionRequest.builder()
+                    .targetStatus(DemandStatus.INTERNAL_SEARCH)
+                    .build());
+        });
     }
 }
