@@ -2,6 +2,8 @@ package com.talentgrid.demand.service;
 
 import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.enums.DemandStatus;
+import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.exception.DemandNotFoundException;
@@ -18,7 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import com.talentgrid.demand.domain.entity.JobTitle;
+import com.talentgrid.demand.domain.entity.Skill;
+import com.talentgrid.demand.domain.entity.DemandSkill;
+import com.talentgrid.demand.repository.DemandSkillRepository;
 
 /**
  * Handles demand CRUD operations (create, update, soft-delete).
@@ -43,6 +51,9 @@ public class DemandService {
     private final DemandValidationService validationService;
     private final AuditLogClient auditLogClient;
     private final UserAuthServiceClient userAuthServiceClient;
+    private final JobTitleLookupService jobTitleLookupService;
+    private final SkillLookupService skillLookupService;
+    private final DemandSkillRepository demandSkillRepository;
 
     /**
      * Creates a new workforce demand in {@code DRAFT} status.
@@ -55,34 +66,36 @@ public class DemandService {
         validationService.validateCreate(request);
         Demand demand = demandMapper.toEntity(request);
 
-        // Fetch Account and Project info from UserAuthService
-        if (request.getAccountId() != null) {
-            try {
-                var account = userAuthServiceClient.getAccountById(request.getAccountId());
-                if (account != null) demand.setAccountName(account.getName());
-            } catch (Exception e) {
-                log.warn("Could not fetch account details for id={}: {}", request.getAccountId(), e.getMessage());
-                demand.setAccountName("Unknown Account");
-            }
+        JobTitle jobTitle = jobTitleLookupService.resolveJobTitleId(request.getJobTitleId());
+        demand.setTitle(jobTitle.getTitleName());
+        System.out.println("\n\n"+demand.getTitle()+"\n\n");
+        // Default onboarding date to target date if not provided
+        if (demand.getOnboardingDate() == null) {
+            demand.setOnboardingDate(demand.getTargetDate());
         }
-        
-        if (request.getProjectId() != null) {
-            try {
-                var project = userAuthServiceClient.getProjectById(request.getProjectId());
-                if (project != null) demand.setProjectName(project.getName());
-            } catch (Exception e) {
-                log.warn("Could not fetch project details for id={}: {}", request.getProjectId(), e.getMessage());
-                demand.setProjectName("Unknown Project");
-            }
-        }
+
+        enrichDemandFromReferences(demand, request);
+        applyCreateDefaults(demand);
 
         // Extract the user ID, email, and name from the security context and set it as
         // the creator
         demand.setCreatedBy(SecurityUtils.getCurrentUserId());
         demand.setCreatorEmail(SecurityUtils.getCurrentUserEmail());
         demand.setCreatorName(SecurityUtils.getCurrentUserName());
+        Long creatorId = SecurityUtils.getCurrentUserId();
+        var user = userAuthServiceClient.getUserById(creatorId);
+        if (user != null && user.getSlackId() != null) {
+            demand.setCreatorSlackId(user.getSlackId());
+        }
 
         Demand saved = demandRepository.save(demand);
+
+        // Persist DemandSkill mappings
+        List<DemandSkill> demandSkills = createDemandSkills(saved, request.getMandatorySkillIds(), request.getOptionalSkillIds());
+        if (!demandSkills.isEmpty()) {
+            demandSkillRepository.saveAll(demandSkills);
+            saved.setDemandSkills(demandSkills);
+        }
 
         // Publish audit event
         auditLogClient.logAction(AuditLogPayload.builder()
@@ -95,7 +108,7 @@ public class DemandService {
                         "title", saved.getTitle(),
                         "status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands")
+                .endpoint("/api/v1/demands")
                 .build());
 
         log.info("Demand created successfully with id={}", saved.getDemandId());
@@ -120,8 +133,25 @@ public class DemandService {
         Demand demand = findActiveOrThrow(id);
         requireDraftState(demand, "update");
 
+        if (request.getJobTitleId() != null) {
+            JobTitle jobTitle = jobTitleLookupService.resolveJobTitleId(request.getJobTitleId());
+            demand.setTitle(jobTitle.getTitleName());
+        }
+
         demandMapper.applyUpdate(request, demand);
         Demand saved = demandRepository.save(demand);
+
+        if (request.getMandatorySkillIds() != null || request.getOptionalSkillIds() != null) {
+            demandSkillRepository.deleteByDemandDemandId(saved.getDemandId());
+            List<DemandSkill> newSkills = createDemandSkills(saved, 
+                request.getMandatorySkillIds() != null ? request.getMandatorySkillIds() : getExistingSkillIds(saved, true),
+                request.getOptionalSkillIds() != null ? request.getOptionalSkillIds() : getExistingSkillIds(saved, false)
+            );
+            if (!newSkills.isEmpty()) {
+                demandSkillRepository.saveAll(newSkills);
+                saved.setDemandSkills(newSkills);
+            }
+        }
 
         // Publish audit event
         auditLogClient.logAction(AuditLogPayload.builder()
@@ -133,7 +163,7 @@ public class DemandService {
                         "title", saved.getTitle(),
                         "status", saved.getStatus().name()))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id)
+                .endpoint("/api/v1/demands/" + id)
                 .build());
 
         log.info("Demand updated successfully with id={}", saved.getDemandId());
@@ -166,7 +196,7 @@ public class DemandService {
                 .actorId(SecurityUtils.getCurrentUserId())
                 .afterState(Map.of("isDeleted", true))
                 .serviceName("demand-service")
-                .endpoint("/api/demands/" + id)
+                .endpoint("/api/v1/demands/" + id)
                 .build());
 
         log.info("Demand soft-deleted successfully with id={}", id);
@@ -191,6 +221,99 @@ public class DemandService {
             throw new InvalidDemandStateException(
                     String.format("Cannot %s demand (id=%d): current status is %s, expected DRAFT.",
                             operation, demand.getDemandId(), demand.getStatus()));
+        }
+    }
+
+    private List<DemandSkill> createDemandSkills(Demand demand, List<Long> mandatoryIds, List<Long> optionalIds) {
+        List<DemandSkill> demandSkills = new ArrayList<>();
+        if (mandatoryIds != null && !mandatoryIds.isEmpty()) {
+            List<Skill> mandatory = skillLookupService.resolveSkillIds(mandatoryIds);
+            for (Skill skill : mandatory) {
+                DemandSkill ds = new DemandSkill();
+                ds.setDemand(demand);
+                ds.setSkill(skill);
+                ds.setIsMandatory(true);
+                demandSkills.add(ds);
+            }
+        }
+        if (optionalIds != null && !optionalIds.isEmpty()) {
+            List<Skill> optional = skillLookupService.resolveSkillIds(optionalIds);
+            for (Skill skill : optional) {
+                DemandSkill ds = new DemandSkill();
+                ds.setDemand(demand);
+                ds.setSkill(skill);
+                ds.setIsMandatory(false);
+                demandSkills.add(ds);
+            }
+        }
+        return demandSkills;
+    }
+
+    private List<Long> getExistingSkillIds(Demand demand, boolean isMandatory) {
+        if (demand.getDemandSkills() == null) return List.of();
+        return demand.getDemandSkills().stream()
+                .filter(ds -> ds.getIsMandatory() == isMandatory)
+                .map(ds -> ds.getSkill().getSkillId())
+                .toList();
+    }
+
+    private void enrichDemandFromReferences(Demand demand, DemandRequest request) {
+        if (request.getProjectId() != null) {
+            try {
+                var project = userAuthServiceClient.getProjectById(request.getProjectId());
+                if (project != null) {
+                    if (project.getName() != null) {
+                        demand.setProjectName(project.getName());
+                    }
+                    if (demand.getAccountId() == null
+                            && project.getAccountId() != null
+                            && project.getAccountId() > 0) {
+                        demand.setAccountId(project.getAccountId());
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch project details for id={}: {}", request.getProjectId(), e.getMessage());
+            }
+        }
+        if (demand.getProjectName() == null) {
+            demand.setProjectName("Unknown Project");
+        }
+
+        Long accountId = demand.getAccountId();
+        if (accountId != null) {
+            try {
+                var account = userAuthServiceClient.getAccountById(accountId);
+                if (account != null && account.getName() != null) {
+                    demand.setAccountName(account.getName());
+                }
+            } catch (Exception e) {
+                log.warn("Could not fetch account details for id={}: {}", accountId, e.getMessage());
+            }
+        }
+        if (demand.getAccountName() == null) {
+            demand.setAccountName("Unknown Account");
+        }
+        if (demand.getAccountId() == null) {
+            throw new IllegalArgumentException(
+                    "accountId is required (provide accountId or a projectId linked to an account)");
+        }
+    }
+
+    private void applyCreateDefaults(Demand demand) {
+        if (demand.getEmploymentType() == null) {
+            demand.setEmploymentType(EmploymentType.FULL_TIME);
+        }
+        if (demand.getWorkMode() == null) {
+            demand.setWorkMode(WorkMode.REMOTE);
+        }
+        if (demand.getExperience() == null) {
+            demand.setExperience(0L);
+        }
+        if (demand.getClientInterview() == null) {
+            demand.setClientInterview(Boolean.FALSE);
+        }
+        if (demand.getRequiredCount() == null) {
+            demand.setRequiredCount(1);
         }
     }
 }

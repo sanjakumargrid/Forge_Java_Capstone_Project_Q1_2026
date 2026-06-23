@@ -15,5 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    java.util.List<User> findByLocationAndIsInterviewerEligible(String location, Boolean isInterviewerEligible);
+    Optional<User> findFirstByLocationAndRoles_NameAndEnabledTrue(
+            String location,
+            String roleName);
 }

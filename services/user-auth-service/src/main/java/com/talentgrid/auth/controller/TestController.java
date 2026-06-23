@@ -1,5 +1,7 @@
 package com.talentgrid.auth.controller;
 
+import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -10,8 +12,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/api/v1/test")
 public class TestController {
+
+    private final UserSecurityCacheService userSecurityCacheService;
+
+    @Autowired
+    public TestController(UserSecurityCacheService userSecurityCacheService) {
+        this.userSecurityCacheService = userSecurityCacheService;
+    }
+
+    @GetMapping("/cache/{userId}")
+    public Object cache(
+            @PathVariable Long userId
+    ) {
+        return userSecurityCacheService.getUser(userId);
+    }
 
     /**
      * GENERAL AUTH TEST

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${title}">Approval Reminder</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; }
+        .header { background: #d97706; color: #fff; padding: 24px 32px; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .badge { display: inline-block; background: #fef3c7; color: #92400e;
+            padding: 4px 12px; border-radius: 12px; font-size: 13px; margin-top: 8px; }
+        .body { padding: 24px 32px; }
+        .field { margin-bottom: 12px; }
+        .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+        .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
+        .warning-box { background: #fffbeb; border-left: 4px solid #d97706;
+            padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
+        .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${title}">Approval Reminder</h1>
+        <span class="badge">⏰ Reminder — <span th:text="${elapsedHours}">24</span>h Elapsed</span>
+    </div>
+    <div class="body">
+
+        <div class="warning-box">
+            <!-- PM Messaging -->
+            <span th:if="${recipientRole == 'Project Manager'}">
+                <strong>Action Required:</strong> The demand below has been pending your approval for <strong th:text="${elapsedHours}">24</strong> hours. Please review it at your earliest convenience.
+            </span>
+            <!-- Creator Messaging -->
+            <span th:if="${recipientRole != 'Project Manager'}">
+                <strong>Status Update:</strong> Your demand has been pending approval for <strong th:text="${elapsedHours}">24</strong> hours.
+            </span>
+        </div>
+
+        <div class="field">
+            <label>Demand</label>
+            <p th:text="${demandTitle}">—</p>
+        </div>
+        <div class="field">
+            <label>Demand ID</label>
+            <p th:text="${demandId}">—</p>
+        </div>
+        <div class="field">
+            <label>Project</label>
+            <p th:text="${projectName}">—</p>
+        </div>
+        <div class="field">
+            <label>Submitted By</label>
+            <p th:text="${creatorName}">—</p>
+        </div>
+        <div class="field">
+            <label>Time Pending</label>
+            <p><strong th:text="${elapsedHours}">24</strong> hours</p>
+        </div>
+
+        <!-- PM Footer Warning -->
+        <p th:if="${recipientRole == 'Project Manager'}" style="color:#b45309;margin-top:16px;line-height:1.5;">
+            ⚠️ <strong>Important:</strong> To maintain SLA compliance, demands left pending for 72 hours will be automatically cancelled. Please approve or reject this request to prevent cancellation.
+        </p>
+
+        <!-- Creator Footer Note -->
+        <p th:if="${recipientRole != 'Project Manager'}" style="color:#047857;margin-top:16px;">
+            We have sent an automated reminder to the Project Manager to review your request. No further action is required from you at this time.
+        </p>
+    </div>
+    <div class="footer">TalentGrid · This is an automated notification.</div>
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # TalentGrid Local Infrastructure
-# Kafka (KRaft) + Kafka UI + PostgreSQL
+# Kafka (KRaft) + Kafka UI + PostgreSQL + Redis
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # Start:
@@ -15,8 +15,11 @@
 # Kafka UI:
 #   http://localhost:7777
 #
-# PostgreSQL:
-#   localhost:5432
+# PostgreSQL (host port = POSTGRES_HOST_PORT, default 5432):
+#   localhost:${POSTGRES_HOST_PORT:-5432}
+# If you see "Bind for 0.0.0.0:5432 failed: port is already allocated", add to a
+# repo-root .env file:  POSTGRES_HOST_PORT=5433
+# Then point Spring at: jdbc:postgresql://localhost:5433/talentgrid
 #
 # DB Name:
 #   talentgrid
@@ -26,6 +29,10 @@
 #
 # Password:
 #   talentgrid
+#
+# Redis:
+#   localhost:6379
+#   Used by user-auth-service (token blacklist, auth cache) and API gateway (rate limiting)
 #
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -84,20 +91,36 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:9093
 
   postgres:
-    image: postgres:16
+    image: pgvector/pgvector:pg16
     container_name: talentgrid-postgres
     networks:
       - talentgrid-network
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     environment:
       POSTGRES_DB: talentgrid
       POSTGRES_USER: talentgrid
       POSTGRES_PASSWORD: talentgrid
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./scripts/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U talentgrid"]
+      test: [ "CMD-SHELL", "pg_isready -U talentgrid" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: talentgrid-redis
+    networks:
+      - talentgrid-network
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -108,3 +131,4 @@ networks:
 
 volumes:
   postgres_data:
+  redis_data:

@@ -25,20 +25,14 @@ public class DemandPipelineResponse {
     private String title;
     private String status;
 
-    /** Total headcount required for this demand. */
-    private Integer requiredCount;
+    /** Whether this demand has been filled. */
+    private Boolean isFilled;
 
-    /** Positions already filled from internal bench. */
-    private Integer internalFilledCount;
-
-    /** Positions already filled from external candidates. */
-    private Integer externalFilledCount;
-
-    /** Total recruited count (internal + external). */
-    private Integer recruitedCount;
-
-    /** Remaining open positions (requiredCount - recruitedCount). */
-    private Integer remainingCount;
+    /**
+     * How it was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} if not yet filled.
+     */
+    private String fillType;
 
     /** Internal candidate matches from the bench (employee IDs or lightweight projections). */
     private List<Long> internalCandidateIds;

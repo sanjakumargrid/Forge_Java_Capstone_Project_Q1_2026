@@ -1,0 +1,60 @@
+package com.talentgrid.demand.service;
+
+
+import com.talentgrid.demand.domain.entity.Skill;
+import com.talentgrid.demand.repository.SkillRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class SkillEmbeddingService {
+
+    private final GeminiEmbeddingService geminiEmbeddingService;
+    private final SkillRepository skillRepository;
+    private final RedisTemplate<String, float[]> embeddingRedisTemplate;
+
+    @Value("${ai.embedding.skill-cache-ttl-seconds:2592000}")
+    private long skillCacheTtl;
+
+    @Transactional
+    public void embedAndPersist(Skill skill) {
+        log.info("Generating embedding for skill: {}", skill.getSkillName());
+        float[] embedding = geminiEmbeddingService.embedContent(skill.getSkillName());
+        
+        skill.setEmbedding(embedding);
+        skill.setEmbeddingUpdatedAt(LocalDateTime.now());
+        skillRepository.save(skill);
+        
+        String redisKey = "embedding:skill:" + skill.getSkillId();
+        embeddingRedisTemplate.opsForValue().set(redisKey, embedding, skillCacheTtl, TimeUnit.SECONDS);
+        log.debug("Saved embedding for skill {} to Redis cache", skill.getSkillId());
+    }
+
+    @Transactional
+    public void backfillAllMissingEmbeddings() {
+        List<Skill> allSkills = skillRepository.findAll();
+        long missingCount = allSkills.stream().filter(s -> s.getEmbedding() == null).count();
+        log.info("Found {} skills missing embeddings. Starting backfill...", missingCount);
+        
+        for (Skill skill : allSkills) {
+            if (skill.getEmbedding() == null) {
+                try {
+                    embedAndPersist(skill);
+                } catch (Exception e) {
+                    log.error("Failed to backfill embedding for skill {}: {}", skill.getSkillId(), e.getMessage());
+                }
+            }
+        }
+        log.info("Backfill complete.");
+    }
+}

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS skills (
+    skill_id BIGSERIAL PRIMARY KEY,
+    skill_name VARCHAR(255) NOT NULL UNIQUE
+);

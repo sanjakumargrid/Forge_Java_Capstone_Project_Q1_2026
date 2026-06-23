@@ -1,20 +1,42 @@
-# IDE and Project
-.idea/
-*.iml
+HELP.md
 target/
-kafka_data/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
 
-# Credentials and Secrets
-**/src/main/resources/google/service-account.json
-**/src/main/resources/google/oauth-client-secret.json
-**/src/main/resources/docusign/private.key
-**/*.pem
-**/*.p12
-**/*.key
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
 .env
 
-# Logs and Scripts
-*.log
-pids.txt
-start_all.sh
-google-oauth-tokens/**/application-secret.properties
+# Kafka persistent data
+kafka_data/*
+!kafka_data/.gitkeep
+
+echo ".DS_Store" >> .gitignore
+git add .gitignore

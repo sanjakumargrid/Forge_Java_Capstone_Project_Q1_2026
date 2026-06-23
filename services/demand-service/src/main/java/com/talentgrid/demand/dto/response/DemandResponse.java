@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Full response DTO for a demand entity.
  * Returned by {@code GET /demands/{id}} and {@code POST /demands}.
- * Maps all 37 fields from the {@code demands} table.
+ * Maps all 42 fields from the {@code demands} table.
  */
 @Data
 @Builder
@@ -32,17 +32,40 @@ public class DemandResponse {
     private Long projectId;
     private String projectName;
     private String businessUnit;
-    private List<String> skills;
+    private Long jobTitleId;
+    private List<SkillDto> mandatorySkills;
+    private List<SkillDto> optionalSkills;
     private BigDecimal budget;
 
     /** Required utilization percentage (0–100) for this demand's project/account. */
     private Integer reqUtilPerc;
 
-    // Headcount
-    private Integer requiredCount;
-    private Integer recruitedCount;
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
+    /** The designated work mode for the demand (e.g., REMOTE, HYBRID, ONSITE). */
+    private String workMode;
+
+    /** Required years of professional experience. */
+    private Long experience;
+
+    /** The specific department requesting the demand. */
+    private String department;
+
+    /** Indicates whether a client interview is a mandatory step. */
+    private Boolean clientInterview;
+
+    /** The target date for the candidate to be officially onboarded. */
+    private LocalDate onboardingDate;
+
+    // Fill tracking (single-person model)
+    /** Whether this demand has been filled by a matched employee. */
+    private Boolean isFilled;
+
+    /**
+     * How the demand was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} when the demand is not yet filled.
+     */
+    private String fillType;
+
+    private Boolean benchHiring;
 
     // Status
     private String status;

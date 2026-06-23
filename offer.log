@@ -1,0 +1,797 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.0)
+
+2026-06-22T14:34:31.788+05:30  INFO 80683 --- [offer-service] [           main] offerService.OfferServiceApplication     : Starting OfferServiceApplication v1.0.0-SNAPSHOT using Java 17.0.18 with PID 80683 (/Users/spratap/.m2/repository/com/talentgrid/offer-service/1.0.0-SNAPSHOT/offer-service-1.0.0-SNAPSHOT.jar started by spratap in /Users/spratap/TalentGridTeam2)
+2026-06-22T14:34:31.858+05:30  INFO 80683 --- [offer-service] [           main] offerService.OfferServiceApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-06-22T14:34:35.097+05:30  INFO 80683 --- [offer-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-22T14:34:35.534+05:30  INFO 80683 --- [offer-service] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 425 ms. Found 2 JPA repository interfaces.
+2026-06-22T14:34:39.206+05:30  INFO 80683 --- [offer-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8085 (http)
+2026-06-22T14:34:39.226+05:30  INFO 80683 --- [offer-service] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-22T14:34:39.226+05:30  INFO 80683 --- [offer-service] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-06-22T14:34:39.271+05:30  INFO 80683 --- [offer-service] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-22T14:34:39.272+05:30  INFO 80683 --- [offer-service] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 7206 ms
+2026-06-22T14:34:40.710+05:30  INFO 80683 --- [offer-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-22T14:34:41.437+05:30  INFO 80683 --- [offer-service] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@511d5e6e
+2026-06-22T14:34:41.439+05:30  INFO 80683 --- [offer-service] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-22T14:34:41.492+05:30  INFO 80683 --- [offer-service] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/talentgrid (PostgreSQL 18.3)
+2026-06-22T14:34:41.809+05:30  WARN 80683 --- [offer-service] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.3 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 17.
+2026-06-22T14:34:41.912+05:30  INFO 80683 --- [offer-service] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 0 migrations (execution time 00:00.034s)
+2026-06-22T14:34:41.912+05:30  WARN 80683 --- [offer-service] [           main] o.f.core.internal.command.DbValidate     : No migrations found. Are your locations set up correctly?
+2026-06-22T14:34:43.393+05:30  INFO 80683 --- [offer-service] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-06-22T14:34:43.421+05:30  INFO 80683 --- [offer-service] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-06-22T14:34:43.590+05:30  INFO 80683 --- [offer-service] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-22T14:34:43.725+05:30  INFO 80683 --- [offer-service] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.2.Final
+2026-06-22T14:34:43.773+05:30  INFO 80683 --- [offer-service] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-22T14:34:44.252+05:30  INFO 80683 --- [offer-service] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-22T14:34:44.519+05:30  WARN 80683 --- [offer-service] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-22T14:34:44.542+05:30  INFO 80683 --- [offer-service] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-22T14:34:46.502+05:30  INFO 80683 --- [offer-service] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-22T14:34:46.767+05:30  INFO 80683 --- [offer-service] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-22T14:34:48.904+05:30  WARN 80683 --- [offer-service] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-22T14:34:49.716+05:30  INFO 80683 --- [offer-service] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-06-22T14:34:51.743+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.clients.admin.AdminClientConfig    : AdminClientConfig values: 
+	auto.include.jmx.reporter = true
+	bootstrap.controllers = []
+	bootstrap.servers = [localhost:9092]
+	client.dns.lookup = use_all_dns_ips
+	client.id = offer-service-admin-0
+	connections.max.idle.ms = 300000
+	default.api.timeout.ms = 60000
+	enable.metrics.push = true
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+
+2026-06-22T14:34:51.911+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-22T14:34:51.911+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-22T14:34:51.911+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782119091910
+2026-06-22T14:34:52.339+05:30  WARN 80683 --- [offer-service] [service-admin-0] o.a.k.clients.admin.KafkaAdminClient     : [AdminClient clientId=offer-service-admin-0] The DescribeTopicPartitions API is not supported, using Metadata API to describe topics.
+2026-06-22T14:34:52.354+05:30  INFO 80683 --- [offer-service] [service-admin-0] o.a.kafka.common.utils.AppInfoParser     : App info kafka.admin.client for offer-service-admin-0 unregistered
+2026-06-22T14:34:52.362+05:30  INFO 80683 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-22T14:34:52.362+05:30  INFO 80683 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-22T14:34:52.363+05:30  INFO 80683 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-22T14:34:52.430+05:30  INFO 80683 --- [offer-service] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8085 (http) with context path '/'
+2026-06-22T14:34:52.461+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-22T14:34:52.522+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-22T14:34:52.771+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-22T14:34:52.772+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-22T14:34:52.772+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782119092771
+2026-06-22T14:34:52.897+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-22T14:34:52.915+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-2
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-22T14:34:52.916+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-22T14:34:52.946+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-22T14:34:52.955+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-22T14:34:52.957+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782119092946
+2026-06-22T14:34:52.981+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-22T14:34:52.984+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-3
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-22T14:34:52.986+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-22T14:34:52.993+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-22T14:34:52.994+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-22T14:34:52.994+05:30  INFO 80683 --- [offer-service] [           main] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782119092993
+2026-06-22T14:34:53.092+05:30  INFO 80683 --- [offer-service] [           main] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-22T14:34:53.116+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-22T14:34:53.116+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-22T14:34:53.116+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-22T14:34:53.117+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T14:34:53.117+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T14:34:53.117+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T14:34:53.119+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.119+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.119+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.132+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-2-4454969e-9f41-4be8-b7c0-2bb949c5f88a
+2026-06-22T14:34:53.132+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-1-f55e7f49-9e09-4a79-894e-65a1c485dc00
+2026-06-22T14:34:53.132+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-3-081d20c8-0e54-401f-a2e5-0b8284ce473f
+2026-06-22T14:34:53.132+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.132+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.133+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] (Re-)joining group
+2026-06-22T14:34:53.136+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=88, memberId='consumer-offer-service-group-1-f55e7f49-9e09-4a79-894e-65a1c485dc00', protocol='range'}
+2026-06-22T14:34:53.136+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=88, memberId='consumer-offer-service-group-2-4454969e-9f41-4be8-b7c0-2bb949c5f88a', protocol='range'}
+2026-06-22T14:34:53.136+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=88, memberId='consumer-offer-service-group-3-081d20c8-0e54-401f-a2e5-0b8284ce473f', protocol='range'}
+2026-06-22T14:34:53.141+05:30  INFO 80683 --- [offer-service] [           main] offerService.OfferServiceApplication     : Started OfferServiceApplication in 22.559 seconds (process running for 24.038)
+2026-06-22T14:34:53.142+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Finished assignment for group at generation 88: {consumer-offer-service-group-2-4454969e-9f41-4be8-b7c0-2bb949c5f88a=Assignment(partitions=[offer-events-1]), consumer-offer-service-group-3-081d20c8-0e54-401f-a2e5-0b8284ce473f=Assignment(partitions=[offer-events-2]), consumer-offer-service-group-1-f55e7f49-9e09-4a79-894e-65a1c485dc00=Assignment(partitions=[offer-events-0])}
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=88, memberId='consumer-offer-service-group-3-081d20c8-0e54-401f-a2e5-0b8284ce473f', protocol='range'}
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=88, memberId='consumer-offer-service-group-1-f55e7f49-9e09-4a79-894e-65a1c485dc00', protocol='range'}
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=88, memberId='consumer-offer-service-group-2-4454969e-9f41-4be8-b7c0-2bb949c5f88a', protocol='range'}
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-2])
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-0])
+2026-06-22T14:34:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-1])
+2026-06-22T14:34:53.163+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Adding newly assigned partitions: offer-events-0
+2026-06-22T14:34:53.163+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Adding newly assigned partitions: offer-events-2
+2026-06-22T14:34:53.163+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Adding newly assigned partitions: offer-events-1
+2026-06-22T14:34:53.172+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Found no committed offset for partition offer-events-1
+2026-06-22T14:34:53.173+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-0 to the committed offset FetchPosition{offset=12, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-06-22T14:34:53.173+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-2 to the committed offset FetchPosition{offset=1, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}
+2026-06-22T14:34:53.174+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-2]
+2026-06-22T14:34:53.175+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-0]
+2026-06-22T14:34:53.184+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.SubscriptionState    : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Resetting offset for partition offer-events-1 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=0}}.
+2026-06-22T14:34:53.185+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-1]
+2026-06-22T14:43:53.231+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T14:43:53.231+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T14:43:53.261+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T14:53:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T14:53:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T14:53:53.151+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Node -1 disconnected.
+2026-06-22T15:11:19.405+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-22T15:11:19.406+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-22T15:11:19.416+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 9 ms
+2026-06-22T15:11:19.908+05:30 ERROR 80683 --- [offer-service] [nio-8085-exec-2] i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.application_id=?
+Hibernate: select nextval('offer_seq')
+2026-06-22T15:11:20.576+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.k.clients.producer.ProducerConfig    : ProducerConfig values: 
+	acks = -1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = offer-service-producer-1
+	compression.gzip.level = -1
+	compression.lz4.level = 9
+	compression.type = none
+	compression.zstd.level = 3
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = true
+	enable.metrics.push = true
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 0
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.springframework.kafka.support.serializer.JsonSerializer
+
+2026-06-22T15:11:20.577+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-22T15:11:20.584+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=offer-service-producer-1] Instantiated an idempotent producer.
+2026-06-22T15:11:20.593+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-22T15:11:20.593+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-22T15:11:20.594+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782121280593
+2026-06-22T15:11:20.597+05:30  INFO 80683 --- [offer-service] [vice-producer-1] org.apache.kafka.clients.Metadata        : [Producer clientId=offer-service-producer-1] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-22T15:11:20.598+05:30  INFO 80683 --- [offer-service] [vice-producer-1] o.a.k.c.p.internals.TransactionManager   : [Producer clientId=offer-service-producer-1] ProducerId set to 20 with epoch 0
+2026-06-22T15:11:20.613+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.kafka.producer.OfferEventProducer      : Published OFFER_CREATED event to topic=offer-events for offerId=102
+2026-06-22T15:11:20.622+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=12 | eventType=OFFER_CREATED
+2026-06-22T15:11:20.625+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=12
+2026-06-22T15:11:20.629+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=CREATE
+2026-06-22T15:11:20.631+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_CREATED | eventId=ad03afce-c1be-4cfb-ae62-ffe6ac81bd50 | source=offer-service | correlationId=2bbfef3c-3ff4-467d-a430-a88323200d5d
+2026-06-22T15:11:20.631+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=60 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:11:20.632+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_CREATED | offerId=102
+2026-06-22T15:11:20.636+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_CREATED | toEmail=null
+2026-06-22T15:11:20.638+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=25 | eventType=NOTIFICATION_SEND
+Hibernate: insert into offer (application_id,approval_chain,approved_at,approved_by,base_salary,bonus,candidate_name,current_approval_step,docu_sign_id,employment_type,equity,expires_at,joining_date,offer_status,rejected_at,rejected_by,rejection_reason,role,sent_at,signed_at,offer_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.application_id=? and o1_0.offer_status=? fetch first ? rows only
+2026-06-22T15:12:36.928+05:30  WARN 80683 --- [offer-service] [nio-8085-exec-4] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:12:48.717+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-5] o.kafka.producer.OfferEventProducer      : Published OFFER_UPDATED event to topic=offer-events for offerId=102
+2026-06-22T15:12:48.719+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-5] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:12:48.728+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=13 | eventType=OFFER_UPDATED
+2026-06-22T15:12:48.731+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=61 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:12:48.731+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=13
+2026-06-22T15:12:48.732+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_UPDATED | eventId=862002da-f57d-45b0-85bf-290d22a5b1e2 | source=offer-service | correlationId=c8a79cc6-ff40-4447-9aae-a0f663588d06
+2026-06-22T15:12:48.732+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_UPDATED | offerId=102
+2026-06-22T15:12:48.732+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_UPDATED | toEmail=null
+2026-06-22T15:12:48.734+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=26 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:12:58.632+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-6] o.kafka.producer.OfferEventProducer      : Published OFFER_UPDATED event to topic=offer-events for offerId=102
+2026-06-22T15:12:58.633+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-6] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:12:58.636+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=14 | eventType=OFFER_UPDATED
+2026-06-22T15:12:58.638+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=62 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:12:58.638+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=14
+2026-06-22T15:12:58.639+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_UPDATED | eventId=2dd288e6-bb07-4604-916e-a0e892265ceb | source=offer-service | correlationId=3ea190ae-c862-4afd-b5b2-d58978997dcf
+2026-06-22T15:12:58.639+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_UPDATED | offerId=102
+2026-06-22T15:12:58.640+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_UPDATED | toEmail=null
+2026-06-22T15:12:58.643+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=27 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:13:22.081+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-8] o.kafka.producer.OfferEventProducer      : Published OFFER_SUBMITTED_FOR_APPROVAL event to topic=offer-events for offerId=102
+2026-06-22T15:13:22.085+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-8] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:13:22.094+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=15 | eventType=OFFER_SUBMITTED_FOR_APPROVAL
+2026-06-22T15:13:22.094+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=63 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:13:22.096+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=15
+2026-06-22T15:13:22.097+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SUBMITTED_FOR_APPROVAL | eventId=9799bf67-6c53-497d-b994-58f27f5ffcfc | source=offer-service | correlationId=e810b0b1-3eab-4b45-93ba-12455c0ab963
+2026-06-22T15:13:22.097+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SUBMITTED_FOR_APPROVAL | offerId=102
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:13:22.104+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_SUBMITTED_FOR_APPROVAL | toEmail=hr.manager@example.com
+2026-06-22T15:13:22.106+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=28 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:13:33.170+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-9] o.kafka.producer.OfferEventProducer      : Published OFFER_PENDING_NEXT_APPROVAL event to topic=offer-events for offerId=102
+2026-06-22T15:13:33.171+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-9] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:13:33.184+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=16 | eventType=OFFER_PENDING_NEXT_APPROVAL
+2026-06-22T15:13:33.185+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=64 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:13:33.191+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=16
+2026-06-22T15:13:33.192+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_PENDING_NEXT_APPROVAL | eventId=35a18fd8-be83-4422-b355-b0b9c615b67d | source=offer-service | correlationId=d62964ef-d834-4610-800c-1c5c12e2f636
+2026-06-22T15:13:33.192+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_PENDING_NEXT_APPROVAL | offerId=102
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:13:33.195+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_PENDING_NEXT_APPROVAL | toEmail=delivery.manager@example.com
+2026-06-22T15:13:33.198+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=29 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:14:02.890+05:30  INFO 80683 --- [offer-service] [io-8085-exec-10] o.kafka.producer.OfferEventProducer      : Published OFFER_APPROVED event to topic=offer-events for offerId=102
+2026-06-22T15:14:02.890+05:30  INFO 80683 --- [offer-service] [io-8085-exec-10] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:14:02.903+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=17 | eventType=OFFER_APPROVED
+2026-06-22T15:14:02.904+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=65 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:14:02.906+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=17
+2026-06-22T15:14:02.907+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_APPROVED | eventId=69335b4b-d6e5-4a27-bb2b-7375faaf4c18 | source=offer-service | correlationId=afdc8b87-9e41-4b5c-94ce-ad7f3ea74613
+2026-06-22T15:14:02.907+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_APPROVED | offerId=102
+2026-06-22T15:14:02.908+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_APPROVED | toEmail=null
+2026-06-22T15:14:02.910+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=30 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+Hibernate: select ot1_0.template_id,ot1_0.active,ot1_0.created_at,ot1_0.template_content,ot1_0.template_name,ot1_0.updated_at from offer_template ot1_0 where ot1_0.active
+com.openhtmltopdf.load INFO:: SAX XMLReader in use (parser): com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser
+com.openhtmltopdf.load INFO:: SAX XMLReader in use (parser): com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser
+com.openhtmltopdf.load INFO:: Loaded document in ~17ms
+com.openhtmltopdf.load INFO:: TIME: parse stylesheets 59ms
+com.openhtmltopdf.match INFO:: media = print
+com.openhtmltopdf.match INFO:: Matcher created with 167 selectors
+com.openhtmltopdf.general INFO:: Using fast-mode renderer. Prepare to fly.
+2026-06-22T15:15:06.870+05:30  WARN 80683 --- [offer-service] [nio-8085-exec-2] o.offer.integration.DocuSignClient       : DocuSign credentials not configured. Generating dummy envelope ID for local testing.
+2026-06-22T15:15:06.880+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] o.kafka.producer.OfferEventProducer      : Published OFFER_SENT event to topic=offer-events for offerId=102
+2026-06-22T15:15:06.881+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-2] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:15:06.892+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=18 | eventType=OFFER_SENT
+2026-06-22T15:15:06.893+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=66 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:15:06.896+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=18
+2026-06-22T15:15:06.896+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SENT | eventId=23851d87-5bc1-4f74-b7c8-beed7f447c96 | source=offer-service | correlationId=786ec6af-9834-4108-8016-af6bcaf7a59b
+2026-06-22T15:15:06.896+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SENT | offerId=102
+2026-06-22T15:15:06.897+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_SENT | toEmail=null
+2026-06-22T15:15:06.899+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=31 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-22T15:16:37.276+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-6] o.kafka.producer.OfferEventProducer      : Published OFFER_SIGNED event to topic=offer-events for offerId=102
+2026-06-22T15:16:37.278+05:30  INFO 80683 --- [offer-service] [nio-8085-exec-6] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=102 | action=UPDATE
+2026-06-22T15:16:37.283+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=0 | offset=19 | eventType=OFFER_SIGNED
+2026-06-22T15:16:37.284+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=67 | eventType=AUDIT_LOG_ENTRY
+2026-06-22T15:16:37.288+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=0 | offset=19
+2026-06-22T15:16:37.291+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SIGNED | eventId=b868017e-3cfe-4dd7-8e9f-953184ff6a61 | source=offer-service | correlationId=b0191226-674a-49a1-a914-5c6e85397a77
+2026-06-22T15:16:37.291+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SIGNED | offerId=102
+2026-06-22T15:16:37.292+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=102 | type=OFFER_SIGNED | toEmail=null
+2026-06-22T15:16:37.294+05:30  INFO 80683 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=2 | offset=32 | eventType=NOTIFICATION_SEND
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-22T15:20:37.301+05:30  INFO 80683 --- [offer-service] [vice-producer-1] org.apache.kafka.clients.NetworkClient   : [Producer clientId=offer-service-producer-1] Node -1 disconnected.
+2026-06-22T15:30:20.631+05:30  INFO 80683 --- [offer-service] [vice-producer-1] org.apache.kafka.clients.NetworkClient   : [Producer clientId=offer-service-producer-1] Node -1 disconnected.
+2026-06-22T15:55:36.950+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T15:55:36.950+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T15:55:37.046+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:37.046+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:36.949+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T15:55:37.047+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T15:55:37.048+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T15:55:37.049+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:37.052+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T15:55:37.156+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:37.156+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:37.159+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T15:55:37.182+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.679+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.692+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.692+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T16:00:32.682+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.692+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.692+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T16:00:32.690+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.706+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.706+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T16:00:32.714+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.715+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.715+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.717+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.717+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.722+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.722+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.725+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: coordinator unavailable. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T16:00:32.725+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.819+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.825+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.854+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T16:00:32.977+05:30  WARN 80683 --- [offer-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m20s838ms).
+2026-06-22T17:04:12.248+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:04:12.367+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17599 due to node 1 being disconnected (elapsed time since creation: 906241ms, elapsed time since send: 906241ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:04:12.327+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:04:12.370+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17590 due to node 1 being disconnected (elapsed time since creation: 906241ms, elapsed time since send: 906241ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:04:12.248+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:04:12.373+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17592 due to node 1 being disconnected (elapsed time since creation: 906264ms, elapsed time since send: 906264ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:04:12.420+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:04:12.420+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.421+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:04:12.422+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Error sending fetch request (sessionId=177010885, epoch=14995) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:04:12.423+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Error sending fetch request (sessionId=2116704413, epoch=14996) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:04:12.423+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Error sending fetch request (sessionId=486517334, epoch=14995) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:04:12.568+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.570+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.570+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.575+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:04:12.577+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:48.765+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:06:48.723+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:06:48.723+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Disconnecting from node 1 due to request timeout.
+2026-06-22T17:06:49.303+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17608 due to node 1 being disconnected (elapsed time since creation: 151363ms, elapsed time since send: 151363ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:06:49.303+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17617 due to node 1 being disconnected (elapsed time since creation: 151362ms, elapsed time since send: 151362ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:06:49.306+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Cancelled in-flight FETCH request with correlation id 17609 due to node 1 being disconnected (elapsed time since creation: 151363ms, elapsed time since send: 151363ms, throttle time: 0ms, request timeout: 30000ms)
+2026-06-22T17:06:49.355+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Error sending fetch request (sessionId=2048391511, epoch=9) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:06:49.330+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Error sending fetch request (sessionId=891902639, epoch=9) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:06:49.350+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.kafka.clients.FetchSessionHandler    : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Error sending fetch request (sessionId=1458600978, epoch=9) to node 1:
+
+org.apache.kafka.common.errors.DisconnectException: null
+
+2026-06-22T17:06:49.387+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:06:49.387+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:49.388+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:06:49.389+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:06:49.389+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:49.389+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:06:49.390+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Group coordinator localhost:9092 (id: 2147483646 rack: null) is unavailable or invalid due to cause: session timed out without receiving a heartbeat response. isDisconnected: false. Rediscovery will be attempted.
+2026-06-22T17:06:49.390+05:30  INFO 80683 --- [offer-service] [r-service-group] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Requesting disconnect from last known coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:49.390+05:30  INFO 80683 --- [offer-service] [r-service-group] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Client requested disconnect from node 2147483646
+2026-06-22T17:06:49.718+05:30  INFO 80683 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:49.725+05:30  INFO 80683 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:06:49.835+05:30  INFO 80683 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-22T17:07:08.597+05:30  WARN 80683 --- [offer-service] [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=18m5s219ms).

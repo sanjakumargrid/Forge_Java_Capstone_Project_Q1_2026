@@ -4,7 +4,10 @@ import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.FillType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -15,7 +18,7 @@ import java.util.List;
 
 /**
  * JPA entity representing a workforce demand.
- * Maps all 37 columns of the {@code demands} table as specified in the schema.
+ * Maps all 42 columns of the {@code demands} table as specified in the schema.
  *
  * <p>
  * Lifecycle callbacks:
@@ -71,14 +74,10 @@ public class Demand {
     @Column(name = "business_unit", nullable = false, length = 150)
     private String businessUnit;
 
-    /**
-     * Array of skill tags stored as a PostgreSQL {@code text[]} column.
-     */
-    @JdbcTypeCode(SqlTypes.ARRAY)
-    @Column(name = "skills", columnDefinition = "text[]", nullable = false)
-    private List<String> skills;//
+    @Column(name = "job_title_id")
+    private Long jobTitleId;
 
-    @Column(name = "budget", precision = 15, scale = 2)
+    @Column(name = "budget", precision = 15, scale = 2, nullable = false)
     private BigDecimal budget;
 
     /**
@@ -94,22 +93,50 @@ public class Demand {
     @Column(name = "req_util_perc")
     private Integer reqUtilPerc;//
 
-    // ─── Headcount Tracking ─────────────────────────────────────────────────────
-    @Column(name = "required_count", nullable = false)
-    private Integer requiredCount;//
+    @Enumerated(EnumType.STRING)
+    @Column(name = "work_mode", nullable = false)
+    private WorkMode workMode;
+
+    @Column(name = "experience", nullable = false)
+    private Long experience;
+
+    @Column(name = "department", nullable = false, length = 150)
+    private String department;
+
+    @Column(name = "client_interview", nullable = false)
+    private Boolean clientInterview;
+
+    @Column(name = "onboarding_date")
+    private LocalDate onboardingDate;
+
+    // ─── Fill Tracking (single-person model) ────────────────────────────────────
+    /**
+     * Whether this demand has been filled by a single matched employee.
+     * Defaults to {@code false} on creation.
+     */
+    @Column(name = "is_filled", nullable = false)
+    @ColumnDefault("false")
+    private Boolean isFilled;
 
     /**
-     * Derived field: {@code internalFilledCount + externalFilledCount}.
-     * Kept in sync by the service layer on every fill event.
+     * How the demand was filled — {@code INTERNAL} (from the bench) or
+     * {@code EXTERNAL} (externally hired). {@code null} until the demand is filled.
      */
-    @Column(name = "recruited_count")
-    private Integer recruitedCount;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "fill_type")
+    private FillType fillType;
 
-    @Column(name = "internal_filled_count")
-    private Integer internalFilledCount;
+    /**
+     * Bench hiring: after approval, skip internal search and go straight to external hiring.
+     */
+    @Column(name = "bench_hiring", nullable = false)
+    @ColumnDefault("false")
+    private Boolean benchHiring;
 
-    @Column(name = "external_filled_count")
-    private Integer externalFilledCount;
+    /** Legacy headcount column; single-person model always persists {@code 1}. */
+    @Column(name = "required_count", nullable = false)
+    @ColumnDefault("1")
+    private Integer requiredCount;
 
     // ─── Status & Priority ──────────────────────────────────────────────────────
     @Enumerated(EnumType.STRING)
@@ -141,6 +168,9 @@ public class Demand {
 
     @Column(name = "creator_email")
     private String creatorEmail;
+
+    @Column(name = "creator_slack_id", length = 50)
+    private String creatorSlackId;
 
     @Column(name = "assigned_recruiter")
     private Long assignedRecruiter;
@@ -187,10 +217,16 @@ public class Demand {
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;//
 
+    @Column(name = "approval_reminder_sent")
+    private Boolean approvalReminderSent;
+
     // ─── Relationships ───────────────────────────────────────────────────────────
 
     @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DemandStatusHistory> statusHistories;
+
+    @OneToMany(mappedBy = "demand", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DemandSkill> demandSkills;
 
     // ─── Lifecycle Callbacks ────────────────────────────────────────────────────
     @PrePersist
@@ -201,14 +237,17 @@ public class Demand {
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
-        if (this.internalFilledCount == null) {
-            this.internalFilledCount = 0;
+        if (this.isFilled == null) {
+            this.isFilled = false;
         }
-        if (this.externalFilledCount == null) {
-            this.externalFilledCount = 0;
+        if (this.approvalReminderSent == null) {
+            this.approvalReminderSent = false;
         }
-        if (this.recruitedCount == null) {
-            this.recruitedCount = 0;
+        if (this.benchHiring == null) {
+            this.benchHiring = false;
+        }
+        if (this.requiredCount == null) {
+            this.requiredCount = 1;
         }
     }
 
@@ -298,12 +337,12 @@ public class Demand {
         this.businessUnit = businessUnit;
     }
 
-    public List<String> getSkills() {
-        return skills;
+    public Long getJobTitleId() {
+        return jobTitleId;
     }
 
-    public void setSkills(List<String> skills) {
-        this.skills = skills;
+    public void setJobTitleId(Long jobTitleId) {
+        this.jobTitleId = jobTitleId;
     }
 
     public BigDecimal getBudget() { return budget; }
@@ -312,36 +351,41 @@ public class Demand {
     public Integer getReqUtilPerc() { return reqUtilPerc; }
     public void setReqUtilPerc(Integer reqUtilPerc) { this.reqUtilPerc = reqUtilPerc; }
 
+    public WorkMode getWorkMode() { return workMode; }
+    public void setWorkMode(WorkMode workMode) { this.workMode = workMode; }
+
+    public Long getExperience() { return experience; }
+    public void setExperience(Long experience) { this.experience = experience; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
+
+    public Boolean getClientInterview() { return clientInterview; }
+    public void setClientInterview(Boolean clientInterview) { this.clientInterview = clientInterview; }
+
+    public LocalDate getOnboardingDate() { return onboardingDate; }
+    public void setOnboardingDate(LocalDate onboardingDate) { this.onboardingDate = onboardingDate; }
+
+    public Boolean getIsFilled() { return isFilled; }
+    public void setIsFilled(Boolean isFilled) { this.isFilled = isFilled; }
+
+    public FillType getFillType() { return fillType; }
+    public void setFillType(FillType fillType) { this.fillType = fillType; }
+
+    public Boolean getBenchHiring() {
+        return benchHiring;
+    }
+
+    public void setBenchHiring(Boolean benchHiring) {
+        this.benchHiring = benchHiring;
+    }
+
     public Integer getRequiredCount() {
         return requiredCount;
     }
 
     public void setRequiredCount(Integer requiredCount) {
         this.requiredCount = requiredCount;
-    }
-
-    public Integer getRecruitedCount() {
-        return recruitedCount;
-    }
-
-    public void setRecruitedCount(Integer recruitedCount) {
-        this.recruitedCount = recruitedCount;
-    }
-
-    public Integer getInternalFilledCount() {
-        return internalFilledCount;
-    }
-
-    public void setInternalFilledCount(Integer internalFilledCount) {
-        this.internalFilledCount = internalFilledCount;
-    }
-
-    public Integer getExternalFilledCount() {
-        return externalFilledCount;
-    }
-
-    public void setExternalFilledCount(Integer externalFilledCount) {
-        this.externalFilledCount = externalFilledCount;
     }
 
     public DemandStatus getStatus() {
@@ -512,11 +556,35 @@ public class Demand {
         this.statusHistories = statusHistories;
     }
 
+    public List<DemandSkill> getDemandSkills() {
+        return demandSkills;
+    }
+
+    public void setDemandSkills(List<DemandSkill> demandSkills) {
+        this.demandSkills = demandSkills;
+    }
+
     public EmploymentType getEmploymentType() {
         return employmentType;
     }
 
     public void setEmploymentType(EmploymentType employmentType) {
         this.employmentType = employmentType;
+    }
+
+    public void setCreatorSlackId(String slackId) {
+        this.creatorSlackId = slackId;
+    }
+
+    public String getCreatorSlackId() {
+        return creatorSlackId;
+    }
+
+    public Boolean getApprovalReminderSent() {
+        return approvalReminderSent;
+    }
+
+    public void setApprovalReminderSent(Boolean approvalReminderSent) {
+        this.approvalReminderSent = approvalReminderSent;
     }
 }

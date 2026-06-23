@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 
 /**
  * Lightweight demand projection for dashboard and list views.
@@ -23,8 +22,6 @@ public class DemandSummaryResponse {
 
     private Long demandId;
     private String title;
-    private List<String> skills;
-    private String accountName;
     private String level;
     private String employmentType;
     private String location;
@@ -32,12 +29,17 @@ public class DemandSummaryResponse {
     private String priority;
     private String businessUnit;
 
+    // Project / Account linkage for quick dashboard grouping
+    private Long accountId;
+    private String accountName;
+    private Long projectId;
+    private String projectName;
+
     /** Age of the demand in days from creation to now — computed by the mapper. */
     private Long ageInDays;
 
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
-    private Integer requiredCount;
+    /** Whether this demand has been filled by a matched employee. */
+    private Boolean isFilled;
 
     private OffsetDateTime createdAt;
 

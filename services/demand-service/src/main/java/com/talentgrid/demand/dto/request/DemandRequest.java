@@ -3,6 +3,7 @@ package com.talentgrid.demand.dto.request;
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
+import com.talentgrid.demand.domain.enums.WorkMode;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,15 +40,25 @@ public class DemandRequest {
     private Long accountId;
     private Long projectId;
     private String businessUnit;
-    private List<String> skills;
+    private Long jobTitleId;
+    private List<Long> mandatorySkillIds;
+    private List<Long> optionalSkillIds;
     private BigDecimal budget;
 
     /** Required utilization percentage (0–100). See {@code Demand.reqUtilPerc} for semantics. */
     private Integer reqUtilPerc;
-    private Integer requiredCount;
     private LocalDate targetDate;
     private DemandPriority priority;
     private EmploymentType employmentType;
     private OffsetDateTime searchStartAt;
+    private WorkMode workMode;
+    private Long experience;
+    private String department;
+    private Boolean clientInterview;
+    private LocalDate onboardingDate;
+
+    /** When true, post-approval flow skips internal search (bench hiring). */
+    private Boolean benchHiring;
 
 }
+

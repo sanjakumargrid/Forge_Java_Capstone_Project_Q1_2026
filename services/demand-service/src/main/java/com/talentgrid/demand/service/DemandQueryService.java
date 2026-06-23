@@ -22,6 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.ArrayList;
+import org.springframework.data.jpa.domain.Specification;
+import jakarta.persistence.criteria.Predicate;
+import com.talentgrid.demand.util.SecurityUtils;
 
 /**
  * Handles demand read operations: detail views, enterprise search
@@ -74,7 +78,7 @@ public class DemandQueryService {
      *   <li>Default: created_at descending (newest first)</li>
      * </ul>
      *
-     * @param status       optional status filter
+     * @param statuses     optional status filter — one or more values, e.g. APPROVED, INTERNAL_SEARCH
      * @param priority     optional priority filter
      * @param businessUnit optional business unit filter
      * @param sortBy       sort field: "age" or "priority" (default: created_at desc)
@@ -83,7 +87,7 @@ public class DemandQueryService {
      * @param size         page size (max 100)
      * @return page of demand summary responses
      */
-    public Page<DemandSummaryResponse> searchDemands(DemandStatus status,
+    public Page<DemandSummaryResponse> searchDemands(List<DemandStatus> statuses,
                                                       DemandPriority priority,
                                                       String businessUnit,
                                                       String accountName,
@@ -98,7 +102,74 @@ public class DemandQueryService {
         Sort sort = resolveSort(sortBy, sortDir);
         Pageable pageable = PageRequest.of(page, effectiveSize, sort);
 
-        Page<Demand> demandPage = demandRepository.searchDemands(status, priority, businessUnit, accountName, location, employmentType, pageable);
+        Specification<Demand> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            // Base filter
+            predicates.add(cb.isFalse(root.get("isDeleted")));
+
+            // Optional status filter — supports one or more statuses (IN predicate)
+            if (statuses != null && !statuses.isEmpty()) {
+                predicates.add(root.get("status").in(statuses));
+            }
+            if (priority != null) {
+                predicates.add(cb.equal(root.get("priority"), priority));
+            }
+            if (businessUnit != null) {
+                predicates.add(cb.equal(root.get("businessUnit"), businessUnit));
+            }
+            if (accountName != null) {
+                predicates.add(cb.equal(root.get("accountName"), accountName));
+            }
+            if (location != null) {
+                predicates.add(cb.equal(root.get("location"), location));
+            }
+            if (employmentType != null) {
+                predicates.add(cb.equal(root.get("employmentType"), employmentType));
+            }
+
+            // Role-based visibility: ADMIN and RM see all; others are scoped
+            if (!SecurityUtils.isPlatformAdmin() && !SecurityUtils.isResourceManager()) {
+                if (SecurityUtils.isRecruiter()) {
+                    predicates.add(root.get("status").in(
+                        DemandStatus.OPEN_EXTERNAL,
+                        DemandStatus.FILLED,
+                        DemandStatus.CLOSED
+                    ));
+                } else if (SecurityUtils.isHiringManager()) {
+                    Long userAccountId = SecurityUtils.getCurrentUserAccountId();
+                    if (userAccountId != null) {
+                        predicates.add(cb.or(
+                            cb.equal(root.get("accountId"), userAccountId),
+                            cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
+                        ));
+                    } else {
+                        // Fallback to only their own created demands + OPEN_EXTERNAL
+                        predicates.add(cb.or(
+                            cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),
+                            cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
+                        ));
+                    }
+                } else if (SecurityUtils.isEmployee()) {
+                    predicates.add(cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL));
+                } else if (SecurityUtils.isPortfolioManager()) {
+                    predicates.add(cb.or(
+                            cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),
+                            cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
+                    ));
+                } else {
+                    // Default fallback
+                    predicates.add(cb.or(
+                        cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),
+                        cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
+                    ));
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Demand> demandPage = demandRepository.findAll(spec, pageable);
         return demandPage.map(demandMapper::toSummaryResponse);
     }
 
@@ -119,15 +190,8 @@ public class DemandQueryService {
         pipeline.setDemandId(demand.getDemandId());
         pipeline.setTitle(demand.getTitle());
         pipeline.setStatus(demand.getStatus() != null ? demand.getStatus().name() : null);
-        pipeline.setRequiredCount(demand.getRequiredCount());
-        pipeline.setInternalFilledCount(demand.getInternalFilledCount());
-        pipeline.setExternalFilledCount(demand.getExternalFilledCount());
-        pipeline.setRecruitedCount(demand.getRecruitedCount());
-
-        // Calculate remaining positions
-        int required = demand.getRequiredCount() != null ? demand.getRequiredCount() : 0;
-        int recruited = demand.getRecruitedCount() != null ? demand.getRecruitedCount() : 0;
-        pipeline.setRemainingCount(Math.max(0, required - recruited));
+        pipeline.setIsFilled(demand.getIsFilled());
+        pipeline.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
 
         // Map status history as the audit trail
         List<DemandStatusHistory> histories = demand.getStatusHistories();

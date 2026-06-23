@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class OAuthController {
 
@@ -29,11 +29,10 @@ public class OAuthController {
 
     private final RefreshTokenService refreshTokenService;
 
-    // Internal helper: issues tokens only after the server-side /session flow has
-    // verified the OAuth login. Intentionally NOT a public endpoint — exposing it
-    // would let any caller mint a JWT for an arbitrary email.
-    private ResponseEntity<LoginResponse> oauthSuccess(
-            String email
+    @Deprecated
+    @GetMapping("/oauth-success")
+    public ResponseEntity<LoginResponse> oauthSuccess(
+            @RequestParam String email
     ) {
 
         User user = userRepository.findByEmail(email)

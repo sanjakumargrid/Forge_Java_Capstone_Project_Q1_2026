@@ -9,6 +9,7 @@ import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.dto.response.DemandStatusHistoryResponse;
 import com.talentgrid.demand.dto.response.DemandSummaryResponse;
+import com.talentgrid.demand.dto.response.SkillDto;
 import org.springframework.stereotype.Component;
 
 import java.time.OffsetDateTime;
@@ -45,18 +46,21 @@ public class DemandMapper {
         demand.setAccountId(request.getAccountId());
         demand.setProjectId(request.getProjectId());
         demand.setBusinessUnit(request.getBusinessUnit());
-        demand.setSkills(request.getSkills());
+        demand.setJobTitleId(request.getJobTitleId());
         demand.setBudget(request.getBudget());
         demand.setReqUtilPerc(request.getReqUtilPerc());
-        demand.setRequiredCount(request.getRequiredCount());
+        demand.setWorkMode(request.getWorkMode());
+        demand.setExperience(request.getExperience());
+        demand.setDepartment(request.getDepartment());
+        demand.setClientInterview(request.getClientInterview());
+        demand.setOnboardingDate(request.getOnboardingDate());
         demand.setTargetDate(request.getTargetDate());
         demand.setPriority(request.getPriority());
         demand.setSearchStartAt(request.getSearchStartAt());
         // Defaults set by business rule
         demand.setStatus(DemandStatus.DRAFT);
-        demand.setInternalFilledCount(0);
-        demand.setExternalFilledCount(0);
-        demand.setRecruitedCount(0);
+        demand.setIsFilled(false);
+        demand.setBenchHiring(Boolean.TRUE.equals(request.getBenchHiring()));
         demand.setIsDeleted(false);
         return demand;
     }
@@ -79,13 +83,18 @@ public class DemandMapper {
         if (request.getAccountId() != null)    demand.setAccountId(request.getAccountId());
         if (request.getProjectId() != null)    demand.setProjectId(request.getProjectId());
         if (request.getBusinessUnit() != null) demand.setBusinessUnit(request.getBusinessUnit());
-        if (request.getSkills() != null)       demand.setSkills(request.getSkills());
+        if (request.getJobTitleId() != null)   demand.setJobTitleId(request.getJobTitleId());
         if (request.getBudget() != null)       demand.setBudget(request.getBudget());
         if (request.getReqUtilPerc() != null)  demand.setReqUtilPerc(request.getReqUtilPerc());
-        if (request.getRequiredCount() != null) demand.setRequiredCount(request.getRequiredCount());
+        if (request.getWorkMode() != null)     demand.setWorkMode(request.getWorkMode());
+        if (request.getExperience() != null)   demand.setExperience(request.getExperience());
+        if (request.getDepartment() != null)   demand.setDepartment(request.getDepartment());
+        if (request.getClientInterview() != null) demand.setClientInterview(request.getClientInterview());
+        if (request.getOnboardingDate() != null) demand.setOnboardingDate(request.getOnboardingDate());
         if (request.getTargetDate() != null)   demand.setTargetDate(request.getTargetDate());
         if (request.getPriority() != null)     demand.setPriority(request.getPriority());
         if (request.getSearchStartAt() != null) demand.setSearchStartAt(request.getSearchStartAt());
+        if (request.getBenchHiring() != null) demand.setBenchHiring(request.getBenchHiring());
     }
 
     // ─── Demand → DemandResponse ────────────────────────────────────────────────
@@ -111,13 +120,27 @@ public class DemandMapper {
         response.setProjectId(demand.getProjectId());
         response.setProjectName(demand.getProjectName());
         response.setBusinessUnit(demand.getBusinessUnit());
-        response.setSkills(demand.getSkills());
+        response.setJobTitleId(demand.getJobTitleId());
+        if (demand.getDemandSkills() != null) {
+            response.setMandatorySkills(demand.getDemandSkills().stream()
+                    .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+            response.setOptionalSkills(demand.getDemandSkills().stream()
+                    .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+        }
         response.setBudget(demand.getBudget());
         response.setReqUtilPerc(demand.getReqUtilPerc());
-        response.setRequiredCount(demand.getRequiredCount());
-        response.setRecruitedCount(demand.getRecruitedCount());
-        response.setInternalFilledCount(demand.getInternalFilledCount());
-        response.setExternalFilledCount(demand.getExternalFilledCount());
+        response.setWorkMode(enumName(demand.getWorkMode()));
+        response.setExperience(demand.getExperience());
+        response.setDepartment(demand.getDepartment());
+        response.setClientInterview(demand.getClientInterview());
+        response.setOnboardingDate(demand.getOnboardingDate());
+        response.setIsFilled(demand.getIsFilled());
+        response.setFillType(enumName(demand.getFillType()));
+        response.setBenchHiring(demand.getBenchHiring());
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setPreviousStatus(enumName(demand.getPreviousStatus()));
@@ -158,7 +181,6 @@ public class DemandMapper {
         DemandSummaryResponse response = new DemandSummaryResponse();
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
-        response.setSkills(demand.getSkills());
         response.setAccountName(demand.getAccountName());
         response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
         response.setEmploymentType(enumName(demand.getEmploymentType()));
@@ -166,9 +188,7 @@ public class DemandMapper {
         response.setStatus(enumName(demand.getStatus()));
         response.setPriority(enumName(demand.getPriority()));
         response.setBusinessUnit(demand.getBusinessUnit());
-        response.setInternalFilledCount(demand.getInternalFilledCount());
-        response.setExternalFilledCount(demand.getExternalFilledCount());
-        response.setRequiredCount(demand.getRequiredCount());
+        response.setIsFilled(demand.getIsFilled());
         response.setCreatedAt(demand.getCreatedAt());
 
         // Compute age in days

@@ -27,6 +27,17 @@ public class RegisterRequest {
     )
     private String password;
 
+    /**
+     * Employee work location.
+     * Used for RMG lookup and approval routing.
+     */
+    @NotBlank(message = "Location is required")
+    private String location;
+
+
     // Optional from frontend
     private String role;
+
+    private String slackId;
+
 }

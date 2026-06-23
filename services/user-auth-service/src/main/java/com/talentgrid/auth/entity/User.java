@@ -2,6 +2,7 @@ package com.talentgrid.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String username;
@@ -29,6 +30,9 @@ public class User implements Serializable {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "location", length = 150)
+    private String location;
 
     @Column(nullable = false)
     @Builder.Default
@@ -42,15 +46,11 @@ public class User implements Serializable {
     @Builder.Default
     private Boolean accountLocked = false;
 
+    @Column(name = "slack_id", length = 50)
+    private String slackId;
+
     @Column(name = "lock_time")
     private LocalDateTime lockTime;
-
-    @Column(name = "location", length = 150)
-    private String location;
-
-    @Column(name = "is_interviewer_eligible")
-    @Builder.Default
-    private Boolean isInterviewerEligible = false;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -59,6 +59,15 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles = new HashSet<>();
+
+    /**
+     * Incremented when permissions change; embedded in JWT for invalidation.
+     * DB default avoids failed {@code ddl-auto=update} when adding NOT NULL to a non-empty {@code users} table.
+     */
+    @Column(name = "auth_version", nullable = false)
+    @ColumnDefault("1")
+    @Builder.Default
+    private Long authVersion = 1L;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -69,6 +78,9 @@ public class User implements Serializable {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (this.authVersion == null) {
+            this.authVersion = 1L;
+        }
     }
 
     @PreUpdate

@@ -1,0 +1,608 @@
+rbac:
+  # Public paths — skip JWT check entirely
+  public-paths:
+    - "/api/v1/auth/**"
+    - "/talentgrid/**"
+    - "/api/v1/careers/**"
+    - "/api/v1/branding"
+    - "/api/v1/health/**"
+    - "/api/v1/jobs/public/**"
+    - "/api/v1/webhooks/docusign"
+    - "/api/v1/ai/careers/chat/**"
+    - /actuator/health
+    - /actuator/info
+
+  # Per-path & Per-method scope requirements
+  rules:
+
+    # ═══════════════════════════════════════════
+    # TEAM 1 — Platform Core & Demand Intelligence
+    # ═══════════════════════════════════════════
+
+    # --- Admin / User Management ---
+    - path: "/api/v1/admin/users"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW]
+
+    - path: "/api/v1/admin/users"
+      methods: [POST]
+      allowed-scopes: [USER_CREATE]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [PUT]
+      allowed-scopes: [USER_UPDATE]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [PATCH]
+      allowed-scopes: [USER_UPDATE]
+
+    - path: "/api/v1/admin/users/**"
+      methods: [DELETE]
+      allowed-scopes: [USER_DELETE]
+
+    - path: "/api/v1/admin/users/**/roles"
+      methods: [PUT]
+      allowed-scopes: [ROLE_ASSIGN]
+
+    - path: "/api/v1/admin/roles"
+      methods: [GET]
+      allowed-scopes: [ROLE_VIEW]
+
+    - path: "/api/v1/admin/roles/**/permissions"
+      methods: [GET]
+      allowed-scopes: [PERMISSION_VIEW]
+
+    - path: "/api/v1/admin/roles/**/permissions"
+      methods: [PUT]
+      allowed-scopes: [PERMISSION_ASSIGN]
+
+    - path: "/api/v1/admin/permissions"
+      methods: [GET]
+      allowed-scopes: [PERMISSION_VIEW]
+
+    # --- User lookup (user-auth; used by demand-service and admin tooling) ---
+    - path: "/api/v1/users/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/projects/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_CREATE, DEMAND_PM_APPROVE, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/accounts/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_CREATE, DEMAND_PM_APPROVE, DEMAND_STATUS_TRANSITION]
+
+    # --- Demands ---
+    - path: "/api/v1/demands"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/pm"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands"
+      methods: [POST]
+      allowed-scopes: [DEMAND_CREATE]
+
+    - path: "/api/v1/demands/*"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/*"
+      methods: [PATCH]
+      allowed-scopes: [DEMAND_UPDATE]
+
+    - path: "/api/v1/demands/*"
+      methods: [DELETE]
+      allowed-scopes: [DEMAND_DELETE]
+
+    - path: "/api/v1/demands/**/approve"
+      methods: [POST]
+      allowed-scopes: [DEMAND_PM_APPROVE]
+
+    - path: "/api/v1/project-manager/**"
+      methods: [PUT]
+      allowed-scopes: [DEMAND_PM_APPROVE]
+
+    - path: "/api/v1/demands/**/reject"
+      methods: [POST]
+      allowed-scopes: [DEMAND_PM_APPROVE]
+
+    - path: "/api/v1/demands/**/status"
+      methods: [PATCH]
+      allowed-scopes: [DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/demands/**/pipeline"
+      methods: [GET]
+      allowed-scopes: [DEMAND_PIPELINE_VIEW]
+
+    - path: "/api/v1/demands/**/history"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/**/submit"
+      methods: [POST]
+      allowed-scopes: [DEMAND_SUBMIT, DEMAND_PM_APPROVE]
+
+    - path: "/api/v1/lookups/job-titles"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/lookups/skills"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/**/nominations"
+      methods: [POST]
+      allowed-scopes: [DEMAND_NOMINATE, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/demands/**/nominations/**/hm-decision"
+      methods: [POST]
+      allowed-scopes: [DEMAND_HM_NOMINATION_DECIDE, DEMAND_STATUS_TRANSITION]
+
+    # --- Notifications ---
+    - path: "/api/v1/notifications"
+      methods: [GET]
+      allowed-scopes: [NOTIFICATION_VIEW]
+
+    # --- Audit Logs ---
+    - path: "/api/v1/audit/**"
+      methods: [GET]
+      allowed-scopes: [AUDIT_VIEW]
+
+    # ═══════════════════════════════════════════
+    # TEAM 2 — Talent Acquisition Engine
+    # ═══════════════════════════════════════════
+
+    # --- Candidates ---
+    - path: "/api/v1/candidates"
+      methods: [GET]
+      allowed-scopes: [CANDIDATE_VIEW]
+
+    - path: "/api/v1/candidates"
+      methods: [POST]
+      allowed-scopes: [CANDIDATE_CREATE]
+
+    - path: "/api/v1/candidates/*"
+      methods: [GET]
+      allowed-scopes: [CANDIDATE_VIEW]
+
+    - path: "/api/v1/candidates/*"
+      methods: [PUT]
+      allowed-scopes: [CANDIDATE_UPDATE]
+
+    - path: "/api/v1/candidates/**/notes"
+      methods: [POST]
+      allowed-scopes: [CANDIDATE_NOTE_CREATE]
+
+    - path: "/api/v1/candidates/resume"
+      methods: [POST]
+      allowed-scopes: [RESUME_UPLOAD]
+
+    # --- AI (Team 2 scoped) ---
+    - path: "/api/v1/ai/candidates/**/score"
+      methods: [POST]
+      allowed-scopes: [AI_CANDIDATE_SCORE]
+
+    - path: "/api/v1/ai/candidates/**/rejection-email"
+      methods: [POST]
+      allowed-scopes: [AI_REJECTION_EMAIL_GENERATE]
+
+    - path: "/api/v1/ai/candidates/**/send-rejection-email"
+      methods: [POST]
+      allowed-scopes: [AI_REJECTION_EMAIL_SEND]
+
+    - path: "/api/v1/ai/interviews/**/questions"
+      methods: [POST]
+      allowed-scopes: [AI_INTERVIEW_QUESTIONS]
+
+    # --- Async Jobs ---
+    - path: "/api/v1/jobs/*"
+      methods: [GET]
+      allowed-scopes: [ASYNC_JOB_VIEW]
+
+    # --- Applications ---
+    - path: "/api/v1/applications"
+      methods: [GET]
+      allowed-scopes: [APPLICATION_VIEW]
+
+    - path: "/api/v1/applications"
+      methods: [POST]
+      allowed-scopes: [APPLICATION_CREATE]
+
+    - path: "/api/v1/applications/bulk"
+      methods: [POST]
+      allowed-scopes: [APPLICATION_BULK_ACTION]
+
+    - path: "/api/v1/applications/*"
+      methods: [GET]
+      allowed-scopes: [APPLICATION_VIEW]
+
+    - path: "/api/v1/applications/**/stage"
+      methods: [PATCH]
+      allowed-scopes: [APPLICATION_STAGE_MOVE]
+
+    # --- Interviews ---
+    - path: "/api/v1/interviews"
+      methods: [GET]
+      allowed-scopes: [INTERVIEW_VIEW]
+
+    - path: "/api/v1/interviews"
+      methods: [POST]
+      allowed-scopes: [INTERVIEW_SCHEDULE]
+
+    - path: "/api/v1/interviews/summary"
+      methods: [GET]
+      allowed-scopes: [INTERVIEW_VIEW]
+
+    - path: "/api/v1/recruiter/interviews/calendar"
+      methods: [GET]
+      allowed-scopes: [INTERVIEW_CALENDAR_VIEW]
+
+    - path: "/api/v1/interviews/*"
+      methods: [GET]
+      allowed-scopes: [INTERVIEW_VIEW]
+
+    - path: "/api/v1/interviews/*"
+      methods: [PATCH]
+      allowed-scopes: [INTERVIEW_UPDATE]
+
+    # --- Scorecards ---
+    - path: "/api/v1/interviews/**/scorecards"
+      methods: [POST]
+      allowed-scopes: [SCORECARD_SUBMIT]
+
+    - path: "/api/v1/interviews/**/scorecards"
+      methods: [GET]
+      allowed-scopes: [SCORECARD_VIEW]
+
+    - path: "/api/v1/demands/**/scorecards"
+      methods: [GET]
+      allowed-scopes: [SCORECARD_VIEW]
+
+    # --- Offers ---
+    - path: "/api/v1/offers"
+      methods: [POST]
+      allowed-scopes: [OFFER_CREATE]
+
+    - path: "/api/v1/offers/*"
+      methods: [GET]
+      allowed-scopes: [OFFER_VIEW]
+
+    - path: "/api/v1/offers/**/approve"
+      methods: [PATCH]
+      allowed-scopes: [OFFER_APPROVE]
+
+    - path: "/api/v1/offers/**/reject"
+      methods: [PATCH]
+      allowed-scopes: [OFFER_REJECT]
+
+    # --- GDPR ---
+    - path: "/api/v1/gdpr/candidates/**/export"
+      methods: [GET]
+      allowed-scopes: [GDPR_EXPORT]
+
+    - path: "/api/v1/gdpr/candidates/**/delete"
+      methods: [POST]
+      allowed-scopes: [GDPR_DELETE]
+
+    # ═══════════════════════════════════════════
+    # TEAM 3 — Job Posting & Careers Portal
+    # ═══════════════════════════════════════════
+
+    # --- Job Postings (internal/admin) ---
+    - path: "/api/v1/job-postings"
+      methods: [GET]
+      allowed-scopes: [JOB_POSTING_VIEW]
+
+    - path: "/api/v1/job-postings"
+      methods: [POST]
+      allowed-scopes: [JOB_POSTING_CREATE]
+
+    - path: "/api/v1/job-postings/from-demand/**"
+      methods: [POST]
+      allowed-scopes: [JOB_POSTING_CREATE]
+
+    - path: "/api/v1/job-postings/*"
+      methods: [GET]
+      allowed-scopes: [JOB_POSTING_VIEW]
+
+    - path: "/api/v1/job-postings/*"
+      methods: [PUT]
+      allowed-scopes: [JOB_POSTING_UPDATE]
+
+    - path: "/api/v1/job-postings/*"
+      methods: [DELETE]
+      allowed-scopes: [JOB_POSTING_DELETE]
+
+    - path: "/api/v1/job-postings/**/approve"
+      methods: [POST]
+      allowed-scopes: [JOB_POSTING_APPROVE]
+
+    - path: "/api/v1/job-postings/**/publish"
+      methods: [POST]
+      allowed-scopes: [JOB_POSTING_PUBLISH]
+
+    - path: "/api/v1/job-postings/**/unpublish"
+      methods: [POST]
+      allowed-scopes: [JOB_POSTING_UNPUBLISH]
+
+    - path: "/api/v1/job-postings/**/channels"
+      methods: [GET]
+      allowed-scopes: [JOB_POSTING_VIEW]
+
+    - path: "/api/v1/job-postings/**/analytics"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_POSTING_VIEW]
+
+    - path: "/api/v1/job-postings/**/referral-link"
+      methods: [POST]
+      allowed-scopes: [REFERRAL_CREATE]
+
+    # --- Branding (admin update — public GET is in public-paths) ---
+    - path: "/api/v1/branding"
+      methods: [PUT]
+      allowed-scopes: [BRANDING_UPDATE]
+
+    # ═══════════════════════════════════════════
+    # TEAM 4 — AI Service
+    # ═══════════════════════════════════════════
+
+    - path: "/api/v1/ai/job-descriptions:generate"
+      methods: [POST]
+      allowed-scopes: [AI_JD_GENERATE]
+
+    - path: "/api/v1/ai/channels:recommend"
+      methods: [POST]
+      allowed-scopes: [AI_CHANNEL_RECOMMEND]
+
+    - path: "/api/v1/ai/interactions"
+      methods: [POST]
+      allowed-scopes: [AI_INTERACTION_CREATE]
+
+    - path: "/api/v1/ai/interactions"
+      methods: [GET]
+      allowed-scopes: [AI_INTERACTION_VIEW]
+
+    - path: "/api/v1/ai/suggestions/skills"
+      methods: [GET]
+      allowed-scopes: [AI_SKILL_SUGGEST]
+
+    # ═══════════════════════════════════════════
+    # TEAM 5 — Internal Workforce Allocation
+    # ═══════════════════════════════════════════
+
+    # --- Engineers ---
+    - path: "/api/v1/engineer-profile/employees/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineer-profile/update"
+      methods: [ PATCH ]
+      allowed-scopes: [ WORKFORCE_PROFILE_UPDATE ]
+
+    - path: "/api/v1/engineer-profile/engineers"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineer-profile/employees-by-id/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineers"
+      methods: [GET]
+      allowed-scopes: [ENGINEER_VIEW]
+
+    - path: "/api/v1/engineers"
+      methods: [POST]
+      allowed-scopes: [ENGINEER_CREATE]
+
+    - path: "/api/v1/engineers/*"
+      methods: [GET]
+      allowed-scopes: [ENGINEER_VIEW]
+
+    - path: "/api/v1/engineers/*"
+      methods: [PUT]
+      allowed-scopes: [ENGINEER_UPDATE]
+
+    - path: "/api/v1/engineers/*"
+      methods: [DELETE]
+      allowed-scopes: [ENGINEER_DELETE]
+
+    - path: "/api/v1/engineers/me/self-service"
+      methods: [PATCH]
+      allowed-scopes: [ENGINEER_SELF_UPDATE]
+
+    - path: "/api/v1/engineers/bench-report"
+      methods: [GET]
+      allowed-scopes: [BENCH_VIEW]
+
+    - path: "/api/v1/engineers/search"
+      methods: [POST]
+      allowed-scopes: [ENGINEER_SEARCH]
+
+    # --- Utilisation ---
+    - path: "/api/v1/utilisation"
+      methods: [GET]
+      allowed-scopes: [UTILISATION_VIEW]
+
+    - path: "/api/v1/utilisation"
+      methods: [POST]
+      allowed-scopes: [UTILISATION_CREATE]
+
+    - path: "/api/v1/utilisation/*"
+      methods: [GET]
+      allowed-scopes: [UTILISATION_VIEW]
+
+    - path: "/api/v1/utilisation/*"
+      methods: [PATCH]
+      allowed-scopes: [UTILISATION_UPDATE]
+
+    - path: "/api/v1/utilisation/*"
+      methods: [DELETE]
+      allowed-scopes: [UTILISATION_DELETE]
+
+    - path: "/api/v1/utilisation/alerts"
+      methods: [GET]
+      allowed-scopes: [UTILISATION_ALERTS_VIEW]
+
+    # --- Nominations ---
+    - path: "/api/v1/rmg/nominations"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_CREATE ]
+
+    - path: "/api/v1/rmg/nominations/demand/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
+
+    - path: "/api/v1/rmg/nominations/engineer/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_NOMINATION_VIEW ]
+
+    - path: "/api/v1/nominations"
+      methods: [GET]
+      allowed-scopes: [NOMINATION_VIEW]
+
+    - path: "/api/v1/nominations"
+      methods: [POST]
+      allowed-scopes: [NOMINATION_CREATE]
+
+    - path: "/api/v1/nominations/*"
+      methods: [GET]
+      allowed-scopes: [NOMINATION_VIEW]
+
+    - path: "/api/v1/nominations/**/accept"
+      methods: [POST]
+      allowed-scopes: [NOMINATION_ACCEPT]
+
+    - path: "/api/v1/nominations/**/reject"
+      methods: [POST]
+      allowed-scopes: [NOMINATION_REJECT]
+
+    # --- AI Match & Embeddings ---
+    - path: "/api/v1/ai/match/**"
+      methods: [GET]
+      allowed-scopes: [AI_MATCH_VIEW]
+
+    - path: "/api/v1/ai/embed/engineer/**"
+      methods: [POST]
+      allowed-scopes: [AI_EMBEDDING_REFRESH]
+
+    - path: "/api/v1/demand-embeddings"
+      methods: [GET]
+      allowed-scopes: [DEMAND_EMBEDDING_VIEW]
+
+    - path: "/api/v1/demand-embeddings"
+      methods: [POST]
+      allowed-scopes: [DEMAND_EMBEDDING_CREATE]
+
+    - path: "/api/v1/demand-embeddings/*"
+      methods: [GET]
+      allowed-scopes: [DEMAND_EMBEDDING_VIEW]
+
+    - path: "/api/v1/demand-embeddings/*"
+      methods: [PUT]
+      allowed-scopes: [DEMAND_EMBEDDING_UPDATE]
+
+    - path: "/api/v1/demand-embeddings/*"
+      methods: [DELETE]
+      allowed-scopes: [DEMAND_EMBEDDING_DELETE]
+
+    # --- HRIS Import ---
+    - path: "/api/v1/engineer-profile/hris-import"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_HRIS_IMPORT ]
+
+      # ═══════════════════════════════════════════
+      # TEAM 6 — RMG-facing UI and the AI upskilling
+      # ═══════════════════════════════════════════
+
+      # --- Skill Gap Heatmap ---
+    - path: "/api/v1/skill-gap/heatmap"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/summary"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/trends"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_VIEW ]
+
+    - path: "/api/v1/skill-gap/refresh"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_SKILLGAP_REFRESH ]
+
+    # --- AI Upskilling Recommendations ---
+    - path: "/api/v1/workforce/ai/upskilling/recommendations/generate"
+      methods: [ POST ]
+      allowed-scopes: [ WORKFORCE_AI_UPSKILL_GENERATE ]
+
+    - path: "/api/v1/workforce/ai/upskilling/recommendations/history"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_AI_UPSKILL_VIEW ]
+
+    # --- RMG Analytics Dashboard ---
+    - path: "/api/v1/rmg-analytics-dashboard/**"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_ANALYTICS_VIEW ]
+
+    # --- RMG Demand Management ---
+    - path: "/api/v1/rmg/demands"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
+
+    - path: "/api/v1/rmg/demands/**/cancel"
+      methods: [ PATCH ]
+      allowed-scopes: [ DEMAND_STATUS_TRANSITION ]
+
+    - path: "/api/v1/rmg/demands/**/status"
+      methods: [ PATCH ]
+      allowed-scopes: [ DEMAND_STATUS_TRANSITION ]
+
+    # --- Bench Filter & CSV Export ---
+    - path: "/api/v1/bench-filter/search"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH ]
+
+    - path: "/api/v1/bench-filter/export/csv"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_REPORT_EXPORT ]
+
+    # --- RMG Search ---
+    - path: "/api/v1/rmg-search/search"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH ]
+
+    # --- Bench Report ---
+    - path: "/api/v1/bench-report"
+      methods: [GET]
+      allowed-scopes: [WORKFORCE_BENCH_SEARCH]
+
+
+    # ═══════════════════════════════════════════
+    # ANALYTICS (cross-team)
+    # ═══════════════════════════════════════════
+
+    - path: "/api/v1/analytics/demands"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_DEMAND_VIEW]
+
+    - path: "/api/v1/analytics/pipeline"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_PIPELINE_VIEW]
+
+    - path: "/api/v1/analytics/match-summary"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_MATCH_VIEW]
+
+    - path: "/api/v1/analytics/utilisation-summary"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_UTILISATION_VIEW]
