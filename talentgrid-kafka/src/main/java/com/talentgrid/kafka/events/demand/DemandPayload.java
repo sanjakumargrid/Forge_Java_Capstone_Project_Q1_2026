@@ -5,8 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -14,31 +17,63 @@ import java.util.List;
 @Builder
 public class DemandPayload {
 
-    // ── Core identifiers ────────────────────────────────────────────────────────
-    private Long demandId;//
-    private String title;//
-    private String status; //
-
-    // ── Seniority & Skills ──────────────────────────────────────────────────────
-    private String level; //
-    private List<String> skills; //
-    private String location;//
-
-    // ── Fill counts ─────────────────────────────────────────────────────────────
-    private Integer requiredCount;//
-    private Integer internalFilledCount;
-    private Integer externalFilledCount;
-    private Integer recruitedCount;
-
-    // ── Closure ─────────────────────────────────────────────────────────────────
-    private String closureReason;//
-
-    // ── Personnel ───────────────────────────────────────────────────────────────
+    private Long demandId;
+    private String title;
+    private String status;
+    private String level;
+    private List<String> mandatorySkills;
+    private List<String> optionalSkills;
+    private String location;
+    private String accountName;
+    private String projectName;
+    private String businessUnit;
+    private String priority;
     private Long createdBy;
-    private Long approvedBy;
-    private Long assignedRecruiter;
-    private Long assignedRm;
+    private String creatorName;
     private String recipientEmail;
+    private String recipientSlackId;
     private String raisedBy;
+    private BigDecimal budget;
+    private LocalDate targetDate;
+    private String description;
+    private String workMode;
+    private Long experience;
+    private String department;
+    private String employmentType;
+    private LocalDate onboardingDate;
+    private Long approvedBy;
+    private String approverName;
+    private OffsetDateTime approvedAt;
+    private Long assignedRm;
+    private String assignedRmName;
     private OffsetDateTime searchStartAt;
+    private Long assignedRecruiter;
+    private String assignedRecruiterName;
+    /** Whether this demand has been filled. */
+    private Boolean isFilled;
+
+    /**
+     * How it was filled: {@code "INTERNAL"} or {@code "EXTERNAL"}.
+     * {@code null} until the demand is filled.
+     */
+    private String fillType;
+    private String closureReason;
+
+    // ─── PM notification routing fields ─────────────────────────────────────────
+    // These are populated transiently in Kafka events for notification routing.
+    // They are NOT stored on the Demand entity or its database table.
+    // Resolved at event-publish time via: Demand.projectId → Project → projectManagerId → User
+    private Long pmUserId;
+    private String pmName;
+    private String pmEmail;
+    private String pmSlackId;
+
+    // ─── SLA metadata ────────────────────────────────────────────────────────────
+    private Long elapsedHours;
+
+    /** Internal nomination id (nomination workflow events only). */
+    private Long nominationId;
+
+    /** Nominee user id for internal nomination events. */
+    private Long nomineeUserId;
 }

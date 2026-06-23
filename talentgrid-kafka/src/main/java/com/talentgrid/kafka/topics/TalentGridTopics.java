@@ -62,4 +62,13 @@ public final class TalentGridTopics {
     public static final String WORKFORCE_EVENTS = "workforce-events";
 
     public static final String NOTIFICATION_SEND = "notification.send";
+
+    // ─────────────────────────────────────────────────────
+    // AUTH SERVICE — User invalidation
+    // ─────────────────────────────────────────────────────
+    public static final String AUTH_USER_UPDATED = "auth.user.updated";
+
+    /** User created events: USER_REGISTERED, USER_CREATED_BY_ADMIN */
+    public static final String AUTH_USER_CREATED = "auth.user.created";
+
 }

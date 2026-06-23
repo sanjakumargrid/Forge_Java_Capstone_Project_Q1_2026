@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/controller/InterviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/controller/InterviewController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/repository/InterviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/repository/InterviewRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/notification.log" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/notification.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,61 +49,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.000000000833557" />
-      <entry key="MS500" value="1.0152822419298368" />
-      <entry key="S2" value="1.366453216407555" />
-      <entry key="S5" value="2.344523214811583" />
-      <entry key="S10" value="5.123132397738319" />
-      <entry key="S30" value="18.13651925074258" />
-      <entry key="S60" value="33.96548285310573" />
-      <entry key="M2" value="58.56957986730223" />
-      <entry key="M5" value="96.2514915372254" />
-      <entry key="M10" value="126.96326346923426" />
-      <entry key="M15" value="147.7761293755555" />
-      <entry key="M30" value="184.57342353263215" />
-      <entry key="H1" value="217.48417589604463" />
-      <entry key="H2" value="248.15986203382195" />
-      <entry key="H4" value="303.2947483462867" />
-      <entry key="D1" value="714.3350560920547" />
-      <entry key="W1" value="1096.5514934603939" />
+      <entry key="MS100" value="1.0163358282955135" />
+      <entry key="MS500" value="2.1732410393843953" />
+      <entry key="S2" value="6.983304249618396" />
+      <entry key="S5" value="11.077444018808382" />
+      <entry key="S10" value="13.235976711708814" />
+      <entry key="S30" value="16.513643187583206" />
+      <entry key="S60" value="25.30514498912686" />
+      <entry key="M2" value="47.228532110048285" />
+      <entry key="M5" value="90.98745511013949" />
+      <entry key="M10" value="128.09022801498458" />
+      <entry key="M15" value="152.0048235495288" />
+      <entry key="M30" value="193.07490583881463" />
+      <entry key="H1" value="229.0223552713426" />
+      <entry key="H2" value="261.60175937470973" />
+      <entry key="H4" value="317.727971503118" />
+      <entry key="D1" value="729.7191979604802" />
+      <entry key="W1" value="1112.4164166115504" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="4.122989772808786E-199" />
-      <entry key="MS500" value="2.103984090376598E-40" />
-      <entry key="S2" value="1.2043718964780086E-10" />
-      <entry key="S5" value="1.0772195959204654E-4" />
-      <entry key="S10" value="0.010378918999204411" />
-      <entry key="S30" value="0.21813099188517485" />
-      <entry key="S60" value="0.4670449570278807" />
-      <entry key="M2" value="0.6834068751687242" />
-      <entry key="M5" value="0.8587598619350759" />
-      <entry key="M10" value="0.9267057777060339" />
-      <entry key="M15" value="0.9510586104386826" />
-      <entry key="M30" value="0.9983399571740706" />
-      <entry key="H1" value="1.1433876025631298" />
-      <entry key="H2" value="1.5094349593938952" />
-      <entry key="H4" value="2.465983815936431" />
-      <entry key="D1" value="9.039240218105968" />
-      <entry key="W1" value="15.322990912292097" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="4.294380314028441E-105" />
+      <entry key="S2" value="8.095154200503894E-27" />
+      <entry key="S5" value="3.6583904133930044E-11" />
+      <entry key="S10" value="6.048462956316254E-6" />
+      <entry key="S30" value="0.018219998703005225" />
+      <entry key="S60" value="0.1349814754068321" />
+      <entry key="M2" value="0.3673982517743274" />
+      <entry key="M5" value="0.6699691947477644" />
+      <entry key="M10" value="0.8185277716667365" />
+      <entry key="M15" value="0.875524521214798" />
+      <entry key="M30" value="0.9578752890575394" />
+      <entry key="H1" value="1.1199760535649117" />
+      <entry key="H2" value="1.4939017407370747" />
+      <entry key="H4" value="2.4532625913950232" />
+      <entry key="D1" value="9.031451700357309" />
+      <entry key="W1" value="15.32110409947114" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.036391136510046E-6" />
-      <entry key="MS500" value="0.0651130068403265" />
-      <entry key="S2" value="0.7157142789837506" />
-      <entry key="S5" value="1.9584956223431063" />
-      <entry key="S10" value="4.864664130523529" />
-      <entry key="S30" value="18.170084187417018" />
-      <entry key="S60" value="34.29968704143011" />
-      <entry key="M2" value="59.16590752378726" />
-      <entry key="M5" value="97.06654857614926" />
-      <entry key="M10" value="127.86515106672168" />
-      <entry key="M15" value="148.70928049267215" />
-      <entry key="M30" value="185.56155663226136" />
-      <entry key="H1" value="218.6218777318871" />
-      <entry key="H2" value="249.66616810643927" />
-      <entry key="H4" value="305.7589154490224" />
-      <entry key="D1" value="723.3737517669754" />
-      <entry key="W1" value="1111.8743786360485" />
+      <entry key="MS100" value="0.9816219699037281" />
+      <entry key="MS500" value="2.155353022479394" />
+      <entry key="S2" value="6.969924948723486" />
+      <entry key="S5" value="11.069333627490714" />
+      <entry key="S10" value="13.2310556606857" />
+      <entry key="S30" value="16.514662211898084" />
+      <entry key="S60" value="25.400814703446645" />
+      <entry key="M2" value="47.548650181101415" />
+      <entry key="M5" value="91.62314083825224" />
+      <entry key="M10" value="128.8867402861549" />
+      <entry key="M15" value="152.86379978350286" />
+      <entry key="M30" value="194.0229564293319" />
+      <entry key="H1" value="230.1367461972914" />
+      <entry key="H2" value="263.0925565350784" />
+      <entry key="H4" value="320.1794228065664" />
+      <entry key="D1" value="738.7501049290155" />
+      <entry key="W1" value="1127.7374148934261" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -133,40 +132,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.ApplicationServiceApplication.executor": "Run",
-    "Spring Boot.CandidateServiceApplication.executor": "Run",
-    "Spring Boot.NotificationServiceApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "team2-dev",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApplicationServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.CandidateServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.NotificationServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;team2-dev&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -232,6 +231,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="talentgrid-api-gateway-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.gateway.GatewayApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="InterviewServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
       <module name="interview-service" />
@@ -269,6 +275,7 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Spring Boot.GatewayApplication" />
       <item itemvalue="Spring Boot.ApplicationServiceApplication" />
       <item itemvalue="Spring Boot.AuditServiceApplication" />
       <item itemvalue="Spring Boot.CandidateServiceApplication" />

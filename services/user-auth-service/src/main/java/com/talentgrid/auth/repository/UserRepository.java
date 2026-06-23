@@ -18,4 +18,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findFirstByLocationAndRoles_NameAndEnabledTrue(
             String location,
             String roleName);
+
+    java.util.List<User> findByLocationAndIsInterviewerEligible(String location, Boolean isInterviewerEligible);
 }

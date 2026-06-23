@@ -52,6 +52,9 @@ public class NotificationPayload {
      */
     private String recipientEmail;
 
+    private String recipientSlackId;
+
+
     /**
      * Notification type identifier, e.g. DEMAND_CREATED, DEMAND_APPROVED,
      * NOMINATION_RECEIVED, OFFER_SENT. Used for routing and template selection.
