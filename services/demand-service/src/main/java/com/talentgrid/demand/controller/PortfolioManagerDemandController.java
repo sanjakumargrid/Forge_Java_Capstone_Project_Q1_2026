@@ -15,20 +15,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Portfolio-manager scoped demand actions (separate from RM/Admin lifecycle APIs).
+ * Portfolio-manager scoped demand actions (separate from RM/Admin lifecycle
+ * APIs).
  */
 @RestController
-@RequestMapping("/api/v1/project-manager/demands")
+@RequestMapping("/api/v1/portfolio-manager/demands")
 @RequiredArgsConstructor
 @Tag(name = "Portfolio Manager Demands", description = "Portfolio-manager-scoped demand operations")
-public class ProjectManagerDemandController {
+public class PortfolioManagerDemandController {
 
     private final DemandLifecycleService lifecycleService;
 
     /**
-     * Approve a demand in {@code PENDING_APPROVAL} for a project the caller manages.
+     * Approve a demand in {@code PENDING_APPROVAL} for a project the caller
+     * manages.
      *
-     * <p>Requires scope {@code DEMAND_PM_APPROVE} and the authenticated user must be
+     * <p>
+     * Requires scope {@code DEMAND_PM_APPROVE} and the authenticated user must be
      * the portfolio manager ({@code project_manager_id}) on the demand's project.
      */
     @PutMapping("/{demandId}/approve")
