@@ -222,54 +222,17 @@ public class InterviewServiceImpl implements InterviewService {
             Long applicationId,
             Status status,
             Type interviewType,
+            Long interviewerId,
             Pageable pageable
     ) {
 
-        Page<Interview> interviews;
-
-        if (applicationId != null && status != null && interviewType != null) {
-            interviews = interviewRepository.findByApplicationIdAndStatusAndInterviewType(
-                    applicationId,
-                    status,
-                    interviewType,
-                    pageable
-            );
-        } else if (applicationId != null && status != null) {
-            interviews = interviewRepository.findByApplicationIdAndStatus(
-                    applicationId,
-                    status,
-                    pageable
-            );
-        } else if (applicationId != null && interviewType != null) {
-            interviews = interviewRepository.findByApplicationIdAndInterviewType(
-                    applicationId,
-                    interviewType,
-                    pageable
-            );
-        } else if (status != null && interviewType != null) {
-            interviews = interviewRepository.findByStatusAndInterviewType(
-                    status,
-                    interviewType,
-                    pageable
-            );
-        } else if (applicationId != null) {
-            interviews = interviewRepository.findByApplicationId(
-                    applicationId,
-                    pageable
-            );
-        } else if (status != null) {
-            interviews = interviewRepository.findByStatus(
-                    status,
-                    pageable
-            );
-        } else if (interviewType != null) {
-            interviews = interviewRepository.findByInterviewType(
-                    interviewType,
-                    pageable
-            );
-        } else {
-            interviews = interviewRepository.findAll(pageable);
-        }
+        Page<Interview> interviews = interviewRepository.findWithFilters(
+                applicationId,
+                status,
+                interviewType,
+                interviewerId,
+                pageable
+        );
 
         return interviews.map(InterviewMapper::entityToDto);
     }

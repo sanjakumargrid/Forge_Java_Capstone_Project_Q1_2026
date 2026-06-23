@@ -51,6 +51,7 @@ public class InterviewController {
             @RequestParam(required = false) Long applicationId,
             @RequestParam(required = false) Status status,
             @RequestParam(required = false) Type interviewType,
+            @RequestParam(required = false) Long interviewerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "scheduledAt") String sortBy,
@@ -69,6 +70,7 @@ public class InterviewController {
                         applicationId,
                         status,
                         interviewType,
+                        interviewerId,
                         pageable
                 );
 
