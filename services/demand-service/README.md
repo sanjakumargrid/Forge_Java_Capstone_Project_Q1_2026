@@ -102,7 +102,7 @@ Issue tokens from **user-auth-service** with the same **scope names** as in `tal
 - `DEMAND_STATUS_TRANSITION` (PATCH status), `DEMAND_PIPELINE_VIEW`, `DEMAND_SUBMIT` (POST submit)
 - `DEMAND_NOMINATE`, `DEMAND_HM_NOMINATION_DECIDE` (internal nominations)
 
-Role names used in code checks include `ADMIN`, `RMG`, `PROJECT_MANAGER`, **`HIRING_MANAGER`** (canonical on JWT from user-auth; legacy alias `HM` is accepted via `SecurityUtils.isHiringManager()`), `RESOURCE_MANAGER`, `RM`, `RECRUITER`, `TA_MANAGER`.
+Role names used in code checks: `ADMIN`, `PORTFOLIO_MANAGER` (legacy alias `PROJECT_MANAGER`), **`HIRING_MANAGER`** (alias `HM`), `RESOURCE_MANAGER`, `RM`, `RMG` (treated as RM for lifecycle), `RECRUITER`, `TA_MANAGER`, `EMPLOYEE`.
 
 > **Note:** Illegal transitions return **HTTP 400** with validation errors from `TransitionValidator` / `DemandStateMachine`.
 

@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/rmg")
 @RequiredArgsConstructor
@@ -31,15 +34,29 @@ public class RmgDemandStatusController {
 
     @GetMapping("/demands")
     @PreAuthorize("hasAnyAuthority('WORKFORCE_BENCH_SEARCH', 'WORKFORCE_NOMINATION_VIEW')")
-    @Operation(summary = "Get demands by status",
-            description = "Fetch demand records by status for RMG dashboard and nomination flow")
+    @Operation(summary = "Get demands by status/statuses",
+            description = "Fetch demand records by single status or multiple statuses for RMG dashboard and nomination flow")
     public ResponseEntity<Page<DemandDto>> getDemandsByStatus(
-            @RequestParam(name = "status") String status,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "statuses", required = false) List<String> statuses,
             @RequestParam(required = false, name = "page", defaultValue = "0") int page,
             @RequestParam(required = false, name = "size", defaultValue = "10") int size) {
-        log.info("Received request to fetch demands by status={} - page={}, size={}", status, page, size);
+        
+        // Combine single status and multiple statuses for backward compatibility
+        List<String> finalStatuses = new ArrayList<>();
+        if (status != null && !status.trim().isEmpty()) {
+            finalStatuses.add(status.trim());
+        }
+        if (statuses != null && !statuses.isEmpty()) {
+            finalStatuses.addAll(statuses.stream().filter(s -> s != null && !s.trim().isEmpty()).toList());
+        }
+        
+        // If no statuses provided, set to null to get all demands
+        List<String> statusesToSearch = finalStatuses.isEmpty() ? null : finalStatuses;
+        
+        log.info("Received request to fetch demands by statuses={} - page={}, size={}", statusesToSearch, page, size);
         Pageable pageable = PageRequest.of(page, size);
-        Page<DemandDto> response = rmgService.getDemandsByStatus(status, pageable);
+        Page<DemandDto> response = rmgService.getDemandsByStatuses(statusesToSearch, pageable);
         return ResponseEntity.ok(response);
     }
 

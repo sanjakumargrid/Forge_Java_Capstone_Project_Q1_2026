@@ -46,32 +46,46 @@ public class DemandSecurityService {
     }
 
     public boolean isOwnerOrHasGlobalAccess(Long demandId) {
-        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+        if (SecurityUtils.isPlatformAdmin()) {
             return true;
         }
         return isOwner(demandId);
     }
 
     public boolean canView(Long demandId) {
-        if (isOwnerOrHasGlobalAccess(demandId)) {
+        if (SecurityUtils.isPlatformAdmin()) {
             return true;
         }
 
-        Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
+        Optional<Demand> demandOpt = demandRepository.findById(demandId);
         if (demandOpt.isEmpty()) {
-            return false;
+            return true;
         }
 
         Demand demand = demandOpt.get();
+        if (Boolean.TRUE.equals(demand.getIsDeleted())) {
+            Long currentUserId = SecurityUtils.getCurrentUserId();
+            return currentUserId != null && currentUserId.equals(demand.getCreatedBy());
+        }
+
+        Long currentUserId = SecurityUtils.getCurrentUserId();
+        if (currentUserId != null && currentUserId.equals(demand.getCreatedBy())) {
+            return true;
+        }
+
         DemandStatus status = demand.getStatus();
 
-        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+        if (SecurityUtils.isPortfolioManager()) {
+            return true;
+        }
+
+        if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL
                     || status == DemandStatus.FILLED
                     || status == DemandStatus.CLOSED;
         }
 
-        if (SecurityUtils.hasAnyRole("EMPLOYEE")) {
+        if (SecurityUtils.isEmployee()) {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
@@ -83,6 +97,18 @@ public class DemandSecurityService {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
+        if (SecurityUtils.isResourceManager()) {
+            return status == DemandStatus.INTERNAL_SEARCH
+                    || status == DemandStatus.ON_HOLD
+                    || status == DemandStatus.OPEN_EXTERNAL
+                    || status == DemandStatus.CLOSED;
+        }
+
+        if (SecurityUtils.isTaManager()) {
+            return status == DemandStatus.OPEN_EXTERNAL
+                    || status == DemandStatus.CLOSED;
+        }
+
         return status == DemandStatus.OPEN_EXTERNAL;
     }
 
@@ -90,7 +116,7 @@ public class DemandSecurityService {
      * True when the caller may call PATCH /status for this demand (fine-grained checks also run in service).
      */
     public boolean canTransition(Long demandId) {
-        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
+        if (SecurityUtils.isPlatformAdmin()) {
             return true;
         }
         Optional<Demand> demandOpt = demandRepository.findByDemandIdAndIsDeletedFalse(demandId);
@@ -104,21 +130,21 @@ public class DemandSecurityService {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole("PROJECT_MANAGER")) {
+        if (SecurityUtils.isPortfolioManager()) {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM")) {
+        if (SecurityUtils.isResourceManager()) {
             return status == DemandStatus.INTERNAL_SEARCH
                     || status == DemandStatus.ON_HOLD
                     || status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        if (SecurityUtils.hasAnyRole("TA_MANAGER")) {
+        if (SecurityUtils.isTaManager()) {
             return status == DemandStatus.OPEN_EXTERNAL;
         }
 
-        if (SecurityUtils.hasAnyRole("RECRUITER")) {
+        if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.ON_HOLD;
         }
 
@@ -126,6 +152,6 @@ public class DemandSecurityService {
     }
 
     public boolean canCloseOrCancel() {
-        return SecurityUtils.hasAnyRole("ADMIN", "RMG");
+        return SecurityUtils.isPlatformAdmin();
     }
 }

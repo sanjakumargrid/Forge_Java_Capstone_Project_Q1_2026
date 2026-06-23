@@ -17,15 +17,12 @@ import java.util.Map;
  * Utility class to extract user details from the Spring Security Context
  * or the HTTP Request's Authorization Header (JWT).
  *
- * <p>Role checks should use the same role names as {@code user-auth-service} puts on the JWT
- * (see {@code JwtService}: {@code role.getName()}), e.g. {@code HIRING_MANAGER}. The alias
- * {@code HM} is still accepted for backward compatibility with older tokens or data.
+ * <p>Role checks use the same role names as {@code user-auth-service} puts on the JWT
+ * (see {@code JwtService}: {@code role.getName()}): {@code ADMIN}, {@code HIRING_MANAGER},
+ * {@code PORTFOLIO_MANAGER}, {@code RESOURCE_MANAGER}, {@code RECRUITER},
+ * {@code TA_MANAGER}, and {@code EMPLOYEE}.
  */
 public class SecurityUtils {
-
-    /** Canonical JWT role from user-auth; {@code HM} kept as legacy alias. */
-    public static final String ROLE_HIRING_MANAGER = "HIRING_MANAGER";
-    public static final String ROLE_HIRING_MANAGER_ALIAS = "HM";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -125,12 +122,33 @@ public class SecurityUtils {
         return false;
     }
 
-    /**
-     * Hiring Manager per workflow: matches JWT role {@link #ROLE_HIRING_MANAGER} (issued by user-auth)
-     * or legacy alias {@link #ROLE_HIRING_MANAGER_ALIAS}.
-     */
     public static boolean isHiringManager() {
-        return hasAnyRole(ROLE_HIRING_MANAGER, ROLE_HIRING_MANAGER_ALIAS);
+        return hasAnyRole("HIRING_MANAGER");
+    }
+
+    public static boolean isPortfolioManager() {
+        return hasAnyRole("PORTFOLIO_MANAGER");
+    }
+
+    public static boolean isResourceManager() {
+        return hasAnyRole("RESOURCE_MANAGER");
+    }
+
+    public static boolean isRecruiter() {
+        return hasAnyRole("RECRUITER");
+    }
+
+    public static boolean isTaManager() {
+        return hasAnyRole("TA_MANAGER");
+    }
+
+    public static boolean isEmployee() {
+        return hasAnyRole("EMPLOYEE");
+    }
+
+    /** Platform admin — may perform any state-machine-legal transition. */
+    public static boolean isPlatformAdmin() {
+        return hasAnyRole("ADMIN");
     }
 
     public static Long getCurrentUserAccountId() {

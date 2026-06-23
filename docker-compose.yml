@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # TalentGrid Local Infrastructure
-# Kafka (KRaft) + Kafka UI + PostgreSQL
+# Kafka (KRaft) + Kafka UI + PostgreSQL + Redis
 # ─────────────────────────────────────────────────────────────────────────────
 #
 # Start:
@@ -29,6 +29,10 @@
 #
 # Password:
 #   talentgrid
+#
+# Redis:
+#   localhost:6379
+#   Used by user-auth-service (token blacklist, auth cache) and API gateway (rate limiting)
 #
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -106,9 +110,25 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: talentgrid-redis
+    networks:
+      - talentgrid-network
+    ports:
+      - "${REDIS_HOST_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   talentgrid-network:
     driver: bridge
 
 volumes:
   postgres_data:
+  redis_data:

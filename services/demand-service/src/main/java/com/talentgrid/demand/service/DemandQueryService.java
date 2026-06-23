@@ -128,9 +128,9 @@ public class DemandQueryService {
                 predicates.add(cb.equal(root.get("employmentType"), employmentType));
             }
 
-            // Role-based visibility logic
-            if (!SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
-                if (SecurityUtils.hasAnyRole("RECRUITER")) {
+            // Role-based visibility: ADMIN and RM see all; others are scoped
+            if (!SecurityUtils.isPlatformAdmin() && !SecurityUtils.isResourceManager()) {
+                if (SecurityUtils.isRecruiter()) {
                     predicates.add(root.get("status").in(
                         DemandStatus.OPEN_EXTERNAL,
                         DemandStatus.FILLED,
@@ -150,8 +150,13 @@ public class DemandQueryService {
                             cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
                         ));
                     }
-                } else if (SecurityUtils.hasAnyRole("EMPLOYEE")) {
+                } else if (SecurityUtils.isEmployee()) {
                     predicates.add(cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL));
+                } else if (SecurityUtils.isPortfolioManager()) {
+                    predicates.add(cb.or(
+                            cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),
+                            cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL)
+                    ));
                 } else {
                     // Default fallback
                     predicates.add(cb.or(

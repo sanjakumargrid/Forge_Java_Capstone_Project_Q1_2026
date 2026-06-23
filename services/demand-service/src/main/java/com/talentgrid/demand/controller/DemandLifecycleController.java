@@ -20,8 +20,8 @@ import java.util.List;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code POST  /api/v1/demands/{id}/submit} — HM submits for PM approval, or PM auto-approves from draft</li>
- * <li>{@code POST  /api/v1/demands/{id}/approve} — project manager approves or rejects (same rules as PM route below)</li>
+ * <li>{@code POST  /api/v1/demands/{id}/submit} — HM submits for portfolio manager approval, or portfolio manager auto-approves from draft</li>
+ * <li>{@code POST  /api/v1/demands/{id}/approve} — portfolio manager approves or rejects (same rules as PM route below)</li>
  * <li>{@code PATCH /api/v1/demands/{id}/status} — perform a legal status
  * transition (e.g., APPROVED -> INTERNAL_SEARCH)</li>
  * <li>{@code GET   /api/v1/demands/{id}/pipeline} — unified internal + external hiring
@@ -38,7 +38,7 @@ public class DemandLifecycleController {
     private final DemandQueryService queryService;
 
     /**
-     * Submit from {@code DRAFT}: HM → {@code PENDING_APPROVAL}; PM on same project → auto post-approval routing.
+     * Submit from {@code DRAFT}: HM → {@code PENDING_APPROVAL}; portfolio manager on same project → auto post-approval routing.
      */
     @PostMapping("/{id}/submit")
     @PreAuthorize("hasAuthority('DEMAND_SUBMIT') or hasAuthority('DEMAND_PM_APPROVE')")

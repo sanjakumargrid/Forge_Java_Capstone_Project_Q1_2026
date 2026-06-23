@@ -64,6 +64,19 @@ rbac:
       methods: [GET]
       allowed-scopes: [PERMISSION_VIEW]
 
+    # --- User lookup (user-auth; used by demand-service and admin tooling) ---
+    - path: "/api/v1/users/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/projects/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_CREATE, DEMAND_PM_APPROVE, DEMAND_STATUS_TRANSITION]
+
+    - path: "/api/v1/accounts/**"
+      methods: [GET]
+      allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_CREATE, DEMAND_PM_APPROVE, DEMAND_STATUS_TRANSITION]
+
     # --- Demands ---
     - path: "/api/v1/demands"
       methods: [GET]

@@ -35,11 +35,19 @@ public class RmgService {
     );
 
     public Page<DemandDto> getDemandsByStatus(String status, Pageable pageable) {
-        log.info("Fetching demands from demand-service with status={}, page={}, size={}",
-                status, pageable.getPageNumber(), pageable.getPageSize());
+        // Backward compatibility method - convert single status to list
+        List<String> statuses = (status != null && !status.trim().isEmpty()) 
+            ? List.of(status.trim()) 
+            : null;
+        return getDemandsByStatuses(statuses, pageable);
+    }
 
-        DemandSummaryPageResponse summaryPage = demandClient.getDemandsByStatus(
-                status,
+    public Page<DemandDto> getDemandsByStatuses(List<String> statuses, Pageable pageable) {
+        log.info("Fetching demands from demand-service with statuses={}, page={}, size={}",
+                statuses, pageable.getPageNumber(), pageable.getPageSize());
+
+        DemandSummaryPageResponse summaryPage = demandClient.getDemandsByStatuses(
+                statuses,
                 pageable.getPageNumber(),
                 pageable.getPageSize()
         );

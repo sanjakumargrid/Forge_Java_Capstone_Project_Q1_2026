@@ -19,10 +19,10 @@ public class UserLookupServiceImpl implements UserLookupService {
     User rmg = userRepository
             .findFirstByLocationAndRoles_NameAndEnabledTrue(
                     location,
-                    "RMG")
+                    "RESOURCE_MANAGER")
             .orElseThrow(() ->
                     new RuntimeException(
-                            "No active RMG found for location: " + location));
+                            "No active resource manager found for location: " + location));
 
     return UserSummaryResponse.builder()
             .id(rmg.getId())

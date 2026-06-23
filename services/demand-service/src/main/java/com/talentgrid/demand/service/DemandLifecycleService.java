@@ -48,8 +48,8 @@ public class DemandLifecycleService {
 
     /**
      * Approve or reject a demand in {@code PENDING_APPROVAL}.
-     * Only the {@linkplain #assertCurrentUserIsProjectManagerForDemand project manager} for the demand's
-     * {@code projectId} may act — same rules as {@link #approveAsProjectManager(Long, ApprovalRequest)}.
+     * Only the portfolio manager for the demand's {@code projectId} may act
+     * (platform {@code ADMIN} may override).
      * <p>Convenience alias for {@code POST /api/v1/demands/{id}/approve}; prefer {@code PUT /api/v1/project-manager/demands/{id}/approve} if you split routes by persona.
      */
     @Transactional
@@ -66,13 +66,15 @@ public class DemandLifecycleService {
     protected DemandResponse approveAsProjectManager(Long id, ApprovalRequest request, String auditEndpoint) {
         Demand demand = findActiveOrThrow(id);
         assertPendingApprovalOrThrow(id, demand);
-        assertCurrentUserIsProjectManagerForDemand(demand);
+        if (!SecurityUtils.isPlatformAdmin()) {
+            assertCurrentUserIsPortfolioManagerForDemand(demand);
+        }
         ApprovalRequest effective = normalizeProjectManagerApprovalRequest(request);
         return executeApprovalDecision(demand, id, effective, auditEndpoint);
     }
 
     /**
-     * HM submits for PM approval, or PM auto-approves from draft (same project).
+     * HM submits for PM approval, portfolio manager auto-approves from draft, or admin override.
      */
     @Transactional
     public DemandResponse submitDemand(Long id, String comments) {
@@ -84,8 +86,11 @@ public class DemandLifecycleService {
 
         DemandStatus from = demand.getStatus();
 
-        if (SecurityUtils.hasAnyRole("PROJECT_MANAGER")) {
-            assertCurrentUserIsProjectManagerForDemand(demand);
+        if (SecurityUtils.isPlatformAdmin()) {
+            transitionValidator.validate(demand, DemandStatus.APPROVED, null);
+            applyPostApprovalRouting(demand, from, comments);
+        } else if (SecurityUtils.isPortfolioManager()) {
+            assertCurrentUserIsPortfolioManagerForDemand(demand);
             transitionValidator.validate(demand, DemandStatus.APPROVED, null);
             applyPostApprovalRouting(demand, from, comments);
         } else if (SecurityUtils.isHiringManager()) {
@@ -100,7 +105,7 @@ public class DemandLifecycleService {
             auditStatusChange(saved, from, DemandStatus.PENDING_APPROVAL, "/api/v1/demands/" + id + "/submit");
             return demandMapper.toResponse(saved);
         } else {
-            throw new AccessDeniedException("Only HM or PM may submit a demand from draft.");
+            throw new AccessDeniedException("Only HM, portfolio manager, or platform admin may submit a demand from draft.");
         }
 
         Demand saved = demandRepository.save(demand);
@@ -129,10 +134,10 @@ public class DemandLifecycleService {
         }
     }
 
-    private void assertCurrentUserIsProjectManagerForDemand(Demand demand) {
+    private void assertCurrentUserIsPortfolioManagerForDemand(Demand demand) {
         Long currentUserId = SecurityUtils.getCurrentUserId();
         if (demand.getProjectId() == null) {
-            throw new AccessDeniedException("Demand has no project; project manager approval is not available.");
+            throw new AccessDeniedException("Demand has no project; portfolio manager approval is not available.");
         }
         try {
             ProjectDto project = userAuthServiceClient.getProjectById(demand.getProjectId());
@@ -140,21 +145,22 @@ public class DemandLifecycleService {
                 throw new AccessDeniedException("Project ownership cannot be verified for this demand.");
             }
             if (!project.getProjectManagerId().equals(currentUserId)) {
-                throw new AccessDeniedException("You are not the project manager for this demand's project.");
+                throw new AccessDeniedException("You are not the portfolio manager for this demand's project.");
             }
         } catch (AccessDeniedException e) {
             throw e;
         } catch (FeignException e) {
             int status = e.status();
             if (status == 401 || status == 403) {
-                log.warn("PM approval: user-auth denied project lookup (status={}) for projectId={}",
+                log.warn("Portfolio manager approval: user-auth denied project lookup (status={}) for projectId={}",
                         status, demand.getProjectId());
             } else {
-                log.error("PM approval: user-auth error resolving projectId={}: {}", demand.getProjectId(), e.getMessage());
+                log.error("Portfolio manager approval: user-auth error resolving projectId={}: {}",
+                        demand.getProjectId(), e.getMessage());
             }
             throw new AccessDeniedException("Unable to verify project ownership.");
         } catch (Exception e) {
-            log.error("PM approval: failed to resolve project for demandId={} projectId={}",
+            log.error("Portfolio manager approval: failed to resolve project for demandId={} projectId={}",
                     demand.getDemandId(), demand.getProjectId(), e);
             throw new AccessDeniedException("Unable to verify project ownership.");
         }
@@ -422,37 +428,69 @@ public class DemandLifecycleService {
     }
 
     private void assertTransitionPermissions(Demand demand, DemandStatus targetStatus, ClosureReason closureReason) {
+        if (SecurityUtils.isPlatformAdmin()) {
+            return;
+        }
+
         DemandStatus from = demand.getStatus();
 
         if (from == DemandStatus.DRAFT && targetStatus == DemandStatus.PENDING_APPROVAL) {
-            if (!SecurityUtils.isHiringManager() && !SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only HM (or admin) may submit a demand for approval.");
+            if (!SecurityUtils.isHiringManager()) {
+                throw new AccessDeniedException("Only the hiring manager may submit a demand for approval.");
             }
-            if (!SecurityUtils.hasAnyRole("ADMIN", "RMG")
-                    && !SecurityUtils.getCurrentUserId().equals(demand.getCreatedBy())) {
+            if (!SecurityUtils.getCurrentUserId().equals(demand.getCreatedBy())) {
                 throw new AccessDeniedException("Only the demand owner may submit for approval.");
             }
             return;
         }
 
-        if (from == DemandStatus.ON_HOLD
-                && (targetStatus == DemandStatus.INTERNAL_SEARCH
-                || targetStatus == DemandStatus.OPEN_EXTERNAL)) {
-            DemandStatus prev = demand.getPreviousStatus();
-            if (prev == DemandStatus.INTERNAL_SEARCH
-                    && !SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only RM (or admin) may resume internal search.");
+        if (from == DemandStatus.INTERNAL_SEARCH
+                && targetStatus == DemandStatus.OPEN_EXTERNAL
+                && closureReason == ClosureReason.HM_REJECTED_NOMINATION) {
+            if (!SecurityUtils.isHiringManager()) {
+                throw new AccessDeniedException("Only HM may open external search after rejecting a nomination.");
             }
-            if (prev == DemandStatus.OPEN_EXTERNAL
-                    && !SecurityUtils.hasAnyRole("RECRUITER", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only recruiter (or admin) may resume external hiring.");
+            return;
+        }
+
+        if (targetStatus == DemandStatus.FILLED && from == DemandStatus.INTERNAL_SEARCH) {
+            if (!SecurityUtils.isHiringManager()) {
+                throw new AccessDeniedException("Only HM may accept internal fill.");
+            }
+            return;
+        }
+
+        if (targetStatus == DemandStatus.FILLED && from == DemandStatus.OPEN_EXTERNAL) {
+            if (!SecurityUtils.isTaManager()) {
+                throw new AccessDeniedException("Only TA Manager may approve external offer (FILLED).");
+            }
+            if (closureReason != ClosureReason.FILLED) {
+                throw new AccessDeniedException("External fill requires closureReason=FILLED.");
+            }
+            return;
+        }
+
+        if (targetStatus == DemandStatus.FILLED) {
+            throw new AccessDeniedException("FILLED is only valid from INTERNAL_SEARCH or OPEN_EXTERNAL.");
+        }
+
+        if (from == DemandStatus.ON_HOLD && targetStatus == DemandStatus.INTERNAL_SEARCH) {
+            if (!SecurityUtils.isResourceManager()) {
+                throw new AccessDeniedException("Only RM may resume internal search.");
+            }
+            return;
+        }
+
+        if (from == DemandStatus.ON_HOLD && targetStatus == DemandStatus.OPEN_EXTERNAL) {
+            if (!SecurityUtils.isRecruiter()) {
+                throw new AccessDeniedException("Only recruiter may resume external hiring.");
             }
             return;
         }
 
         if (targetStatus == DemandStatus.CLOSED && from == DemandStatus.ON_HOLD) {
-            if (!SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only RM (or admin) may close an on-hold demand.");
+            if (!SecurityUtils.isResourceManager()) {
+                throw new AccessDeniedException("Only RM may close an on-hold demand.");
             }
             if (closureReason != ClosureReason.RM_CLOSED_ON_HOLD) {
                 throw new AccessDeniedException("Closing from ON_HOLD requires closureReason=RM_CLOSED_ON_HOLD.");
@@ -460,57 +498,26 @@ public class DemandLifecycleService {
             return;
         }
 
-        if (targetStatus == DemandStatus.FILLED) {
-            if (from == DemandStatus.INTERNAL_SEARCH) {
-                if (!SecurityUtils.isHiringManager() && !SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
-                    throw new AccessDeniedException("Only HM (or admin) may accept internal fill.");
-                }
-            } else if (from == DemandStatus.OPEN_EXTERNAL) {
-                if (!SecurityUtils.hasAnyRole("TA_MANAGER", "ADMIN", "RMG")) {
-                    throw new AccessDeniedException("Only TA Manager (or admin) may approve external offer (FILLED).");
-                }
-                if (closureReason != ClosureReason.FILLED) {
-                    throw new AccessDeniedException("External fill requires closureReason=FILLED.");
-                }
-            } else {
-                throw new AccessDeniedException("FILLED is only valid from INTERNAL_SEARCH or OPEN_EXTERNAL.");
+        if (from == DemandStatus.INTERNAL_SEARCH
+                && (targetStatus == DemandStatus.ON_HOLD || targetStatus == DemandStatus.OPEN_EXTERNAL)) {
+            if (!SecurityUtils.isResourceManager()) {
+                throw new AccessDeniedException("Only RM may perform this internal-search transition.");
             }
             return;
         }
 
-        if (targetStatus == DemandStatus.ON_HOLD && from == DemandStatus.INTERNAL_SEARCH) {
-            if (!SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only RM (or admin) may place internal search on hold.");
+        if (from == DemandStatus.OPEN_EXTERNAL && targetStatus == DemandStatus.ON_HOLD) {
+            if (!SecurityUtils.isRecruiter()) {
+                throw new AccessDeniedException("Only recruiter may hold external hiring.");
             }
             return;
         }
 
-        if (SecurityUtils.hasAnyRole("RECRUITER") && !SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
-            if (!(from == DemandStatus.OPEN_EXTERNAL
-                    && (targetStatus == DemandStatus.ON_HOLD))) {
-                throw new AccessDeniedException("Recruiters may only place OPEN_EXTERNAL demands on hold.");
-            }
-            return;
+        if (SecurityUtils.isRecruiter()) {
+            throw new AccessDeniedException(
+                    "Recruiters may only place OPEN_EXTERNAL demands on hold or resume external hiring.");
         }
 
-        if ((targetStatus == DemandStatus.OPEN_EXTERNAL && from == DemandStatus.INTERNAL_SEARCH)
-                || (targetStatus == DemandStatus.ON_HOLD && from == DemandStatus.INTERNAL_SEARCH)) {
-            if (!SecurityUtils.hasAnyRole("RESOURCE_MANAGER", "RM", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only RM (or admin) may perform this internal-search transition.");
-            }
-            return;
-        }
-
-        if (targetStatus == DemandStatus.ON_HOLD && from == DemandStatus.OPEN_EXTERNAL) {
-            if (!SecurityUtils.hasAnyRole("RECRUITER", "ADMIN", "RMG")) {
-                throw new AccessDeniedException("Only recruiter (or admin) may hold external hiring.");
-            }
-            return;
-        }
-
-        if (SecurityUtils.hasAnyRole("ADMIN", "RMG")) {
-            return;
-        }
         throw new AccessDeniedException("Insufficient permissions for this transition.");
     }
 

@@ -67,7 +67,7 @@ class DemandLifecycleServicePmApprovalTest {
         JwtPrincipal principal = JwtPrincipal.builder()
                 .userId(userId)
                 .email("pm@example.com")
-                .roles(List.of("PROJECT_MANAGER"))
+                .roles(List.of("PORTFOLIO_MANAGER"))
                 .scopes(List.of("DEMAND_PM_APPROVE"))
                 .build();
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -164,7 +164,7 @@ class DemandLifecycleServicePmApprovalTest {
 
         AccessDeniedException ex = assertThrows(AccessDeniedException.class,
                 () -> lifecycleService.approveAsProjectManager(7L, null));
-        assertTrue(ex.getMessage().contains("not the project manager"));
+        assertTrue(ex.getMessage().contains("not the portfolio manager"));
         verifyNoInteractions(eventProducer);
     }
 

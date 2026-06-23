@@ -10,19 +10,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(
-        name = "redis.enabled",
-        havingValue = "true"
-)
+@ConditionalOnProperty(name = "redis.enabled", havingValue = "true")
 public class AuthUserEventConsumer {
 
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
-    @KafkaListener(
-            topics = "auth.user.updated",
-            groupId = "${spring.application.name}",
-            containerFactory = "kafkaListenerContainerFactory"
-    )
+    @KafkaListener(topics = "auth.user.updated", groupId = "${spring.application.name}", containerFactory = "kafkaListenerContainerFactory")
     public void onUserUpdated(AuthUserUpdatedEvent event) {
 
         if (event == null || event.getUserId() == null) {

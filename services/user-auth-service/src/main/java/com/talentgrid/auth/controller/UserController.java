@@ -61,13 +61,4 @@ public class UserController {
         );
     }
 
-    @GetMapping("/accounts/{id}")
-    public ResponseEntity<Map<String, Object>> getAccountById(@PathVariable Long id) {
-        return ResponseEntity.ok(Map.of(
-                "id", id,
-                "name", "Mock Account",
-                "accountManagerId", 1L
-        ));
-    }
-
 }
