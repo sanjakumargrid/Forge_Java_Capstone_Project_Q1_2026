@@ -62,6 +62,9 @@ Configured in `rbac-rules.yml` → `public-paths`:
 | GET | `/api/v1/admin/roles/**/permissions` | `PERMISSION_VIEW` | Role permissions |
 | PUT | `/api/v1/admin/roles/**/permissions` | `PERMISSION_ASSIGN` | Update role permissions |
 | GET | `/api/v1/admin/permissions` | `PERMISSION_VIEW` | All permissions |
+| GET | `/api/v1/users/**` | `USER_VIEW`, `DEMAND_VIEW`, or `DEMAND_STATUS_TRANSITION` | User lookup by id, RMG-by-location (proxied to user-auth) |
+| GET | `/api/v1/projects/**` | `USER_VIEW`, `DEMAND_VIEW`, `DEMAND_CREATE`, `DEMAND_PM_APPROVE`, or `DEMAND_STATUS_TRANSITION` | Project by id, PM `mine-as-pm` list (proxied to user-auth) |
+| GET | `/api/v1/accounts/**` | `USER_VIEW`, `DEMAND_VIEW`, `DEMAND_CREATE`, `DEMAND_PM_APPROVE`, or `DEMAND_STATUS_TRANSITION` | Account lookup by id (proxied to user-auth) |
 | GET | `/api/v1/demands` | `DEMAND_VIEW` | Search demands (`?status=` supports multiple values) |
 | GET | `/api/v1/demands/pm` | `DEMAND_VIEW` | PM-scoped demand list |
 | POST | `/api/v1/demands` | `DEMAND_CREATE` | Create demand |
