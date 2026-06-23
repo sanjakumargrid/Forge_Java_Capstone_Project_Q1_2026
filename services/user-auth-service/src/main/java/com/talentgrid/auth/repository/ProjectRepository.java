@@ -15,7 +15,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p FROM Project p LEFT JOIN FETCH p.account WHERE p.projectManagerId = :projectManagerId")
     List<Project> findByProjectManagerId(@Param("projectManagerId") Long projectManagerId);
 
-    List<Project> findByAccountId(Long accountId);
 
     /**
      * @param accountId owning account id
