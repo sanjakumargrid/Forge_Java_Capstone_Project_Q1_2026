@@ -2,6 +2,10 @@ package com.talentgrid.interview.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.talentgrid.clients.notification.NotificationEventPublisher;
+import com.talentgrid.interview.client.ApplicationClient;
+import com.talentgrid.interview.client.CandidateClient;
+import com.talentgrid.interview.client.dto.CandidateDto;
+import com.talentgrid.interview.interview.dto.ApplicationDto;
 import com.talentgrid.kafka.consumer.BaseKafkaConsumer;
 import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.events.interview.InterviewPayload;
@@ -24,6 +28,8 @@ public class InterviewEventTranslator extends BaseKafkaConsumer<InterviewPayload
 
     private final NotificationEventPublisher notificationEventPublisher;
     private final ObjectMapper objectMapper;
+    private final ApplicationClient applicationClient;
+    private final CandidateClient candidateClient;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
@@ -209,12 +215,14 @@ public class InterviewEventTranslator extends BaseKafkaConsumer<InterviewPayload
             String templateCode,
             String correlationId
     ) {
+        
+        String recipientEmail = getCandidateEmail(interview.getApplicationId());
 
         notificationEventPublisher.sendInAppAndEmail(
                 interview.getApplicationId() != null
                         ? interview.getApplicationId().toString()
                         : null,
-                null,
+                recipientEmail,
                 notificationType,
                 title,
                 message,
@@ -248,6 +256,24 @@ public class InterviewEventTranslator extends BaseKafkaConsumer<InterviewPayload
                 interview.getInterviewId(),
                 notificationType
         );
+    }
+    
+    private String getCandidateEmail(Long applicationId) {
+        if (applicationId == null) {
+            return null;
+        }
+        try {
+            ApplicationDto applicationDto = applicationClient.getApplication(applicationId);
+            if (applicationDto != null && applicationDto.getCandidateId() != null) {
+                CandidateDto candidateDto = candidateClient.getCandidate(applicationDto.getCandidateId());
+                if (candidateDto != null && candidateDto.getEmail() != null) {
+                    return candidateDto.getEmail();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[INTERVIEW-TRANSLATOR] Failed to fetch candidate email for applicationId={}: {}", applicationId, e.getMessage());
+        }
+        return null;
     }
 
     private String scheduledAt(InterviewPayload interview) {

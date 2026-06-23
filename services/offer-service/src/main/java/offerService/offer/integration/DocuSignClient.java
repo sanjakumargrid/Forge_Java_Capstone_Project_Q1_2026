@@ -32,6 +32,11 @@ public class DocuSignClient {
 
         try {
 
+            if (properties.getIntegrationKey() == null || properties.getIntegrationKey().isEmpty()) {
+                log.warn("DocuSign credentials not configured. Generating dummy envelope ID for local testing.");
+                return "MOCK_ENVELOPE_" + System.currentTimeMillis();
+            }
+
             ApiClient apiClient = createAuthenticatedClient();
 
             EnvelopeDefinition envelope =

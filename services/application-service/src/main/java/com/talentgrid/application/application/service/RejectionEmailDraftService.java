@@ -12,6 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.talentgrid.application.client.CandidateClient;
+import com.talentgrid.application.client.DemandClient;
+import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
+import com.talentgrid.application.application.dto.DemandDto;
+
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +27,8 @@ public class RejectionEmailDraftService {
     private final ApplicationRepository applicationRepository;
     private final GeminiProperties geminiProperties;
     private final ObjectMapper objectMapper;
+    private final CandidateClient candidateClient;
+    private final DemandClient demandClient;
 
     public RejectionEmailDraftResponseDto generateDraft(
             Long applicationId,
@@ -29,6 +36,23 @@ public class RejectionEmailDraftService {
     ) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
+
+        ExternalCandidateDto candidate = null;
+        DemandDto demand = null;
+        try {
+            candidate = candidateClient.getCandidateById(application.getCandidateId());
+        } catch (Exception e) {
+            // Ignore error and proceed with ID if fetch fails
+        }
+        
+        try {
+            demand = demandClient.getDemand(application.getDemandId());
+        } catch (Exception e) {
+            // Ignore error and proceed with ID if fetch fails
+        }
+
+        String candidateName = (candidate != null) ? (candidate.getFirstName() + " " + candidate.getLastName()) : ("Candidate " + application.getCandidateId());
+        String jobTitle = (demand != null) ? demand.getTitle() : ("Demand " + application.getDemandId());
 
         String prompt = """
                 Generate a polite personalised rejection email draft.
@@ -39,19 +63,29 @@ public class RejectionEmailDraftService {
                 - Keep it professional and empathetic.
                 - Include subject and body.
                 - Return valid JSON only with fields: subject, body.
+                - DO NOT USE PLACEHOLDERS like [Candidate Name] or [Job Title]. Use the exact values provided below.
 
-                Candidate ID: %s
-                Demand ID: %s
+                Candidate Name: %s
+                Job Title: %s
+                Company Name: TalentGrid
                 Current Stage: %s
                 Rejection Reason: %s
                 Additional Context: %s
                 """.formatted(
-                application.getCandidateId(),
-                application.getDemandId(),
+                candidateName,
+                jobTitle,
                 application.getCurrentStage(),
                 request.getRejectionReason(),
                 request.getAdditionalContext()
         );
+
+        String apiKey = geminiProperties.getApiKey();
+        if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("dummy-key")) {
+            return RejectionEmailDraftResponseDto.builder()
+                    .subject("Update on your application for Candidate " + application.getCandidateId())
+                    .body("Dear Candidate,\n\nThank you for applying. Unfortunately, we will not be moving forward with your application at this time.\n\nBest regards,\nTalentGrid Recruiting Team\n\n[MOCK EMAIL DRAFT - NO API KEY CONFIGURED]")
+                    .build();
+        }
 
         String url = geminiProperties.getBaseUrl()
                 + "/models/"

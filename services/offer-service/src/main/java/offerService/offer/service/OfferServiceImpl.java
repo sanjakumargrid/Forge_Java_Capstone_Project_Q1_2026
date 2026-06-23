@@ -86,6 +86,16 @@ public class OfferServiceImpl implements OfferService {
             );
         }
 
+        List<Offer> existingOffers = offerRepository.findByApplicationId(offer.getApplicationId());
+        boolean hasActiveOffer = existingOffers.stream()
+                .anyMatch(existing -> existing.getOfferStatus() != Status.REJECTED 
+                        && existing.getOfferStatus() != Status.EXPIRED);
+
+        if (hasActiveOffer) {
+            throw new IllegalStateException(
+                    "An active offer already exists for this application. Please update the existing offer or wait for it to be rejected/expired."
+            );
+        }
 
         if (offer.getOfferStatus() == null) {
             offer.setOfferStatus(Status.DRAFT);

@@ -18,6 +18,10 @@ import java.util.Map;
 import offerService.offer.repository.OfferRepository;
 import offerService.offer.entity.Offer;
 import offerService.offer.dto.ApprovalStep;
+import offerService.offer.client.ApplicationClient;
+import offerService.offer.client.CandidateClient;
+import offerService.offer.dto.ApplicationDto;
+import offerService.offer.dto.CandidateDto;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +31,8 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
     private final NotificationEventPublisher notificationEventPublisher;
     private final ObjectMapper objectMapper;
     private final OfferRepository offerRepository;
+    private final ApplicationClient applicationClient;
+    private final CandidateClient candidateClient;
 
     @KafkaListener(
             topics = TalentGridTopics.OFFER_EVENTS,
@@ -429,7 +435,26 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
             String templateCode,
             String correlationId
     ) {
-        publishNotification(offer, notificationType, title, message, priority, templateCode, null, null, correlationId);
+        String recipientEmail = getCandidateEmail(offer.getApplicationId());
+        publishNotification(offer, notificationType, title, message, priority, templateCode, recipientEmail, null, correlationId);
+    }
+    
+    private String getCandidateEmail(Long applicationId) {
+        if (applicationId == null) {
+            return null;
+        }
+        try {
+            ApplicationDto applicationDto = applicationClient.getApplication(applicationId);
+            if (applicationDto != null && applicationDto.getCandidateId() != null) {
+                CandidateDto candidateDto = candidateClient.getCandidate(applicationDto.getCandidateId());
+                if (candidateDto != null && candidateDto.getEmail() != null) {
+                    return candidateDto.getEmail();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[OFFER-TRANSLATOR] Failed to fetch candidate email for applicationId={}: {}", applicationId, e.getMessage());
+        }
+        return null;
     }
 
     private void publishNotification(
