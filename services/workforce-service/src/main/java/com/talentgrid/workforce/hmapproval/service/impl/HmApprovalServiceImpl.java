@@ -1,13 +1,18 @@
 package com.talentgrid.workforce.hmapproval.service.impl;
 
+import com.talentgrid.workforce.hmapproval.client.UserAuthClient;
+import com.talentgrid.workforce.hmapproval.dto.HiringTypeResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmAcceptRequest;
 import com.talentgrid.workforce.hmapproval.dto.HmNominatedEngineerResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmRejectRequest;
 import com.talentgrid.workforce.hmapproval.dto.HmReviewOutcomeResponse;
 import com.talentgrid.workforce.hmapproval.dto.MatchAcceptedPayload;
 import com.talentgrid.workforce.hmapproval.dto.MatchRejectedPayload;
+import com.talentgrid.workforce.hmapproval.dto.UserRoleResponse;
 import com.talentgrid.workforce.hmapproval.kafka.HmApprovalKafkaProducer;
 import com.talentgrid.workforce.hmapproval.service.HmApprovalService;
+import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
+import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
 import com.talentgrid.workforce.rmgdashboard.service.RmgService;
 import com.talentgrid.workforce.rmgnomination.entity.InternalMatch;
 import com.talentgrid.workforce.rmgnomination.enums.MatchStatus;
@@ -32,9 +37,14 @@ public class HmApprovalServiceImpl implements HmApprovalService {
     private static final String AUTO_REJECT_REASON =
             "Auto-rejected: another engineer was accepted for this demand by the Hiring Manager.";
 
+    private static final String ROLE_RESOURCE_MANAGER = "RESOURCE_MANAGER";
+    private static final String ROLE_RECRUITER = "RECRUITER";
+
     private final InternalMatchRepository internalMatchRepository;
     private final RmgService rmgService;
     private final HmApprovalKafkaProducer kafkaProducer;
+    private final DemandClient demandClient;
+    private final UserAuthClient userAuthClient;
 
     @Override
     public List<HmNominatedEngineerResponse> getPendingNominationsForDemand(Long demandId) {
@@ -182,6 +192,94 @@ public class HmApprovalServiceImpl implements HmApprovalService {
                 .reviewedBy(request.getReviewedBy())
                 .reviewedAt(now)
                 .build();
+    }
+
+    @Override
+    public HiringTypeResponse getHiringType(Long demandId) {
+        log.info("Resolving hiring type for demandId={}", demandId);
+
+        // 1. Fetch the demand to extract the approvedBy user ID
+        DemandDto demand;
+        try {
+            demand = demandClient.getDemandById(demandId);
+        } catch (Exception ex) {
+            log.warn("Could not fetch demand {}: {}", demandId, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Demand not found: " + demandId);
+        }
+
+        Long approvedBy = demand.getApprovedBy();
+        if (approvedBy == null) {
+            log.info("Demand {} has no approvedBy user recorded", demandId);
+            return HiringTypeResponse.builder()
+                    .demandId(demandId)
+                    .hiringType("UNKNOWN")
+                    .message("No approver recorded for this demand — hiring type cannot be determined.")
+                    .build();
+        }
+
+        // 2. Fetch the approver's roles from user-auth-service
+        UserRoleResponse approver;
+        try {
+            approver = userAuthClient.getUserById(approvedBy);
+        } catch (Exception ex) {
+            log.warn("Could not fetch roles for userId={}: {}", approvedBy, ex.getMessage());
+            return HiringTypeResponse.builder()
+                    .demandId(demandId)
+                    .approvedByUserId(approvedBy)
+                    .hiringType("UNKNOWN")
+                    .message("Unable to retrieve approver roles (insufficient permissions or user-auth-service error).")
+                    .build();
+        }
+
+        // 3. Classify based on role
+        String resolvedRole = null;
+        String hiringType = "UNKNOWN";
+
+        if (approver.getRoles() != null) {
+            if (approver.getRoles().contains(ROLE_RESOURCE_MANAGER)) {
+                resolvedRole = ROLE_RESOURCE_MANAGER;
+                hiringType = "INTERNAL";
+            } else if (approver.getRoles().contains(ROLE_RECRUITER)) {
+                resolvedRole = ROLE_RECRUITER;
+                hiringType = "EXTERNAL";
+            }
+        }
+
+        // 4. For INTERNAL hires, check the nomination_type of the accepted match
+        String nominationMode = null;
+        if ("INTERNAL".equals(hiringType)) {
+            nominationMode = internalMatchRepository
+                    .findByDemandIdAndIsDeletedFalse(demandId)
+                    .stream()
+                    .filter(m -> MatchStatus.ACCEPTED.equals(m.getMatchStatus()))
+                    .findFirst()
+                    .map(m -> m.getNominationType().name())
+                    .orElse(null);
+            log.info("demandId={} nominationMode={}", demandId, nominationMode);
+        }
+
+        log.info("demandId={} approvedBy={} role={} hiringType={} nominationMode={}",
+                demandId, approvedBy, resolvedRole, hiringType, nominationMode);
+
+        return HiringTypeResponse.builder()
+                .demandId(demandId)
+                .approvedByUserId(approvedBy)
+                .approvedByRole(resolvedRole)
+                .hiringType(hiringType)
+                .nominationMode(nominationMode)
+                .message(buildHiringTypeMessage(hiringType, nominationMode, approver))
+                .build();
+    }
+
+    private String buildHiringTypeMessage(String hiringType, String nominationMode, UserRoleResponse approver) {
+        return switch (hiringType) {
+            case "INTERNAL" -> nominationMode != null
+                    ? "Demand was approved by a Resource Manager — classified as INTERNAL hiring via " + nominationMode + " nomination."
+                    : "Demand was approved by a Resource Manager — classified as INTERNAL hiring (no accepted match yet).";
+            case "EXTERNAL" -> "Demand was approved by a Recruiter — classified as EXTERNAL hiring.";
+            default -> "Approver '" + (approver.getUsername() != null ? approver.getUsername() : approver.getId())
+                    + "' does not hold a RESOURCE_MANAGER or RECRUITER role.";
+        };
     }
 
     private InternalMatch loadPendingMatch(Long matchId) {

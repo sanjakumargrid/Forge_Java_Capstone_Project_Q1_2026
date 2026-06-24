@@ -1,5 +1,6 @@
 package com.talentgrid.workforce.hmapproval.controller;
 
+import com.talentgrid.workforce.hmapproval.dto.HiringTypeResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmAcceptRequest;
 import com.talentgrid.workforce.hmapproval.dto.HmNominatedEngineerResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmRejectRequest;
@@ -71,5 +72,20 @@ public class HmApprovalController {
             @Valid @RequestBody HmRejectRequest request) {
         log.info("HM reject nomination: matchId={}", matchId);
         return ResponseEntity.ok(hmApprovalService.rejectNomination(matchId, request));
+    }
+
+    @GetMapping("/demand/{demandId}/hiring-type")
+    @PreAuthorize("hasAuthority('DEMAND_HM_NOMINATION_DECIDE')")
+    @Operation(
+            summary = "Determine hiring type for a demand",
+            description = "Looks up the role of the user who approved the demand. " +
+                          "Returns INTERNAL if the approver is a RESOURCE_MANAGER, " +
+                          "EXTERNAL if the approver is a RECRUITER, " +
+                          "or UNKNOWN if the role cannot be determined."
+    )
+    public ResponseEntity<HiringTypeResponse> getHiringType(
+            @PathVariable Long demandId) {
+        log.info("Resolving hiring type for demandId={}", demandId);
+        return ResponseEntity.ok(hmApprovalService.getHiringType(demandId));
     }
 }

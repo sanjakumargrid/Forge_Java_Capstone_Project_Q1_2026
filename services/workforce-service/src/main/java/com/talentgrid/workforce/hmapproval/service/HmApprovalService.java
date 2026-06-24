@@ -1,5 +1,6 @@
 package com.talentgrid.workforce.hmapproval.service;
 
+import com.talentgrid.workforce.hmapproval.dto.HiringTypeResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmAcceptRequest;
 import com.talentgrid.workforce.hmapproval.dto.HmNominatedEngineerResponse;
 import com.talentgrid.workforce.hmapproval.dto.HmRejectRequest;
@@ -31,4 +32,16 @@ public interface HmApprovalService {
      * HM manually rejects a specific nomination with a mandatory written reason (≥ 20 chars).
      */
     HmReviewOutcomeResponse rejectNomination(Long matchId, HmRejectRequest request);
+
+    /**
+     * Determines the hiring type for a demand by looking up the role of the user
+     * who approved the demand.
+     *
+     * <ul>
+     *   <li>RESOURCE_MANAGER approved → INTERNAL hiring</li>
+     *   <li>RECRUITER approved        → EXTERNAL hiring</li>
+     *   <li>Role unknown / no access  → UNKNOWN</li>
+     * </ul>
+     */
+    HiringTypeResponse getHiringType(Long demandId);
 }
