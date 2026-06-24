@@ -10,14 +10,16 @@ import java.util.List;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-    boolean existsByCandidateIdAndDemandId(Long candidateId, Long demandId);
+    boolean existsByCandidateIdAndJobPostingId(Long candidateId, Long jobPostingId);
 
-    Page<Application> findByDemandId(Long demandId, Pageable pageable);
+    List<Application> findByJobPostingIdAndCurrentStageNotIn(Long jobPostingId, List<Stage> stages);
+
+    Page<Application> findByJobPostingId(Long jobPostingId, Pageable pageable);
 
     Page<Application> findByCurrentStage(Stage currentStage, Pageable pageable);
 
-    Page<Application> findByDemandIdAndCurrentStage(
-            Long demandId,
+    Page<Application> findByJobPostingIdAndCurrentStage(
+            Long jobPostingId,
             Stage currentStage,
             Pageable pageable
     );
@@ -27,8 +29,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             Pageable pageable
     );
 
-    /**
-     * Fetch all applications by a list of IDs — used for bulk operations.
-     */
     List<Application> findAllByIdIn(List<Long> ids);
 }

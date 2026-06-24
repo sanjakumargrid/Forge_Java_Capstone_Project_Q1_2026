@@ -2,20 +2,19 @@ package com.talentgrid.application.application.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.talentgrid.application.application.dto.JobPostingDto;
 import com.talentgrid.application.application.dto.RejectionEmailDraftRequestDto;
 import com.talentgrid.application.application.dto.RejectionEmailDraftResponseDto;
+import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 import com.talentgrid.application.application.entity.Application;
 import com.talentgrid.application.application.repository.ApplicationRepository;
+import com.talentgrid.application.client.CandidateClient;
+import com.talentgrid.application.client.JobPostingClient;
 import com.talentgrid.application.integration.GeminiProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import com.talentgrid.application.client.CandidateClient;
-import com.talentgrid.application.client.DemandClient;
-import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
-import com.talentgrid.application.application.dto.DemandDto;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class RejectionEmailDraftService {
     private final GeminiProperties geminiProperties;
     private final ObjectMapper objectMapper;
     private final CandidateClient candidateClient;
-    private final DemandClient demandClient;
+    private final JobPostingClient jobPostingClient;
 
     public RejectionEmailDraftResponseDto generateDraft(
             Long applicationId,
@@ -38,21 +37,29 @@ public class RejectionEmailDraftService {
                 .orElseThrow(() -> new IllegalArgumentException("Application not found with id: " + applicationId));
 
         ExternalCandidateDto candidate = null;
-        DemandDto demand = null;
+        JobPostingDto jobPosting = null;
+
         try {
             candidate = candidateClient.getCandidateById(application.getCandidateId());
         } catch (Exception e) {
-            // Ignore error and proceed with ID if fetch fails
-        }
-        
-        try {
-            demand = demandClient.getDemand(application.getDemandId());
-        } catch (Exception e) {
-            // Ignore error and proceed with ID if fetch fails
+            // Continue with fallback candidate name
         }
 
-        String candidateName = (candidate != null) ? (candidate.getFirstName() + " " + candidate.getLastName()) : ("Candidate " + application.getCandidateId());
-        String jobTitle = (demand != null) ? demand.getTitle() : ("Demand " + application.getDemandId());
+        try {
+            jobPosting = jobPostingClient.getJobPosting(application.getJobPostingId());
+        } catch (Exception e) {
+            // Continue with fallback job title
+        }
+
+        String candidateName =
+                candidate != null
+                        ? candidate.getFirstName() + " " + candidate.getLastName()
+                        : "Candidate " + application.getCandidateId();
+
+        String jobTitle =
+                jobPosting != null
+                        ? jobPosting.getTitle()
+                        : "Job Posting " + application.getJobPostingId();
 
         String prompt = """
                 Generate a polite personalised rejection email draft.
@@ -80,10 +87,17 @@ public class RejectionEmailDraftService {
         );
 
         String apiKey = geminiProperties.getApiKey();
+
         if (apiKey == null || apiKey.trim().isEmpty() || apiKey.equals("dummy-key")) {
             return RejectionEmailDraftResponseDto.builder()
-                    .subject("Update on your application for Candidate " + application.getCandidateId())
-                    .body("Dear Candidate,\n\nThank you for applying. Unfortunately, we will not be moving forward with your application at this time.\n\nBest regards,\nTalentGrid Recruiting Team\n\n[MOCK EMAIL DRAFT - NO API KEY CONFIGURED]")
+                    .subject("Update on your application for " + jobTitle)
+                    .body("Dear " + candidateName + ",\n\n"
+                            + "Thank you for your interest in the " + jobTitle + " role at TalentGrid. "
+                            + "After careful review, we will not be moving forward with your application at this time.\n\n"
+                            + "We appreciate the time you invested and wish you the best in your job search.\n\n"
+                            + "Best regards,\n"
+                            + "TalentGrid Recruiting Team\n\n"
+                            + "[MOCK EMAIL DRAFT - NO API KEY CONFIGURED]")
                     .build();
         }
 
@@ -119,9 +133,11 @@ public class RejectionEmailDraftService {
             JsonNode root = objectMapper.readTree(response);
 
             JsonNode candidates = root.path("candidates");
+
             if (candidates.isMissingNode() || !candidates.isArray() || candidates.isEmpty()) {
-                throw new IllegalStateException("Gemini response missing 'candidates' array (possible rate limit): " + response);
+                throw new IllegalStateException("Gemini response missing candidates array: " + response);
             }
+
             String text = candidates.get(0)
                     .path("content")
                     .path("parts")

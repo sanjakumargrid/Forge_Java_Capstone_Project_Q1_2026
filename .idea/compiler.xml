@@ -93,6 +93,15 @@
         </processorPath>
         <module name="talentgrid-shared" />
       </profile>
+      <profile name="Annotation profile for job-posting-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="job-posting-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="candidate-service" target="17" />
@@ -106,6 +115,7 @@
       <module name="candidate-service" options="-parameters" />
       <module name="demand-service" options="-parameters" />
       <module name="interview-service" options="-parameters" />
+      <module name="job-posting-service" options="-parameters" />
       <module name="notification-client" options="-parameters" />
       <module name="offer-service" options="-parameters" />
       <module name="talentgrid-api-gateway-service" options="-parameters" />

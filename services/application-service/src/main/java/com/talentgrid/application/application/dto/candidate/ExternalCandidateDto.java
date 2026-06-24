@@ -1,6 +1,7 @@
 package com.talentgrid.application.application.dto.candidate;
 
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.talentgrid.application.application.enums.Source;
@@ -15,6 +16,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ExternalCandidateDto {
+
+    @JsonAlias({"id", "candidateId"})
+    private Long candidateId;
 
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 100, message = "First name must be between 1 and 100 characters")

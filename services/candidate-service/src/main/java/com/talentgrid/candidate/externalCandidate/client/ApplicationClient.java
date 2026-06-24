@@ -2,60 +2,77 @@ package com.talentgrid.candidate.externalCandidate.client;
 
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationRequestDto;
-import com.talentgrid.candidate.externalCandidate.dto.ApplicationResponseDto;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+@Slf4j
 @Component
 public class ApplicationClient {
 
     private final WebClient applicationWebClient;
+    private final HttpServletRequest httpServletRequest;
 
-    public ApplicationClient(WebClient applicationWebClient) {
+    public ApplicationClient(WebClient applicationWebClient,
+                             HttpServletRequest httpServletRequest) {
         this.applicationWebClient = applicationWebClient;
+        this.httpServletRequest = httpServletRequest;
     }
 
-    public ApplicationResponseDto createApplication(
-            ApplicationRequestDto request
-    ) {
+    public void createApplication(ApplicationRequestDto request) {
+        String authorizationHeader =
+                httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+
         try {
-            return applicationWebClient.post()
-                    .uri("/api/applications")
+            WebClient.RequestBodySpec requestSpec = applicationWebClient
+                    .post()
+                    .uri("/api/applications");
+
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                requestSpec.header(HttpHeaders.AUTHORIZATION, authorizationHeader);
+            }
+
+            requestSpec
                     .bodyValue(request)
                     .retrieve()
-                    .bodyToMono(ApplicationResponseDto.class)
+                    .toBodilessEntity()
                     .block();
 
+            log.info("Automatic application submitted successfully | candidateId={} | demandId={}",
+                    request.getCandidateId(),
+                    request.getDemandId());
+
         } catch (WebClientResponseException.Conflict ex) {
-            throw new BusinessException(
-                    HttpStatus.CONFLICT,
-                    "Application already exists for this candidate and demand"
-            );
+            log.warn("Application already exists for candidateId={} and demandId={}. Skipping.",
+                    request.getCandidateId(),
+                    request.getDemandId());
 
-        } catch (WebClientResponseException.BadRequest ex) {
-            throw new BusinessException(
-                    HttpStatus.BAD_REQUEST,
-                    ex.getResponseBodyAsString()
-            );
-
-        } catch (WebClientResponseException.NotFound ex) {
-            throw new BusinessException(
-                    HttpStatus.NOT_FOUND,
-                    ex.getResponseBodyAsString()
-            );
+            // Do not fail candidate create/update
+            return;
 
         } catch (WebClientResponseException ex) {
+            log.error("Application-service error | status={} | body={}",
+                    ex.getStatusCode(),
+                    ex.getResponseBodyAsString());
+
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
-                    "Application-service error: " + ex.getResponseBodyAsString()
+                    "Application-service error: "
+                            + ex.getStatusCode()
+                            + " - "
+                            + ex.getResponseBodyAsString()
             );
 
         } catch (Exception ex) {
+            log.error("Unable to connect application-service", ex);
+
             throw new BusinessException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Unable to connect application-service"
+                    HttpStatus.BAD_GATEWAY,
+                    "Automatic application submission failed: " + ex.getMessage()
             );
         }
     }

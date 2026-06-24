@@ -2,21 +2,22 @@ package com.talentgrid.application.application.controller;
 
 import com.talentgrid.application.application.dto.ApplicationDto;
 import com.talentgrid.application.application.dto.request.ApplicationCreateRequest;
+import com.talentgrid.application.application.dto.request.AtsEvaluationPayload;
+import com.talentgrid.application.application.dto.request.BulkJobPostingReassignRequest;
+import com.talentgrid.application.application.dto.request.BulkRejectRequest;
+import com.talentgrid.application.application.dto.request.BulkStageMoveRequest;
 import com.talentgrid.application.application.dto.request.StageMoveRequest;
 import com.talentgrid.application.application.service.ApplicationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import com.talentgrid.application.application.dto.request.BulkRejectRequest;
-import com.talentgrid.application.application.dto.request.AtsEvaluationPayload;
-import com.talentgrid.application.application.dto.request.BulkStageMoveRequest;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -28,23 +29,25 @@ public class ApplicationController {
         this.applicationService = applicationService;
     }
 
-    @PreAuthorize("hasAuthority('APPLICATION_CREATE')")
     @PostMapping
-    public ApplicationDto createApplication(
+    public ResponseEntity<ApplicationDto> createApplication(
             @Valid @RequestBody ApplicationCreateRequest request
     ) {
-        return applicationService.createApplication(request);
+        ApplicationDto response = applicationService.createApplication(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping
     public Page<ApplicationDto> getApplications(
+            @RequestParam(required = false) Long jobPostingId,
             @RequestParam(required = false) Long demandId,
             @RequestParam(required = false) String stage,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        return applicationService.getApplications(demandId, stage, page, size);
+        Long resolvedJobPostingId = jobPostingId != null ? jobPostingId : demandId;
+        return applicationService.getApplications(resolvedJobPostingId, stage, page, size);
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
@@ -90,6 +93,7 @@ public class ApplicationController {
     ) {
         applicationService.updateAiEvaluation(applicationId, payload);
     }
+
     @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
     @PostMapping("/bulk/stage")
     public List<ApplicationDto> bulkMoveStage(
@@ -106,26 +110,24 @@ public class ApplicationController {
         return applicationService.bulkReject(request);
     }
 
-    /**
-     * Bulk-reassigns applications to a new demand (e.g., when a demand is filled/cancelled
-     * and the recruiter wants to move remaining candidates to the next open demand).
-     * Candidates already on the target demand and terminal-stage candidates are silently skipped.
-     */
     @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")
-    @PostMapping("/bulk/reassign-demand")
-    public List<ApplicationDto> bulkReassignDemand(
-            @Valid @RequestBody com.talentgrid.application.application.dto.request.BulkDemandReassignRequest request
+    @PostMapping({"/bulk/reassign-job-posting", "/bulk/reassign-demand"})
+    public List<ApplicationDto> bulkReassignJobPosting(
+            @Valid @RequestBody BulkJobPostingReassignRequest request
     ) {
-        return applicationService.bulkReassignDemand(request);
+        return applicationService.bulkReassignJobPosting(request);
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping(value = "/bulk/export", produces = "text/csv")
     public ResponseEntity<String> exportToCsv(
+            @RequestParam(required = false) Long jobPostingId,
             @RequestParam(required = false) Long demandId,
             @RequestParam(required = false) String stage
     ) {
-        String csvData = applicationService.exportToCsv(demandId, stage);
+        Long resolvedJobPostingId = jobPostingId != null ? jobPostingId : demandId;
+        String csvData = applicationService.exportToCsv(resolvedJobPostingId, stage);
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"applications_export.csv\"")
                 .contentType(MediaType.parseMediaType("text/csv"))
