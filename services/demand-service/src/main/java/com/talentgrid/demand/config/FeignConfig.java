@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * <p>JWT propagation for user-auth-service ONLY is handled in {@link UserAuthFeignConfig},
  * which is referenced via @FeignClient(configuration = UserAuthFeignConfig.class).
+ * Bearer auth for Groq is scoped in {@link GroqFeignConfig} (referenced only by GroqAiClient).
  * GeminiAiClient has no interceptors — it uses ?key= query param for Gemini API auth.
  */
 @Configuration

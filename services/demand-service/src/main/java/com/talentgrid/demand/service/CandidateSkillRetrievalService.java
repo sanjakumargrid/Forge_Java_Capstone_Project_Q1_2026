@@ -1,5 +1,6 @@
 package com.talentgrid.demand.service;
 
+import com.talentgrid.demand.ai.AllAiProvidersFailedException;
 import com.talentgrid.demand.domain.entity.Skill;
 import com.talentgrid.demand.domain.enums.SkillSuggestionMode;
 import com.talentgrid.demand.repository.SkillRepository;
@@ -20,18 +21,33 @@ public class CandidateSkillRetrievalService {
 
     public List<Skill> getCandidateSkills(String jobDescriptionText) {
         SkillSuggestionMode mode = configService.getCurrentMode();
-        
+
         if (mode == SkillSuggestionMode.FULL_CATALOG) {
             log.info("Using FULL_CATALOG mode for candidate retrieval.");
             return skillRepository.findAllByOrderBySkillNameAsc();
         } else {
             Integer topN = configService.getCurrentTopN();
             log.info("Using TOP_N_SIMILARITY mode for candidate retrieval with TopN={}", topN);
-            
-            float[] jdEmbedding = jdEmbeddingService.embedWithCache(jobDescriptionText);
-            String vectorStr = formatVector(jdEmbedding);
-            
-            return skillRepository.findNearestSkills(vectorStr, topN);
+
+            try {
+                float[] jdEmbedding = jdEmbeddingService.embedWithCache(jobDescriptionText);
+                String vectorStr = formatVector(jdEmbedding);
+                List<Skill> nearest = skillRepository.findNearestSkills(vectorStr, topN);
+                if (nearest.isEmpty()) {
+                    long withEmbeddings = skillRepository.findAllByEmbeddingIsNotNull().size();
+                    long total = skillRepository.count();
+                    log.warn(
+                            "TOP_N_SIMILARITY returned 0 skills (total={}, withEmbeddings={}); "
+                                    + "falling back to FULL_CATALOG",
+                            total, withEmbeddings);
+                    return skillRepository.findAllByOrderBySkillNameAsc();
+                }
+                return nearest;
+            } catch (AllAiProvidersFailedException e) {
+                log.warn("Embedding unavailable in TOP_N_SIMILARITY mode; falling back to FULL_CATALOG: {}",
+                        e.getMessage());
+                return skillRepository.findAllByOrderBySkillNameAsc();
+            }
         }
     }
 

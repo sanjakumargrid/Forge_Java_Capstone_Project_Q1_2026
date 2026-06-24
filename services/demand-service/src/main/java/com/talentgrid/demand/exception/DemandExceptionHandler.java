@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
+import com.talentgrid.demand.ai.AllAiProvidersFailedException;
 import com.talentgrid.demand.dto.response.ErrorResponse;
 
 /**
@@ -67,6 +68,13 @@ public class DemandExceptionHandler {
     public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
         log.warn("HTTP method not supported: {}", ex.getMessage());
         return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage());
+    }
+
+    @ExceptionHandler(AllAiProvidersFailedException.class)
+    public ResponseEntity<ErrorResponse> handleAllAiProvidersFailed(AllAiProvidersFailedException ex) {
+        log.warn("All AI providers failed: {}", ex.getMessage());
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE,
+                "AI service is temporarily unavailable. Please try again shortly.");
     }
 
     @ExceptionHandler(Exception.class)
