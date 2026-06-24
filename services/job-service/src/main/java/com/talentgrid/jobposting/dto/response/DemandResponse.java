@@ -36,6 +36,8 @@ public class DemandResponse {
 
     private String businessUnit;
     private List<String> skills;
+    private List<String> mandatorySkills;
+    private List<String> optionalSkills;
     private BigDecimal budget;
     private Integer requiredCount;
     private Integer recruitedCount;
@@ -66,6 +68,17 @@ public class DemandResponse {
     private Boolean isDeleted;
     private Integer version;
 
+    // ── External-posting specifics (from DEMAND_EXTERNAL_OPENED) ───────────────
+    private String workMode;
+    private String experience;
+    private String department;
+    private String onboardingDate;
+
+    // ── Notification & creator routing (from DEMAND_EXTERNAL_OPENED) ───────────
+    private String recipientEmail;
+    private String recipientSlackId;
+    private String raisedBy;
+
     /** Always 0 — applicant tracking is not yet implemented. */
     private Integer applicantCount;
     /** Always 0 — AI matching is not yet implemented. */
@@ -81,12 +94,14 @@ public class DemandResponse {
                 .level(d.getLevel())
                 .location(d.getLocation())
                 .employmentType(d.getEmploymentType())
-                .accountName("—")
+                .accountName(d.getAccountName() != null ? d.getAccountName() : "—")
                 .accountId(d.getAccountId())
-                .projectName("—")
+                .projectName(d.getProjectName() != null ? d.getProjectName() : "—")
                 .projectId(d.getProjectId())
                 .businessUnit(d.getBusinessUnit())
                 .skills(d.getSkills())
+                .mandatorySkills(d.getMandatorySkills())
+                .optionalSkills(d.getOptionalSkills())
                 .budget(d.getBudget())
                 .requiredCount(d.getRequiredCount())
                 .recruitedCount(d.getRecruitedCount() != null ? d.getRecruitedCount() : 0)
@@ -102,16 +117,23 @@ public class DemandResponse {
                 .updatedAt(d.getSourceUpdatedAt())
                 .closureReason(d.getClosureReason())
                 .createdBy(d.getCreatedBy())
-                .creatorName("Unassigned")
-                .creatorEmail("")
+                .creatorName(d.getCreatorName() != null ? d.getCreatorName() : "Unassigned")
+                .creatorEmail(d.getRecipientEmail() != null ? d.getRecipientEmail() : "")
                 .assignedRecruiter(d.getAssignedRecruiter())
-                .assignedRecruiterName("Unassigned")
+                .assignedRecruiterName(d.getAssignedRecruiterName() != null ? d.getAssignedRecruiterName() : "Unassigned")
                 .assignedRm(d.getAssignedRm())
-                .assignedRmName("Unassigned")
+                .assignedRmName(d.getAssignedRmName() != null ? d.getAssignedRmName() : "Unassigned")
                 .approvedBy(d.getApprovedBy())
                 .approverName(d.getApprovedBy() != null ? "Unassigned" : null)
                 .isDeleted(Boolean.TRUE.equals(d.getIsDeleted()))
                 .version(d.getVersion() != null ? d.getVersion() : 1)
+                .workMode(d.getWorkMode())
+                .experience(d.getExperience())
+                .department(d.getDepartment())
+                .onboardingDate(d.getOnboardingDate())
+                .recipientEmail(d.getRecipientEmail())
+                .recipientSlackId(d.getRecipientSlackId())
+                .raisedBy(d.getRaisedBy())
                 .applicantCount(0)
                 .aiMatchScore(0)
                 .slaStatus(computeSlaStatus(d.getTargetDate(), d.getStatus()))

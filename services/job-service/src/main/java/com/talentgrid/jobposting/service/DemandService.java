@@ -63,7 +63,9 @@ public class DemandService {
         demand.setAccountId(p.getAccountId());
         demand.setProjectId(p.getProjectId());
         demand.setBusinessUnit(p.getBusinessUnit());
-        demand.setSkills(p.getSkills());
+        demand.setSkills(p.getEffectiveSkills());
+        demand.setMandatorySkills(p.getMandatorySkills());
+        demand.setOptionalSkills(p.getOptionalSkills());
         demand.setBudget(p.getBudget());
         demand.setRequiredCount(p.getRequiredCount());
         demand.setRecruitedCount(p.getRecruitedCount());
@@ -84,6 +86,26 @@ public class DemandService {
         demand.setApprovedBy(p.getApprovedBy());
         demand.setIsDeleted(Boolean.TRUE.equals(p.getIsDeleted()));
         demand.setVersion(p.getVersion());
+
+        // Denormalised display names — only overwrite when the event supplies a
+        // value, so a leaner follow-up event can't blank out names we already have.
+        if (p.getAccountName() != null) demand.setAccountName(p.getAccountName());
+        if (p.getProjectName() != null) demand.setProjectName(p.getProjectName());
+        if (p.getCreatorName() != null) demand.setCreatorName(p.getCreatorName());
+        if (p.getAssignedRecruiterName() != null) demand.setAssignedRecruiterName(p.getAssignedRecruiterName());
+        if (p.getAssignedRmName() != null) demand.setAssignedRmName(p.getAssignedRmName());
+
+        // External-posting specifics
+        if (p.getWorkMode() != null) demand.setWorkMode(p.getWorkMode());
+        if (p.getExperience() != null) demand.setExperience(p.getExperience());
+        if (p.getDepartment() != null) demand.setDepartment(p.getDepartment());
+        if (p.getOnboardingDate() != null) demand.setOnboardingDate(p.getOnboardingDate());
+
+        // Notification & creator routing
+        if (p.getRecipientEmail() != null) demand.setRecipientEmail(p.getRecipientEmail());
+        if (p.getRecipientSlackId() != null) demand.setRecipientSlackId(p.getRecipientSlackId());
+        if (p.getRaisedBy() != null) demand.setRaisedBy(p.getRaisedBy());
+
         demand.setEventId(event.getEventId());
         demand.setCorrelationId(event.getCorrelationId());
 

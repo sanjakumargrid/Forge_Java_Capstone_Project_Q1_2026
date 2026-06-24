@@ -56,6 +56,16 @@ public class Demand {
     @Column(name = "skill")
     private List<String> skills;
 
+    @ElementCollection
+    @CollectionTable(name = "demand_mandatory_skills", joinColumns = @JoinColumn(name = "demand_id"))
+    @Column(name = "skill")
+    private List<String> mandatorySkills;
+
+    @ElementCollection
+    @CollectionTable(name = "demand_optional_skills", joinColumns = @JoinColumn(name = "demand_id"))
+    @Column(name = "skill")
+    private List<String> optionalSkills;
+
     private BigDecimal budget;
 
     @Column(name = "required_count")
@@ -113,6 +123,46 @@ public class Demand {
     private Boolean isDeleted;
 
     private Integer version;
+
+    // ── Denormalised display names (from DEMAND_EXTERNAL_OPENED) ───────────────
+
+    @Column(name = "account_name")
+    private String accountName;
+
+    @Column(name = "project_name")
+    private String projectName;
+
+    @Column(name = "creator_name")
+    private String creatorName;
+
+    @Column(name = "assigned_recruiter_name")
+    private String assignedRecruiterName;
+
+    @Column(name = "assigned_rm_name")
+    private String assignedRmName;
+
+    // ── External-posting specifics (from DEMAND_EXTERNAL_OPENED) ───────────────
+
+    @Column(name = "work_mode")
+    private String workMode;
+
+    private String experience;
+
+    private String department;
+
+    @Column(name = "onboarding_date")
+    private String onboardingDate;
+
+    // ── Notification & creator routing (from DEMAND_EXTERNAL_OPENED) ───────────
+
+    @Column(name = "recipient_email")
+    private String recipientEmail;
+
+    @Column(name = "recipient_slack_id")
+    private String recipientSlackId;
+
+    @Column(name = "raised_by")
+    private String raisedBy;
 
     @Column(name = "event_id")
     private String eventId;
