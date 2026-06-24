@@ -9,7 +9,8 @@ talentgrid:
 
 spring:
   config:
-    import: "optional:file:../../.env[.properties],classpath:rbac-rules.yml,optional:configserver:"
+    # Single source of truth: repo-root .env (../ or ../../ from module working directory)
+    import: "optional:file:../.env[.properties],optional:file:../../.env[.properties],classpath:rbac-rules.yml,optional:configserver:"
   application:
     name: talentgrid-api-gateway-service
   lifecycle:
