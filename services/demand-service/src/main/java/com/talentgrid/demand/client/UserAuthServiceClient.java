@@ -23,7 +23,7 @@ import java.util.List;
 @FeignClient(
         name = "user-auth-service",
         url = "${user-auth-service.url:http://localhost:8081}",
-        path = "/api/v1/v1",
+        path = "/api/v1",
         configuration = UserAuthFeignConfig.class
 )
 public interface UserAuthServiceClient {
