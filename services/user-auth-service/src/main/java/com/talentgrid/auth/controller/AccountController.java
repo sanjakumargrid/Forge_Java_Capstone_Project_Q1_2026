@@ -1,6 +1,5 @@
 package com.talentgrid.auth.controller;
 
-import com.talentgrid.auth.constants.RoleConstants;
 import com.talentgrid.auth.dto.request.CreateAccountRequest;
 import com.talentgrid.auth.dto.request.UpdateAccountRequest;
 import com.talentgrid.auth.dto.response.AccountResponse;
@@ -36,7 +35,7 @@ public class AccountController {
      * POST /api/v1/accounts
      */
     @PostMapping
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AccountResponse> createAccount(
             @Valid @RequestBody CreateAccountRequest request
     ) {

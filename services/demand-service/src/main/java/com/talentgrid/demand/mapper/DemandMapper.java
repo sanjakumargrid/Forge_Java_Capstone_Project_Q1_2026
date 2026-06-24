@@ -197,6 +197,18 @@ public class DemandMapper {
             response.setAgeInDays(days);
         }
 
+        // Map mandatory/optional skills into the lightweight summary response as well
+        if (demand.getDemandSkills() != null) {
+            response.setMandatorySkills(demand.getDemandSkills().stream()
+                    .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+            response.setOptionalSkills(demand.getDemandSkills().stream()
+                    .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+        }
+
         return response;
     }
 

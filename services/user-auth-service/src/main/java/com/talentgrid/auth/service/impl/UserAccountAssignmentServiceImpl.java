@@ -174,6 +174,8 @@ public class UserAccountAssignmentServiceImpl implements UserAccountAssignmentSe
             return;
         }
 
+        Role.requireAllowedName(roleName);
+
         Role role = roleRepository.findByName(roleName.toUpperCase())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + roleName));
         user.setRoles(Set.of(role));

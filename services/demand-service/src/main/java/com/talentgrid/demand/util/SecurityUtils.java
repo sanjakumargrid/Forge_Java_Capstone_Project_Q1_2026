@@ -17,30 +17,12 @@ import java.util.Map;
  * Utility class to extract user details from the Spring Security Context
  * or the HTTP Request's Authorization Header (JWT).
  *
- * <p>Role checks should use the same role names as {@code user-auth-service} puts on the JWT
- * (see {@code JwtService}: {@code role.getName()}), e.g. {@code HIRING_MANAGER}. The alias
- * {@code HM} is still accepted for backward compatibility with older tokens or data.
- * Portfolio manager role is {@code PORTFOLIO_MANAGER} ({@code PROJECT_MANAGER} legacy alias).
+ * <p>Role checks use the same role names as {@code user-auth-service} puts on the JWT
+ * (see {@code JwtService}: {@code role.getName()}): {@code ADMIN}, {@code HIRING_MANAGER},
+ * {@code PORTFOLIO_MANAGER}, {@code RESOURCE_MANAGER}, {@code RECRUITER},
+ * {@code TA_MANAGER}, and {@code EMPLOYEE}.
  */
 public class SecurityUtils {
-
-    /** Canonical JWT role from user-auth; {@code HM} kept as legacy alias. */
-    public static final String ROLE_HIRING_MANAGER = "HIRING_MANAGER";
-    public static final String ROLE_HIRING_MANAGER_ALIAS = "HM";
-
-    /** Canonical portfolio manager role; {@code PROJECT_MANAGER} kept as legacy alias. */
-    public static final String ROLE_PORTFOLIO_MANAGER = "PORTFOLIO_MANAGER";
-    public static final String ROLE_PORTFOLIO_MANAGER_ALIAS = "PROJECT_MANAGER";
-
-    public static final String ROLE_RESOURCE_MANAGER = "RESOURCE_MANAGER";
-    public static final String ROLE_RESOURCE_MANAGER_ALIAS = "RM";
-
-    public static final String ROLE_ADMIN = "ADMIN";
-    public static final String ROLE_RECRUITER = "RECRUITER";
-    public static final String ROLE_TA_MANAGER = "TA_MANAGER";
-    public static final String ROLE_EMPLOYEE = "EMPLOYEE";
-    /** Org-wide workforce operator; treated like RM for demand lifecycle. */
-    public static final String ROLE_RMG = "RMG";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -140,37 +122,33 @@ public class SecurityUtils {
         return false;
     }
 
-    /**
-     * Hiring Manager per workflow: matches JWT role {@link #ROLE_HIRING_MANAGER} (issued by user-auth)
-     * or legacy alias {@link #ROLE_HIRING_MANAGER_ALIAS}.
-     */
     public static boolean isHiringManager() {
-        return hasAnyRole(ROLE_HIRING_MANAGER, ROLE_HIRING_MANAGER_ALIAS);
+        return hasAnyRole("HIRING_MANAGER");
     }
 
     public static boolean isPortfolioManager() {
-        return hasAnyRole(ROLE_PORTFOLIO_MANAGER, ROLE_PORTFOLIO_MANAGER_ALIAS);
+        return hasAnyRole("PORTFOLIO_MANAGER");
     }
 
     public static boolean isResourceManager() {
-        return hasAnyRole(ROLE_RESOURCE_MANAGER, ROLE_RESOURCE_MANAGER_ALIAS, ROLE_RMG);
+        return hasAnyRole("RESOURCE_MANAGER");
     }
 
     public static boolean isRecruiter() {
-        return hasAnyRole(ROLE_RECRUITER);
+        return hasAnyRole("RECRUITER");
     }
 
     public static boolean isTaManager() {
-        return hasAnyRole(ROLE_TA_MANAGER);
+        return hasAnyRole("TA_MANAGER");
     }
 
     public static boolean isEmployee() {
-        return hasAnyRole(ROLE_EMPLOYEE);
+        return hasAnyRole("EMPLOYEE");
     }
 
     /** Platform admin — may perform any state-machine-legal transition. */
     public static boolean isPlatformAdmin() {
-        return hasAnyRole(ROLE_ADMIN);
+        return hasAnyRole("ADMIN");
     }
 
     public static Long getCurrentUserAccountId() {
