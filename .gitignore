@@ -47,3 +47,4 @@ git add .gitignore
 # Secrets
 **/application-secret.properties
 **/google/*.json
+.DS_Store
