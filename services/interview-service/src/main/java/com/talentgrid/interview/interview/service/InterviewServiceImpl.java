@@ -195,7 +195,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 "status", savedInterview.getStatus().name()
                         ))
                         .serviceName("interview-service")
-                        .endpoint("/api/interviews")
+                        .endpoint("/api/v1/interviews")
                         .build()
         );
 
@@ -310,7 +310,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 "status", savedInterview.getStatus().name()
                         ))
                         .serviceName("interview-service")
-                        .endpoint("/api/interviews/" + id)
+                        .endpoint("/api/v1/interviews/" + id)
                         .build()
         );
 
@@ -360,7 +360,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 "status", "CANCELLED"
                         ))
                         .serviceName("interview-service")
-                        .endpoint("/api/interviews/" + id + "/cancel")
+                        .endpoint("/api/v1/interviews/" + id + "/cancel")
                         .build()
         );
 
@@ -403,7 +403,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 "status", "COMPLETED"
                         ))
                         .serviceName("interview-service")
-                        .endpoint("/api/interviews/" + id + "/complete")
+                        .endpoint("/api/v1/interviews/" + id + "/complete")
                         .build()
         );
 
@@ -431,7 +431,7 @@ public class InterviewServiceImpl implements InterviewService {
                         .entityId(interview.getInterviewId())
                         .action(AuditAction.DELETE)
                         .serviceName("interview-service")
-                        .endpoint("/api/interviews/" + id)
+                        .endpoint("/api/v1/interviews/" + id)
                         .build()
         );
     }

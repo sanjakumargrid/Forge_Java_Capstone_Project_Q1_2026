@@ -22,7 +22,7 @@
 //     * based on the candidate's resume content and prior scorecard competency gaps.
 //     * Each question is labelled with a clear intent (e.g. "Gap Probe – Technical").
 //     *
-//     * GET /api/interviews/{interviewId}/follow-up-questions
+//     * GET /api/v1/interviews/{interviewId}/follow-up-questions
 //     */
 //    // @PreAuthorize("hasAuthority('INTERVIEW_VIEW')")
 //    // @GetMapping("/interviews/{interviewId}/follow-up-questions")

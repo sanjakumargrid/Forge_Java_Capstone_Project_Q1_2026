@@ -73,7 +73,7 @@ Configured in `rbac-rules.yml` → `public-paths`:
 | DELETE | `/api/v1/demands/*` | `DEMAND_DELETE` | Soft-delete draft |
 | POST | `/api/v1/demands/**/submit` | `DEMAND_SUBMIT` **or** `DEMAND_PM_APPROVE` | HM submit / PM auto-approve |
 | POST | `/api/v1/demands/**/approve` | `DEMAND_PM_APPROVE` | PM approve/reject |
-| PUT | `/api/v1/project-manager/**` | `DEMAND_PM_APPROVE` | PM approve route alias |
+| PUT | `/api/v1/portfolio-manager/**` | `DEMAND_PM_APPROVE` | Portfolio manager approve route |
 | POST | `/api/v1/demands/**/reject` | `DEMAND_PM_APPROVE` | PM reject |
 | PATCH | `/api/v1/demands/**/status` | `DEMAND_STATUS_TRANSITION` | Workflow transition |
 | GET | `/api/v1/demands/**/pipeline` | `DEMAND_PIPELINE_VIEW` | Hiring pipeline |

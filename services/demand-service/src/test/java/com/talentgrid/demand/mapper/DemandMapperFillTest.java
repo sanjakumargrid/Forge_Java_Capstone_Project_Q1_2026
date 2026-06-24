@@ -53,16 +53,12 @@ class DemandMapperFillTest {
 
     @Test
     void toEntity_doesNotAcceptRequiredCount() {
-        // DemandRequest must NOT have a requiredCount field any more.
-        // Verify the entity has no requiredCount either.
+        // DemandRequest must NOT expose requiredCount; mapper must not set it on the entity.
+        assertNoMethod(DemandRequest.class, "getRequiredCount");
+
         Demand demand = mapper.toEntity(minimalRequest());
-        // If the field still existed, this would be a compile error — defensive runtime check:
-        try {
-            demand.getClass().getMethod("getRequiredCount");
-            fail("getRequiredCount() should not exist on Demand after headcount removal");
-        } catch (NoSuchMethodException expected) {
-            // Correct — field has been removed
-        }
+        assertNull(demand.getRequiredCount(),
+                "Mapper must not set requiredCount; @PrePersist defaults legacy column to 1");
     }
 
     // ─── toResponse ───────────────────────────────────────────────────────────

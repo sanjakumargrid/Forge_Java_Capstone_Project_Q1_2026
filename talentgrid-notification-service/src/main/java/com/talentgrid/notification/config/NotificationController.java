@@ -15,10 +15,10 @@ import java.util.Map;
  * <p>In production this endpoint is secured via the auth-service JWT filter.
  * For dev/demo, auth is disabled in {@code application.properties}.</p>
  *
- * <p>Base path: {@code /api/notifications}</p>
+ * <p>Base path: {@code /api/v1/notifications}</p>
  */
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -26,7 +26,7 @@ public class NotificationController {
 
     /**
      * Returns all notifications for a given user (most recent first).
-     * GET /api/notifications?userId=101
+     * GET /api/v1/notifications?userId=101
      */
     @GetMapping
     public ResponseEntity<List<Notification>> getNotifications(
@@ -36,7 +36,7 @@ public class NotificationController {
 
     /**
      * Returns only unread notifications.
-     * GET /api/notifications/unread?userId=101
+     * GET /api/v1/notifications/unread?userId=101
      */
     @GetMapping("/unread")
     public ResponseEntity<List<Notification>> getUnread(
@@ -46,7 +46,7 @@ public class NotificationController {
 
     /**
      * Returns unread notification count (for the bell badge).
-     * GET /api/notifications/count?userId=101
+     * GET /api/v1/notifications/count?userId=101
      */
     @GetMapping("/count")
     public ResponseEntity<Map<String, Long>> getUnreadCount(
@@ -56,7 +56,7 @@ public class NotificationController {
 
     /**
      * Marks a single notification as read.
-     * PATCH /api/notifications/{id}/read?userId=101
+     * PATCH /api/v1/notifications/{id}/read?userId=101
      */
     @PatchMapping("/{id}/read")
     public ResponseEntity<Void> markAsRead(
@@ -68,7 +68,7 @@ public class NotificationController {
 
     /**
      * Marks all notifications for a user as read.
-     * PATCH /api/notifications/read-all?userId=101
+     * PATCH /api/v1/notifications/read-all?userId=101
      */
     @PatchMapping("/read-all")
     public ResponseEntity<Map<String, Integer>> markAllAsRead(

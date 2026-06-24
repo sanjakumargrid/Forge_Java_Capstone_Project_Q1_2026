@@ -16,7 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/interviews")
+@RequestMapping("/api/v1/interviews")
 @RequiredArgsConstructor
 public class InterviewController {
 

@@ -46,9 +46,9 @@ src/main/java/com/talentgrid/auth/
 ├── constants/
 │   └── PermissionConstants.java       Scope name constants (USER_CREATE, USER_VIEW, USER_DELETE)
 ├── controller/
-│   ├── AuthController.java            /api/auth endpoints (register, login, refresh, logout)
-│   ├── OAuthController.java           /api/auth/oauth-success — handles post-OAuth2 redirect
-│   └── TestController.java            /api/test endpoints for auth and RBAC verification
+│   ├── AuthController.java            /api/v1/auth endpoints (register, login, refresh, logout)
+│   ├── OAuthController.java           /api/v1/auth/oauth-success — handles post-OAuth2 redirect
+│   └── TestController.java            /api/v1/test endpoints for auth and RBAC verification
 ├── dto/
 │   ├── request/
 │   │   ├── LoginRequest.java
@@ -131,7 +131,7 @@ Schema is auto-managed by Hibernate (`ddl-auto=update`). Flyway migrations will 
 
 ## API endpoints
 
-### `POST /api/auth/register`
+### `POST /api/v1/auth/register`
 
 Registers a new user. Role defaults to `EMPLOYEE` if not provided.
 
@@ -158,7 +158,7 @@ Password rules: minimum 8 characters, at least one uppercase letter, one lowerca
 
 ---
 
-### `POST /api/auth/login`
+### `POST /api/v1/auth/login`
 
 Authenticates a user. Returns JWT access token in the response body and sets a refresh token as an HttpOnly cookie.
 
@@ -189,7 +189,7 @@ Account locks for 15 minutes after 5 consecutive failed login attempts.
 
 ---
 
-### `POST /api/auth/refresh`
+### `POST /api/v1/auth/refresh`
 
 Issues a new access token and rotates the refresh token. Reads the refresh token from the cookie — no request body required.
 
@@ -197,7 +197,7 @@ Issues a new access token and rotates the refresh token. Reads the refresh token
 
 ---
 
-### `POST /api/auth/logout`
+### `POST /api/v1/auth/logout`
 
 Revokes the refresh token and blacklists the current access token in Redis by its JTI so it cannot be reused.
 
@@ -215,17 +215,17 @@ Authorization: Bearer <access_token>
 
 ---
 
-### `GET /api/auth/oauth-success?email={email}`
+### `GET /api/v1/auth/oauth-success?email={email}`
 
 Called internally after Google OAuth2 redirect completes. If no account exists for the email, one is created automatically with the `CANDIDATE` role. Returns a JWT access token.
 
 ---
 
-### `GET /api/test/secure`
+### `GET /api/v1/test/secure`
 
 Returns the authenticated user's email and granted authorities. Use this to verify JWT authentication is working end-to-end. Requires a valid Bearer token.
 
-### `GET /api/test/admin`
+### `GET /api/v1/test/admin`
 
 Requires the `USER_DELETE` scope. Returns an RBAC confirmation response. Use this to verify scope-based access control is working correctly.
 
@@ -256,7 +256,7 @@ Signing algorithm: **HS256**. Key is derived from `JWT_SECRET`.
 
 | Endpoint pattern | Auth required |
 |---|---|
-| `POST /api/auth/**` | No |
+| `POST /api/v1/auth/**` | No |
 | `GET /oauth2/**` | No |
 | `GET /login/**` | No |
 | `GET /swagger-ui/**` | No |
@@ -332,7 +332,7 @@ The service starts on **port 8081**.
 ### 3. Verify startup
 
 ```bash
-curl -X POST http://localhost:8081/api/auth/register \
+curl -X POST http://localhost:8081/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"test","email":"test@example.com","password":"Test@1234","role":"EMPLOYEE"}'
 ```

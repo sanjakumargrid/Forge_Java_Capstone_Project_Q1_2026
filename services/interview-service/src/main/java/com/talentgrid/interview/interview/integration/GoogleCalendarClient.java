@@ -269,7 +269,7 @@ public class GoogleCalendarClient {
             if (googleOAuthTokenService == null || !googleOAuthTokenService.isAuthorized()) {
                 throw new BusinessException(
                         HttpStatus.SERVICE_UNAVAILABLE,
-                        "Google OAuth is not authorized. Open http://localhost:8084/api/google/oauth/authorize first."
+                        "Google OAuth is not authorized. Open http://localhost:8084/api/v1/google/oauth/authorize first."
                 );
             }
 

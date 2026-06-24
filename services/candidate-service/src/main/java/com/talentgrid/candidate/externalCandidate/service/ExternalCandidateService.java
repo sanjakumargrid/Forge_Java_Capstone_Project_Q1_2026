@@ -98,7 +98,7 @@ public class ExternalCandidateService {
                                     "isDuplicateMerge", true
                             ))
                             .serviceName("candidate-service")
-                            .endpoint("/api/candidates")
+                            .endpoint("/api/v1/candidates")
                             .build()
             );
             
@@ -136,7 +136,7 @@ public class ExternalCandidateService {
                                     "email", candidate.getEmail()
                             ))
                             .serviceName("candidate-service")
-                            .endpoint("/api/candidates")
+                            .endpoint("/api/v1/candidates")
                             .build()
             );
 
@@ -238,7 +238,7 @@ public class ExternalCandidateService {
                                 "email", savedCandidate.getEmail()
                         ))
                         .serviceName("candidate-service")
-                        .endpoint("/api/candidates/" + candidateId)
+                        .endpoint("/api/v1/candidates/" + candidateId)
                         .build()
         );
 
@@ -294,7 +294,7 @@ public class ExternalCandidateService {
                                 "isDeleted", true
                         ))
                         .serviceName("candidate-service")
-                        .endpoint("/api/candidates/" + candidateId)
+                        .endpoint("/api/v1/candidates/" + candidateId)
                         .build()
         );
 

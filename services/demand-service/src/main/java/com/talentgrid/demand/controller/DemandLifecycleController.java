@@ -55,7 +55,7 @@ public class DemandLifecycleController {
      * Only the user who is {@code project_manager_id} for the demand's project may call this
      * (scope {@code DEMAND_PM_APPROVE}; enforced in service via user-auth project lookup).
      *
-     * <p>Same behavior as {@code PUT /api/v1/project-manager/demands/{id}/approve}; offered as a
+     * <p>Same behavior as {@code PUT /api/v1/portfolio-manager/demands/{id}/approve}; offered as a
      * convenience alias if UI doesn't segment PM persona.</p> single demand URL prefix.
      *
      * <p>

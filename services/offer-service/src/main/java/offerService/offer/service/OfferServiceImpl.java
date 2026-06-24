@@ -123,7 +123,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers")
+                        .endpoint("/api/v1/offers")
                         .build()
         );
 
@@ -225,7 +225,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id)
+                        .endpoint("/api/v1/offers/" + id)
                         .build()
         );
 
@@ -296,7 +296,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/send")
+                        .endpoint("/api/v1/offers/" + id + "/send")
                         .build()
         );
 
@@ -339,7 +339,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/accept")
+                        .endpoint("/api/v1/offers/" + id + "/accept")
                         .build()
         );
 
@@ -392,7 +392,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/reject")
+                        .endpoint("/api/v1/offers/" + id + "/reject")
                         .build()
         );
 
@@ -434,7 +434,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/expire")
+                        .endpoint("/api/v1/offers/" + id + "/expire")
                         .build()
         );
 
@@ -459,7 +459,7 @@ public class OfferServiceImpl implements OfferService {
                         .entityId(offer.getId())
                         .action(AuditAction.DELETE)
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id)
+                        .endpoint("/api/v1/offers/" + id)
                         .build()
         );
     }
@@ -562,7 +562,7 @@ public class OfferServiceImpl implements OfferService {
                                 "approvalSteps", savedOffer.getApprovalChain().size()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/approval-chain")
+                        .endpoint("/api/v1/offers/" + offerId + "/approval-chain")
                         .build()
         );
 
@@ -613,7 +613,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/submit-approval")
+                        .endpoint("/api/v1/offers/" + offerId + "/submit-approval")
                         .build()
         );
 
@@ -719,7 +719,7 @@ public class OfferServiceImpl implements OfferService {
                                 "currentStep", savedOffer.getCurrentApprovalStep()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/approve")
+                        .endpoint("/api/v1/offers/" + offerId + "/approve")
                         .build()
         );
 
@@ -782,7 +782,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/reject-approval")
+                        .endpoint("/api/v1/offers/" + offerId + "/reject-approval")
                         .build()
         );
 
@@ -874,7 +874,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", savedOffer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
 
@@ -918,7 +918,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", offer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
 
@@ -951,7 +951,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", offer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
         }

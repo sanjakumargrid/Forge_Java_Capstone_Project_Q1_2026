@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/webhooks/docusign")
+@RequestMapping("/api/v1/webhooks/docusign")
 @RequiredArgsConstructor
 public class DocuSignWebhookController {
 

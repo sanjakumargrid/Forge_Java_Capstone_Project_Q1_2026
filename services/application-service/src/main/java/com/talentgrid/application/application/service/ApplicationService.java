@@ -125,7 +125,7 @@ public class ApplicationService {
                                 "demandId", saved.getDemandId(),
                                 "stage", saved.getCurrentStage().name()))
                         .serviceName("application-service")
-                        .endpoint("/api/applications")
+                        .endpoint("/api/v1/applications")
                         .build());
 
         if (saved.getCurrentStage() == Stage.REJECTED) {
@@ -217,7 +217,7 @@ public class ApplicationService {
                         .afterState(Map.of(
                                 "stage", updated.getCurrentStage().name()))
                         .serviceName("application-service")
-                        .endpoint("/api/applications/" + applicationId + "/stage")
+                        .endpoint("/api/v1/applications/" + applicationId + "/stage")
                         .build());
 
         switch (targetStage) {
@@ -353,7 +353,7 @@ public class ApplicationService {
                     .beforeState(Map.of("demandId", app.getDemandId() != null ? app.getDemandId() : "null"))
                     .afterState(Map.of("demandId", request.getTargetDemandId()))
                     .serviceName("application-service")
-                    .endpoint("/api/applications/bulk/reassign-demand")
+                    .endpoint("/api/v1/applications/bulk/reassign-demand")
                     .build());
 
             // Fire event so downstream services (interview-service analytics etc.) stay in sync
@@ -413,7 +413,7 @@ public class ApplicationService {
                         .beforeState(Map.of())
                         .afterState(Map.of("recordsExported", applications.size()))
                         .serviceName("application-service")
-                        .endpoint("/api/applications/bulk/export")
+                        .endpoint("/api/v1/applications/bulk/export")
                         .build());
 
         return csv.toString();

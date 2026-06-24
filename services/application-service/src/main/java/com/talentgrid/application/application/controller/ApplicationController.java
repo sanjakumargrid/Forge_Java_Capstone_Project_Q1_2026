@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/api/applications")
+@RequestMapping("/api/v1/applications")
 public class ApplicationController {
 
     private final ApplicationService applicationService;

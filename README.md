@@ -246,7 +246,7 @@ system-events
 Create a Demand using Postman:
 
 ```http
-POST http://localhost:8081/api/demands
+POST http://localhost:8081/api/v1/demands
 ```
 
 Request Body:

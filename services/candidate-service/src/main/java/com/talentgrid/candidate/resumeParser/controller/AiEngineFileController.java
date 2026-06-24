@@ -123,7 +123,7 @@ public class AiEngineFileController {
             );
 
             try {
-                String applicationServiceUrl = applicationServiceBaseUrl + "/api/applications/" + applicationId + "/ai-evaluation";
+                String applicationServiceUrl = applicationServiceBaseUrl + "/api/v1/applications/" + applicationId + "/ai-evaluation";
                 org.springframework.http.HttpHeaders fwdHeaders = new org.springframework.http.HttpHeaders();
                 jakarta.servlet.http.HttpServletRequest httpReq = ((org.springframework.web.context.request.ServletRequestAttributes)
                         org.springframework.web.context.request.RequestContextHolder.getRequestAttributes()).getRequest();

@@ -134,6 +134,7 @@ class DemandValidationServiceFillTest {
         req.setPriority(DemandPriority.MEDIUM);
         req.setLocation("Remote");
         req.setBusinessUnit("Engineering");
+        req.setDepartment("Engineering");
         req.setBudget(BigDecimal.valueOf(90_000));
         req.setTargetDate(java.time.LocalDate.now().plusMonths(2));
         req.setJobTitleId(10L);

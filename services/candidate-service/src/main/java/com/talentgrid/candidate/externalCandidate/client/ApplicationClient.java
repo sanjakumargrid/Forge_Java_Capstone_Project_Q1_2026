@@ -22,7 +22,7 @@ public class ApplicationClient {
     ) {
         try {
             return applicationWebClient.post()
-                    .uri("/api/applications")
+                    .uri("/api/v1/applications")
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(ApplicationResponseDto.class)

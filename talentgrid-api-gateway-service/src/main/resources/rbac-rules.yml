@@ -106,7 +106,7 @@ rbac:
       methods: [POST]
       allowed-scopes: [DEMAND_PM_APPROVE]
 
-    - path: "/api/v1/project-manager/**"
+    - path: "/api/v1/portfolio-manager/**"
       methods: [PUT]
       allowed-scopes: [DEMAND_PM_APPROVE]
 

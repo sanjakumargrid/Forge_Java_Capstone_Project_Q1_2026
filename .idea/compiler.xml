@@ -11,9 +11,9 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="candidate-service" />
+        <module name="interview-service" />
         <module name="application-service" />
         <module name="offer-service" />
-        <module name="interview-service" />
       </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

@@ -22,8 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import java.util.List;
-
 /**
  * Core Spring Security configuration for the auth-service.
  *
@@ -33,7 +31,6 @@ import java.util.List;
  * <li>Configure stateless JWT-based session management for API endpoints</li>
  * <li>Configure OAuth2 login with session support for browser-based SSO
  * flows</li>
- * <li>Define CORS policies</li>
  * <li>Register the {@link JwtAuthenticationFilter} in the filter chain</li>
  * </ul>
  *
@@ -192,45 +189,4 @@ public class SecurityConfig {
 
                 return config.getAuthenticationManager();
         }
-
-        /**
-         * Configures CORS policies for local frontend development environments.
-         * NOTE: Disabled because CORS is handled by the API Gateway
-         *
-         * @return the configured CORS source
-         */
-        /*
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-
-                CorsConfiguration configuration = new CorsConfiguration();
-
-                configuration.setAllowedOrigins(
-                                List.of(
-                                                "http://localhost:3000",
-                                                "http://localhost:4200"));
-
-                configuration.setAllowedMethods(
-                                List.of(
-                                                "GET",
-                                                "POST",
-                                                "PUT",
-                                                "DELETE",
-                                                "PATCH",
-                                                "OPTIONS"));
-
-                configuration.setAllowedHeaders(
-                                List.of("*"));
-
-                configuration.setAllowCredentials(true);
-
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
-                source.registerCorsConfiguration(
-                                "/**",
-                                configuration);
-
-                return source;
-        }
-        */
 }
