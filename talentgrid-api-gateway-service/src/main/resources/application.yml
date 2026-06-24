@@ -30,12 +30,13 @@ spring:
             connect-timeout: ${GATEWAY_HTTP_CONNECT_TIMEOUT:5000}
             response-timeout: ${GATEWAY_HTTP_RESPONSE_TIMEOUT:60s}
           globalcors:
-            add-to-simple-url-handler-mapping: true
+            # Avoid duplicate Access-Control-Allow-Origin (handler mapping + route CORS).
+            add-to-simple-url-handler-mapping: false
             cors-configurations:
               "[/**]":
-                # Use origin patterns (not allowed-origins: *) so the gateway echoes a single
-                # Access-Control-Allow-Origin value and works with credentials.
-                allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:*}
+                # Wildcard (*) with allow-credentials causes duplicate/conflicting headers in browsers.
+                # Set CORS_ALLOWED_ORIGIN_PATTERNS=http://localhost:4200 in .env for local Angular dev.
+                allowed-origin-patterns: ${CORS_ALLOWED_ORIGIN_PATTERNS:http://localhost:4200}
                 allowed-methods: "*"
                 allowed-headers: "*"
                 exposed-headers: "*"
