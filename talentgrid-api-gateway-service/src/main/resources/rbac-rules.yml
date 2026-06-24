@@ -383,7 +383,11 @@ rbac:
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
 
-    - path: "/api/v1/engineer-profile/update"
+    - path: "/api/v1/engineer-profile/employees/email/*"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
+    - path: "/api/v1/engineer-profile/update/**"
       methods: [ PATCH ]
       allowed-scopes: [ WORKFORCE_PROFILE_UPDATE ]
 

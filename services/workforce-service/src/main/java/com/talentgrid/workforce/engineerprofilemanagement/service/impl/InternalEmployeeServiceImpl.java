@@ -55,6 +55,14 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     }
 
     @Override
+    public InternalEmployeeResponse getEmployeeByEmail(String email) {
+        InternalEmployee employee = repository.findByEmailIgnoreCaseAndIsDeletedFalse(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Internal employee not found for email: " + email));
+        return mapToResponse(employee);
+    }
+
+    @Override
     public List<InternalEmployeeResponse> getAllEngineers() {
         return repository.findByIsDeletedFalseOrderByIdAsc()
                 .stream()
@@ -72,13 +80,13 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
     @Override
     @Transactional
-    public InternalEmployeeResponse updateOwnProfile(Long employeeId,
+    public InternalEmployeeResponse updateOwnProfile(String emailId,
                                                      UpdateEngineerProfileRequest request,
                                                      String requestId) {
 
-        InternalEmployee employee = repository.findByEmployeeIdAndIsDeletedFalse(employeeId)
+        InternalEmployee employee = repository.findByEmailIgnoreCaseAndIsDeletedFalse(emailId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Internal employee not found for id: " + employeeId));
+                        "Internal employee not found for email: " + emailId));
 
         // Reject empty PATCH
         if (request.getSkills() == null

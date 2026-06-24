@@ -6,22 +6,18 @@ import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmploy
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/engineer-profile")
+@RequiredArgsConstructor
 @Tag(name = "Engineer Profile Management", description = "APIs for internal employee profile retrieval")
 public class InternalEmployeeController {
 
     private final InternalEmployeeService internalEmployeeService;
-
-    public InternalEmployeeController(InternalEmployeeService internalEmployeeService) {
-        this.internalEmployeeService = internalEmployeeService;
-    }
 
     @Operation(summary = "Get internal employee by employee ID",
             description = "Returns internal employee profile details for a given employee_id")
@@ -43,16 +39,27 @@ public class InternalEmployeeController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Get internal employee by email",
+            description = "Fetches employee profile from the internal_employees table by the user's login email. "
+                    + "Intended for the profile page of a logged-in engineer.")
+    @GetMapping("/employees/email/{emailId}")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    public ResponseEntity<InternalEmployeeResponse> getEmployeeByEmail(
+            @PathVariable("emailId") String emailId) {
+        InternalEmployeeResponse response = internalEmployeeService.getEmployeeByEmail(emailId);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "Update own skills, resume Drive link, and availability",
-            description = "Authenticated engineers update their own skills, resume Drive link, and availability date. "
-                    + "Changes publish an EMPLOEE_PROFILE_UPDATED event.")
-    @PatchMapping("/update")
+            description = "Authenticated engineers update their own skills, resume Drive link, and availability date "
+                    + "for the employee identified by email in the path. Changes publish an EMPLOEE_PROFILE_UPDATED event.")
+    @PatchMapping("/update/{emailId:.+}")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_UPDATE')")
     public ResponseEntity<InternalEmployeeResponse> updateOwnProfile(
-            @RequestHeader("X-Employee-Id") Long employeeId,
+            @PathVariable("emailId") String emailId,
             @Valid @RequestBody UpdateEngineerProfileRequest request,
             @RequestHeader(value = "X-Request-Id", required = false) String requestId) {
-        InternalEmployeeResponse response = internalEmployeeService.updateOwnProfile(employeeId, request, requestId);
+        InternalEmployeeResponse response = internalEmployeeService.updateOwnProfile(emailId, request, requestId);
         return ResponseEntity.ok(response);
     }
 
