@@ -1,5 +1,6 @@
 package com.talentgrid.jobposting.service;
 
+import com.talentgrid.jobposting.dto.embedded.AnalyticsDto;
 import com.talentgrid.jobposting.dto.embedded.ChannelDto;
 import com.talentgrid.jobposting.dto.embedded.ChannelMetricsDto;
 import com.talentgrid.jobposting.dto.request.ChannelEventRequest;
@@ -40,8 +41,9 @@ public class AnalyticsService {
 
     /**
      * Records one funnel event (view/click/apply-start/apply-completion) for a job posting
-     * on a specific channel. Increments the matching counter, creating the channel bucket
-     * if it does not exist yet.
+     * on a specific channel. Increments the matching per-channel counter (creating the channel
+     * bucket if it does not exist yet) and the posting's overall {@code analytics} counters —
+     * the latter is what the public career-portal listing (`/api/job-postings/public/live`) shows.
      */
     @Transactional
     public void recordEvent(ChannelEventRequest req) {
@@ -65,16 +67,35 @@ public class AnalyticsService {
             metrics.add(bucket);
         }
 
+        AnalyticsDto analytics = posting.getAnalytics();
+        if (analytics == null) {
+            analytics = new AnalyticsDto();
+            posting.setAnalytics(analytics);
+        }
+
         switch (req.getEventType()) {
-            case VIEW -> bucket.setViews(bucket.getViews() + 1);
-            case CLICK -> bucket.setClicks(bucket.getClicks() + 1);
-            case APPLY_START -> bucket.setApplyStarts(bucket.getApplyStarts() + 1);
-            case APPLY_COMPLETION -> bucket.setApplyCompletions(bucket.getApplyCompletions() + 1);
+            case VIEW -> {
+                bucket.setViews(bucket.getViews() + 1);
+                analytics.setViews(analytics.getViews() + 1);
+            }
+            case CLICK -> {
+                bucket.setClicks(bucket.getClicks() + 1);
+                analytics.setClicks(analytics.getClicks() + 1);
+            }
+            case APPLY_START -> {
+                bucket.setApplyStarts(bucket.getApplyStarts() + 1);
+                analytics.setApplyStarts(analytics.getApplyStarts() + 1);
+            }
+            case APPLY_COMPLETION -> {
+                bucket.setApplyCompletions(bucket.getApplyCompletions() + 1);
+                analytics.setApplyCompletions(analytics.getApplyCompletions() + 1);
+            }
         }
 
         jobPostingRepository.save(posting);
-        log.info("Recorded {} on channel={} for jobPostingId={}",
-                req.getEventType(), req.getChannel(), req.getJobPostingId());
+        log.info("Recorded {} on channel={} for jobPostingId={} (overall views={}, clicks={}, applyStarts={}, applyCompletions={})",
+                req.getEventType(), req.getChannel(), req.getJobPostingId(),
+                analytics.getViews(), analytics.getClicks(), analytics.getApplyStarts(), analytics.getApplyCompletions());
     }
 
     /** Market-presence dashboard aggregated across every job posting. */

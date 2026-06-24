@@ -24,6 +24,32 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenUtil jwtTokenUtil;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        String method = request.getMethod();
+
+        boolean isGet = "GET".equalsIgnoreCase(method);
+        boolean isOptions = "OPTIONS".equalsIgnoreCase(method);
+
+        return isOptions
+                || path.equals("/actuator/health")
+                || path.equals("/swagger-ui.html")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-resources")
+                || path.startsWith("/webjars")
+
+                // Public job posting read APIs only
+                || (isGet && path.equals("/api/job-postings"))
+                || (isGet && path.matches("^/api/job-postings/\\d+$"))
+                || (isGet && path.startsWith("/api/job-postings/public"))
+
+                // Public only for GET
+                || (isGet && path.startsWith("/api/demands"))
+                || (isGet && path.startsWith("/api/analytics"));
+    }
+
+    @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -41,30 +67,49 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         try {
             if (token.matches("mock-\\d+")) {
-                // Frontend dev/demo login (libs/auth/src/lib/auth.service.ts) issues
-                // `mock-<userId>` tokens with no embedded role — there's no real JWT
-                // to validate, so synthesize a principal directly from the id. Role is
-                // a placeholder; this service has no @PreAuthorize checks that read it.
+
                 Long userId = Long.parseLong(token.substring("mock-".length()));
+
                 AuthenticatedUser principal = new AuthenticatedUser(
-                        userId, "mock" + userId + "@test.com", List.of("RECRUITER"));
+                        userId,
+                        "mock" + userId + "@test.com",
+                        List.of("RECRUITER")
+                );
+
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                principal.getAuthorities()
+                        );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
             } else if (jwtTokenUtil.isValid(token)) {
+
                 Long userId = jwtTokenUtil.extractUserId(token);
                 String email = jwtTokenUtil.extractEmail(token);
                 List<String> roles = jwtTokenUtil.extractRoles(token);
 
-                AuthenticatedUser principal = new AuthenticatedUser(userId, email, roles);
+                AuthenticatedUser principal = new AuthenticatedUser(
+                        userId,
+                        email,
+                        roles
+                );
+
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                        new UsernamePasswordAuthenticationToken(
+                                principal,
+                                null,
+                                principal.getAuthorities()
+                        );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
             } else {
                 log.debug("JWT invalid or expired; proceeding unauthenticated");
             }
+
         } catch (Exception e) {
             log.debug("JWT parse error: {}", e.getMessage());
         }

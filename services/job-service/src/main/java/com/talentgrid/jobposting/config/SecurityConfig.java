@@ -27,8 +27,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
+                        // Preflight
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Health
                         .requestMatchers("/actuator/health").permitAll()
+
+                        // Swagger
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -37,10 +43,19 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/webjars/**"
                         ).permitAll()
-                        .requestMatchers("/api/demands/**").permitAll()
-                        .requestMatchers("/api/job-postings/**").permitAll()
+
+                        // Public read-only job posting APIs
+                        .requestMatchers(HttpMethod.GET, "/api/job-postings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/job-postings/*").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/job-postings/public/**").permitAll()
-                        .requestMatchers("/api/analytics/**").permitAll()
+
+                        // Public read-only demand APIs
+                        .requestMatchers(HttpMethod.GET, "/api/demands/**").permitAll()
+
+                        // Public read-only analytics APIs
+                        .requestMatchers(HttpMethod.GET, "/api/analytics/**").permitAll()
+
+                        // POST / PUT / PATCH / DELETE APIs need authentication
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
