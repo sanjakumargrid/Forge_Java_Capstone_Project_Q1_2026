@@ -148,7 +148,11 @@ public class RmgService {
                 .accountId(summary.getAccountId())
                 .accountName(summary.getAccountName())
                 .businessUnit(summary.getBusinessUnit())
-                .skills(summary.getSkills())
+                // Map the new skill structure
+                .mandatorySkills(summary.getMandatorySkills())
+                .optionalSkills(summary.getOptionalSkills())
+                // Legacy skills field for backward compatibility (use combined skills)
+                .skills(summary.getAllSkillNames())
                 .budget(summary.getBudget())
                 .employmentType(summary.getEmploymentType())
                 .status(summary.getStatus())
