@@ -11,9 +11,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
         <module name="candidate-service" />
-        <module name="application-service" />
         <module name="offer-service" />
-        <module name="interview-service" />
       </profile>
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -21,7 +19,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="talentgrid-api-gateway-service" />
       </profile>
-      <profile name="Annotation profile for demand-service" enabled="true">
+      <profile name="Annotation profile for TalentGrid Interview Service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -29,6 +27,8 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="demand-service" />
+        <module name="application-service" />
+        <module name="interview-service" />
       </profile>
       <profile name="Annotation profile for user-auth-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -95,9 +95,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="application-service" target="17" />
       <module name="candidate-service" target="17" />
-      <module name="interview-service" target="17" />
       <module name="offer-service" target="17" />
     </bytecodeTargetLevel>
   </component>
@@ -114,6 +112,7 @@
       <module name="talentgrid-audit-service" options="-parameters" />
       <module name="talentgrid-kafka" options="-parameters" />
       <module name="talentgrid-notification-service" options="-parameters" />
+      <module name="talentgrid-parent" options="-parameters" />
       <module name="talentgrid-shared" options="-parameters" />
       <module name="user-auth-service" options="-parameters" />
     </option>

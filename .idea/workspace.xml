@@ -5,53 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/audit.log" beforeDir="false" afterPath="$PROJECT_DIR$/audit.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/ApplicationServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/ApplicationServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/DemandDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/DemandDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/ApplicationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/ApplicationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/client/DemandClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/client/DemandClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/kafka/ApplicationEventTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/kafka/ApplicationEventTranslator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/CandidateServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/CandidateServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/kafka/CandidateEventTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/kafka/CandidateEventTranslator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/client/DemandServiceClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/client/DemandServiceClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/model/DemandDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/model/DemandDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/entity/ExternalCandidate.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/entity/ExternalCandidate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/resumeParser/controller/AiEngineFileController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/DemandServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/DemandServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/domain/entity/Demand.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/domain/entity/Demand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/domain/entity/Skill.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/domain/entity/Skill.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/google-oauth-tokens/StoredCredential" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/google-oauth-tokens/StoredCredential" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/InterviewServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/InterviewServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/analytics/controller/AnalyticsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/analytics/controller/AnalyticsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/interview/service/InterviewServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/kafka/InterviewEventTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/java/com/talentgrid/interview/kafka/InterviewEventTranslator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/resources/google/oauth-client-secret.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/interview-service/src/main/resources/google/service-account.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/OfferServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/OfferServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/kafka/OfferEventTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/kafka/OfferEventTranslator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/offer/service/OfferServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/java/offerService/offer/service/OfferServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/offer-service/src/main/resources/docusign/private.key" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user-auth-service/src/main/java/com/talentgrid/auth/UserAuthServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/user-auth-service/src/main/java/com/talentgrid/auth/UserAuthServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/user-auth-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/user-auth-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-api-gateway-service/src/main/java/com/talentgrid/gateway/GatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-api-gateway-service/src/main/java/com/talentgrid/gateway/GatewayApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-api-gateway-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-api-gateway-service/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/AuditServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-audit-service/src/main/java/com/talentgrid/auditservice/AuditServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/notification.log" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/notification.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/src/main/java/com/talentgrid/notification/NotificationServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/src/main/java/com/talentgrid/notification/NotificationServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/src/main/resources/application-secret.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-notification-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-notification-service/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-shared/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-shared/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/java/com/talentgrid/shared/config/KafkaConsumerAutoConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-shared/src/main/java/com/talentgrid/shared/config/KafkaConsumerAutoConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/talentgrid-shared/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports " beforeDir="false" afterPath="$PROJECT_DIR$/talentgrid-shared/src/main/resources/META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports " afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +25,7 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="796" />
+    <option name="cachedIndexableFilesCount" value="1058" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -92,61 +53,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.580389479560619" />
-      <entry key="MS500" value="3.9568362170229867" />
-      <entry key="S2" value="6.740448433709235" />
-      <entry key="S5" value="7.944601429564508" />
-      <entry key="S10" value="8.442386450207351" />
-      <entry key="S30" value="8.806976818807502" />
-      <entry key="S60" value="8.902560817089558" />
-      <entry key="M2" value="8.951045909136951" />
-      <entry key="M5" value="8.980361747300972" />
-      <entry key="M10" value="8.990171430016211" />
-      <entry key="M15" value="8.993473526665639" />
-      <entry key="M30" value="9.048414224268651" />
-      <entry key="H1" value="12.662663365753993" />
-      <entry key="H2" value="48.5292311964956" />
-      <entry key="H4" value="156.73016811059378" />
-      <entry key="D1" value="756.2811717898993" />
-      <entry key="W1" value="1279.09398725623" />
+      <entry key="MS100" value="1.0000000351965983" />
+      <entry key="MS500" value="1.0376434832867114" />
+      <entry key="S2" value="1.8784484280821412" />
+      <entry key="S5" value="2.815125366105318" />
+      <entry key="S10" value="3.329365007382093" />
+      <entry key="S30" value="3.8580825311528986" />
+      <entry key="S60" value="5.633037025383757" />
+      <entry key="M2" value="12.443334654580157" />
+      <entry key="M5" value="26.635509070083824" />
+      <entry key="M10" value="35.97695887694941" />
+      <entry key="M15" value="41.70660834492579" />
+      <entry key="M30" value="57.18346673523376" />
+      <entry key="H1" value="79.752277178611" />
+      <entry key="H2" value="122.440037285772" />
+      <entry key="H4" value="228.25820235238413" />
+      <entry key="D1" value="842.7659671237296" />
+      <entry key="W1" value="1388.1009611622314" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="4.085296729803684E-234" />
-      <entry key="S60" value="2.021211698413523E-117" />
-      <entry key="M2" value="4.49578880555535E-59" />
-      <entry key="M5" value="4.582766365616435E-24" />
-      <entry key="M10" value="2.14824463625492E-12" />
-      <entry key="M15" value="1.6994162091784836E-8" />
-      <entry key="M30" value="1.4894064407443123E-4" />
-      <entry key="H1" value="0.01647788198524462" />
-      <entry key="H2" value="0.20760818519173013" />
-      <entry key="H4" value="0.9644932903345693" />
-      <entry key="D1" value="8.045486428946973" />
-      <entry key="W1" value="15.811325824805774" />
+      <entry key="MS500" value="7.71996214592942E-103" />
+      <entry key="S2" value="2.964174676561469E-26" />
+      <entry key="S5" value="6.148393455309654E-11" />
+      <entry key="S10" value="7.847326435327357E-6" />
+      <entry key="S30" value="0.022775029186530085" />
+      <entry key="S60" value="0.21721121012775615" />
+      <entry key="M2" value="0.7659690634310073" />
+      <entry key="M5" value="1.7163850880373395" />
+      <entry key="M10" value="2.2646965566388677" />
+      <entry key="M15" value="2.4861434295677562" />
+      <entry key="M30" value="2.7304541034187024" />
+      <entry key="H1" value="2.868770151715635" />
+      <entry key="H2" value="3.064244252611037" />
+      <entry key="H4" value="3.7401398888762962" />
+      <entry key="D1" value="10.752081558495767" />
+      <entry key="W1" value="18.728500131172073" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.5307052175003768" />
-      <entry key="MS500" value="3.911765759517169" />
-      <entry key="S2" value="6.717569524618722" />
-      <entry key="S5" value="7.933641669024561" />
-      <entry key="S10" value="8.436545431550227" />
-      <entry key="S30" value="8.804942951958639" />
-      <entry key="S60" value="8.901532582329843" />
-      <entry key="M2" value="8.950528931912093" />
-      <entry key="M5" value="8.98015426557762" />
-      <entry key="M10" value="8.990067573642825" />
-      <entry key="M15" value="8.993404280193406" />
-      <entry key="M30" value="9.048528006805272" />
-      <entry key="H1" value="12.679084436359876" />
-      <entry key="H2" value="48.73654817820192" />
-      <entry key="H4" value="157.69406671183953" />
-      <entry key="D1" value="764.3261682050248" />
-      <entry key="W1" value="1294.9052013211897" />
+      <entry key="MS100" value="7.359668798254491E-5" />
+      <entry key="MS500" value="0.16149618780836808" />
+      <entry key="S2" value="1.3655894751530124" />
+      <entry key="S5" value="2.5414750169015057" />
+      <entry key="S10" value="3.176734138874529" />
+      <entry key="S30" value="3.824811080621812" />
+      <entry key="S60" value="5.8170501872220175" />
+      <entry key="M2" value="13.186094828262073" />
+      <entry key="M5" value="28.338084233222368" />
+      <entry key="M10" value="38.23340396983694" />
+      <entry key="M15" value="44.186779483352865" />
+      <entry key="M30" value="59.91041526176625" />
+      <entry key="H1" value="82.61895998393425" />
+      <entry key="H2" value="125.50292717227181" />
+      <entry key="H4" value="231.9972363643063" />
+      <entry key="D1" value="853.5174640953614" />
+      <entry key="W1" value="1406.8293339002764" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -204,7 +165,7 @@
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -224,7 +185,7 @@
           <value>
             <map>
               <entry key="CandidateServiceApplication" value="FAILED" />
-              <entry key="NotificationServiceApplication" value="FAILED" />
+              <entry key="NotificationServiceApplication" value="STOPPED" />
             </map>
           </value>
         </entry>
@@ -351,6 +312,9 @@
       <workItem from="1781959907478" duration="265000" />
       <workItem from="1781960185671" duration="10000" />
       <workItem from="1781960201185" duration="35117000" />
+      <workItem from="1782281544803" duration="9200000" />
+      <workItem from="1782299882531" duration="204000" />
+      <workItem from="1782300099048" duration="340000" />
     </task>
     <servers />
   </component>

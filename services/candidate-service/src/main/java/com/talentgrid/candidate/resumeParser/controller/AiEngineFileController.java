@@ -1,20 +1,20 @@
 package com.talentgrid.candidate.resumeParser.controller;
 
+
+
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.resumeParser.client.DemandServiceClient;
-import com.talentgrid.candidate.resumeParser.model.ApplicationUpdatePayload;
+import com.talentgrid.candidate.resumeParser.model.ParsedResumeDTO;
 import com.talentgrid.candidate.resumeParser.model.AtsEvaluationDTO;
 import com.talentgrid.candidate.resumeParser.model.DemandDTO;
-import com.talentgrid.candidate.resumeParser.model.ParsedResumeDTO;
 import com.talentgrid.candidate.resumeParser.service.AtsEvaluationService;
 import com.talentgrid.candidate.resumeParser.service.ResumeParserService;
 import com.talentgrid.candidate.resumeParser.service.ResumeStoreService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Map;
 
@@ -26,21 +26,18 @@ public class AiEngineFileController {
     private final DemandServiceClient demandServiceClient;
     private final AtsEvaluationService atsEvaluationService;
     private final ResumeStoreService resumeStoreService;
-    private final RestTemplate restTemplate;
 
-    @Value("${application.service.url:http://localhost:8083}")
-    private String applicationServiceBaseUrl;
+    // Notice we no longer need the RestTemplate or applicationServiceBaseUrl in this controller
+    // because the frontend is handling the database save now.
 
     public AiEngineFileController(ResumeParserService resumeParserService,
                                   DemandServiceClient demandServiceClient,
                                   AtsEvaluationService atsEvaluationService,
-                                  ResumeStoreService resumeStoreService,
-                                  RestTemplate restTemplate) {
+                                  ResumeStoreService resumeStoreService) {
         this.resumeParserService = resumeParserService;
         this.demandServiceClient = demandServiceClient;
         this.atsEvaluationService = atsEvaluationService;
         this.resumeStoreService = resumeStoreService;
-        this.restTemplate = restTemplate;
     }
 
     @PostMapping
@@ -90,10 +87,10 @@ public class AiEngineFileController {
         }
     }
 
+    // Notice we REMOVED the applicationId parameter from the path and the inter-service call
     @PostMapping("/evaluate/{demandId}")
     public ResponseEntity<?> evaluate(
             @PathVariable Long demandId,
-            @RequestParam("applicationId") Long applicationId,
             @RequestParam("file") MultipartFile file) {
 
         try {
@@ -113,30 +110,11 @@ public class AiEngineFileController {
                 throw new BusinessException(HttpStatus.NOT_FOUND, "Demand not found.");
             }
 
+            // The Service evaluates the resume and returns the DTO
             AtsEvaluationDTO evaluation = atsEvaluationService.evaluateResume(file, demand);
 
-            ApplicationUpdatePayload updatePayload = new ApplicationUpdatePayload(
-                    evaluation.aiScore(),
-                    evaluation.matchedSkills(),
-                    evaluation.missingSkills(),
-                    evaluation.otherSkills()
-            );
-
-            try {
-                String applicationServiceUrl = applicationServiceBaseUrl + "/api/applications/" + applicationId + "/ai-evaluation";
-                org.springframework.http.HttpHeaders fwdHeaders = new org.springframework.http.HttpHeaders();
-                jakarta.servlet.http.HttpServletRequest httpReq = ((org.springframework.web.context.request.ServletRequestAttributes)
-                        org.springframework.web.context.request.RequestContextHolder.getRequestAttributes()).getRequest();
-                String authHeader = httpReq.getHeader("Authorization");
-                if (authHeader != null) {
-                    fwdHeaders.set("Authorization", authHeader);
-                }
-                restTemplate.exchange(applicationServiceUrl, org.springframework.http.HttpMethod.PATCH,
-                        new org.springframework.http.HttpEntity<>(updatePayload, fwdHeaders), Void.class);
-            } catch (Exception e) {
-                throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "Evaluation completed, but failed to save to Application DB: " + e.getMessage());
-            }
-
+            // Return the Evaluation directly to the Frontend
+            // The frontend will take this payload and hit your Application Service's POST endpoint to create the record.
             return ResponseEntity.ok(evaluation);
 
         } catch (BusinessException be) {
