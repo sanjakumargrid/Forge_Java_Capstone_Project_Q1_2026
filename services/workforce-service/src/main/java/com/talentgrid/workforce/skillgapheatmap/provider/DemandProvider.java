@@ -5,7 +5,7 @@ import com.talentgrid.workforce.skillgapheatmap.provider.model.DemandResponse;
 import java.util.List;
 
 /**
- * Port interface for fetching open demands with their required skills.
+ * Port interface for fetching open demands with their mandatory skills.
  * Production implementation: FeignDemandProvider (calls demand-service via HTTP).
  */
 public interface DemandProvider {

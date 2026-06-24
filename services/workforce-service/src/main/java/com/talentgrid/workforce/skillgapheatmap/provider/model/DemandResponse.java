@@ -6,8 +6,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * Internal model representing a single open demand with its required skills.
- * Built from DemandServiceResponse after filtering by open status.
+ * Internal model representing a single open demand with its mandatory skills.
+ * Built from demand-service list summaries (GET /api/v1/demands).
  */
 @Data
 @Builder

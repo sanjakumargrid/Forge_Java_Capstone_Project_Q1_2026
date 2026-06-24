@@ -27,6 +27,7 @@ import java.util.List;
  * <li>{@code GET   /api/v1/demands/{id}/pipeline} — unified internal + external hiring
  * pipeline view</li>
  * <li>{@code GET   /api/v1/demands/{id}/history} — full audit trail of status transitions</li>
+ * <li>{@code GET   /api/v1/demands/{id}/skills} — mandatory and optional skills required for the demand</li>
  * </ul>
  */
 @RestController
@@ -124,6 +125,19 @@ public class DemandLifecycleController {
     @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<List<DemandStatusHistoryResponse>> getHistory(@PathVariable Long id) {
         List<DemandStatusHistoryResponse> response = queryService.getDemandHistory(id);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Returns the mandatory and optional skills required for a demand.
+     *
+     * @param id the demand ID
+     * @return the demand skills (mandatory and optional)
+     */
+    @GetMapping("/{id}/skills")
+    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
+    public ResponseEntity<Object> getDemandSkills(@PathVariable Long id) {
+        Object response = queryService.getDemandSkills(id);
         return ResponseEntity.ok(response);
     }
 }

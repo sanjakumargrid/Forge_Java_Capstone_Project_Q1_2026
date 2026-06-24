@@ -7,8 +7,7 @@ import java.util.List;
 
 /**
  * Mirrors the fields from demand-service's DemandSummaryResponse
- * (GET /api/v1/demands) — lightweight list projection used to discover
- * open demand IDs before fetching full detail.
+ * (GET /api/v1/demands) — lightweight list projection including mandatory skills.
  *
  * @JsonIgnoreProperties ensures future fields added by the demand-service
  * do not break deserialization in this service.
@@ -18,8 +17,17 @@ import java.util.List;
 public class DemandSummary {
 
     private Long demandId;
+    private String title;
     private String status;
-    private Integer requiredCount;
+    private List<SkillDto> mandatorySkills;
+    private List<SkillDto> optionalSkills;
+
+    @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class SkillDto {
+        private Long skillId;
+        private String skillName;
+    }
 
     // -------------------------------------------------------------------------
     // Pagination wrapper — mirrors the demand-service's DemandListResponse

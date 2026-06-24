@@ -1,5 +1,6 @@
 package com.talentgrid.workforce.skillgapheatmap.service.impl;
 
+import com.talentgrid.workforce.skillgapheatmap.client.SkillGapAuthContext;
 import com.talentgrid.workforce.skillgapheatmap.dto.*;
 import com.talentgrid.workforce.skillgapheatmap.entity.GapLevel;
 import com.talentgrid.workforce.skillgapheatmap.entity.SkillGapAnalytics;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,13 +38,115 @@ public class SkillGapServiceImpl implements SkillGapService {
     @Value("${skill-gap.retention-days:30}")
     private int retentionDays;
 
-    // -------------------------------------------------------------------------
-    // Read endpoints
-    // -------------------------------------------------------------------------
+    @Override
+    public SkillGapResponse getSkillGap() {
+        refreshForViewer();
+        return buildSkillGapResponse();
+    }
 
     @Override
-    @Transactional(readOnly = true)
-    public SkillGapResponse getSkillGap() {
+    public SkillGapSummaryResponse getSummary() {
+        refreshForViewer();
+        return buildSummaryResponse();
+    }
+
+    @Override
+    public SkillTrendResponse getTrends() {
+        refreshForViewer();
+        return buildTrendResponse();
+    }
+
+    @Override
+    public RefreshResponse refresh() {
+        if (!SkillGapAuthContext.hasAuthorization()) {
+            return RefreshResponse.builder()
+                    .status("SKIPPED_NO_AUTH")
+                    .processedSkills(0)
+                    .build();
+        }
+
+        if (refreshCoordinator.isDebounced()) {
+            RefreshResponse debounced = refreshCoordinator.debouncedResponse();
+            if (debounced != null) {
+                return debounced;
+            }
+        }
+
+        if (!refreshCoordinator.tryAcquireLock()) {
+            return refreshCoordinator.skippedInProgressResponse();
+        }
+
+        try {
+            if (refreshCoordinator.isDebounced()) {
+                RefreshResponse debounced = refreshCoordinator.debouncedResponse();
+                if (debounced != null) {
+                    return debounced;
+                }
+            }
+
+            return executeRefresh();
+        } catch (DemandServiceUnavailableException ex) {
+            refreshCoordinator.markDegraded(ex.getMessage());
+            throw ex;
+        } finally {
+            refreshCoordinator.releaseLock();
+        }
+    }
+
+    private void refreshForViewer() {
+        if (!SkillGapAuthContext.hasAuthorization()) {
+            throw new DemandServiceUnavailableException(
+                    "Authentication is required to load the skill gap heatmap.");
+        }
+        refresh();
+    }
+
+    private RefreshResponse executeRefresh() {
+        List<DemandResponse> demands = demandProvider.getOpenDemands();
+        List<EngineerResponse> engineers = workforceProvider.getBenchEngineers();
+
+        Map<String, Integer> demandCounts = buildDemandSkillMap(demands);
+        Map<String, Integer> benchCounts = buildBenchSkillMap(engineers);
+
+        Set<String> allSkills = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        allSkills.addAll(demandCounts.keySet());
+        allSkills.addAll(benchCounts.keySet());
+
+        LocalDateTime snapshotTime = LocalDateTime.now();
+        Map<String, Integer> previousGapScores = snapshotWriter.fetchPreviousGapScores();
+
+        List<SkillGapAnalytics> rows = new ArrayList<>(allSkills.size());
+
+        for (String skill : allSkills) {
+            int demandCount = demandCounts.getOrDefault(skill, 0);
+            int benchCount = benchCounts.getOrDefault(skill, 0);
+            int gapScore = Math.max(demandCount - benchCount, 0);
+
+            rows.add(SkillGapAnalytics.builder()
+                    .skillName(skill)
+                    .demandCount(demandCount)
+                    .benchCount(benchCount)
+                    .gapScore(gapScore)
+                    .gapLevel(determineGapLevel(gapScore))
+                    .trendDirection(determineTrend(skill, gapScore, previousGapScores))
+                    .calculatedAt(snapshotTime)
+                    .build());
+        }
+
+        snapshotWriter.persistSnapshot(rows, snapshotTime, retentionDays);
+
+        RefreshResponse response = RefreshResponse.builder()
+                .status("SUCCESS")
+                .processedSkills(rows.size())
+                .refreshedAt(snapshotTime)
+                .build();
+
+        refreshCoordinator.markSuccess(response);
+        log.debug("[SKILL-GAP] Refresh complete — {} skills.", rows.size());
+        return response;
+    }
+
+    private SkillGapResponse buildSkillGapResponse() {
         List<SkillGapAnalytics> latestSnapshot = queryRepository.getLatestSnapshot();
 
         if (latestSnapshot.isEmpty()) {
@@ -64,9 +166,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                 .build();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public SkillGapSummaryResponse getSummary() {
+    private SkillGapSummaryResponse buildSummaryResponse() {
         List<SkillGapAnalytics> latestSnapshot = queryRepository.getLatestSnapshot();
 
         if (latestSnapshot.isEmpty()) {
@@ -74,9 +174,9 @@ public class SkillGapServiceImpl implements SkillGapService {
         }
 
         long critical = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.CRITICAL).count();
-        long high     = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.HIGH).count();
-        long medium   = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.MEDIUM).count();
-        long low      = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.LOW).count();
+        long high = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.HIGH).count();
+        long medium = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.MEDIUM).count();
+        long low = latestSnapshot.stream().filter(s -> s.getGapLevel() == GapLevel.LOW).count();
 
         return SkillGapSummaryResponse.builder()
                 .totalSkills(latestSnapshot.size())
@@ -90,9 +190,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                 .build();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public SkillTrendResponse getTrends() {
+    private SkillTrendResponse buildTrendResponse() {
         List<SkillGapAnalytics> twoSnapshots = queryRepository.findLatestTwoSnapshotsForAllSkills();
 
         if (twoSnapshots.isEmpty()) {
@@ -115,7 +213,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                 continue;
             }
 
-            SkillGapAnalytics current  = history.get(0);
+            SkillGapAnalytics current = history.get(0);
             SkillGapAnalytics previous = history.get(1);
 
             trends.add(SkillTrendDto.builder()
@@ -131,7 +229,7 @@ public class SkillGapServiceImpl implements SkillGapService {
 
         if (trends.isEmpty()) {
             throw new SkillGapDataNotFoundException(
-                    "Not enough snapshots to calculate trends. Please run refresh at least twice.");
+                    "Not enough snapshots to calculate trends. Open the heatmap again after data changes.");
         }
 
         return SkillTrendResponse.builder()
@@ -142,83 +240,6 @@ public class SkillGapServiceImpl implements SkillGapService {
                 .build();
     }
 
-    // -------------------------------------------------------------------------
-    // Refresh — locking, debouncing, fail-loud demand fetch
-    // -------------------------------------------------------------------------
-
-    @Override
-    public RefreshResponse refresh() {
-        if (refreshCoordinator.isDebounced()) {
-            return refreshCoordinator.debouncedResponse();
-        }
-
-        if (!refreshCoordinator.tryAcquireLock()) {
-            return refreshCoordinator.skippedInProgressResponse();
-        }
-
-        try {
-            if (refreshCoordinator.isDebounced()) {
-                return refreshCoordinator.debouncedResponse();
-            }
-
-            return executeRefresh();
-        } catch (DemandServiceUnavailableException ex) {
-            refreshCoordinator.markDegraded(ex.getMessage());
-            log.error("[SKILL-GAP] Refresh failed — demand-service unavailable: {}", ex.getMessage());
-            throw ex;
-        } finally {
-            refreshCoordinator.releaseLock();
-        }
-    }
-
-    private RefreshResponse executeRefresh() {
-        List<DemandResponse> demands = demandProvider.getOpenDemands();
-        List<EngineerResponse> engineers = workforceProvider.getBenchEngineers();
-
-        Map<String, Integer> demandCounts = buildDemandSkillMap(demands);
-        Map<String, Integer> benchCounts  = buildBenchSkillMap(engineers);
-
-        Set<String> allSkills = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-        allSkills.addAll(demandCounts.keySet());
-        allSkills.addAll(benchCounts.keySet());
-
-        LocalDateTime snapshotTime = LocalDateTime.now();
-        Map<String, Integer> previousGapScores = snapshotWriter.fetchPreviousGapScores();
-
-        List<SkillGapAnalytics> rows = new ArrayList<>(allSkills.size());
-
-        for (String skill : allSkills) {
-            int demandCount = demandCounts.getOrDefault(skill, 0);
-            int benchCount  = benchCounts.getOrDefault(skill, 0);
-            int gapScore    = Math.max(demandCount - benchCount, 0);
-
-            rows.add(SkillGapAnalytics.builder()
-                    .skillName(skill)
-                    .demandCount(demandCount)
-                    .benchCount(benchCount)
-                    .gapScore(gapScore)
-                    .gapLevel(determineGapLevel(gapScore))
-                    .trendDirection(determineTrend(skill, gapScore, previousGapScores))
-                    .calculatedAt(snapshotTime)
-                    .build());
-        }
-
-        snapshotWriter.persistSnapshot(rows, snapshotTime, retentionDays);
-
-        RefreshResponse response = RefreshResponse.builder()
-                .status("SUCCESS")
-                .processedSkills(rows.size())
-                .refreshedAt(snapshotTime)
-                .build();
-
-        refreshCoordinator.markSuccess(response);
-        return response;
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
     private RuntimeException notFoundOrUnavailable() {
         if (refreshCoordinator.isDegraded()) {
             throw new DemandServiceUnavailableException(
@@ -226,7 +247,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                             + refreshCoordinator.getDegradedReason());
         }
         throw new SkillGapDataNotFoundException(
-                "No skill gap analytics available. Please run refresh.");
+                "No skill gap analytics available yet.");
     }
 
     private SkillGapRowDto mapToRow(SkillGapAnalytics entity) {
@@ -247,13 +268,17 @@ public class SkillGapServiceImpl implements SkillGapService {
         Map<String, Integer> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         for (DemandResponse demand : demands) {
-            if (demand == null || demand.getRequiredSkills() == null) continue;
+            if (demand == null || demand.getRequiredSkills() == null) {
+                continue;
+            }
 
             int headcount = resolveDemandHeadcount(demand);
 
             for (String skill : demand.getRequiredSkills()) {
                 String normalized = normalizeSkillName(skill);
-                if (normalized == null) continue;
+                if (normalized == null) {
+                    continue;
+                }
                 result.merge(normalized, headcount, Integer::sum);
             }
         }
@@ -269,11 +294,15 @@ public class SkillGapServiceImpl implements SkillGapService {
         Map<String, Integer> result = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         for (EngineerResponse engineer : engineers) {
-            if (engineer == null || engineer.getSkills() == null) continue;
+            if (engineer == null || engineer.getSkills() == null) {
+                continue;
+            }
 
             for (String skill : engineer.getSkills()) {
                 String normalized = normalizeSkillName(skill);
-                if (normalized == null) continue;
+                if (normalized == null) {
+                    continue;
+                }
                 result.merge(normalized, 1, Integer::sum);
             }
         }
@@ -281,24 +310,38 @@ public class SkillGapServiceImpl implements SkillGapService {
     }
 
     private String normalizeSkillName(String skill) {
-        if (skill == null) return null;
+        if (skill == null) {
+            return null;
+        }
         String normalized = skill.trim().replaceAll("\\s+", " ");
         return normalized.isEmpty() ? null : normalized;
     }
 
     private GapLevel determineGapLevel(int gapScore) {
-        if (gapScore >= 10) return GapLevel.CRITICAL;
-        if (gapScore >= 5)  return GapLevel.HIGH;
-        if (gapScore >= 2)  return GapLevel.MEDIUM;
+        if (gapScore >= 10) {
+            return GapLevel.CRITICAL;
+        }
+        if (gapScore >= 5) {
+            return GapLevel.HIGH;
+        }
+        if (gapScore >= 2) {
+            return GapLevel.MEDIUM;
+        }
         return GapLevel.LOW;
     }
 
     private TrendDirection determineTrend(String skill, int currentGap,
                                           Map<String, Integer> previousGapScores) {
         Integer previousGap = previousGapScores.get(skill);
-        if (previousGap == null) return TrendDirection.STABLE;
-        if (currentGap > previousGap) return TrendDirection.DOWN;
-        if (currentGap < previousGap) return TrendDirection.UP;
+        if (previousGap == null) {
+            return TrendDirection.STABLE;
+        }
+        if (currentGap > previousGap) {
+            return TrendDirection.DOWN;
+        }
+        if (currentGap < previousGap) {
+            return TrendDirection.UP;
+        }
         return TrendDirection.STABLE;
     }
 }

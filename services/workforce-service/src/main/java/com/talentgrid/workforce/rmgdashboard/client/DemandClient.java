@@ -19,7 +19,7 @@ public interface DemandClient {
 
     @GetMapping("/api/v1/demands")
     DemandSummaryPageResponse getDemandsByStatus(
-            @RequestParam("status") String status,
+            @RequestParam("statuses") String status,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "500") int size
     );

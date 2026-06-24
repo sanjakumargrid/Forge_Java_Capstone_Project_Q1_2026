@@ -11,13 +11,14 @@ import java.util.List;
 
 @FeignClient(
         name = "skillgap-demand-service",
-        url = "${demand-service.url:http://localhost:8082}"
+        url = "${demand-service.url:http://localhost:8082}",
+        configuration = SkillGapDemandFeignConfig.class
 )
 public interface DemandServiceClient {
 
     @GetMapping("/api/v1/demands")
-    DemandSummary.PagedResponse getDemandsByStatus(
-            @RequestParam("status") String status,
+    DemandSummary.PagedResponse getDemandsByStatuses(
+            @RequestParam(value = "statuses", required = false) List<String> statuses,
             @RequestParam(value = "size", defaultValue = "100") int size,
             @RequestParam(value = "page", defaultValue = "0") int page
     );

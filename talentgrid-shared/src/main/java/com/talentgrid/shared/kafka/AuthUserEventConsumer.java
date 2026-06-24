@@ -15,7 +15,7 @@ public class AuthUserEventConsumer {
 
     private final RedisTemplate<String, Object> objectRedisTemplate;
 
-    @KafkaListener(topics = "auth.user.updated", groupId = "${spring.application.name}", containerFactory = "kafkaListenerContainerFactory")
+    @KafkaListener(topics = "auth.user.updated", groupId = "${spring.application.name}", containerFactory = "authUserKafkaListenerContainerFactory")
     public void onUserUpdated(AuthUserUpdatedEvent event) {
 
         if (event == null || event.getUserId() == null) {

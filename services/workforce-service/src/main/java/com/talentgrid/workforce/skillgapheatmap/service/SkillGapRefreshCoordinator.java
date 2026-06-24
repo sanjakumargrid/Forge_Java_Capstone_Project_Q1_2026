@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Serialises refresh execution and debounces bursty Kafka triggers so only one
+ * Serialises refresh execution and debounces rapid UI reloads so only one
  * snapshot is calculated within the configured window.
  */
 @Slf4j
@@ -26,7 +26,6 @@ public class SkillGapRefreshCoordinator {
     private volatile RefreshResponse lastSuccessfulRefresh;
     private volatile boolean degraded;
     private volatile String degradedReason;
-    private volatile LocalDateTime degradedSince;
 
     public boolean tryAcquireLock() {
         return refreshLock.tryLock();
@@ -43,7 +42,7 @@ public class SkillGapRefreshCoordinator {
         if (last == null) {
             return null;
         }
-        log.info("[SKILL-GAP] Refresh debounced — last successful refresh was {}s ago.",
+        log.debug("[SKILL-GAP] Refresh debounced — last successful refresh was {}s ago.",
                 secondsSince(last.getRefreshedAt()));
         return RefreshResponse.builder()
                 .status("DEBOUNCED")
@@ -61,7 +60,7 @@ public class SkillGapRefreshCoordinator {
 
     public RefreshResponse skippedInProgressResponse() {
         RefreshResponse last = lastSuccessfulRefresh;
-        log.info("[SKILL-GAP] Refresh skipped — another refresh is already in progress.");
+        log.debug("[SKILL-GAP] Refresh skipped — another refresh is already in progress.");
         return RefreshResponse.builder()
                 .status("SKIPPED_IN_PROGRESS")
                 .processedSkills(last != null ? last.getProcessedSkills() : 0)
@@ -74,13 +73,11 @@ public class SkillGapRefreshCoordinator {
         lastSuccessfulRefreshAt = response.getRefreshedAt();
         degraded = false;
         degradedReason = null;
-        degradedSince = null;
     }
 
     public void markDegraded(String reason) {
         degraded = true;
         degradedReason = reason;
-        degradedSince = LocalDateTime.now();
     }
 
     public boolean isDegraded() {
@@ -89,10 +86,6 @@ public class SkillGapRefreshCoordinator {
 
     public String getDegradedReason() {
         return degradedReason;
-    }
-
-    public LocalDateTime getDegradedSince() {
-        return degradedSince;
     }
 
     private long secondsSince(LocalDateTime timestamp) {
