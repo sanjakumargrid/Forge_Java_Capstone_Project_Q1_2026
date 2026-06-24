@@ -98,7 +98,7 @@ public class GoogleOAuthTokenService {
 
             if (credential == null) {
                 throw new IllegalStateException(
-                        "Google OAuth not authorized. Open /api/google/oauth/authorize first."
+                        "Google OAuth not authorized. Open /api/v1/google/oauth/authorize first."
                 );
             }
 

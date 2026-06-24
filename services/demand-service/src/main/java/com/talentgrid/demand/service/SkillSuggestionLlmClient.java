@@ -1,15 +1,13 @@
 package com.talentgrid.demand.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.talentgrid.demand.client.GeminiAiClient;
-import com.talentgrid.demand.client.dto.gemini.GenerateContentRequest;
-import com.talentgrid.demand.client.dto.gemini.GenerateContentResponse;
+import com.talentgrid.demand.ai.AiTextGenerationOrchestrator;
+import com.talentgrid.demand.ai.AllAiProvidersFailedException;
 import com.talentgrid.demand.domain.entity.Skill;
 import com.talentgrid.demand.dto.response.AiSkillSuggestionResponse;
 import com.talentgrid.demand.dto.response.SkillDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,15 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SkillSuggestionLlmClient {
 
-    private final GeminiAiClient geminiAiClient;
+    private final AiTextGenerationOrchestrator aiTextGenerationOrchestrator;
     private final SkillSuggestionPromptBuilder promptBuilder;
     private final ObjectMapper objectMapper;
-
-    @Value("${gemini.api.key}")
-    private String apiKey;
-
-    @Value("${gemini.chat.model}")
-    private String chatModel;
 
     public AiSkillSuggestionResponse suggestSkills(
             String jobDescriptionText,
@@ -41,30 +33,24 @@ public class SkillSuggestionLlmClient {
         String systemPrompt = promptBuilder.buildSystemPrompt();
         String userPrompt = promptBuilder.buildUserPrompt(jobDescriptionText, jobTitle, level, experienceYears, candidates);
 
-        if (apiKey == null || apiKey.isBlank()) {
-            log.warn("Gemini API key is not set (GEMINI_API_KEY); returning empty skill suggestions");
+        if (candidates == null || candidates.isEmpty()) {
+            log.warn("No candidate skills provided — skipping LLM call");
             return new AiSkillSuggestionResponse(new ArrayList<>(), new ArrayList<>());
         }
 
-        GenerateContentRequest request = new GenerateContentRequest();
-        
-        GenerateContentRequest.Content systemInstruction = new GenerateContentRequest.Content(
-                "system", List.of(new GenerateContentRequest.Part(systemPrompt)));
-        request.setSystemInstruction(systemInstruction);
-
-        GenerateContentRequest.Content userContent = new GenerateContentRequest.Content(
-                "user", List.of(new GenerateContentRequest.Part(userPrompt)));
-        request.setContents(List.of(userContent));
-
-        String pathModel = chatModel.startsWith("models/") ? chatModel.substring(7) : chatModel;
-        GenerateContentResponse response = geminiAiClient.generateContent(pathModel, apiKey, request);
-
-        if (response == null || response.getCandidates() == null || response.getCandidates().isEmpty()) {
-            log.warn("Empty response from Gemini LLM");
+        String jsonContent;
+        try {
+            jsonContent = aiTextGenerationOrchestrator.generateContent(systemPrompt, userPrompt);
+        } catch (AllAiProvidersFailedException e) {
+            log.warn("All AI text generation providers failed; returning empty skill suggestions: {}", e.getMessage());
             return new AiSkillSuggestionResponse(new ArrayList<>(), new ArrayList<>());
         }
 
-        String jsonContent = response.getCandidates().get(0).getContent().getParts().get(0).getText();
+        if (jsonContent == null || jsonContent.isBlank()) {
+            log.warn("Empty response from AI LLM");
+            return new AiSkillSuggestionResponse(new ArrayList<>(), new ArrayList<>());
+        }
+
         try {
             // Strip potential markdown code block syntax if present
             if (jsonContent.startsWith("```json")) {
@@ -73,7 +59,7 @@ public class SkillSuggestionLlmClient {
                     jsonContent = jsonContent.substring(0, jsonContent.length() - 3);
                 }
             }
-            
+
             AiSkillSuggestionResponse suggestion = objectMapper.readValue(jsonContent, AiSkillSuggestionResponse.class);
             return validateAgainstCandidates(suggestion, candidates);
         } catch (Exception e) {
@@ -109,7 +95,7 @@ public class SkillSuggestionLlmClient {
 
         return new AiSkillSuggestionResponse(validMandatory, validOptional);
     }
-    
+
     private boolean containsId(List<SkillDto> list, Long id) {
         return list.stream().anyMatch(s -> s.getSkillId().equals(id));
     }

@@ -56,6 +56,8 @@ public class AdminUserServiceImpl implements AdminUserService {
             throw new RuntimeException("Username already exists");
         }
 
+        Role.requireAllowedName(request.getRole());
+
         Role role = roleRepository.findByName(request.getRole().toUpperCase())
                 .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRole()));
 
@@ -156,6 +158,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Role.requireAllowedName(request.getRoleName());
 
         Role role = roleRepository.findByName(request.getRoleName().toUpperCase())
                 .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRoleName()));

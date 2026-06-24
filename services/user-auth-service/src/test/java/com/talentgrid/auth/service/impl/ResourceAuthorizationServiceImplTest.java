@@ -1,6 +1,5 @@
 package com.talentgrid.auth.service.impl;
 
-import com.talentgrid.auth.constants.RoleConstants;
 import com.talentgrid.auth.entity.Account;
 import com.talentgrid.auth.entity.Project;
 import com.talentgrid.auth.repository.AccountRepository;
@@ -48,7 +47,7 @@ class ResourceAuthorizationServiceImplTest {
 
     @Test
     void isAdminReturnsTrueWhenJwtHasAdminRole() {
-        authenticate(1L, List.of(RoleConstants.toAuthority(RoleConstants.ADMIN)));
+        authenticate(1L, List.of("ROLE_ADMIN"));
         assertTrue(authorizationService.isAdmin());
     }
 
@@ -72,13 +71,13 @@ class ResourceAuthorizationServiceImplTest {
 
     @Test
     void canManageProjectAllowsAdminWithoutDbLookup() {
-        authenticate(1L, List.of(RoleConstants.toAuthority(RoleConstants.ADMIN)));
+        authenticate(1L, List.of("ROLE_ADMIN"));
         assertTrue(authorizationService.canManageProject(99L));
     }
 
     @Test
     void canManageProjectAllowsAccountManagerOfOwningAccount() {
-        authenticate(10L, List.of("ROLE_PROJECT_MANAGER"));
+        authenticate(10L, List.of("ROLE_PORTFOLIO_MANAGER"));
 
         Account account = Account.builder()
                 .id(5L)

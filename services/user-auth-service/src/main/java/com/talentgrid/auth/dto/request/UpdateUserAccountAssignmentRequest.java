@@ -22,6 +22,6 @@ public class UpdateUserAccountAssignmentRequest {
     /** Optional project scope for the assignment. */
     private Long projectId;
 
-    /** Optional role name to assign to the user (e.g. PROJECT_MANAGER). */
+    /** Optional role name to assign to the user (e.g. PORTFOLIO_MANAGER). */
     private String roleName;
 }

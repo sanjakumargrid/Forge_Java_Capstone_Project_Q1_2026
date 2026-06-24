@@ -9,14 +9,14 @@ import com.talentgrid.auth.dto.response.UserSummaryResponse;
 public interface UserLookupService {
 
   /**
-   * Returns the RMG responsible for the given location.
+   * Returns the resource manager responsible for the given location.
    *
    * Example:
-   * Chennai -> Chennai RMG
-   * Bangalore -> Bangalore RMG
+   * Chennai -> Chennai resource manager
+   * Bangalore -> Bangalore resource manager
    *
    * @param location employee/project/demand location
-   * @return RMG user summary
+   * @return resource manager user summary
    */
   UserSummaryResponse getRmgByLocation(String location);
 }

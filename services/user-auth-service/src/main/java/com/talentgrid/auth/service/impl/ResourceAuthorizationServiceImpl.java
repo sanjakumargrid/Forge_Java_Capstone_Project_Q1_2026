@@ -1,6 +1,5 @@
 package com.talentgrid.auth.service.impl;
 
-import com.talentgrid.auth.constants.RoleConstants;
 import com.talentgrid.auth.repository.AccountRepository;
 import com.talentgrid.auth.repository.ProjectRepository;
 import com.talentgrid.auth.security.CachedUserPrincipal;
@@ -52,10 +51,9 @@ public class ResourceAuthorizationServiceImpl implements ResourceAuthorizationSe
             return false;
         }
 
-        String adminAuthority = RoleConstants.toAuthority(RoleConstants.ADMIN);
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(adminAuthority::equals);
+                .anyMatch("ROLE_ADMIN"::equals);
     }
 
     /**

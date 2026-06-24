@@ -151,7 +151,7 @@ public class DemandQueryService {
                         ));
                     }
                 } else if (SecurityUtils.isEmployee()) {
-                    predicates.add(cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL));
+                    predicates.add(root.get("status").in(DemandStatus.OPEN_EXTERNAL, DemandStatus.INTERNAL_SEARCH));
                 } else if (SecurityUtils.isPortfolioManager()) {
                     predicates.add(cb.or(
                             cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),
@@ -220,6 +220,36 @@ public class DemandQueryService {
             return List.of();
         }
         return demandMapper.toHistoryResponseList(histories);
+    }
+
+    /**
+     * Returns the mandatory and optional skills required for a demand.
+     *
+     * @param id the demand ID
+     * @return demand skills response containing mandatory and optional skills
+     * @throws DemandNotFoundException if the demand does not exist
+     */
+    public com.talentgrid.demand.dto.response.DemandSkillsResponse getDemandSkills(Long id) {
+        Demand demand = demandRepository.findByDemandIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new DemandNotFoundException(
+                        "Demand not found with id: " + id));
+
+        com.talentgrid.demand.dto.response.DemandSkillsResponse response = new com.talentgrid.demand.dto.response.DemandSkillsResponse();
+        response.setDemandId(demand.getDemandId());
+        response.setTitle(demand.getTitle());
+
+        if (demand.getDemandSkills() != null) {
+            response.setMandatorySkills(demand.getDemandSkills().stream()
+                    .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new com.talentgrid.demand.dto.response.SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .toList());
+            response.setOptionalSkills(demand.getDemandSkills().stream()
+                    .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new com.talentgrid.demand.dto.response.SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .toList());
+        }
+
+        return response;
     }
 
     // ─── Private helpers ─────────────────────────────────────────────────────────

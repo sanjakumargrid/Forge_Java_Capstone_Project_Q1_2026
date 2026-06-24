@@ -14,7 +14,7 @@ public interface ResourceAuthorizationService {
     Long getCurrentUserId();
 
     /**
-     * @return {@code true} when the current user has the {@link com.talentgrid.auth.constants.RoleConstants#ADMIN} role
+     * @return {@code true} when the current user has the {@code ADMIN} role
      */
     boolean isAdmin();
 

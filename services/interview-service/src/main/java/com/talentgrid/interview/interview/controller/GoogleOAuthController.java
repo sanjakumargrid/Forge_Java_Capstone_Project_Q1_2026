@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
 @RestController
-@RequestMapping("/api/google/oauth")
+@RequestMapping("/api/v1/google/oauth")
 @ConditionalOnProperty(name = "google.calendar.auth-mode", havingValue = "oauth")
 public class GoogleOAuthController {
 
@@ -41,7 +41,7 @@ public class GoogleOAuthController {
         }
         if (code == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Missing authorization code. Please restart the authorization flow at /api/google/oauth/authorize");
+                    .body("Missing authorization code. Please restart the authorization flow at /api/v1/google/oauth/authorize");
         }
         
         try {

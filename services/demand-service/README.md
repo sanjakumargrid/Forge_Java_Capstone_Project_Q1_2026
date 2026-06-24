@@ -144,7 +144,7 @@ Role names used in code checks: `ADMIN`, `PORTFOLIO_MANAGER` (legacy alias `PROJ
 | Method | Endpoint | Description |
 |:---|:---|:---|
 | `POST` | `/api/v1/demands/{id}/submit` | HM submits for PM approval, or PM auto-approves from `DRAFT`. |
-| `POST` | `/api/v1/demands/{id}/approve` | Project **PM** for that demand's `projectId` only (`DEMAND_PM_APPROVE`); same checks as `PUT /api/v1/project-manager/demands/{id}/approve`. |
+| `POST` | `/api/v1/demands/{id}/approve` | Project **PM** for that demand's `projectId` only (`DEMAND_PM_APPROVE`); same checks as `PUT /api/v1/portfolio-manager/demands/{id}/approve`. |
 | `PATCH` | `/api/v1/demands/{id}/status` | Trigger a state transition. Expects `targetStatus` and optional `comments`/`closureReason`. |
 | `GET` | `/api/v1/demands/{id}/pipeline` | Retrieves the real-time split of internal/external recruiting counts and status audit trails. |
 | `GET` | `/api/v1/demands/{id}/history` | Retrieves the chronological timeline (audit trail) of status modifications. |

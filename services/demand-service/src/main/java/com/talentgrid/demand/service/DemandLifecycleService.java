@@ -50,7 +50,7 @@ public class DemandLifecycleService {
      * Approve or reject a demand in {@code PENDING_APPROVAL}.
      * Only the portfolio manager for the demand's {@code projectId} may act
      * (platform {@code ADMIN} may override).
-     * <p>Convenience alias for {@code POST /api/v1/demands/{id}/approve}; prefer {@code PUT /api/v1/project-manager/demands/{id}/approve} if you split routes by persona.
+     * <p>Convenience alias for {@code POST /api/v1/demands/{id}/approve}; prefer {@code PUT /api/v1/portfolio-manager/demands/{id}/approve} if you split routes by persona.
      */
     @Transactional
     public DemandResponse approve(Long id, ApprovalRequest request) {
@@ -59,7 +59,7 @@ public class DemandLifecycleService {
 
     @Transactional
     public DemandResponse approveAsProjectManager(Long id, ApprovalRequest request) {
-        return approveAsProjectManager(id, request, "/api/v1/project-manager/demands/" + id + "/approve");
+        return approveAsProjectManager(id, request, "/api/v1/portfolio-manager/demands/" + id + "/approve");
     }
 
     @Transactional

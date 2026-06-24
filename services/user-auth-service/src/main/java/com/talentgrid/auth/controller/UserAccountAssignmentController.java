@@ -1,6 +1,5 @@
 package com.talentgrid.auth.controller;
 
-import com.talentgrid.auth.constants.RoleConstants;
 import com.talentgrid.auth.dto.request.CreateUserAccountAssignmentRequest;
 import com.talentgrid.auth.dto.request.UpdateUserAccountAssignmentRequest;
 import com.talentgrid.auth.dto.response.UserAccountAssignmentResponse;
@@ -31,7 +30,7 @@ public class UserAccountAssignmentController {
      * POST /api/v1/assignments
      */
     @PostMapping
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserAccountAssignmentResponse> createAssignment(
             @Valid @RequestBody CreateUserAccountAssignmentRequest request
     ) {
@@ -44,7 +43,7 @@ public class UserAccountAssignmentController {
      * GET /api/v1/assignments/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserAccountAssignmentResponse> getAssignmentById(@PathVariable Long id) {
         return ResponseEntity.ok(assignmentService.getAssignmentById(id));
     }
@@ -55,7 +54,7 @@ public class UserAccountAssignmentController {
      * GET /api/v1/assignments
      */
     @GetMapping
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserAccountAssignmentResponse>> getAllAssignments() {
         return ResponseEntity.ok(assignmentService.getAllAssignments());
     }
@@ -66,7 +65,7 @@ public class UserAccountAssignmentController {
      * PUT /api/v1/assignments/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserAccountAssignmentResponse> updateAssignment(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserAccountAssignmentRequest request
@@ -80,7 +79,7 @@ public class UserAccountAssignmentController {
      * DELETE /api/v1/assignments/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('" + RoleConstants.ADMIN + "')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
         assignmentService.deleteAssignment(id);
         return ResponseEntity.noContent().build();

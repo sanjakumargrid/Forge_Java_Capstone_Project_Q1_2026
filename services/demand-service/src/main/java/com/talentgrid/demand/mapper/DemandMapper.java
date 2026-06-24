@@ -181,7 +181,10 @@ public class DemandMapper {
         DemandSummaryResponse response = new DemandSummaryResponse();
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
+        response.setAccountId(demand.getAccountId());
         response.setAccountName(demand.getAccountName());
+        response.setProjectId(demand.getProjectId());
+        response.setProjectName(demand.getProjectName());
         response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
         response.setEmploymentType(enumName(demand.getEmploymentType()));
         response.setLocation(demand.getLocation());
@@ -190,11 +193,24 @@ public class DemandMapper {
         response.setBusinessUnit(demand.getBusinessUnit());
         response.setIsFilled(demand.getIsFilled());
         response.setCreatedAt(demand.getCreatedAt());
+        response.setTargetDate(demand.getTargetDate());
 
         // Compute age in days
         if (demand.getCreatedAt() != null) {
             long days = ChronoUnit.DAYS.between(demand.getCreatedAt(), OffsetDateTime.now());
             response.setAgeInDays(days);
+        }
+
+        // Map mandatory/optional skills into the lightweight summary response as well
+        if (demand.getDemandSkills() != null) {
+            response.setMandatorySkills(demand.getDemandSkills().stream()
+                    .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
+            response.setOptionalSkills(demand.getDemandSkills().stream()
+                    .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                    .map(ds -> new SkillDto(ds.getSkill().getSkillId(), ds.getSkill().getSkillName()))
+                    .collect(Collectors.toList()));
         }
 
         return response;

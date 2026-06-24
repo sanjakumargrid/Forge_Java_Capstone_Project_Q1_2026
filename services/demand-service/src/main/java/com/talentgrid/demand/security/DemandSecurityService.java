@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * Custom Spring Security component for evaluating data-level (scoped) permissions.
+ * Custom Spring Security component for evaluating data-level (scoped)
+ * permissions.
  */
 @Component("demandSecurity")
 public class DemandSecurityService {
@@ -79,14 +80,14 @@ public class DemandSecurityService {
             return true;
         }
 
-        if (SecurityUtils.hasAnyRole(SecurityUtils.ROLE_RECRUITER)) {
+        if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL
                     || status == DemandStatus.FILLED
                     || status == DemandStatus.CLOSED;
         }
 
         if (SecurityUtils.isEmployee()) {
-            return status == DemandStatus.OPEN_EXTERNAL;
+            return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.INTERNAL_SEARCH;
         }
 
         if (SecurityUtils.isHiringManager()) {
@@ -113,7 +114,8 @@ public class DemandSecurityService {
     }
 
     /**
-     * True when the caller may call PATCH /status for this demand (fine-grained checks also run in service).
+     * True when the caller may call PATCH /status for this demand (fine-grained
+     * checks also run in service).
      */
     public boolean canTransition(Long demandId) {
         if (SecurityUtils.isPlatformAdmin()) {

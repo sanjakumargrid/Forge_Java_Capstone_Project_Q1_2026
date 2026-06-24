@@ -13,7 +13,12 @@ import org.springframework.data.repository.query.Param;
 public interface SkillRepository extends JpaRepository<Skill, Long> {
     List<Skill> findAllByOrderBySkillNameAsc();
 
-    @Query(value = "SELECT * FROM skills ORDER BY embedding <=> CAST(:vector AS vector) LIMIT :limit", nativeQuery = true)
+    @Query(value = """
+            SELECT * FROM skills
+            WHERE embedding IS NOT NULL
+            ORDER BY embedding <=> CAST(:vector AS vector(768))
+            LIMIT :limit
+            """, nativeQuery = true)
     List<Skill> findNearestSkills(@Param("vector") String vector, @Param("limit") int limit);
 
     List<Skill> findAllByEmbeddingIsNotNull();

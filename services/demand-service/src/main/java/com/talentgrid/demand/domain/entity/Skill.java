@@ -1,6 +1,14 @@
 package com.talentgrid.demand.domain.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.Array;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * JPA entity representing a skill in the skills lookup table.
@@ -17,7 +25,9 @@ public class Skill {
     @Column(name = "skill_name", nullable = false, unique = true, length = 255)
     private String skillName;
 
-    @Column(name = "embedding", columnDefinition = "real[]")
+    @JdbcTypeCode(SqlTypes.VECTOR)
+    @Array(length = 768)
+    @Column(name = "embedding", columnDefinition = "vector(768)")
     private float[] embedding;
 
     @Column(name = "embedding_updated_at")

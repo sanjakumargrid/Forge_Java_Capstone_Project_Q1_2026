@@ -120,7 +120,7 @@ class DemandLifecycleServicePmApprovalTest {
 
         ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
         verify(auditLogClient).logAction(auditCap.capture());
-        assertTrue(auditCap.getValue().getEndpoint().contains("/api/v1/project-manager/demands/7/approve"));
+        assertTrue(auditCap.getValue().getEndpoint().contains("/api/v1/portfolio-manager/demands/7/approve"));
     }
 
     @Test

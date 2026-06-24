@@ -12,6 +12,7 @@ import com.talentgrid.auth.jwt.JwtService;
 import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
+import com.talentgrid.auth.oauth.OAuthAuthorizationCodeService;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AuthService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
@@ -56,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtBlacklistService jwtBlacklistService;
     private final UserCreatedEventPublisher userCreatedEventPublisher;
+    private final OAuthAuthorizationCodeService oauthAuthorizationCodeService;
 
 
     @Override
@@ -72,6 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
         String requestedRole =
                 request.getRole() != null ? request.getRole() : "EMPLOYEE";
+        Role.requireAllowedName(requestedRole);
 
         Role role = roleRepository.findByName(requestedRole.toUpperCase())
                 .orElseThrow(() ->
@@ -266,5 +269,48 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Override
+    @Transactional
+    public LoginResponse exchangeOAuthCode(String code, HttpServletResponse response) {
+        Long userId = oauthAuthorizationCodeService.consumeCode(code)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired OAuth code"));
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!Boolean.TRUE.equals(user.getEnabled())) {
+            throw new RuntimeException("Account disabled. Please contact administrator.");
+        }
+
+        if (Boolean.TRUE.equals(user.getAccountLocked())) {
+            throw new RuntimeException("Account locked. Try again later.");
+        }
+
+        userSecurityCacheService.cacheUser(user);
+
+        String accessToken = jwtService.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        ResponseCookie refreshCookie = ResponseCookie
+                .from("refreshToken", refreshToken.getToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .sameSite("Strict")
+                .maxAge(jwtService.getRefreshExpiration() / 1000)
+                .build();
+
+        response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .type("Bearer")
+                .email(user.getEmail())
+                .roles(user.getRoles()
+                        .stream()
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
+                .build();
+    }
 
 }
