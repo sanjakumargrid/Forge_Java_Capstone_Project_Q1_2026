@@ -158,6 +158,12 @@ spring:
                 - "Path=/api/v1/ai/candidates/**, /talentgrid/ai/candidates/**"
               filters:
                 - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: ai-engine
+              uri: http://${CANDIDATE_SERVICE_HOST:localhost}:${CANDIDATE_SERVICE_PORT:8085}
+              predicates:
+                - "Path=/api/v1/aiengine/**, /talentgrid/aiengine/**"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
             - id: candidate-service
               uri: http://${CANDIDATE_SERVICE_HOST:localhost}:${CANDIDATE_SERVICE_PORT:8085}
               predicates:

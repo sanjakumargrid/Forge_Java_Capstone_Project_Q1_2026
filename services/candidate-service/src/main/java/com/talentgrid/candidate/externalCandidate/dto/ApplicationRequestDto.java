@@ -9,7 +9,7 @@ public class ApplicationRequestDto {
 
     private Long candidateId;
 
-    private Long demandId;
+    private Long jobPostingId;
 
     private String source;
 

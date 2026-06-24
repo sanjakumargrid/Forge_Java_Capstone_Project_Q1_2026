@@ -28,10 +28,7 @@ public class JobPostingClient {
                     .block();
 
         } catch (WebClientResponseException.NotFound ex) {
-            throw new BusinessException(
-                    HttpStatus.NOT_FOUND,
-                    "Job posting not found with id: " + jobPostingId
-            );
+            return null;
 
         } catch (WebClientResponseException ex) {
             throw new BusinessException(

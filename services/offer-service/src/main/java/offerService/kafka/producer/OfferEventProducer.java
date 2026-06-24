@@ -168,22 +168,22 @@ public class OfferEventProducer {
             Offer offer
     ) {
 
-        Long demandId = null;
+        Long jobPostingId = null;
         try {
             if (offer.getApplicationId() != null) {
                 ApplicationDto app = applicationClient.getApplication(offer.getApplicationId());
                 if (app != null) {
-                    demandId = app.getDemandId();
+                    jobPostingId = app.getJobPostingId();
                 }
             }
         } catch (Exception e) {
-            log.warn("Failed to fetch demandId for applicationId: {}", offer.getApplicationId(), e);
+            log.warn("Failed to fetch jobPostingId for applicationId: {}", offer.getApplicationId(), e);
         }
 
         return OfferPayload.builder()
                 .offerId(offer.getId())
                 .applicationId(offer.getApplicationId())
-                .demandId(demandId)
+                .demandId(jobPostingId)
                 .role(offer.getRole())
                 .baseSalary(offer.getBaseSalary())
                 .bonus(offer.getBonus())

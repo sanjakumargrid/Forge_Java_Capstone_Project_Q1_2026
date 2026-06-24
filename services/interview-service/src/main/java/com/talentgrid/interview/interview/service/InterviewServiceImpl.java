@@ -165,7 +165,7 @@ public class InterviewServiceImpl implements InterviewService {
                                 savedInterview.getInterviewId().toString(),
                                 "INTERVIEW",
                                 "HIGH",
-                                "interview-invitation",
+                                "interviewer-invitation",
                                 Map.of(
                                         "candidateName", candidateName,
                                         "companyName", "Grid Dynamics",

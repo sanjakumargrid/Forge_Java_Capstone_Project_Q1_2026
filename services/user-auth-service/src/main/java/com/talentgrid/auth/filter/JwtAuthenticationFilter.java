@@ -108,23 +108,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             Long userId = Long.valueOf(jwtService.extractUserId(jwtToken));
-            Long jwtVersion = jwtService.extractAuthVersion(jwtToken);
-            CachedUserContext cachedUser = userSecurityCacheService.getUser(userId);
+            CachedUserContext cachedUser = null;
+            if (userId != 0L) {
+                Long jwtVersion = jwtService.extractAuthVersion(jwtToken);
+                cachedUser = userSecurityCacheService.getUser(userId);
 
-            if (cachedUser == null) {
-                // Cache miss - require re-login rather than silently falling through
-                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Session expired. Please login again.");
-                return;
-            }
-            
-            if (!Boolean.TRUE.equals(cachedUser.getEnabled())) {
-                sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Account has been disabled.");
-                return;
-            }
+                if (cachedUser == null) {
+                    // Cache miss - require re-login rather than silently falling through
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Session expired. Please login again.");
+                    return;
+                }
+                
+                if (!Boolean.TRUE.equals(cachedUser.getEnabled())) {
+                    sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Account has been disabled.");
+                    return;
+                }
 
-            if (!cachedUser.getAuthVersion().equals(jwtVersion)) {
-                sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization changed. Please login again.");
-                return;
+                if (!cachedUser.getAuthVersion().equals(jwtVersion)) {
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authorization changed. Please login again.");
+                    return;
+                }
             }
 
             String userEmail = jwtService.extractEmail(jwtToken);
@@ -133,34 +136,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 Set<SimpleGrantedAuthority> authorities = new HashSet<>();
 
-                cachedUser.getRoles().forEach(role ->
-                        authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+                if (cachedUser != null) {
+                    cachedUser.getRoles().forEach(role ->
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
 
-                cachedUser.getScopes().forEach(scope ->
-                        authorities.add(new SimpleGrantedAuthority(scope)));
+                    cachedUser.getScopes().forEach(scope ->
+                            authorities.add(new SimpleGrantedAuthority(scope)));
 
-                CachedUserPrincipal principal = CachedUserPrincipal.builder()
-                        .userId(cachedUser.getUserId())
-                        .email(cachedUser.getEmail())
-                        .enabled(cachedUser.getEnabled())
-                        .authVersion(cachedUser.getAuthVersion())
-                        .build();
+                    CachedUserPrincipal principal = CachedUserPrincipal.builder()
+                            .userId(cachedUser.getUserId())
+                            .email(cachedUser.getEmail())
+                            .enabled(cachedUser.getEnabled())
+                            .authVersion(cachedUser.getAuthVersion())
+                            .build();
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                principal,
-                                null,
-                                authorities
-                        );
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    principal,
+                                    null,
+                                    authorities
+                            );
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
 
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    // For internal tokens (userId == 0), assign ROLE_SYSTEM
+                    authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
+                    
+                    CachedUserPrincipal principal = CachedUserPrincipal.builder()
+                            .userId(0L)
+                            .email(userEmail)
+                            .enabled(true)
+                            .authVersion(1L)
+                            .build();
+                            
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    principal,
+                                    null,
+                                    authorities
+                            );
+
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+
             }
-
         } catch (Exception e) {
             log.warn("JWT Authentication failed: {}", e.getMessage());
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired JWT");

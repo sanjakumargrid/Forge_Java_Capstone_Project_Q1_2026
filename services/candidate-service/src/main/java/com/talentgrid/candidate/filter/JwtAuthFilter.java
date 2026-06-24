@@ -65,14 +65,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             JwtPrincipal principal = jwtAuthenticationProvider.authenticate(token);
 
-            String redisKey = "auth:user:" + principal.getUserId();
-            Boolean exists = objectRedisTemplate.hasKey(redisKey);
+            if (principal.getUserId() != null && principal.getUserId() != 0) {
+                String redisKey = "auth:user:" + principal.getUserId();
+                Boolean exists = objectRedisTemplate.hasKey(redisKey);
 
-            if (!Boolean.TRUE.equals(exists)) {
-                SecurityContextHolder.clearContext();
-                sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
-                        "Authorization changed. Please login again.");
-                return;
+                if (!Boolean.TRUE.equals(exists)) {
+                    SecurityContextHolder.clearContext();
+                    sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                            "Authorization changed. Please login again.");
+                    return;
+                }
             }
 
             Set<String> authorityNames = new LinkedHashSet<>();

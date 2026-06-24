@@ -43,6 +43,7 @@ public class SecurityConfig {
 
                         // PUBLIC for external candidate apply flow
                         .requestMatchers(HttpMethod.POST,
+                                "/api/v1/applications",
                                 "/api/applications",
                                 "/api/applications/",
                                 "/applications",

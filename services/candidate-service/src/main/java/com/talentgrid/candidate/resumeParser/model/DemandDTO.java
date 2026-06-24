@@ -8,7 +8,8 @@ import java.util.List;
 @Getter
 @Setter
 public class DemandDTO {
-    private Long demandId;
+    @com.fasterxml.jackson.annotation.JsonAlias("demandId")
+    private Long jobPostingId;
     private String title;
     private String description;
 

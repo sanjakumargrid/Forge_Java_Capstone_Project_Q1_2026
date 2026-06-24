@@ -24,13 +24,13 @@ public class WebClientConfig {
                 .build();
     }
 
-    @Bean
-    public WebClient demandWebClient(
-            @Value("${demand.service.url}") String demandServiceUrl,
+    @Bean(name = "jobPostingWebClient")
+    public WebClient jobPostingWebClient(
+            @Value("${job.service.url}") String jobServiceUrl,
             JwtTokenService jwtTokenService
     ) {
         return WebClient.builder()
-                .baseUrl(demandServiceUrl)
+                .baseUrl(jobServiceUrl)
                 .filter(authHeaderFilter(jwtTokenService))
                 .build();
     }

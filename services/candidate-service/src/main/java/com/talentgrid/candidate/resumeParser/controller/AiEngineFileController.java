@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/aiengine")
+@RequestMapping("/api/v1/aiengine")
 public class AiEngineFileController {
 
     private final ResumeParserService resumeParserService;
@@ -88,9 +88,9 @@ public class AiEngineFileController {
     }
 
     // Notice we REMOVED the applicationId parameter from the path and the inter-service call
-    @PostMapping("/evaluate/{demandId}")
+    @PostMapping("/evaluate/{jobPostingId}")
     public ResponseEntity<?> evaluate(
-            @PathVariable Long demandId,
+            @PathVariable Long jobPostingId,
             @RequestParam("file") MultipartFile file) {
 
         try {
@@ -104,7 +104,7 @@ public class AiEngineFileController {
                 throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid file type. Please upload a PDF, DOCX, or TXT file.");
             }
 
-            DemandDTO demand = demandServiceClient.fetchDemandById(demandId);
+            DemandDTO demand = demandServiceClient.fetchDemandById(jobPostingId);
 
             if (demand == null) {
                 throw new BusinessException(HttpStatus.NOT_FOUND, "Demand not found.");

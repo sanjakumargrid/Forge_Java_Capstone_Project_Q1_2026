@@ -314,7 +314,7 @@
 //            );
 //        }
 //
-//        if (dto.getDemandId() == null) {
+//        if (dto.getJobPostingId() == null) {
 //            throw new BusinessException(
 //                    HttpStatus.BAD_REQUEST,
 //                    "Demand ID is required for automatic application submission"
@@ -340,7 +340,7 @@
 //                new ApplicationRequestDto();
 //
 //        applicationRequest.setCandidateId(candidateId);
-//        applicationRequest.setDemandId(dto.getDemandId());
+//        applicationRequest.setJobPostingId(dto.getJobPostingId());
 //        applicationRequest.setSource(dto.getSource().name());
 //
 //        applicationRequest.setResumeFilePath(getResumeFilePath(dto));
@@ -741,7 +741,7 @@ public class ExternalCandidateService {
             );
         }
 
-        if (dto.getDemandId() == null) {
+        if (dto.getJobPostingId() == null) {
             throw new BusinessException(
                     HttpStatus.BAD_REQUEST,
                     "Demand ID is required for automatic application submission"
@@ -767,7 +767,7 @@ public class ExternalCandidateService {
                 new ApplicationRequestDto();
 
         applicationRequest.setCandidateId(candidateId);
-        applicationRequest.setDemandId(dto.getDemandId());
+        applicationRequest.setJobPostingId(dto.getJobPostingId());
         applicationRequest.setSource(dto.getSource().name());
 
         applicationRequest.setResumeFilePath(getResumeFilePath(dto));

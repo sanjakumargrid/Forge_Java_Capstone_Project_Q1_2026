@@ -47,14 +47,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Step 1 - Validate JWT signature, expiry, token type
             JwtPrincipal principal = jwtAuthenticationProvider.authenticate(token);
 
-            // Step 2 - Check Redis cache (evicted by Kafka consumer when admin changes something)
-            String redisKey = "auth:user:" + principal.getUserId();
-            Boolean exists = objectRedisTemplate.hasKey(redisKey);
-            if (!Boolean.TRUE.equals(exists)) {
-                // Cache was evicted — admin changed something — force re-login
-                sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
-                        "Authorization changed. Please login again.");
-                return;
+            if (principal.getUserId() != null && principal.getUserId() != 0) {
+                // Step 2 - Check Redis cache (evicted by Kafka consumer when admin changes something)
+                String redisKey = "auth:user:" + principal.getUserId();
+                Boolean exists = objectRedisTemplate.hasKey(redisKey);
+                if (!Boolean.TRUE.equals(exists)) {
+                    // Cache was evicted — admin changed something — force re-login
+                    sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
+                            "Authorization changed. Please login again.");
+                    return;
+                }
             }
 
             // Step 3 - Set security context (scopes + role names as authorities for @PreAuthorize)

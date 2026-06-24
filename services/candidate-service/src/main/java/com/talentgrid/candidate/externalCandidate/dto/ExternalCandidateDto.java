@@ -17,8 +17,12 @@ import java.util.List;
 @Setter
 public class ExternalCandidateDto {
 
-    @NotNull(message = "Demand ID is required for automatic application submission")
-    private Long demandId;
+    @com.fasterxml.jackson.annotation.JsonAlias({"id", "candidateId"})
+    private Long candidateId;
+
+    @NotNull(message = "Job Posting ID is required for automatic application submission")
+    @com.fasterxml.jackson.annotation.JsonAlias({"demandId", "demand_id", "job_id"})
+    private Long jobPostingId;
 
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 100, message = "First name must be between 1 and 100 characters")

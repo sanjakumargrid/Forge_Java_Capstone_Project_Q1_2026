@@ -1,14 +1,16 @@
 server:
-  port: 8082
+  port: ${JOB_SERVICE_PORT:8089}
 
 spring:
+  config:
+    import: optional:file:../../.env[.properties],optional:file:../.env[.properties]
   application:
     name: job-posting-service
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/job_posting_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/${DB_NAME:talentgrid}}
+    username: ${DB_USERNAME:talentgrid}
+    password: ${DB_PASSWORD:talentgrid}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2

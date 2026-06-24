@@ -9,6 +9,9 @@ rbac:
     - "/api/v1/jobs/public/**"
     - "/api/v1/webhooks/docusign"
     - "/api/v1/ai/careers/chat/**"
+    - "/api/v1/external-candidates"
+    - "/api/v1/applications"
+    - "/api/v1/aiengine/**"
     - /actuator/health
     - /actuator/info
 
@@ -199,10 +202,6 @@ rbac:
     # ═══════════════════════════════════════════
 
     # --- External candidates (candidate-service ExternalCandidateController) ---
-    - path: "/api/v1/external-candidates"
-      methods: [POST]
-      allowed-scopes: [CANDIDATE_CREATE]
-
     - path: "/api/v1/external-candidates/*"
       methods: [GET]
       allowed-scopes: [CANDIDATE_VIEW]
@@ -266,10 +265,6 @@ rbac:
     - path: "/api/v1/applications"
       methods: [GET]
       allowed-scopes: [APPLICATION_VIEW]
-
-    - path: "/api/v1/applications"
-      methods: [POST]
-      allowed-scopes: [APPLICATION_CREATE]
 
     - path: "/api/v1/applications/search"
       methods: [GET]

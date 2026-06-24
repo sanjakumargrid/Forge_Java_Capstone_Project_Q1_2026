@@ -11,7 +11,8 @@ public class ApplicationDto {
 
     private Long candidateId;
 
-    private Long demandId;
+    @com.fasterxml.jackson.annotation.JsonAlias("demandId")
+    private Long jobPostingId;
 
     private String currentStage;
 }

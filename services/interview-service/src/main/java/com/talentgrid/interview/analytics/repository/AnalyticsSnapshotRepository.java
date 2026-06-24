@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface AnalyticsSnapshotRepository extends JpaRepository<RecruitmentAnalyticsSnapshot, Long> {
 
-    Optional<RecruitmentAnalyticsSnapshot> findFirstByDemandIdOrderByCalculatedAtDesc(Long demandId);
+    Optional<RecruitmentAnalyticsSnapshot> findFirstByJobPostingIdOrderByCalculatedAtDesc(Long jobPostingId);
 
-    @Query("SELECT r FROM RecruitmentAnalyticsSnapshot r WHERE r.demandId IS NULL ORDER BY r.calculatedAt DESC LIMIT 1")
+    @Query("SELECT r FROM RecruitmentAnalyticsSnapshot r WHERE r.jobPostingId IS NULL ORDER BY r.calculatedAt DESC LIMIT 1")
     Optional<RecruitmentAnalyticsSnapshot> findLatestGlobalSnapshot();
 
     /**
@@ -39,9 +39,9 @@ public interface AnalyticsSnapshotRepository extends JpaRepository<RecruitmentAn
             AVG(EXTRACT(EPOCH FROM (offer_at - final_round_at))) / 86400 as avg_final_to_offer,
             AVG(EXTRACT(EPOCH FROM (hired_at - offer_at))) / 86400 as avg_offer_to_hired
         FROM application
-        WHERE (:demandId IS NULL OR demand_id = :demandId)
+        WHERE (:jobPostingId IS NULL OR demand_id = :jobPostingId)
     """, nativeQuery = true)
-    Map<String, Object> getRawLiveApplicationMetrics(@Param("demandId") Long demandId);
+    Map<String, Object> getRawLiveApplicationMetrics(@Param("jobPostingId") Long jobPostingId);
 
     /**
      * Calculates current offer sign-off completion metrics
@@ -52,7 +52,7 @@ public interface AnalyticsSnapshotRepository extends JpaRepository<RecruitmentAn
             COUNT(CASE WHEN offer_status = 'SIGNED' THEN 1 END) as signed_offers
         FROM offer o
         INNER JOIN application a ON o.application_id = a.application_id
-        WHERE (:demandId IS NULL OR a.demand_id = :demandId)
+        WHERE (:jobPostingId IS NULL OR a.demand_id = :jobPostingId)
     """, nativeQuery = true)
-    Map<String, Object> getRawLiveOfferMetrics(@Param("demandId") Long demandId);
+    Map<String, Object> getRawLiveOfferMetrics(@Param("jobPostingId") Long jobPostingId);
 }

@@ -18,10 +18,10 @@ public class AnalyticsService {
 
     private final AnalyticsSnapshotRepository snapshotRepository;
 
-    public AnalyticsResponse calculateLiveMetrics(Long demandId) {
+    public AnalyticsResponse calculateLiveMetrics(Long jobPostingId) {
         // 1. Fetch raw query blocks from the database
-        Map<String, Object> appMetrics = snapshotRepository.getRawLiveApplicationMetrics(demandId);
-        Map<String, Object> offerMetrics = snapshotRepository.getRawLiveOfferMetrics(demandId);
+        Map<String, Object> appMetrics = snapshotRepository.getRawLiveApplicationMetrics(jobPostingId);
+        Map<String, Object> offerMetrics = snapshotRepository.getRawLiveOfferMetrics(jobPostingId);
 
         // 2. Parse basic summary numbers
         long totalApplications = ((Number) Optional.ofNullable(appMetrics.get("total_apps")).orElse(0L)).longValue();
@@ -92,19 +92,19 @@ public class AnalyticsService {
         return Math.round(value * 10.0) / 10.0;
     }
 
-    public AnalyticsResponse getHistoricalSnapshot(Long demandId) {
+    public AnalyticsResponse getHistoricalSnapshot(Long jobPostingId) {
         // Fetch the most recent pre-cached snapshot from the reporting table.
-        // Global view (demandId == null) → latest snapshot with NULL demand_id.
-        // Demand-specific view → latest snapshot for that demand.
+        // Global view (jobPostingId == null) → latest snapshot with NULL demand_id.
+        // Demand-specific view → latest snapshot for that jobPostingId.
         java.util.Optional<com.talentgrid.interview.analytics.entity.RecruitmentAnalyticsSnapshot> snapshotOpt =
-                (demandId == null)
+                (jobPostingId == null)
                         ? snapshotRepository.findLatestGlobalSnapshot()
-                        : snapshotRepository.findFirstByDemandIdOrderByCalculatedAtDesc(demandId);
+                        : snapshotRepository.findFirstByJobPostingIdOrderByCalculatedAtDesc(jobPostingId);
 
         // If no snapshot has been pre-calculated yet, fall back to a live computation.
         // This prevents NullPointerExceptions on the frontend dashboard.
         if (snapshotOpt.isEmpty()) {
-            return calculateLiveMetrics(demandId);
+            return calculateLiveMetrics(jobPostingId);
         }
 
         com.talentgrid.interview.analytics.entity.RecruitmentAnalyticsSnapshot snapshot = snapshotOpt.get();
