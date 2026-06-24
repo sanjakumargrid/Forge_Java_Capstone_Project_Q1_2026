@@ -77,6 +77,32 @@ rbac:
       methods: [GET]
       allowed-scopes: [USER_VIEW, DEMAND_VIEW, DEMAND_CREATE, DEMAND_PM_APPROVE, DEMAND_STATUS_TRANSITION]
 
+    - path: "/api/v1/accounts"
+      methods: [POST]
+      allowed-roles: [ADMIN]
+
+    - path: "/api/v1/accounts/**"
+      methods: [PUT, DELETE]
+      allowed-roles: [ADMIN]
+
+    - path: "/api/v1/projects"
+      methods: [POST]
+      allowed-scopes: [DEMAND_CREATE, USER_VIEW]
+
+    - path: "/api/v1/projects/**"
+      methods: [PUT, DELETE]
+      allowed-roles: [ADMIN]
+
+    # --- Reference-data lookups (user-auth LookupController; demand form dropdowns) ---
+    - path: "/api/v1/lookup/**"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW, DEMAND_CREATE, DEMAND_UPDATE, USER_VIEW]
+
+    # --- User-account assignments (admin only) ---
+    - path: "/api/v1/assignments/**"
+      methods: [GET, POST, PUT, DELETE]
+      allowed-roles: [ADMIN]
+
     # --- Demands ---
     - path: "/api/v1/demands"
       methods: [GET]
@@ -126,6 +152,18 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
+    - path: "/api/v1/demands/**/skills"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/demands/ai-skill-suggestion"
+      methods: [POST]
+      allowed-scopes: [DEMAND_CREATE]
+
+    - path: "/api/v1/admin/ai-skill-suggestion-config"
+      methods: [GET, PUT]
+      allowed-scopes: [AI_SKILL_CONFIG_MANAGE]
+
     - path: "/api/v1/demands/**/submit"
       methods: [POST]
       allowed-scopes: [DEMAND_SUBMIT, DEMAND_PM_APPROVE]
@@ -159,6 +197,23 @@ rbac:
     # ═══════════════════════════════════════════
     # TEAM 2 — Talent Acquisition Engine
     # ═══════════════════════════════════════════
+
+    # --- External candidates (candidate-service ExternalCandidateController) ---
+    - path: "/api/v1/external-candidates"
+      methods: [POST]
+      allowed-scopes: [CANDIDATE_CREATE]
+
+    - path: "/api/v1/external-candidates/*"
+      methods: [GET]
+      allowed-scopes: [CANDIDATE_VIEW]
+
+    - path: "/api/v1/external-candidates/*"
+      methods: [PUT]
+      allowed-scopes: [CANDIDATE_UPDATE]
+
+    - path: "/api/v1/external-candidates/*"
+      methods: [DELETE]
+      allowed-scopes: [CANDIDATE_DELETE]
 
     # --- Candidates ---
     - path: "/api/v1/candidates"
@@ -207,7 +262,7 @@ rbac:
       methods: [GET]
       allowed-scopes: [ASYNC_JOB_VIEW]
 
-    # --- Applications ---
+    # --- Applications (application-service ApplicationController) ---
     - path: "/api/v1/applications"
       methods: [GET]
       allowed-scopes: [APPLICATION_VIEW]
@@ -216,9 +271,13 @@ rbac:
       methods: [POST]
       allowed-scopes: [APPLICATION_CREATE]
 
-    - path: "/api/v1/applications/bulk"
-      methods: [POST]
-      allowed-scopes: [APPLICATION_BULK_ACTION]
+    - path: "/api/v1/applications/search"
+      methods: [GET]
+      allowed-scopes: [APPLICATION_VIEW]
+
+    - path: "/api/v1/applications/bulk/export"
+      methods: [GET]
+      allowed-scopes: [APPLICATION_VIEW]
 
     - path: "/api/v1/applications/*"
       methods: [GET]
@@ -226,16 +285,32 @@ rbac:
 
     - path: "/api/v1/applications/**/stage"
       methods: [PATCH]
-      allowed-scopes: [APPLICATION_STAGE_MOVE]
+      allowed-scopes: [APPLICATION_UPDATE]
 
-    # --- Interviews ---
+    - path: "/api/v1/applications/**/timeline"
+      methods: [GET]
+      allowed-scopes: [APPLICATION_VIEW]
+
+    - path: "/api/v1/applications/**/ai-evaluation"
+      methods: [PATCH]
+      allowed-scopes: [APPLICATION_UPDATE]
+
+    - path: "/api/v1/applications/**/rejection-email-draft"
+      methods: [POST]
+      allowed-scopes: [APPLICATION_UPDATE]
+
+    - path: "/api/v1/applications/bulk/**"
+      methods: [POST]
+      allowed-scopes: [APPLICATION_UPDATE]
+
+    # --- Interviews (interview-service InterviewController) ---
     - path: "/api/v1/interviews"
       methods: [GET]
       allowed-scopes: [INTERVIEW_VIEW]
 
     - path: "/api/v1/interviews"
       methods: [POST]
-      allowed-scopes: [INTERVIEW_SCHEDULE]
+      allowed-scopes: [INTERVIEW_CREATE]
 
     - path: "/api/v1/interviews/summary"
       methods: [GET]
@@ -250,13 +325,35 @@ rbac:
       allowed-scopes: [INTERVIEW_VIEW]
 
     - path: "/api/v1/interviews/*"
-      methods: [PATCH]
+      methods: [PUT, PATCH]
       allowed-scopes: [INTERVIEW_UPDATE]
 
-    # --- Scorecards ---
+    - path: "/api/v1/interviews/*"
+      methods: [DELETE]
+      allowed-scopes: [INTERVIEW_DELETE]
+
+    # --- Interviewers ---
+    - path: "/api/v1/interviewers/**"
+      methods: [GET]
+      allowed-scopes: [INTERVIEW_VIEW]
+
+    - path: "/api/v1/interviewers/**"
+      methods: [POST]
+      allowed-scopes: [INTERVIEW_CREATE]
+
+    # --- Interview analytics (AnalyticsController) ---
+    - path: "/api/v1/analytics/live"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_PIPELINE_VIEW, ANALYTICS_DEMAND_VIEW]
+
+    - path: "/api/v1/analytics/snapshot"
+      methods: [GET]
+      allowed-scopes: [ANALYTICS_PIPELINE_VIEW, ANALYTICS_DEMAND_VIEW]
+
+    # --- Scorecards (ScorecardController) ---
     - path: "/api/v1/interviews/**/scorecards"
       methods: [POST]
-      allowed-scopes: [SCORECARD_SUBMIT]
+      allowed-scopes: [SCORECARD_CREATE, SCORECARD_SUBMIT]
 
     - path: "/api/v1/interviews/**/scorecards"
       methods: [GET]
@@ -266,22 +363,42 @@ rbac:
       methods: [GET]
       allowed-scopes: [SCORECARD_VIEW]
 
-    # --- Offers ---
+    - path: "/api/v1/scorecards/**"
+      methods: [GET, DELETE]
+      allowed-scopes: [SCORECARD_VIEW, SCORECARD_DELETE]
+
+    - path: "/api/v1/applications/**/scorecards"
+      methods: [GET]
+      allowed-scopes: [SCORECARD_VIEW]
+
+    # --- Offers (OfferController) ---
     - path: "/api/v1/offers"
       methods: [POST]
       allowed-scopes: [OFFER_CREATE]
+
+    - path: "/api/v1/offers"
+      methods: [GET]
+      allowed-scopes: [OFFER_VIEW]
 
     - path: "/api/v1/offers/*"
       methods: [GET]
       allowed-scopes: [OFFER_VIEW]
 
+    - path: "/api/v1/offers/*"
+      methods: [PUT, PATCH]
+      allowed-scopes: [OFFER_UPDATE]
+
+    - path: "/api/v1/offers/*"
+      methods: [DELETE]
+      allowed-scopes: [OFFER_DELETE]
+
     - path: "/api/v1/offers/**/approve"
       methods: [PATCH]
-      allowed-scopes: [OFFER_APPROVE]
+      allowed-scopes: [OFFER_UPDATE, OFFER_APPROVE]
 
     - path: "/api/v1/offers/**/reject"
       methods: [PATCH]
-      allowed-scopes: [OFFER_REJECT]
+      allowed-scopes: [OFFER_UPDATE, OFFER_REJECT]
 
     # --- GDPR ---
     - path: "/api/v1/gdpr/candidates/**/export"

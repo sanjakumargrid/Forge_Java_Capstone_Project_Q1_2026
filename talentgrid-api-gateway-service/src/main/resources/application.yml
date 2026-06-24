@@ -97,6 +97,18 @@ spring:
                 - "Path=/api/v1/accounts/**, /talentgrid/accounts/**"
               filters:
                 - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: user-auth-lookup
+              uri: http://${USER_AUTH_SERVICE_HOST:localhost}:${USER_AUTH_SERVICE_PORT:8081}
+              predicates:
+                - "Path=/api/v1/lookup/**, /talentgrid/lookup/**"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: user-auth-assignments
+              uri: http://${USER_AUTH_SERVICE_HOST:localhost}:${USER_AUTH_SERVICE_PORT:8081}
+              predicates:
+                - "Path=/api/v1/assignments/**, /talentgrid/assignments/**"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
             - id: demand-analytics
               uri: http://${DEMAND_SERVICE_HOST:localhost}:${DEMAND_SERVICE_PORT:8082}
               predicates:
@@ -151,6 +163,12 @@ spring:
                 - "Path=/api/v1/candidates/**, /talentgrid/candidates/**"
               filters:
                 - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: external-candidate-service
+              uri: http://${CANDIDATE_SERVICE_HOST:localhost}:${CANDIDATE_SERVICE_PORT:8085}
+              predicates:
+                - "Path=/api/v1/external-candidates/**, /talentgrid/external-candidates/**"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
             - id: gdpr-service
               uri: http://${CANDIDATE_SERVICE_HOST:localhost}:${CANDIDATE_SERVICE_PORT:8085}
               predicates:
@@ -169,6 +187,12 @@ spring:
                 - "Path=/api/v1/analytics/pipeline, /talentgrid/analytics/pipeline"
               filters:
                 - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: interview-analytics
+              uri: http://${INTERVIEW_SERVICE_HOST:localhost}:${INTERVIEW_SERVICE_PORT:8087}
+              predicates:
+                - "Path=/api/v1/analytics/live, /api/v1/analytics/snapshot, /talentgrid/analytics/live, /talentgrid/analytics/snapshot"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
             - id: application-service
               uri: http://${APPLICATION_SERVICE_HOST:localhost}:${APPLICATION_SERVICE_PORT:8086}
               predicates:
@@ -185,6 +209,12 @@ spring:
               uri: http://${INTERVIEW_SERVICE_HOST:localhost}:${INTERVIEW_SERVICE_PORT:8087}
               predicates:
                 - "Path=/api/v1/interviews/**, /talentgrid/interviews/**"
+              filters:
+                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+            - id: interview-interviewers
+              uri: http://${INTERVIEW_SERVICE_HOST:localhost}:${INTERVIEW_SERVICE_PORT:8087}
+              predicates:
+                - "Path=/api/v1/interviewers/**, /talentgrid/interviewers/**"
               filters:
                 - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
             - id: recruiter-calendar
