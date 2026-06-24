@@ -256,9 +256,9 @@ spring:
             - id: demand-ai-skills
               uri: http://${DEMAND_SERVICE_HOST:localhost}:${DEMAND_SERVICE_PORT:8082}
               predicates:
-                - "Path=/api/v1/ai/suggestions/skills, /talentgrid/ai/suggestions/skills"
+                - "Path=/api/v1/ai/suggestions/skills, /api/v1/demands/ai-skill-suggestion, /talentgrid/ai/suggestions/skills, /talentgrid/demands/ai-skill-suggestion"
               filters:
-                - "RewritePath=/(api/v1|talentgrid)/(?<segment>.*), /api/v1/${segment}"
+                - "RewritePath=/(api/v1|talentgrid)/(ai/suggestions/skills|demands/ai-skill-suggestion), /api/v1/demands/ai-skill-suggestion"
             - id: ai-match
               uri: http://${WORKFORCE_SERVICE_HOST:localhost}:${WORKFORCE_SERVICE_PORT:8091}
               predicates:

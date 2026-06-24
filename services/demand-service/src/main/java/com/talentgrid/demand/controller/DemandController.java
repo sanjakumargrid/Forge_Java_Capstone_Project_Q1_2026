@@ -118,7 +118,7 @@ public class DemandController {
      * @param id the demand ID
      * @return the full demand response
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandResponse> getDemandById(@PathVariable Long id) {
         return ResponseEntity.ok(demandQueryService.getDemandById(id));
@@ -133,7 +133,7 @@ public class DemandController {
      * @param request the partial update request
      * @return the updated demand response
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_UPDATE') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
     public ResponseEntity<DemandResponse> updateDemand(
             @PathVariable Long id, @RequestBody DemandRequest request) {
@@ -147,7 +147,7 @@ public class DemandController {
      * @param id the demand ID
      * @return HTTP 204 No Content on success
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_DELETE') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
     public ResponseEntity<Void> deleteDemand(@PathVariable Long id) {
         demandService.deleteDemand(id);

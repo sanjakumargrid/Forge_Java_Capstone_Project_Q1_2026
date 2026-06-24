@@ -134,6 +134,11 @@
             <artifactId>pgvector</artifactId>
             <version>0.1.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-vector</artifactId>
+            <version>6.6.49.Final</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -158,7 +158,7 @@ rbac:
 
     - path: "/api/v1/demands/ai-skill-suggestion"
       methods: [POST]
-      allowed-scopes: [DEMAND_CREATE]
+      allowed-scopes: [DEMAND_CREATE, AI_SKILL_SUGGEST]
 
     - path: "/api/v1/admin/ai-skill-suggestion-config"
       methods: [GET, PUT]
@@ -488,8 +488,8 @@ rbac:
       allowed-scopes: [AI_INTERACTION_VIEW]
 
     - path: "/api/v1/ai/suggestions/skills"
-      methods: [GET]
-      allowed-scopes: [AI_SKILL_SUGGEST]
+      methods: [POST]
+      allowed-scopes: [DEMAND_CREATE, AI_SKILL_SUGGEST]
 
     # ═══════════════════════════════════════════
     # TEAM 5 — Internal Workforce Allocation
