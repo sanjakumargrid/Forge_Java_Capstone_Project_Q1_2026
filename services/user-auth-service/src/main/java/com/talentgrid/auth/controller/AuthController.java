@@ -1,6 +1,7 @@
 package com.talentgrid.auth.controller;
 
 import com.talentgrid.auth.dto.request.LoginRequest;
+import com.talentgrid.auth.dto.request.OAuthTokenExchangeRequest;
 import com.talentgrid.auth.dto.request.RegisterRequest;
 import com.talentgrid.auth.dto.response.LoginResponse;
 import com.talentgrid.auth.dto.response.RegisterResponse;
@@ -71,6 +72,19 @@ public class AuthController {
      * @param response HTTP response to attach the refresh token cookie
      * @return response containing the JWT access token and user roles
      */
+    /**
+     * Exchanges a one-time Google OAuth code for JWT and refresh tokens.
+     *
+     * <p>Called by the SPA after the browser redirect from {@code /login/oauth2/code/google}.
+     */
+    @PostMapping("/oauth/token")
+    public ResponseEntity<LoginResponse> exchangeOAuthToken(
+            @Valid @RequestBody OAuthTokenExchangeRequest request,
+            HttpServletResponse response
+    ) {
+        return ResponseEntity.ok(authService.exchangeOAuthCode(request.getCode(), response));
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request,
