@@ -5,14 +5,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import offerService.kafka.producer.OfferEventProducer;
 import offerService.offer.client.ApplicationClient;
-import offerService.offer.dto.ApplicationDto;
-import offerService.offer.dto.ApprovalChainRequestDto;
-import offerService.offer.dto.ApprovalStep;
-import offerService.offer.dto.ApprovalStepDto;
-import offerService.offer.dto.DocuSignWebhookDto;
+import offerService.offer.client.CandidateClient;
+import offerService.offer.dto.*;
 import offerService.offer.entity.Offer;
 import offerService.offer.enums.Status;
 import offerService.offer.integration.DocuSignClient;
+import offerService.offer.integration.OfferDocumentService;
 import offerService.offer.repository.OfferRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +39,13 @@ public class OfferServiceImpl implements OfferService {
     private final ApplicationClient applicationClient;
 
 
+    private final CandidateClient candidateClient;
+
+
     private final DocuSignClient docuSignClient;
+
+
+    private final OfferDocumentService offerDocumentService;
 
 
     private final AuditLogClient auditLogClient;
@@ -82,6 +86,22 @@ public class OfferServiceImpl implements OfferService {
             );
         }
 
+        List<Offer> existingOffers = offerRepository.findByApplicationId(offer.getApplicationId());
+        boolean hasActiveOffer = existingOffers.stream()
+                .anyMatch(existing -> existing.getOfferStatus() != Status.REJECTED 
+                        && existing.getOfferStatus() != Status.EXPIRED);
+
+        if (hasActiveOffer) {
+            throw new IllegalStateException(
+                    "An active offer already exists for this application. Please update the existing offer or wait for it to be rejected/expired."
+            );
+        }
+
+        if (offer.getOfferStatus() == null) {
+            offer.setOfferStatus(Status.DRAFT);
+        }
+
+        Offer savedOffer = offerRepository.save(offer);
 
         if ("FINAL_ROUND".equalsIgnoreCase(currentStage)) {
             applicationClient.moveApplicationStage(
@@ -91,17 +111,7 @@ public class OfferServiceImpl implements OfferService {
             );
         }
 
-
-        if (offer.getOfferStatus() == null) {
-            offer.setOfferStatus(Status.DRAFT);
-        }
-
-
-        Offer savedOffer = offerRepository.save(offer);
-
-
         offerEventProducer.publishCreated(savedOffer);
-
 
         auditLogClient.logAction(
                 AuditLogPayload.builder()
@@ -113,14 +123,9 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers")
+                        .endpoint("/api/v1/offers")
                         .build()
         );
-
-
-
-
-
 
         return savedOffer;
     }
@@ -220,7 +225,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id)
+                        .endpoint("/api/v1/offers/" + id)
                         .build()
         );
 
@@ -248,7 +253,27 @@ public class OfferServiceImpl implements OfferService {
         }
 
 
-        String envelopeId = docuSignClient.createEnvelope(offer);
+        ApplicationDto application =
+                applicationClient.getApplication(
+                        offer.getApplicationId()
+                );
+
+        CandidateDto candidate =
+                candidateClient.getCandidate(
+                        application.getCandidateId()
+                );
+
+        byte[] pdf =
+                offerDocumentService.generateOfferPdf(
+                        offer
+                );
+
+        String envelopeId =
+                docuSignClient.createEnvelope(
+                        offer,
+                        candidate,
+                        pdf
+                );
 
 
         offer.setDocuSignId(envelopeId);
@@ -271,7 +296,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/send")
+                        .endpoint("/api/v1/offers/" + id + "/send")
                         .build()
         );
 
@@ -314,7 +339,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/accept")
+                        .endpoint("/api/v1/offers/" + id + "/accept")
                         .build()
         );
 
@@ -367,7 +392,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/reject")
+                        .endpoint("/api/v1/offers/" + id + "/reject")
                         .build()
         );
 
@@ -409,7 +434,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id + "/expire")
+                        .endpoint("/api/v1/offers/" + id + "/expire")
                         .build()
         );
 
@@ -434,7 +459,7 @@ public class OfferServiceImpl implements OfferService {
                         .entityId(offer.getId())
                         .action(AuditAction.DELETE)
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + id)
+                        .endpoint("/api/v1/offers/" + id)
                         .build()
         );
     }
@@ -537,7 +562,7 @@ public class OfferServiceImpl implements OfferService {
                                 "approvalSteps", savedOffer.getApprovalChain().size()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/approval-chain")
+                        .endpoint("/api/v1/offers/" + offerId + "/approval-chain")
                         .build()
         );
 
@@ -588,7 +613,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/submit-approval")
+                        .endpoint("/api/v1/offers/" + offerId + "/submit-approval")
                         .build()
         );
 
@@ -679,6 +704,8 @@ public class OfferServiceImpl implements OfferService {
 
         if (savedOffer.getOfferStatus() == Status.APPROVED) {
             offerEventProducer.publishApproved(savedOffer);
+        } else if (savedOffer.getOfferStatus() == Status.PENDING_APPROVAL) {
+            offerEventProducer.publishPendingNextApproval(savedOffer);
         }
 
 
@@ -692,7 +719,7 @@ public class OfferServiceImpl implements OfferService {
                                 "currentStep", savedOffer.getCurrentApprovalStep()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/approve")
+                        .endpoint("/api/v1/offers/" + offerId + "/approve")
                         .build()
         );
 
@@ -755,7 +782,7 @@ public class OfferServiceImpl implements OfferService {
                                 "status", savedOffer.getOfferStatus().name()
                         ))
                         .serviceName("offer-service")
-                        .endpoint("/api/offers/" + offerId + "/reject-approval")
+                        .endpoint("/api/v1/offers/" + offerId + "/reject-approval")
                         .build()
         );
 
@@ -824,6 +851,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("completed".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.SIGNED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.SIGNED);
             offer.setSignedAt(LocalDateTime.now());
@@ -844,7 +874,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", savedOffer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
 
@@ -862,6 +892,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("declined".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.REJECTED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.REJECTED);
             offer.setRejectedAt(LocalDateTime.now());
@@ -885,7 +918,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", offer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
 
@@ -896,6 +929,9 @@ public class OfferServiceImpl implements OfferService {
 
         if ("voided".equalsIgnoreCase(dto.getStatus())) {
 
+            if (offer.getOfferStatus() == Status.EXPIRED) {
+                return;
+            }
 
             offer.setOfferStatus(Status.EXPIRED);
 
@@ -915,7 +951,7 @@ public class OfferServiceImpl implements OfferService {
                                     "status", offer.getOfferStatus().name()
                             ))
                             .serviceName("offer-service")
-                            .endpoint("/api/offers/docusign/webhook")
+                            .endpoint("/api/v1/offers/docusign/webhook")
                             .build()
             );
         }

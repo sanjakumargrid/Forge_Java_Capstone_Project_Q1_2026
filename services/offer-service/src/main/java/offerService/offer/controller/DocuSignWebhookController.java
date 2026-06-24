@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/webhooks/docusign")
+@RequestMapping("/api/v1/webhooks/docusign")
 @RequiredArgsConstructor
 public class DocuSignWebhookController {
 
@@ -17,8 +17,15 @@ public class DocuSignWebhookController {
     @PostMapping
     public ResponseEntity<Void> receive(@RequestBody JsonNode payload) {
 
-        String envelopeId = payload.path("envelopeId").asText(null);
-        String status = payload.path("status").asText(null);
+        String envelopeId = payload.path("data").path("envelopeId").asText(null);
+        String status = payload.path("data").path("envelopeSummary").path("status").asText(null);
+        
+        if (envelopeId == null) {
+            envelopeId = payload.path("envelopeId").asText(null);
+        }
+        if (status == null) {
+            status = payload.path("status").asText(null);
+        }
 
         if (envelopeId == null || status == null) {
             return ResponseEntity.badRequest().build();

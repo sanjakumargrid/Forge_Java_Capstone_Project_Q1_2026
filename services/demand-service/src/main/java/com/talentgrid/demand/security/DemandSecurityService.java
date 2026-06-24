@@ -86,7 +86,7 @@ public class DemandSecurityService {
         }
 
         if (SecurityUtils.isEmployee()) {
-            return status == DemandStatus.OPEN_EXTERNAL;
+            return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.INTERNAL_SEARCH;
         }
 
         if (SecurityUtils.isHiringManager()) {
@@ -113,7 +113,8 @@ public class DemandSecurityService {
     }
 
     /**
-     * True when the caller may call PATCH /status for this demand (fine-grained checks also run in service).
+     * True when the caller may call PATCH /status for this demand (fine-grained
+     * checks also run in service).
      */
     public boolean canTransition(Long demandId) {
         if (SecurityUtils.isPlatformAdmin()) {

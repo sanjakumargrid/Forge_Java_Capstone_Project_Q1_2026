@@ -14,5 +14,6 @@ public class DocuSignProperties {
     private String userId;
     private String accountId;
     private String basePath;
+    private String authServer;
     private String privateKeyPath;
 }

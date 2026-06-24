@@ -12,15 +12,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/interviews")
+@RequestMapping("/api/v1/interviews")
 @RequiredArgsConstructor
 public class InterviewController {
 
     private final InterviewService interviewService;
-
+    @PreAuthorize("hasAuthority('INTERVIEW_CREATE')")
     @PostMapping
     public ResponseEntity<InterviewDto> createInterview(
             @Valid @RequestBody InterviewDto interviewDto
@@ -33,7 +34,7 @@ public class InterviewController {
                 .status(HttpStatus.CREATED)
                 .body(createdInterview);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_VIEW')")
     @GetMapping("/{id}")
     public ResponseEntity<InterviewDto> getInterviewById(
             @PathVariable Long id
@@ -44,12 +45,13 @@ public class InterviewController {
 
         return ResponseEntity.ok(interview);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_VIEW')")
     @GetMapping
     public ResponseEntity<Page<InterviewDto>> getAllInterviews(
             @RequestParam(required = false) Long applicationId,
             @RequestParam(required = false) Status status,
             @RequestParam(required = false) Type interviewType,
+            @RequestParam(required = false) Long interviewerId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "scheduledAt") String sortBy,
@@ -68,12 +70,13 @@ public class InterviewController {
                         applicationId,
                         status,
                         interviewType,
+                        interviewerId,
                         pageable
                 );
 
         return ResponseEntity.ok(interviews);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_UPDATE')")
     @PutMapping("/{id}")
     public ResponseEntity<InterviewDto> updateInterview(
             @PathVariable Long id,
@@ -85,7 +88,7 @@ public class InterviewController {
 
         return ResponseEntity.ok(updatedInterview);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_UPDATE')")
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<InterviewDto> cancelInterview(
             @PathVariable Long id
@@ -96,7 +99,7 @@ public class InterviewController {
 
         return ResponseEntity.ok(cancelledInterview);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_UPDATE')")
     @PatchMapping("/{id}/complete")
     public ResponseEntity<InterviewDto> completeInterview(
             @PathVariable Long id
@@ -107,7 +110,7 @@ public class InterviewController {
 
         return ResponseEntity.ok(completedInterview);
     }
-
+    @PreAuthorize("hasAuthority('INTERVIEW_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInterview(
             @PathVariable Long id

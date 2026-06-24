@@ -16,6 +16,7 @@ public interface InterviewService {
             Long applicationId,
             Status status,
             Type interviewType,
+            Long interviewerId,
             Pageable pageable
     );
 

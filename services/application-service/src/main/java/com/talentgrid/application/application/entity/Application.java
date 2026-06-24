@@ -59,7 +59,7 @@ public class Application {
             name = "application_matched_skills",
             joinColumns = @JoinColumn(name = "application_id")
     )
-    @Column(name = "skill", length = 50)
+    @Column(name = "skill", length = 100)
     private List<String> matchedSkills;
 
     @ElementCollection
@@ -67,7 +67,7 @@ public class Application {
             name = "application_missing_skills",
             joinColumns = @JoinColumn(name = "application_id")
     )
-    @Column(name = "skill", length = 50)
+    @Column(name = "skill", length = 100)
     private List<String> missingSkills;
 
     @ElementCollection
@@ -75,7 +75,7 @@ public class Application {
             name = "application_other_skills",
             joinColumns = @JoinColumn(name = "application_id")
     )
-    @Column(name = "skill", length = 50)
+    @Column(name = "skill", length = 100)
     private List<String> otherSkills;
 
     @NotBlank(message = "AI rationale is required")
@@ -135,8 +135,8 @@ public class Application {
     @Column(name = "rejected_at")
     private LocalDateTime rejectedAt;
 
-    @Size(max = 100, message = "Rejection reason must not exceed 100 characters")
-    @Column(name = "rejection_reason", length = 100)
+    @Size(max = 500, message = "Rejection reason must not exceed 500 characters")
+    @Column(name = "rejection_reason", length = 500)
     private String rejectionReason;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

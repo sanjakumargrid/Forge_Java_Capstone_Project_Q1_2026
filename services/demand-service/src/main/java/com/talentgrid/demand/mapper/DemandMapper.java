@@ -181,7 +181,10 @@ public class DemandMapper {
         DemandSummaryResponse response = new DemandSummaryResponse();
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
+        response.setAccountId(demand.getAccountId());
         response.setAccountName(demand.getAccountName());
+        response.setProjectId(demand.getProjectId());
+        response.setProjectName(demand.getProjectName());
         response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
         response.setEmploymentType(enumName(demand.getEmploymentType()));
         response.setLocation(demand.getLocation());
@@ -190,6 +193,7 @@ public class DemandMapper {
         response.setBusinessUnit(demand.getBusinessUnit());
         response.setIsFilled(demand.getIsFilled());
         response.setCreatedAt(demand.getCreatedAt());
+        response.setTargetDate(demand.getTargetDate());
 
         // Compute age in days
         if (demand.getCreatedAt() != null) {

@@ -52,6 +52,10 @@ public class User implements Serializable {
     @Column(name = "lock_time")
     private LocalDateTime lockTime;
 
+    @Column(name = "is_interviewer_eligible")
+    @Builder.Default
+    private Boolean isInterviewerEligible = false;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

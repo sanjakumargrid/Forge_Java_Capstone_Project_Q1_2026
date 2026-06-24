@@ -32,7 +32,7 @@ import java.time.LocalDate;
  * </ul>
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/")
 @RequiredArgsConstructor
 @Tag(name = "Demand Analytics", description = "Demand metrics and analytics endpoints")
 public class DemandAnalyticsController {

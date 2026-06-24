@@ -2,20 +2,17 @@ package com.talentgrid.candidate.resumeParser.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.resumeParser.model.AtsEvaluationDTO;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
+import com.talentgrid.candidate.resumeParser.model.DemandDTO;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -25,93 +22,128 @@ public class AtsEvaluationService {
     @Value("${llm.api.key}")
     private String apiKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    // Groq's API endpoint
-    private static final String GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+    private static final String API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-    // NO parameters in this constructor!
-    public AtsEvaluationService() {
+
+    public AtsEvaluationService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
         this.objectMapper = new ObjectMapper()
                 .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
-    // Now accepts the List of skills directly from your Demand Service
-    public AtsEvaluationDTO evaluateResume(MultipartFile file, List<String> demandSkills) throws IOException {
-        // 1. Extract raw text from the resume PDF
+    public AtsEvaluationDTO evaluateResume(MultipartFile file, DemandDTO demand) {
         String resumeText = extractTextFromFile(file);
 
-        // Convert the list of skills into a comma-separated string for the AI to read easily
-        String requiredSkillsText = String.join(", ", demandSkills);
+        String maskedText = maskPII(resumeText);
 
-        // 2. Define the ATS scoring rules for the LLM
+        String demandContext = String.format(
+                "ROLE: %s\nREQUIRED EXPERIENCE: %d years\nPRIMARY SKILLS (Critical): %s\nADD-ON SKILLS (Bonus): %s\nJOB DESCRIPTION: %s",
+                demand.getTitle(),
+                demand.getYearsOfExperience() != null ? demand.getYearsOfExperience() : 0,
+                demand.getPrimarySkills() != null ? String.join(", ", demand.getPrimarySkills()) : "None specified",
+                demand.getAddOnSkills() != null ? String.join(", ", demand.getAddOnSkills()) : "None specified",
+                demand.getDescription()
+        );
+
         String systemPrompt = """
             You are an expert ATS (Applicant Tracking System) reviewer. 
-            Your task is to evaluate the provided resume text against the target required skills.
+            Evaluate the provided RESUME TEXT against the provided JOB DEMAND.
             
             CRITICAL CRITERIA RULES:
-            - Focus EXCLUSIVELY on content alignment: Check if the required skills are present in the resume.
-            - IGNORE visual aspects such as fonts, font sizes, colors, margins, columns, text colors, page limits, or overall visual aesthetics. Do not deduct points for lack of styling.
+            - Experience Threshold: Calculate total relevant years of experience based on chronological dates in the work history. Drastically lower the aiScore if experience is below REQUIRED EXPERIENCE.
+            - Weighted Scoring: Base the `aiScore` heavily on the presence and application of PRIMARY SKILLS. Missing primary skills must drastically lower the score. ADD-ON SKILLS act as a bonus but cannot replace missing primary skills.
+            - Strict Text Matching: Identify which requested skills appear explicitly in the RESUME TEXT.
+            - Practical Evidence: Verify if matched skills are actively utilized in described projects or roles. Do not infer unstated experience.
+            - Extra Capabilities: Identify valuable technical skills present in the resume that were NOT requested in the demand.
             
-            Provide your final evaluation strictly as a JSON object matching this schema:
+            Provide your final evaluation strictly as a JSON object matching this exact schema:
             {
-              "matchScore": 85, // An integer between 0 and 100 based on how many required skills are met
-              "matchedSkills": ["string"], // Required skills that ARE present in the resume
-              "unmatchedSkills": ["string"], // Required skills that are MISSING from the resume
-              "recommendations": ["string"], // Actionable suggestions to improve alignment
-              "overallFeedback": "string" // A concise summary of the candidate's match
+              "aiScore": 0,
+              "matchedSkills": [],
+              "missingSkills": [],
+              "otherSkills": [],
+              "recommendations": [],
+              "overallFeedback": ""
             }
-            Do not include any markdown syntax wrappers (like ```json). Return only raw JSON.
+            
+            Return ONLY raw JSON. No markdown wrappers.
             """;
 
-        // 3. Groq (OpenAI-compatible) Payload structure
         Map<String, Object> requestBody = Map.of(
                 "model", "llama-3.3-70b-versatile",
-                "response_format", Map.of("type", "json_object"), // Enforces strict JSON output
+                "response_format", Map.of("type", "json_object"),
                 "temperature", 0.1,
                 "messages", List.of(
                         Map.of("role", "system", "content", systemPrompt),
-                        Map.of("role", "user", "content", "REQUIRED SKILLS:\n" + requiredSkillsText + "\n\n-------------\n\nRESUME TEXT:\n" + resumeText)
+                        Map.of("role", "user", "content", "JOB DEMAND:\n" + demandContext + "\n\n-------------\n\nRESUME TEXT:\n" + maskedText)
                 )
         );
 
-        // 4. Set Headers (Groq requires Bearer Auth)
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
-        // 5. Call the Groq API
-        ResponseEntity<String> response = restTemplate.postForEntity(GROQ_API_URL, entity, String.class);
-
-        // 6. Map response JSON to the DTO
-        return parseLlmResponseToDTO(response.getBody());
-    }
-
-    private String extractTextFromFile(MultipartFile file) throws IOException {
         try {
-            Tika tika = new Tika();
-            // Tika automatically detects if it's a PDF, DOCX, TXT, etc., and pulls the text
-            String extractedText = tika.parseToString(file.getInputStream());
-
-            if (extractedText == null || extractedText.trim().isEmpty()) {
-                throw new IOException("The extracted document is empty or unreadable.");
-            }
-            return extractedText;
-
+            ResponseEntity<String> response = restTemplate.postForEntity(API_URL, entity, String.class);
+            return parseLlmResponseToDTO(response.getBody());
         } catch (Exception e) {
-            throw new IOException("Failed to parse document. Unsupported or corrupted file.", e);
+            throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "AI evaluation service is currently unreachable: " + e.getMessage());
         }
     }
 
-    private AtsEvaluationDTO parseLlmResponseToDTO(String responseBody) throws IOException {
-        JsonNode rootNode = objectMapper.readTree(responseBody);
-        String jsonContent = rootNode.path("choices").get(0)
-                .path("message")
-                .path("content").asText();
 
-        return objectMapper.readValue(jsonContent, AtsEvaluationDTO.class);
+    private String extractTextFromFile(MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            Tika tika = new Tika();
+            String extractedText = tika.parseToString(inputStream);
+            if (extractedText == null || extractedText.trim().isEmpty()) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "The uploaded document is empty or unreadable.");
+            }
+            return extractedText;
+        } catch (Exception e) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "Failed to extract text. Unsupported or corrupted file format.");
+        }
+    }
+
+    private AtsEvaluationDTO parseLlmResponseToDTO(String responseBody) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(responseBody);
+            JsonNode choices = rootNode.path("choices");
+            if (choices.isMissingNode() || !choices.isArray() || choices.isEmpty()) {
+                throw new BusinessException(HttpStatus.BAD_GATEWAY, "LLM response missing 'choices' array (possible rate limit): " + responseBody);
+            }
+            String jsonContent = choices.get(0)
+                    .path("message")
+                    .path("content").asText();
+
+            return objectMapper.readValue(jsonContent, AtsEvaluationDTO.class);
+        } catch (Exception e) {
+            throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to parse AI output into valid format.");
+        }
+    }
+
+    private String maskPII(String text) {
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+
+        String emailRegex = "([a-zA-Z0-9_\\-\\.]+)@([a-zA-Z0-9_\\-\\.]+)\\.([a-zA-Z]{2,5})";
+        text = text.replaceAll(emailRegex, "[EMAIL REDACTED]");
+
+        String phoneRegex = "(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}";
+        text = text.replaceAll(phoneRegex, "[PHONE REDACTED]");
+
+        String linkedInRegex = "(https?://)?(www\\.)?(linkedin\\.com/in/[a-zA-Z0-9_-]+)";
+        text = text.replaceAll(linkedInRegex, "[LINKEDIN REDACTED]");
+
+        String generalUrlRegex = "(https?://\\S+)";
+        text = text.replaceAll(generalUrlRegex, "https://www.merriam-webster.com/dictionary/redacted");
+
+        return text;
     }
 }

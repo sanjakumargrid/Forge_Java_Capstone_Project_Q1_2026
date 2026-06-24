@@ -2,14 +2,28 @@ package com.talentgrid.interview.interview.integration;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.*;
+import com.google.api.services.calendar.model.ConferenceData;
+import com.google.api.services.calendar.model.ConferenceSolutionKey;
+import com.google.api.services.calendar.model.CreateConferenceRequest;
+import com.google.api.services.calendar.model.EntryPoint;
+import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
+import com.google.api.services.calendar.model.FreeBusyCalendar;
+import com.google.api.services.calendar.model.FreeBusyRequest;
+import com.google.api.services.calendar.model.FreeBusyRequestItem;
+import com.google.api.services.calendar.model.FreeBusyResponse;
+import com.talentgrid.interview.client.EmployeeClient;
+import com.talentgrid.interview.client.dto.EmployeeDto;
+import com.talentgrid.interview.config.GoogleOAuthTokenService;
 import com.talentgrid.interview.exception.BusinessException;
 import com.talentgrid.interview.interview.entity.Interview;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.time.ZoneId;
@@ -20,50 +34,55 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GoogleCalendarClient {
 
-    private final Calendar googleCalendarService;
+    private final ObjectProvider<Calendar> serviceAccountCalendarProvider;
+    private final ObjectProvider<GoogleOAuthTokenService> googleOAuthTokenServiceProvider;
+    private final EmployeeClient employeeClient;
 
     @Value("${google.calendar.enabled:false}")
     private boolean googleCalendarEnabled;
 
-    /**
-     * REQ-ER-07: Checks if any interviewer has a conflicting calendar event at the
-     * scheduled interview time, then creates a Google Calendar event with an
-     * auto-generated Google Meet video link.
-     *
-     * @param interview the interview entity with scheduledAt, durationMins, timeZone, interviewers
-     * @return GoogleCalendarResponse containing the real eventId and Google Meet link
-     */
+    @Value("${google.calendar.auth-mode:service-account}")
+    private String googleCalendarAuthMode;
+
+    @Value("${google.calendar.invites-enabled:false}")
+    private boolean calendarInvitesEnabled;
+
+    @Value("${google.calendar.meet-enabled:false}")
+    private boolean googleMeetEnabled;
+
+    public GoogleCalendarClient(
+            ObjectProvider<Calendar> serviceAccountCalendarProvider,
+            ObjectProvider<GoogleOAuthTokenService> googleOAuthTokenServiceProvider,
+            EmployeeClient employeeClient
+    ) {
+        this.serviceAccountCalendarProvider = serviceAccountCalendarProvider;
+        this.googleOAuthTokenServiceProvider = googleOAuthTokenServiceProvider;
+        this.employeeClient = employeeClient;
+    }
+
     public GoogleCalendarResponse createEvent(Interview interview) {
 
-        if (!googleCalendarEnabled) {
-            String eventId = "mock-calendar-event-" + UUID.randomUUID();
-            String meetLink = "https://meet.google.com/mock-local";
+        Calendar calendarService = getCalendarServiceOrNull();
 
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Returning mock eventId={} meetLink={}",
-                    eventId,
-                    meetLink
+        if (!googleCalendarEnabled || calendarService == null) {
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Google Calendar integration is currently disabled or unavailable. Cannot schedule interview."
             );
-
-            return new GoogleCalendarResponse(eventId, meetLink);
         }
 
         try {
-            // existing real Google Calendar code
             ZoneId zone = ZoneId.of(interview.getTimeZone());
 
             ZonedDateTime startZdt = interview.getScheduledAt().atZone(zone);
             ZonedDateTime endZdt = startZdt.plusMinutes(interview.getDurationMins());
 
-            // 1. FreeBusy check — verify all interviewers are available at this time
-            checkInterviewerAvailability(interview, startZdt, endZdt);
+            if (calendarInvitesEnabled) {
+                checkInterviewerAvailability(calendarService, interview, startZdt, endZdt);
+            }
 
-            // 2. Build attendee list
-            List<EventAttendee> attendees = buildAttendees(interview);
-
-            // 3. Build the Calendar Event object
             Event event = new Event()
                     .setSummary("TalentGrid Interview — Application #" + interview.getApplicationId())
                     .setDescription(buildEventDescription(interview))
@@ -73,16 +92,6 @@ public class GoogleCalendarClient {
                     .setEnd(new EventDateTime()
                             .setDateTime(new DateTime(endZdt.toInstant().toEpochMilli()))
                             .setTimeZone(interview.getTimeZone()))
-                    .setAttendees(attendees)
-                    // 4. Request Google Meet conference link auto-generation
-                    .setConferenceData(new ConferenceData()
-                            .setCreateRequest(new CreateConferenceRequest()
-                                    .setRequestId(UUID.randomUUID().toString())
-                                    .setConferenceSolutionKey(
-                                            new ConferenceSolutionKey().setType("hangoutsMeet")
-                                    )
-                            )
-                    )
                     .setReminders(new Event.Reminders()
                             .setUseDefault(false)
                             .setOverrides(List.of(
@@ -91,24 +100,55 @@ public class GoogleCalendarClient {
                             ))
                     );
 
-            // 5. Insert event — conferenceDataVersion=1 triggers Meet link generation
-            //    sendUpdates=all sends email invites to all attendees
-            Event createdEvent = googleCalendarService.events()
+            if (calendarInvitesEnabled) {
+                event.setAttendees(buildAttendees(interview));
+            }
+
+            if (googleMeetEnabled) {
+                event.setConferenceData(new ConferenceData()
+                        .setCreateRequest(new CreateConferenceRequest()
+                                .setRequestId(UUID.randomUUID().toString())
+                                .setConferenceSolutionKey(
+                                        new ConferenceSolutionKey().setType("hangoutsMeet")
+                                )
+                        )
+                );
+            }
+
+            Calendar.Events.Insert insertRequest = calendarService.events()
                     .insert("primary", event)
-                    .setConferenceDataVersion(1)
-                    .setSendUpdates("all")
-                    .execute();
+                    .setSendUpdates(calendarInvitesEnabled ? "all" : "none");
 
-            // 6. Extract the auto-generated Google Meet link
-            String meetLink = extractMeetLink(createdEvent);
+            if (googleMeetEnabled) {
+                insertRequest.setConferenceDataVersion(1);
+            }
+
+            Event createdEvent = insertRequest.execute();
+
             String eventId = createdEvent.getId();
+            String meetLink;
 
-            log.info("[GoogleCalendarClient] Calendar event created | eventId={} | meetLink={}", eventId, meetLink);
+            if (googleMeetEnabled) {
+                meetLink = extractMeetLink(createdEvent);
+            } else {
+                throw new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "Google Meet generation is not enabled for this interview."
+                );
+            }
+
+            log.info("[GoogleCalendarClient] Calendar event created | eventId={} | meetLink={}",
+                    eventId,
+                    meetLink
+            );
 
             return new GoogleCalendarResponse(eventId, meetLink);
 
         } catch (IOException ex) {
-            log.error("[GoogleCalendarClient] Failed to create Google Calendar event: {}", ex.getMessage());
+            log.error("[GoogleCalendarClient] Failed to create Google Calendar event: {}",
+                    ex.getMessage()
+            );
+
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
                     "Failed to create Google Calendar event: " + ex.getMessage()
@@ -116,31 +156,30 @@ public class GoogleCalendarClient {
         }
     }
 
-    /**
-     * REQ-ER-07: Updates an existing Google Calendar event when interview details change
-     * (reschedule, interviewer change, etc.).
-     *
-     * @param eventId   the existing calendar event ID stored on the Interview record
-     * @param interview the interview entity with the updated details
-     */
     public void updateEvent(String eventId, Interview interview) {
 
-        if (!googleCalendarEnabled || eventId == null || eventId.startsWith("mock-calendar-event-")) {
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock update for eventId={}", eventId);
-            return;
+        Calendar calendarService = getCalendarServiceOrNull();
+
+        if (!googleCalendarEnabled
+                || calendarService == null
+                || eventId == null) {
+
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Cannot update interview: Google Calendar integration is disabled or eventId is missing."
+            );
         }
 
         try {
             ZoneId zone = ZoneId.of(interview.getTimeZone());
+
             ZonedDateTime startZdt = interview.getScheduledAt().atZone(zone);
             ZonedDateTime endZdt = startZdt.plusMinutes(interview.getDurationMins());
 
-            // Fetch existing event to preserve conference data and other fields
-            Event existingEvent = googleCalendarService.events()
+            Event existingEvent = calendarService.events()
                     .get("primary", eventId)
                     .execute();
 
-            // Update mutable fields
             existingEvent
                     .setSummary("TalentGrid Interview — Application #" + interview.getApplicationId())
                     .setDescription(buildEventDescription(interview))
@@ -149,21 +188,32 @@ public class GoogleCalendarClient {
                             .setTimeZone(interview.getTimeZone()))
                     .setEnd(new EventDateTime()
                             .setDateTime(new DateTime(endZdt.toInstant().toEpochMilli()))
-                            .setTimeZone(interview.getTimeZone()))
-                    .setAttendees(buildAttendees(interview));
+                            .setTimeZone(interview.getTimeZone()));
 
-            // sendUpdates=all sends updated invites to all attendees
-            googleCalendarService.events()
+            if (calendarInvitesEnabled) {
+                existingEvent.setAttendees(buildAttendees(interview));
+            } else {
+                existingEvent.setAttendees(null);
+            }
+
+            Calendar.Events.Update updateRequest = calendarService.events()
                     .update("primary", eventId, existingEvent)
-                    .setConferenceDataVersion(1)
-                    .setSendUpdates("all")
-                    .execute();
+                    .setSendUpdates(calendarInvitesEnabled ? "all" : "none");
+
+            if (googleMeetEnabled) {
+                updateRequest.setConferenceDataVersion(1);
+            }
+
+            updateRequest.execute();
 
             log.info("[GoogleCalendarClient] Calendar event updated | eventId={}", eventId);
 
         } catch (IOException ex) {
             log.error("[GoogleCalendarClient] Failed to update Google Calendar event eventId={}: {}",
-                    eventId, ex.getMessage());
+                    eventId,
+                    ex.getMessage()
+            );
+
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
                     "Failed to update Google Calendar event: " + ex.getMessage()
@@ -171,30 +221,34 @@ public class GoogleCalendarClient {
         }
     }
 
-    /**
-     * REQ-ER-07: Deletes a Google Calendar event when an interview is canceled.
-     * Sends cancellation emails to all attendees via sendUpdates=all.
-     *
-     * @param eventId the calendar event ID to delete
-     */
     public void deleteEvent(String eventId) {
 
-        if (!googleCalendarEnabled || eventId == null || eventId.startsWith("mock-calendar-event-")) {
-            log.info("[GoogleCalendarClient] Google Calendar disabled. Mock delete for eventId={}", eventId);
-            return;
+        Calendar calendarService = getCalendarServiceOrNull();
+
+        if (!googleCalendarEnabled
+                || calendarService == null
+                || eventId == null) {
+
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Cannot delete interview: Google Calendar integration is disabled or eventId is missing."
+            );
         }
 
         try {
-            googleCalendarService.events()
+            calendarService.events()
                     .delete("primary", eventId)
-                    .setSendUpdates("all")
+                    .setSendUpdates(calendarInvitesEnabled ? "all" : "none")
                     .execute();
 
             log.info("[GoogleCalendarClient] Calendar event deleted | eventId={}", eventId);
 
         } catch (IOException ex) {
             log.error("[GoogleCalendarClient] Failed to delete Google Calendar event eventId={}: {}",
-                    eventId, ex.getMessage());
+                    eventId,
+                    ex.getMessage()
+            );
+
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
                     "Failed to delete Google Calendar event: " + ex.getMessage()
@@ -202,25 +256,42 @@ public class GoogleCalendarClient {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Private Helpers
-    // ─────────────────────────────────────────────────────────────────────────
+    private Calendar getCalendarServiceOrNull() {
 
-    /**
-     * Uses the Google Calendar FreeBusy API to check if any of the interviewers
-     * already have a conflicting event at the proposed interview time.
-     * Throws a BusinessException listing which interviewers are unavailable.
-     */
+        if (!googleCalendarEnabled) {
+            return null;
+        }
+
+        if ("oauth".equalsIgnoreCase(googleCalendarAuthMode)) {
+            GoogleOAuthTokenService googleOAuthTokenService =
+                    googleOAuthTokenServiceProvider.getIfAvailable();
+
+            if (googleOAuthTokenService == null || !googleOAuthTokenService.isAuthorized()) {
+                throw new BusinessException(
+                        HttpStatus.SERVICE_UNAVAILABLE,
+                        "Google OAuth is not authorized. Open http://localhost:8084/api/v1/google/oauth/authorize first."
+                );
+            }
+
+            return googleOAuthTokenService.getCalendarService();
+        }
+
+        return serviceAccountCalendarProvider.getIfAvailable();
+    }
+
     private void checkInterviewerAvailability(
+            Calendar calendarService,
             Interview interview,
             ZonedDateTime startZdt,
             ZonedDateTime endZdt
     ) throws IOException {
 
         List<FreeBusyRequestItem> items = new ArrayList<>();
+
         for (Long interviewerId : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
             items.add(new FreeBusyRequestItem()
-                    .setId("interviewer-" + interviewerId + "@talentgrid.com"));
+                    .setId(employee.getEmail()));
         }
 
         FreeBusyRequest freeBusyRequest = new FreeBusyRequest()
@@ -229,20 +300,22 @@ public class GoogleCalendarClient {
                 .setTimeZone(interview.getTimeZone())
                 .setItems(items);
 
-        FreeBusyResponse freeBusyResponse = googleCalendarService.freebusy()
+        FreeBusyResponse freeBusyResponse = calendarService.freebusy()
                 .query(freeBusyRequest)
                 .execute();
 
         List<String> busyInterviewers = new ArrayList<>();
 
         for (Long interviewerId : interview.getInterviewers()) {
-            String calendarId = "interviewer-" + interviewerId + "@talentgrid.com";
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+            String calendarId = employee.getEmail();
             FreeBusyCalendar calendarBusy = freeBusyResponse.getCalendars().get(calendarId);
 
             if (calendarBusy != null
                     && calendarBusy.getBusy() != null
                     && !calendarBusy.getBusy().isEmpty()) {
-                busyInterviewers.add("Interviewer #" + interviewerId);
+
+                busyInterviewers.add(employee.getName() + " (" + employee.getEmail() + ")");
             }
         }
 
@@ -256,45 +329,44 @@ public class GoogleCalendarClient {
         }
 
         log.info("[GoogleCalendarClient] All {} interviewers are available for the scheduled slot",
-                interview.getInterviewers().size());
+                interview.getInterviewers().size()
+        );
     }
 
-    /**
-     * Builds the list of Google Calendar attendees from the interview's interviewer IDs.
-     * In production, resolve interviewer IDs to real work email addresses from employee-service.
-     */
     private List<EventAttendee> buildAttendees(Interview interview) {
+
         List<EventAttendee> attendees = new ArrayList<>();
+
         for (Long interviewerId : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
             EventAttendee attendee = new EventAttendee();
-            attendee.setEmail("interviewer-" + interviewerId + "@talentgrid.com");
+            attendee.setEmail(employee.getEmail());
+            attendee.setDisplayName(employee.getName());
             attendee.setResponseStatus("needsAction");
             attendees.add(attendee);
         }
+
         return attendees;
     }
 
-    /**
-     * Extracts the Google Meet video link from the created event's conference data.
-     */
     private String extractMeetLink(Event createdEvent) {
+
         if (createdEvent.getConferenceData() != null
                 && createdEvent.getConferenceData().getEntryPoints() != null) {
 
             return createdEvent.getConferenceData().getEntryPoints()
                     .stream()
-                    .filter(ep -> "video".equals(ep.getEntryPointType()))
+                    .filter(entryPoint -> "video".equals(entryPoint.getEntryPointType()))
                     .map(EntryPoint::getUri)
                     .findFirst()
                     .orElse(createdEvent.getHangoutLink());
         }
+
         return createdEvent.getHangoutLink();
     }
 
-    /**
-     * Builds a human-readable event description for the calendar invite body.
-     */
     private String buildEventDescription(Interview interview) {
+
         return String.format(
                 """
                 TalentGrid Interview Details
@@ -304,8 +376,7 @@ public class GoogleCalendarClient {
                 Duration       : %d minutes
                 Time Zone      : %s
                 
-                This invite was automatically generated by TalentGrid.
-                Please do not reply to this calendar event directly.
+                This calendar event was automatically generated by TalentGrid.
                 """,
                 interview.getApplicationId(),
                 interview.getInterviewType(),

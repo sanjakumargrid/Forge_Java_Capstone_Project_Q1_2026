@@ -20,6 +20,8 @@ public class OfferPayload {
 
     private Long applicationId;
 
+    private Long demandId;
+
     private String role;
 
     private BigDecimal baseSalary;

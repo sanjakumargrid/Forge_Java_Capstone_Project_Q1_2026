@@ -151,7 +151,7 @@ public class DemandQueryService {
                         ));
                     }
                 } else if (SecurityUtils.isEmployee()) {
-                    predicates.add(cb.equal(root.get("status"), DemandStatus.OPEN_EXTERNAL));
+                    predicates.add(root.get("status").in(DemandStatus.OPEN_EXTERNAL, DemandStatus.INTERNAL_SEARCH));
                 } else if (SecurityUtils.isPortfolioManager()) {
                     predicates.add(cb.or(
                             cb.equal(root.get("createdBy"), SecurityUtils.getCurrentUserId()),

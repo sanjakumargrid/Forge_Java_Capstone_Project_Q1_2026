@@ -23,6 +23,10 @@ public interface OfferRepository
             Pageable pageable
     );
 
+    List<Offer> findByApplicationId(
+            Long applicationId
+    );
+
     /**
      * Find offers by status
      */

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update on your application at [[${companyName}]]</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f7f6; font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; color: #333333;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f7f6; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="100%" max-width="600" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color: #1e293b; padding: 30px 40px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600; letter-spacing: 0.5px;">
+                                <span th:text="${companyName}">Grid Dynamics</span>
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                Dear <strong style="color: #0f172a;" th:text="${candidateName}">Candidate</strong>,
+                            </p>
+                            
+                            <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                Thank you for taking the time to consider <strong th:text="${companyName}">Grid Dynamics</strong> and for interviewing with our team. We genuinely appreciate the opportunity to learn about your background, experience, and career aspirations.
+                            </p>
+
+                            <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                After careful consideration by our hiring team, we regret to inform you that we will not be moving forward with your application following the <strong style="color: #0f172a;" th:text="${rejectedRound}">Technical Round</strong>.
+                            </p>
+
+                            <!-- Reason Box -->
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin: 25px 0; background-color: #f8fafc; border-left: 4px solid #ef4444; border-radius: 0 4px 4px 0;">
+                                <tr>
+                                    <td style="padding: 15px 20px;">
+                                        <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #475569; font-style: italic;" th:text="${reason}">
+                                            Your profile did not meet the required threshold for this specific role.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                We were impressed by your skills and encourage you to apply for other suitable roles at <span th:text="${companyName}">Grid Dynamics</span> in the future as our needs evolve. 
+                            </p>
+
+                            <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                We wish you the absolute best of luck in your career endeavors.
+                            </p>
+
+                            <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #334155;">
+                                Best regards,<br>
+                                <strong style="color: #0f172a;">The <span th:text="${companyName}">Grid Dynamics</span> Recruiting Team</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8fafc; padding: 20px 40px; border-top: 1px solid #e2e8f0; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #64748b;">
+                                Application ID: <span th:text="${applicationId}">12345</span>
+                            </p>
+                            <p style="margin: 10px 0 0 0; font-size: 12px; color: #94a3b8;">
+                                This is an automated message. Please do not reply to this email.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

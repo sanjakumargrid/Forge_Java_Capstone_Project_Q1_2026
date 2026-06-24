@@ -11,17 +11,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/offers")
+@RequestMapping("/api/v1/offers")
 @RequiredArgsConstructor
 public class OfferController {
 
     private final OfferService offerService;
-
+    @PreAuthorize("hasAuthority('OFFER_CREATE')")
     @PostMapping
     public ResponseEntity<Offer> createOffer(
             @Valid @RequestBody Offer offer
@@ -34,7 +35,7 @@ public class OfferController {
                 .status(HttpStatus.CREATED)
                 .body(createdOffer);
     }
-
+    @PreAuthorize("hasAuthority('OFFER_VIEW')")
     @GetMapping("/{id}")
     public ResponseEntity<Offer> getOfferById(
             @PathVariable Long id
@@ -44,7 +45,7 @@ public class OfferController {
                 offerService.getOfferById(id)
         );
     }
-
+    @PreAuthorize("hasAuthority('OFFER_VIEW')")
     @GetMapping
     public ResponseEntity<Page<Offer>> getAllOffers(
             @RequestParam(required = false) Long applicationId,
@@ -61,7 +62,7 @@ public class OfferController {
 
         return ResponseEntity.ok(offers);
     }
-
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PutMapping("/{id}")
     public ResponseEntity<Offer> updateOffer(
             @PathVariable Long id,
@@ -72,7 +73,7 @@ public class OfferController {
                 offerService.updateOffer(id, offer)
         );
     }
-
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/send")
     public ResponseEntity<Offer> sendOffer(
             @PathVariable Long id
@@ -83,6 +84,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/accept")
     public ResponseEntity<Offer> acceptOffer(
             @PathVariable Long id
@@ -93,6 +95,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/reject")
     public ResponseEntity<Offer> rejectOffer(
             @PathVariable Long id
@@ -103,6 +106,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/expire")
     public ResponseEntity<Offer> expireOffer(
             @PathVariable Long id
@@ -113,6 +117,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_DELETE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOffer(
             @PathVariable Long id
@@ -123,6 +128,7 @@ public class OfferController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PutMapping("/{id}/approval-chain")
     public ResponseEntity<Offer> saveApprovalChain(
             @PathVariable Long id,
@@ -133,7 +139,7 @@ public class OfferController {
                 offerService.saveApprovalChain(id, request)
         );
     }
-
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/submit-approval")
     public ResponseEntity<Offer> submitForApproval(
             @PathVariable Long id
@@ -144,6 +150,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/approve")
     public ResponseEntity<Offer> approveCurrentStep(
             @PathVariable Long id,
@@ -155,6 +162,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
     @PatchMapping("/{id}/reject-approval")
     public ResponseEntity<Offer> rejectApproval(
             @PathVariable Long id,
@@ -167,6 +175,7 @@ public class OfferController {
         );
     }
 
+    @PreAuthorize("hasAuthority('OFFER_VIEW')")
     @GetMapping("/{id}/approval-chain")
     public ResponseEntity<List<ApprovalStepDto>> getApprovalChain(
             @PathVariable Long id

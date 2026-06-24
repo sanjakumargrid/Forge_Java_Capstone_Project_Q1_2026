@@ -18,8 +18,9 @@ public class ApplicationClient {
     public ApplicationDto getApplication(Long applicationId) {
 
         try {
+
             return applicationWebClient.get()
-                    .uri("/applications/{applicationId}", applicationId)
+                    .uri("/api/v1/applications/{applicationId}", applicationId)
                     .retrieve()
                     .bodyToMono(ApplicationDto.class)
                     .block();
@@ -56,8 +57,9 @@ public class ApplicationClient {
         request.setReason(reason);
 
         try {
+
             return applicationWebClient.patch()
-                    .uri("/applications/{applicationId}/stage", applicationId)
+                    .uri("/api/v1/applications/{applicationId}/stage", applicationId)
                     .bodyValue(request)
                     .retrieve()
                     .bodyToMono(ApplicationDto.class)

@@ -13,7 +13,7 @@ import com.talentgrid.gateway.config.RbacProperties;
  * platform, responsible for routing requests, enforcing stateless JWT authentication,
  * applying Role-Based Access Control (RBAC), and managing distributed rate limits.</p>
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.talentgrid"})
 @EnableConfigurationProperties({ RbacProperties.class, GatewayRuntimeProperties.class })
 public class GatewayApplication {
 

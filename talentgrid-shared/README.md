@@ -345,7 +345,7 @@ After running the SQL, **login again** to get a fresh token with the new scopes 
 
 ```bash
 # Get a fresh token
-TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
+TOKEN=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"your@email.com","password":"yourpassword"}' \
   | python3 -c "import sys,json; print(json.load(sys.stdin)['accessToken'])")
@@ -353,7 +353,7 @@ TOKEN=$(curl -s -X POST http://localhost:8080/api/auth/login \
 echo "TOKEN: $TOKEN"
 
 # Call your service with the token
-curl -s -X GET http://localhost:<your-service-port>/api/<your-endpoint> \
+curl -s -X GET http://localhost:<your-service-port>/api/v1/<your-endpoint> \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json"
 ```

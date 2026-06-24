@@ -9,68 +9,80 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.StringUtils;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
 @Slf4j
 @Configuration
+@ConditionalOnProperty(
+        name = "google.calendar.auth-mode",
+        havingValue = "service-account",
+        matchIfMissing = true
+)
 public class GoogleCalendarConfig {
 
-    /**
-     * Absolute path to your Google Service Account JSON key file.
-     * Set via environment variable: GOOGLE_SERVICE_ACCOUNT_KEY_PATH
-     * e.g. /etc/secrets/talentgrid-service-account.json
-     */
+    private final ResourceLoader resourceLoader;
+
+    public GoogleCalendarConfig(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
+
     @Value("${google.calendar.service-account-key-path}")
     private String serviceAccountKeyPath;
 
-    /**
-     * The Google Workspace domain admin email used for domain-wide delegation.
-     * The service account impersonates this account to access interviewer calendars.
-     * Set via environment variable: GOOGLE_CALENDAR_DELEGATE_EMAIL
-     */
-    @Value("${google.calendar.delegate-email}")
+    @Value("${google.calendar.delegate-email:}")
     private String delegateEmail;
 
-    /**
-     * Your application name registered in Google Cloud Console.
-     */
     @Value("${google.calendar.application-name:TalentGrid}")
     private String applicationName;
 
-    /**
-     * Builds and returns a Google Calendar API service client authenticated
-     * via a Service Account with domain-wide delegation.
-     *
-     * Setup required in Google Cloud Console:
-     * 1. Create a Service Account in your Google Cloud project.
-     * 2. Enable domain-wide delegation on the service account.
-     * 3. In Google Workspace Admin → Security → API Controls → Domain-wide Delegation,
-     *    add the service account client ID with scope:
-     *    https://www.googleapis.com/auth/calendar
-     * 4. Download the service account JSON key and set its path in application.properties.
-     */
     @Bean
+    @ConditionalOnProperty(
+            name = "google.calendar.enabled",
+            havingValue = "true"
+    )
     public Calendar googleCalendarService() throws GeneralSecurityException, IOException {
-        log.info("[GoogleCalendarConfig] Initialising Google Calendar API service with service account: {}",
+
+        log.info("[GoogleCalendarConfig] Initialising Google Calendar API service with service account path: {}",
                 serviceAccountKeyPath);
 
-        GoogleCredentials credentials = ServiceAccountCredentials
-                .fromStream(new FileInputStream(serviceAccountKeyPath))
-                .createScoped(List.of(CalendarScopes.CALENDAR))
-                .createDelegated(delegateEmail);
+        Resource resource = resourceLoader.getResource(serviceAccountKeyPath);
 
-        return new Calendar.Builder(
-                GoogleNetHttpTransport.newTrustedTransport(),
-                GsonFactory.getDefaultInstance(),
-                new HttpCredentialsAdapter(credentials)
-        )
-                .setApplicationName(applicationName)
-                .build();
+        if (!resource.exists()) {
+            throw new IOException("Google service account file not found at path: " + serviceAccountKeyPath);
+        }
+
+        try (InputStream inputStream = resource.getInputStream()) {
+
+            GoogleCredentials credentials = ServiceAccountCredentials
+                    .fromStream(inputStream)
+                    .createScoped(List.of(CalendarScopes.CALENDAR));
+
+            if (StringUtils.hasText(delegateEmail)) {
+                log.info("[GoogleCalendarConfig] Domain-wide delegation enabled. Delegate email: {}",
+                        delegateEmail);
+
+                credentials = credentials.createDelegated(delegateEmail);
+            } else {
+                log.info("[GoogleCalendarConfig] No delegate email configured. Using service account directly.");
+            }
+
+            return new Calendar.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    GsonFactory.getDefaultInstance(),
+                    new HttpCredentialsAdapter(credentials)
+            )
+                    .setApplicationName(applicationName)
+                    .build();
+        }
     }
 }

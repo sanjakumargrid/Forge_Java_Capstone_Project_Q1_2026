@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${title}">Offer Approval Required</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; }
+        .header { background: #0ea5e9; color: #fff; padding: 24px 32px; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .body { padding: 24px 32px; }
+        .field { margin-bottom: 12px; }
+        .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+        .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
+        .button { display: inline-block; background: #0ea5e9; color: #ffffff !important; text-decoration: none;
+            padding: 12px 24px; border-radius: 6px; font-weight: bold; margin-top: 24px; }
+        .button:hover { background: #0284c7; }
+        .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${title}">Action Required: Offer Approval</h1>
+    </div>
+    <div class="body">
+        <p style="color: #374151; font-size: 16px; margin-top: 0;">Hello <strong th:text="${approverName}">Approver</strong>,</p>
+        <p style="color: #4b5563; font-size: 15px; line-height: 1.5;">
+            An offer has been submitted and is waiting for your review and approval. 
+            Please review the details below.
+        </p>
+
+        <div style="background: #f8fafc; padding: 16px; border-radius: 6px; margin: 20px 0; border: 1px solid #e2e8f0;">
+            <div class="field">
+                <label>Offer ID</label>
+                <p th:text="${offerId}">—</p>
+            </div>
+            <div class="field">
+                <label>Role</label>
+                <p th:text="${role}">—</p>
+            </div>
+            <div class="field">
+                <label>Base Salary</label>
+                <p th:text="${baseSalary}">—</p>
+            </div>
+            <div class="field" th:if="${bonus != null and !bonus.empty}">
+                <label>Bonus</label>
+                <p th:text="${bonus}">—</p>
+            </div>
+            <div class="field" th:if="${equity != null and !equity.empty}">
+                <label>Equity</label>
+                <p th:text="${equity}">—</p>
+            </div>
+            <div class="field">
+                <label>Proposed Joining Date</label>
+                <p th:text="${joiningDate}">—</p>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a th:href="@{http://localhost:4200/offers/{id}/review(id=${offerId})}" class="button">Review & Approve Offer</a>
+        </div>
+    </div>
+    <div class="footer">TalentGrid · This is an automated notification.</div>
+</div>
+</body>
+</html>

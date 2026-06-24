@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 /**
  * Position-level analytics response for demand fill rate, time-to-fill, and internal vs external split.
- * Returned by {@code GET /api/analytics/demands} with optional date range filters (default: last 30 days).
+ * Returned by {@code GET /api/v1/analytics/demands} with optional date range filters (default: last 30 days).
  *
  * <p>Metrics:
  * <ul>

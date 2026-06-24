@@ -16,6 +16,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+import com.talentgrid.application.client.CandidateClient;
+import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
+import com.talentgrid.application.application.repository.ApplicationRepository;
+import com.talentgrid.application.application.entity.Application;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +28,8 @@ public class ApplicationEventTranslator extends BaseKafkaConsumer<ApplicationPay
 
   private final NotificationEventPublisher notificationEventPublisher;
   private final ObjectMapper objectMapper;
+  private final CandidateClient candidateClient;
+  private final ApplicationRepository applicationRepository;
 
   @KafkaListener(
           topics = TalentGridTopics.APPLICATION_EVENTS,
@@ -143,24 +150,86 @@ public class ApplicationEventTranslator extends BaseKafkaConsumer<ApplicationPay
             ? application.getRejectionReason()
             : "Not specified";
 
-    String title = "Application Update";
+    String candidateEmail = null;
+    String candidateName = "Candidate";
+    try {
+      if (application.getCandidateId() != null) {
+        ExternalCandidateDto candidate = candidateClient.getCandidateById(application.getCandidateId());
+        if (candidate != null) {
+          candidateEmail = candidate.getEmail();
+          candidateName = candidate.getFirstName() + " " + candidate.getLastName();
+        }
+      }
+    } catch (Exception e) {
+      log.warn("[APPLICATION-TRANSLATOR] Failed to fetch candidate email for candidateId={} - sending in-app only", application.getCandidateId(), e);
+    }
+
+    String rejectedRound = "the recruitment process";
+    try {
+      if (application.getApplicationId() != null) {
+        Application app = applicationRepository.findById(application.getApplicationId()).orElse(null);
+        if (app != null) {
+            if (app.getFinalRoundAt() != null) rejectedRound = "Final Round";
+            else if (app.getInterviewAt() != null) rejectedRound = "Interview Round";
+            else if (app.getTechnicalAt() != null) rejectedRound = "Technical Round";
+            else if (app.getScreeningAt() != null) rejectedRound = "Screening Round";
+            else rejectedRound = "Initial Resume Screening";
+        }
+      }
+    } catch (Exception e) {
+        log.warn("[APPLICATION-TRANSLATOR] Failed to fetch application for determining round", e);
+    }
+
+    String title = "Update on Your Application at Grid Dynamics";
     String message = String.format(
-            "We regret to inform you that your application (ID: %s) has not progressed further. " +
-                    "Reason: %s. We encourage you to apply for other suitable roles.",
-            application.getApplicationId(),
+            "Dear %s,\n\n" +
+            "Thank you for taking the time to consider Grid Dynamics and for interviewing with our team. " +
+            "We appreciate the opportunity to learn about your background and experience.\n\n" +
+            "After careful consideration, we regret to inform you that we will not be moving forward with your application " +
+            "following the %s. Reason: %s.\n\n" +
+            "We were impressed by your skills and encourage you to apply for other suitable roles at Grid Dynamics in the future. " +
+            "We wish you the best of luck in your career endeavors.\n\n" +
+            "Best regards,\n" +
+            "The Grid Dynamics Recruiting Team",
+            candidateName,
+            rejectedRound,
             reason
     );
 
-    notificationEventPublisher.sendInApp(
-            application.getCandidateId() != null ? application.getCandidateId().toString() : null,
-            "APPLICATION_REJECTED",
-            title,
-            message,
-            "application-service",
-            application.getApplicationId() != null ? application.getApplicationId().toString() : null,
-            "APPLICATION",
-            correlationId
-    );
+    if (candidateEmail != null) {
+      notificationEventPublisher.sendInAppAndEmail(
+              application.getCandidateId().toString(),
+              candidateEmail,
+              null,
+              "APPLICATION_REJECTED",
+              title,
+              message,
+              "application-service",
+              application.getApplicationId() != null ? application.getApplicationId().toString() : null,
+              "APPLICATION",
+              "NORMAL",
+              "application-rejected",
+              Map.of(
+                      "applicationId", String.valueOf(application.getApplicationId()),
+                      "reason", reason,
+                      "candidateName", candidateName,
+                      "companyName", "Grid Dynamics",
+                      "rejectedRound", rejectedRound
+              ),
+              correlationId
+      );
+    } else {
+      notificationEventPublisher.sendInApp(
+              application.getCandidateId() != null ? application.getCandidateId().toString() : null,
+              "APPLICATION_REJECTED",
+              title,
+              message,
+              "application-service",
+              application.getApplicationId() != null ? application.getApplicationId().toString() : null,
+              "APPLICATION",
+              correlationId
+      );
+    }
 
     log.info("[APPLICATION-TRANSLATOR] ✓ NOTIFICATION_SEND published | applicationId={} | type=APPLICATION_REJECTED",
             application.getApplicationId());

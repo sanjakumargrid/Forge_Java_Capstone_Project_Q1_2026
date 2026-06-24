@@ -13,8 +13,15 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
-
 import java.util.Map;
+
+import offerService.offer.repository.OfferRepository;
+import offerService.offer.entity.Offer;
+import offerService.offer.dto.ApprovalStep;
+import offerService.offer.client.ApplicationClient;
+import offerService.offer.client.CandidateClient;
+import offerService.offer.dto.ApplicationDto;
+import offerService.offer.dto.CandidateDto;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +30,9 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
 
     private final NotificationEventPublisher notificationEventPublisher;
     private final ObjectMapper objectMapper;
+    private final OfferRepository offerRepository;
+    private final ApplicationClient applicationClient;
+    private final CandidateClient candidateClient;
 
     @KafkaListener(
             topics = TalentGridTopics.OFFER_EVENTS,
@@ -89,6 +99,9 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
 
             case "OFFER_SUBMITTED_FOR_APPROVAL" ->
                     translateOfferSubmittedForApproval(offer, correlationId);
+
+            case "OFFER_PENDING_NEXT_APPROVAL" ->
+                    translateOfferPendingNextApproval(offer, correlationId);
 
             case "OFFER_APPROVED" ->
                     translateOfferApproved(offer, correlationId);
@@ -179,13 +192,73 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
                 value(offer.getOfferId())
         );
 
-        publishNotification(
+        notifyCurrentApprover(
                 offer,
                 "OFFER_SUBMITTED_FOR_APPROVAL",
                 title,
                 message,
-                "NORMAL",
                 "offer-submitted-for-approval",
+                correlationId
+        );
+    }
+
+    private void translateOfferPendingNextApproval(
+            OfferPayload offer,
+            String correlationId
+    ) {
+
+        String title = "Offer Pending Next Approval";
+
+        String message = String.format(
+                "Offer ID %s is waiting for your approval.",
+                value(offer.getOfferId())
+        );
+
+        notifyCurrentApprover(
+                offer,
+                "OFFER_PENDING_NEXT_APPROVAL",
+                title,
+                message,
+                "offer-pending-next-approval",
+                correlationId
+        );
+    }
+
+    private void notifyCurrentApprover(
+            OfferPayload payload,
+            String eventType,
+            String title,
+            String message,
+            String templateCode,
+            String correlationId
+    ) {
+        if (payload.getOfferId() == null) return;
+
+        Offer offer = offerRepository.findById(payload.getOfferId()).orElse(null);
+        if (offer == null || offer.getApprovalChain() == null || offer.getApprovalChain().isEmpty()) {
+            return;
+        }
+
+        Integer currentStepNumber = offer.getCurrentApprovalStep();
+        if (currentStepNumber == null || currentStepNumber < 1 || currentStepNumber > offer.getApprovalChain().size()) {
+            return;
+        }
+
+        ApprovalStep currentStep = offer.getApprovalChain().get(currentStepNumber - 1);
+        String approverEmail = currentStep.getApproverEmail();
+        String approverName = currentStep.getApproverName();
+
+        Map<String, String> additionalVariables = Map.of("approverName", safe(approverName));
+
+        publishNotification(
+                payload,
+                eventType,
+                title,
+                message,
+                "HIGH",
+                templateCode,
+                approverEmail,
+                additionalVariables,
                 correlationId
         );
     }
@@ -362,11 +435,69 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
             String templateCode,
             String correlationId
     ) {
+        String recipientEmail = getCandidateEmail(offer.getApplicationId());
+        publishNotification(offer, notificationType, title, message, priority, templateCode, recipientEmail, null, correlationId);
+    }
+    
+    private String getCandidateEmail(Long applicationId) {
+        if (applicationId == null) {
+            return null;
+        }
+        try {
+            ApplicationDto applicationDto = applicationClient.getApplication(applicationId);
+            if (applicationDto != null && applicationDto.getCandidateId() != null) {
+                CandidateDto candidateDto = candidateClient.getCandidate(applicationDto.getCandidateId());
+                if (candidateDto != null && candidateDto.getEmail() != null) {
+                    return candidateDto.getEmail();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[OFFER-TRANSLATOR] Failed to fetch candidate email for applicationId={}: {}", applicationId, e.getMessage());
+        }
+        return null;
+    }
+
+    private void publishNotification(
+            OfferPayload offer,
+            String notificationType,
+            String title,
+            String message,
+            String priority,
+            String templateCode,
+            String recipientEmail,
+            Map<String, String> additionalVariables,
+            String correlationId
+    ) {
+
+        Map<String, String> templateVariables = new java.util.HashMap<>(Map.of(
+                "offerId", value(offer.getOfferId()),
+                "applicationId", value(offer.getApplicationId()),
+                "role", safe(offer.getRole()),
+                "baseSalary", offer.getBaseSalary() != null
+                        ? offer.getBaseSalary().toString()
+                        : "",
+                "bonus", offer.getBonus() != null
+                        ? offer.getBonus().toString()
+                        : "",
+                "equity", offer.getEquity() != null
+                        ? offer.getEquity().toString()
+                        : "",
+                "joiningDate", offer.getJoiningDate() != null
+                        ? offer.getJoiningDate().toString()
+                        : "",
+                "status", safe(offer.getStatus()),
+                "rejectionReason", safe(offer.getRejectionReason())
+        ));
+
+        if (additionalVariables != null) {
+            templateVariables.putAll(additionalVariables);
+        }
 
         notificationEventPublisher.sendInAppAndEmail(
                 offer.getApplicationId() != null
                         ? offer.getApplicationId().toString()
                         : null,
+                recipientEmail,
                 null,
                 notificationType,
                 title,
@@ -378,32 +509,15 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
                 "OFFER",
                 priority,
                 templateCode,
-                Map.of(
-                        "offerId", value(offer.getOfferId()),
-                        "applicationId", value(offer.getApplicationId()),
-                        "role", safe(offer.getRole()),
-                        "baseSalary", offer.getBaseSalary() != null
-                                ? offer.getBaseSalary().toString()
-                                : "",
-                        "bonus", offer.getBonus() != null
-                                ? offer.getBonus().toString()
-                                : "",
-                        "equity", offer.getEquity() != null
-                                ? offer.getEquity().toString()
-                                : "",
-                        "joiningDate", offer.getJoiningDate() != null
-                                ? offer.getJoiningDate().toString()
-                                : "",
-                        "status", safe(offer.getStatus()),
-                        "rejectionReason", safe(offer.getRejectionReason())
-                ),
+                templateVariables,
                 correlationId
         );
 
         log.info(
-                "[OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId={} | type={}",
+                "[OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId={} | type={} | toEmail={}",
                 offer.getOfferId(),
-                notificationType
+                notificationType,
+                recipientEmail
         );
     }
 

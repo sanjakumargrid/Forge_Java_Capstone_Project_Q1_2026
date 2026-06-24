@@ -45,4 +45,13 @@ public interface AuthService {
      * @return the registration response
      */
     RegisterResponse register(RegisterRequest request);
+
+    /**
+     * Exchanges a one-time Google OAuth code for JWT and refresh tokens.
+     *
+     * @param code     short-lived code from the OAuth browser redirect
+     * @param response HTTP response used to attach the refresh token cookie
+     * @return login response containing the access token
+     */
+    LoginResponse exchangeOAuthCode(String code, HttpServletResponse response);
 }

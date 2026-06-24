@@ -34,25 +34,4 @@ public class KafkaAutoConfiguration {
         mapper.registerModule(new JavaTimeModule());
         return mapper;
     }
-
-    @Bean
-    @ConditionalOnMissingBean(name = "authUserKafkaListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String>
-    authUserKafkaListenerContainerFactory() {
-
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId + "-auth-user");
-        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-
-        DefaultKafkaConsumerFactory<String, String> consumerFactory =
-                new DefaultKafkaConsumerFactory<>(config);
-
-        ConcurrentKafkaListenerContainerFactory<String, String> containerFactory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        containerFactory.setConsumerFactory(consumerFactory);
-        return containerFactory;
-    }
 }

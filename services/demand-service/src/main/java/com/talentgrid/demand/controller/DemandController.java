@@ -24,15 +24,15 @@ import java.util.List;
  * <p>
  * Endpoints:
  * <ul>
- * <li>{@code GET    /api/demands} — enterprise demand search with
+ * <li>{@code GET    /api/v1/demands} — enterprise demand search with
  * filters/sorting</li>
- * <li>{@code GET    /api/demands/pm} — demands on projects managed by the logged-in PM (optional {@code projectId})</li>
- * <li>{@code POST   /api/demands} — create a new workforce demand (status:
+ * <li>{@code GET    /api/v1/demands/pm} — demands on projects managed by the logged-in PM (optional {@code projectId})</li>
+ * <li>{@code POST   /api/v1/demands} — create a new workforce demand (status:
  * DRAFT)</li>
- * <li>{@code GET    /api/demands/{id}} — get detailed demand information</li>
- * <li>{@code PATCH  /api/demands/{id}} — update editable fields (DRAFT
+ * <li>{@code GET    /api/v1/demands/{id}} — get detailed demand information</li>
+ * <li>{@code PATCH  /api/v1/demands/{id}} — update editable fields (DRAFT
  * only)</li>
- * <li>{@code DELETE /api/demands/{id}} — soft delete a draft demand</li>
+ * <li>{@code DELETE /api/v1/demands/{id}} — soft delete a draft demand</li>
  * </ul>
  */
 @RestController
@@ -118,7 +118,7 @@ public class DemandController {
      * @param id the demand ID
      * @return the full demand response
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandResponse> getDemandById(@PathVariable Long id) {
         return ResponseEntity.ok(demandQueryService.getDemandById(id));
@@ -133,7 +133,7 @@ public class DemandController {
      * @param request the partial update request
      * @return the updated demand response
      */
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_UPDATE') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
     public ResponseEntity<DemandResponse> updateDemand(
             @PathVariable Long id, @RequestBody DemandRequest request) {
@@ -147,7 +147,7 @@ public class DemandController {
      * @param id the demand ID
      * @return HTTP 204 No Content on success
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @PreAuthorize("hasAuthority('DEMAND_DELETE') and @demandSecurity.isOwnerOrHasGlobalAccess(#id)")
     public ResponseEntity<Void> deleteDemand(@PathVariable Long id) {
         demandService.deleteDemand(id);

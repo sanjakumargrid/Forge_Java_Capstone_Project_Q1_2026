@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     boolean existsByCandidateIdAndDemandId(Long candidateId, Long demandId);
@@ -24,4 +26,9 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             Integer aiScore,
             Pageable pageable
     );
+
+    /**
+     * Fetch all applications by a list of IDs — used for bulk operations.
+     */
+    List<Application> findAllByIdIn(List<Long> ids);
 }

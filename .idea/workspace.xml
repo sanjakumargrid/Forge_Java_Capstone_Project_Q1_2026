@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/config/FeignConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/config/FeignConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/exception/DemandExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/exception/DemandExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/AiSkillSuggestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/AiSkillSuggestionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/CandidateSkillRetrievalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/CandidateSkillRetrievalService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/GeminiEmbeddingService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/JdEmbeddingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/JdEmbeddingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillEmbeddingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillEmbeddingService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillSuggestionLlmClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillSuggestionLlmClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" afterDir="false" />
+    </list>
+    <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_/Users/spratap/TalentGridTeam2" value="3FJQqcDAMa2BJFTTuRE7JXuzMi0" />
+    </persistenceIdMap>
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="796" />
+    <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;spratapgrid&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/rdevakirubaigrid/TalentGridTeam2.git&quot;,
+    &quot;accountId&quot;: &quot;6d4c1247-3e0e-4e46-a91f-f154e23687f1&quot;
+  }
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.580389479560619" />
+      <entry key="MS500" value="3.9568362170229867" />
+      <entry key="S2" value="6.740448433709235" />
+      <entry key="S5" value="7.944601429564508" />
+      <entry key="S10" value="8.442386450207351" />
+      <entry key="S30" value="8.806976818807502" />
+      <entry key="S60" value="8.902560817089558" />
+      <entry key="M2" value="8.951045909136951" />
+      <entry key="M5" value="8.980361747300972" />
+      <entry key="M10" value="8.990171430016211" />
+      <entry key="M15" value="8.993473526665639" />
+      <entry key="M30" value="9.048414224268651" />
+      <entry key="H1" value="12.662663365753993" />
+      <entry key="H2" value="48.5292311964956" />
+      <entry key="H4" value="156.73016811059378" />
+      <entry key="D1" value="756.2811717898993" />
+      <entry key="W1" value="1279.09398725623" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="4.085296729803684E-234" />
+      <entry key="S60" value="2.021211698413523E-117" />
+      <entry key="M2" value="4.49578880555535E-59" />
+      <entry key="M5" value="4.582766365616435E-24" />
+      <entry key="M10" value="2.14824463625492E-12" />
+      <entry key="M15" value="1.6994162091784836E-8" />
+      <entry key="M30" value="1.4894064407443123E-4" />
+      <entry key="H1" value="0.01647788198524462" />
+      <entry key="H2" value="0.20760818519173013" />
+      <entry key="H4" value="0.9644932903345693" />
+      <entry key="D1" value="8.045486428946973" />
+      <entry key="W1" value="15.811325824805774" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.5307052175003768" />
+      <entry key="MS500" value="3.911765759517169" />
+      <entry key="S2" value="6.717569524618722" />
+      <entry key="S5" value="7.933641669024561" />
+      <entry key="S10" value="8.436545431550227" />
+      <entry key="S30" value="8.804942951958639" />
+      <entry key="S60" value="8.901532582329843" />
+      <entry key="M2" value="8.950528931912093" />
+      <entry key="M5" value="8.98015426557762" />
+      <entry key="M10" value="8.990067573642825" />
+      <entry key="M15" value="8.993404280193406" />
+      <entry key="M30" value="9.048528006805272" />
+      <entry key="H1" value="12.679084436359876" />
+      <entry key="H2" value="48.73654817820192" />
+      <entry key="H4" value="157.69406671183953" />
+      <entry key="D1" value="764.3261682050248" />
+      <entry key="W1" value="1294.9052013211897" />
+    </decayedShown>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3FJQqcDAMa2BJFTTuRE7JXuzMi0" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="BACKGROUND" />
+      </template>
+    </option>
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.ApplicationServiceApplication.executor": "Run",
+    "Spring Boot.CandidateServiceApplication.executor": "Run",
+    "Spring Boot.NotificationServiceApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "integ-ch2",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="CandidateServiceApplication" value="FAILED" />
+              <entry key="NotificationServiceApplication" value="FAILED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.NotificationServiceApplication">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="talentgrid-parent" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="talentgrid-parent" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="ApplicationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="application-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.application.ApplicationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AuditServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="talentgrid-audit-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.auditservice.AuditServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CandidateServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="candidate-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.candidate.CandidateServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DemandServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="demand-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.demand.DemandServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="talentgrid-api-gateway-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.gateway.GatewayApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="InterviewServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="interview-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.interview.InterviewServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <envs>
+        <env name="MAIL_USERNAME" value="sirraveerapratap@gmail.com" />
+        <env name="MAIL_PASSWORD" value="zuvruqpmiyvomdgm" />
+      </envs>
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="talentgrid-notification-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.notification.NotificationServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="OfferServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="offer-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="offerService.OfferServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserAuthServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="user-auth-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.auth.UserAuthServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Spring Boot.GatewayApplication" />
+      <item itemvalue="Spring Boot.ApplicationServiceApplication" />
+      <item itemvalue="Spring Boot.AuditServiceApplication" />
+      <item itemvalue="Spring Boot.CandidateServiceApplication" />
+      <item itemvalue="Spring Boot.DemandServiceApplication" />
+      <item itemvalue="Spring Boot.InterviewServiceApplication" />
+      <item itemvalue="Spring Boot.NotificationServiceApplication" />
+      <item itemvalue="Spring Boot.OfferServiceApplication" />
+      <item itemvalue="Spring Boot.UserAuthServiceApplication" />
+    </list>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="" />
+      <created>1781790885545</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781790885545</updated>
+      <workItem from="1781790887342" duration="372000" />
+      <workItem from="1781791274949" duration="4913000" />
+      <workItem from="1781816039242" duration="6933000" />
+      <workItem from="1781959794632" duration="101000" />
+      <workItem from="1781959907478" duration="265000" />
+      <workItem from="1781960185671" duration="10000" />
+      <workItem from="1781960201185" duration="35117000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

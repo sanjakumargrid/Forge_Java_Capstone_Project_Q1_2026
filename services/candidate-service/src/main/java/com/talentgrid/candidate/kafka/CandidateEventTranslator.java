@@ -94,6 +94,7 @@ public class CandidateEventTranslator extends BaseKafkaConsumer<CandidatePayload
     notificationEventPublisher.sendInAppAndEmail(
             candidate.getCandidateId() != null ? candidate.getCandidateId().toString() : null,
             candidate.getEmail(),
+            null,
             "CANDIDATE_CREATED",
             title,
             message,
@@ -124,6 +125,7 @@ public class CandidateEventTranslator extends BaseKafkaConsumer<CandidatePayload
     notificationEventPublisher.sendInAppAndEmail(
             candidate.getCandidateId() != null ? candidate.getCandidateId().toString() : null,
             candidate.getEmail(),
+            null,
             "CANDIDATE_UPDATED",
             title,
             message,
@@ -154,6 +156,7 @@ public class CandidateEventTranslator extends BaseKafkaConsumer<CandidatePayload
     notificationEventPublisher.sendInAppAndEmail(
             candidate.getCandidateId() != null ? candidate.getCandidateId().toString() : null,
             candidate.getEmail(),
+            null,
             "CANDIDATE_DELETED",
             title,
             message,

@@ -1,0 +1,1615 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.talentgrid:offer-service:jar:1.0.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: com.talentgrid:talentgrid-shared:jar -> version ${project.version} vs (?) @ line 74, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] 
+[INFO] --------------------< com.talentgrid:offer-service >--------------------
+[INFO] Building TalentGrid Offer Service 1.0.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.4.0:run (default-cli) > test-compile @ offer-service >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ offer-service ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ offer-service ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ offer-service ---
+[INFO] skip non existing resourceDirectory /Users/spratap/TalentGridTeam2/services/offer-service/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ offer-service ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] <<< spring-boot:3.4.0:run (default-cli) < test-compile @ offer-service <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.4.0:run (default-cli) @ offer-service ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.0)
+
+2026-06-23T10:48:42.443+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : Starting OfferServiceApplication using Java 17.0.18 with PID 32733 (/Users/spratap/TalentGridTeam2/services/offer-service/target/classes started by spratap in /Users/spratap/TalentGridTeam2/services/offer-service)
+2026-06-23T10:48:42.444+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-06-23T10:48:42.461+05:30  INFO 32733 --- [offer-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-06-23T10:48:42.461+05:30  INFO 32733 --- [offer-service] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-06-23T10:48:42.947+05:30  INFO 32733 --- [offer-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-23T10:48:43.019+05:30  INFO 32733 --- [offer-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 68 ms. Found 2 JPA repository interfaces.
+2026-06-23T10:48:43.403+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8085 (http)
+2026-06-23T10:48:43.409+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-23T10:48:43.409+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-06-23T10:48:43.429+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-23T10:48:43.429+05:30  INFO 32733 --- [offer-service] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 968 ms
+2026-06-23T10:48:43.576+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-23T10:48:43.624+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@288d6d78
+2026-06-23T10:48:43.624+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-23T10:48:43.634+05:30  INFO 32733 --- [offer-service] [  restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/talentgrid (PostgreSQL 18.3)
+2026-06-23T10:48:43.640+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.3 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 17.
+2026-06-23T10:48:43.653+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 0 migrations (execution time 00:00.008s)
+2026-06-23T10:48:43.653+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbValidate     : No migrations found. Are your locations set up correctly?
+2026-06-23T10:48:43.671+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-06-23T10:48:43.673+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-06-23T10:48:43.713+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-23T10:48:43.737+05:30  INFO 32733 --- [offer-service] [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.2.Final
+2026-06-23T10:48:43.752+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-23T10:48:43.847+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-23T10:48:43.869+05:30  WARN 32733 --- [offer-service] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-23T10:48:43.875+05:30  INFO 32733 --- [offer-service] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 18.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-23T10:48:44.218+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-23T10:48:44.250+05:30  INFO 32733 --- [offer-service] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-23T10:48:44.625+05:30  WARN 32733 --- [offer-service] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-23T10:48:44.789+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-06-23T10:48:45.048+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : Unable to start LiveReload server
+2026-06-23T10:48:45.082+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.admin.AdminClientConfig    : AdminClientConfig values: 
+	auto.include.jmx.reporter = true
+	bootstrap.controllers = []
+	bootstrap.servers = [localhost:9092]
+	client.dns.lookup = use_all_dns_ips
+	client.id = offer-service-admin-0
+	connections.max.idle.ms = 300000
+	default.api.timeout.ms = 60000
+	enable.metrics.push = true
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+
+2026-06-23T10:48:45.114+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T10:48:45.114+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T10:48:45.114+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782191925114
+2026-06-23T10:48:45.201+05:30  WARN 32733 --- [offer-service] [service-admin-0] o.a.k.clients.admin.KafkaAdminClient     : [AdminClient clientId=offer-service-admin-0] The DescribeTopicPartitions API is not supported, using Metadata API to describe topics.
+2026-06-23T10:48:45.203+05:30  INFO 32733 --- [offer-service] [service-admin-0] o.a.kafka.common.utils.AppInfoParser     : App info kafka.admin.client for offer-service-admin-0 unregistered
+2026-06-23T10:48:45.204+05:30  INFO 32733 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T10:48:45.204+05:30  INFO 32733 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T10:48:45.205+05:30  INFO 32733 --- [offer-service] [service-admin-0] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T10:48:45.215+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8085 (http) with context path '/'
+2026-06-23T10:48:45.222+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-1
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T10:48:45.234+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T10:48:45.251+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T10:48:45.251+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T10:48:45.251+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782191925251
+2026-06-23T10:48:45.254+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T10:48:45.257+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-2
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T10:48:45.257+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T10:48:45.259+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T10:48:45.259+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T10:48:45.259+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782191925259
+2026-06-23T10:48:45.260+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T10:48:45.261+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-3
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T10:48:45.261+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T10:48:45.263+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T10:48:45.263+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T10:48:45.263+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782191925263
+2026-06-23T10:48:45.264+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T10:48:45.271+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T10:48:45.271+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T10:48:45.271+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : Started OfferServiceApplication in 2.954 seconds (process running for 3.154)
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:48:45.272+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-2-8d0bcfe2-ffba-4661-ba5f-90140d9f0837
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-3-a52e9013-4c0f-43a8-898d-af951a564585
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-1-a9ed3905-07bf-4e9d-b14c-8181dabcfe32
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:48:45.282+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] (Re-)joining group
+2026-06-23T10:49:14.951+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=12, memberId='consumer-offer-service-group-2-8d0bcfe2-ffba-4661-ba5f-90140d9f0837', protocol='range'}
+2026-06-23T10:49:14.951+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=12, memberId='consumer-offer-service-group-1-a9ed3905-07bf-4e9d-b14c-8181dabcfe32', protocol='range'}
+2026-06-23T10:49:14.951+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=12, memberId='consumer-offer-service-group-3-a52e9013-4c0f-43a8-898d-af951a564585', protocol='range'}
+2026-06-23T10:49:14.968+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Finished assignment for group at generation 12: {consumer-offer-service-group-1-a9ed3905-07bf-4e9d-b14c-8181dabcfe32=Assignment(partitions=[offer-events-0]), consumer-offer-service-group-2-8d0bcfe2-ffba-4661-ba5f-90140d9f0837=Assignment(partitions=[offer-events-1]), consumer-offer-service-group-3-a52e9013-4c0f-43a8-898d-af951a564585=Assignment(partitions=[offer-events-2])}
+2026-06-23T10:49:14.973+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=12, memberId='consumer-offer-service-group-3-a52e9013-4c0f-43a8-898d-af951a564585', protocol='range'}
+2026-06-23T10:49:14.973+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=12, memberId='consumer-offer-service-group-1-a9ed3905-07bf-4e9d-b14c-8181dabcfe32', protocol='range'}
+2026-06-23T10:49:14.973+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=12, memberId='consumer-offer-service-group-2-8d0bcfe2-ffba-4661-ba5f-90140d9f0837', protocol='range'}
+2026-06-23T10:49:14.974+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-0])
+2026-06-23T10:49:14.974+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-1])
+2026-06-23T10:49:14.974+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-2])
+2026-06-23T10:49:14.975+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Adding newly assigned partitions: offer-events-2
+2026-06-23T10:49:14.975+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Adding newly assigned partitions: offer-events-0
+2026-06-23T10:49:14.976+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Adding newly assigned partitions: offer-events-1
+2026-06-23T10:49:14.981+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Found no committed offset for partition offer-events-0
+2026-06-23T10:49:14.983+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-2 to the committed offset FetchPosition{offset=15, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}
+2026-06-23T10:49:14.983+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-1 to the committed offset FetchPosition{offset=9, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}
+2026-06-23T10:49:14.984+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-1]
+2026-06-23T10:49:14.984+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-2]
+2026-06-23T10:49:14.990+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.SubscriptionState    : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Resetting offset for partition offer-events-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}.
+2026-06-23T10:49:14.990+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-0]
+2026-06-23T10:56:38.243+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-06-23T10:56:38.243+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-06-23T10:56:38.246+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-06-23T10:56:38.424+05:30 ERROR 32733 --- [offer-service] [nio-8085-exec-2] i.n.r.d.DnsServerAddressStreamProviders  : Unable to load io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'. Use DEBUG level to see the full stack: java.lang.UnsatisfiedLinkError: failed to load the required native library
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.application_id=?
+Hibernate: select nextval('offer_seq')
+2026-06-23T10:56:39.008+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.k.clients.producer.ProducerConfig    : ProducerConfig values: 
+	acks = -1
+	auto.include.jmx.reporter = true
+	batch.size = 16384
+	bootstrap.servers = [localhost:9092]
+	buffer.memory = 33554432
+	client.dns.lookup = use_all_dns_ips
+	client.id = offer-service-producer-1
+	compression.gzip.level = -1
+	compression.lz4.level = 9
+	compression.type = none
+	compression.zstd.level = 3
+	connections.max.idle.ms = 540000
+	delivery.timeout.ms = 120000
+	enable.idempotence = true
+	enable.metrics.push = true
+	interceptor.classes = []
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 0
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.max.age.ms = 300000
+	metadata.max.idle.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partitioner.adaptive.partitioning.enable = true
+	partitioner.availability.timeout.ms = 0
+	partitioner.class = null
+	partitioner.ignore.keys = false
+	receive.buffer.bytes = 32768
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	transaction.timeout.ms = 60000
+	transactional.id = null
+	value.serializer = class org.springframework.kafka.support.serializer.JsonSerializer
+
+2026-06-23T10:56:39.009+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T10:56:39.014+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=offer-service-producer-1] Instantiated an idempotent producer.
+2026-06-23T10:56:39.019+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T10:56:39.019+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T10:56:39.019+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782192399019
+2026-06-23T10:56:39.021+05:30  INFO 32733 --- [offer-service] [vice-producer-1] org.apache.kafka.clients.Metadata        : [Producer clientId=offer-service-producer-1] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T10:56:39.022+05:30  INFO 32733 --- [offer-service] [vice-producer-1] o.a.k.c.p.internals.TransactionManager   : [Producer clientId=offer-service-producer-1] ProducerId set to 1007 with epoch 0
+2026-06-23T10:56:39.027+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.kafka.producer.OfferEventProducer      : Published OFFER_CREATED event to topic=offer-events for offerId=352
+2026-06-23T10:56:39.036+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=9 | eventType=OFFER_CREATED
+2026-06-23T10:56:39.037+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=CREATE
+2026-06-23T10:56:39.037+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=9
+2026-06-23T10:56:39.038+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=65 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:56:39.040+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_CREATED | eventId=b017c0ea-24d7-4ca1-a65f-2bde363a4dbf | source=offer-service | correlationId=82e62d54-0afd-4cf2-b6e8-42a6cc457aac
+2026-06-23T10:56:39.040+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_CREATED | offerId=352
+Hibernate: insert into offer (application_id,approval_chain,approved_at,approved_by,base_salary,bonus,candidate_name,current_approval_step,docu_sign_id,employment_type,equity,expires_at,joining_date,offer_status,rejected_at,rejected_by,rejection_reason,role,sent_at,signed_at,offer_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+2026-06-23T10:56:39.092+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_CREATED | toEmail=rishi662233@gmail.com
+2026-06-23T10:56:39.095+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=37 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:56:55.726+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-3] o.kafka.producer.OfferEventProducer      : Published OFFER_UPDATED event to topic=offer-events for offerId=352
+2026-06-23T10:56:55.729+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-3] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T10:56:55.736+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=10 | eventType=OFFER_UPDATED
+2026-06-23T10:56:55.740+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=66 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:56:55.740+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=10
+2026-06-23T10:56:55.741+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_UPDATED | eventId=1d651f97-3bdf-4f55-9614-1c160377f779 | source=offer-service | correlationId=ed300314-09f0-49eb-be07-ffc5b8857044
+2026-06-23T10:56:55.741+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_UPDATED | offerId=352
+2026-06-23T10:56:55.784+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_UPDATED | toEmail=rishi662233@gmail.com
+2026-06-23T10:56:55.786+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=38 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:07.427+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-4] o.kafka.producer.OfferEventProducer      : Published OFFER_UPDATED event to topic=offer-events for offerId=352
+2026-06-23T10:57:07.431+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-4] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T10:57:07.442+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=11 | eventType=OFFER_UPDATED
+2026-06-23T10:57:07.444+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=67 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:57:07.447+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=11
+2026-06-23T10:57:07.450+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_UPDATED | eventId=dee8870a-1f43-480f-9ef6-f321dd038fda | source=offer-service | correlationId=bcaac8d2-501a-4def-9115-1fe3349da3f9
+2026-06-23T10:57:07.450+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_UPDATED | offerId=352
+2026-06-23T10:57:07.502+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_UPDATED | toEmail=rishi662233@gmail.com
+2026-06-23T10:57:07.505+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=39 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:20.174+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-5] o.kafka.producer.OfferEventProducer      : Published OFFER_SUBMITTED_FOR_APPROVAL event to topic=offer-events for offerId=352
+2026-06-23T10:57:20.177+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-5] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T10:57:20.190+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=12 | eventType=OFFER_SUBMITTED_FOR_APPROVAL
+2026-06-23T10:57:20.191+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=68 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:57:20.194+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=12
+2026-06-23T10:57:20.195+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SUBMITTED_FOR_APPROVAL | eventId=7730141e-fd16-4f5f-9c92-8784327d9805 | source=offer-service | correlationId=7a42c089-676b-4447-a76f-c140a1a1acf4
+2026-06-23T10:57:20.195+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SUBMITTED_FOR_APPROVAL | offerId=352
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:20.203+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_SUBMITTED_FOR_APPROVAL | toEmail=hr.manager@example.com
+2026-06-23T10:57:20.206+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=40 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:30.181+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-6] o.kafka.producer.OfferEventProducer      : Published OFFER_PENDING_NEXT_APPROVAL event to topic=offer-events for offerId=352
+2026-06-23T10:57:30.182+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-6] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T10:57:30.186+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=13 | eventType=OFFER_PENDING_NEXT_APPROVAL
+2026-06-23T10:57:30.188+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=13
+2026-06-23T10:57:30.188+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=69 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:57:30.189+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_PENDING_NEXT_APPROVAL | eventId=ab81ed8f-aa66-4c69-9a5a-20d6d9304624 | source=offer-service | correlationId=37efb50d-c559-4556-818e-6a5ad36e66f1
+2026-06-23T10:57:30.189+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_PENDING_NEXT_APPROVAL | offerId=352
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:30.191+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_PENDING_NEXT_APPROVAL | toEmail=sirraveerapratap@gmail.com
+2026-06-23T10:57:30.193+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=41 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T10:57:38.471+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-7] o.kafka.producer.OfferEventProducer      : Published OFFER_APPROVED event to topic=offer-events for offerId=352
+2026-06-23T10:57:38.472+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-7] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T10:57:38.485+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=14 | eventType=OFFER_APPROVED
+2026-06-23T10:57:38.486+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=70 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T10:57:38.488+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=14
+2026-06-23T10:57:38.488+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_APPROVED | eventId=e6b32f4b-1560-49b7-b40f-969b4f3eb65e | source=offer-service | correlationId=db978761-b677-4c63-b2eb-978da0738549
+2026-06-23T10:57:38.488+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_APPROVED | offerId=352
+2026-06-23T10:57:38.570+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_APPROVED | toEmail=rishi662233@gmail.com
+2026-06-23T10:57:38.575+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=42 | eventType=NOTIFICATION_SEND
+2026-06-23T10:57:45.404+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T10:57:45.404+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T10:57:45.537+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Node -1 disconnected.
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+Hibernate: select ot1_0.template_id,ot1_0.active,ot1_0.created_at,ot1_0.template_content,ot1_0.template_name,ot1_0.updated_at from offer_template ot1_0 where ot1_0.active
+com.openhtmltopdf.load INFO:: SAX XMLReader in use (parser): com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser
+com.openhtmltopdf.load INFO:: SAX XMLReader in use (parser): com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser
+com.openhtmltopdf.load INFO:: Loaded document in ~10ms
+com.openhtmltopdf.load INFO:: TIME: parse stylesheets 19ms
+com.openhtmltopdf.match INFO:: media = print
+com.openhtmltopdf.match INFO:: Matcher created with 167 selectors
+com.openhtmltopdf.general INFO:: Using fast-mode renderer. Prepare to fly.
+2026-06-23T10:57:50.741+05:30 ERROR 32733 --- [offer-service] [nio-8085-exec-8] o.offer.integration.DocuSignClient       : Failed to create DocuSign envelope
+
+com.docusign.esign.client.ApiException: Error while requesting server, received a non successful HTTP code 400 with response Body: '{"error":"consent_required"}'
+	at com.docusign.esign.client.ApiClient.requestJWTUserToken(ApiClient.java:990) ~[docusign-esign-java-6.3.0.jar:na]
+	at offerService.offer.integration.DocuSignClient.createAuthenticatedClient(DocuSignClient.java:141) ~[classes/:na]
+	at offerService.offer.integration.DocuSignClient.createEnvelope(DocuSignClient.java:40) ~[classes/:na]
+	at offerService.offer.service.OfferServiceImpl.sendOffer(OfferServiceImpl.java:272) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.0.jar:6.2.0]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727) ~[spring-aop-6.2.0.jar:6.2.0]
+	at offerService.offer.service.OfferServiceImpl$$SpringCGLIB$$0.sendOffer(<generated>) ~[classes/:na]
+	at offerService.offer.controller.OfferController.sendOffer(OfferController.java:83) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.proceed(AuthorizationManagerBeforeMethodInterceptor.java:268) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.attemptAuthorization(AuthorizationManagerBeforeMethodInterceptor.java:263) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:196) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.config.annotation.method.configuration.DeferringMethodInterceptor.invoke(DeferringMethodInterceptor.java:44) ~[spring-security-config-6.4.1.jar:6.4.1]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727) ~[spring-aop-6.2.0.jar:6.2.0]
+	at offerService.offer.controller.OfferController$$SpringCGLIB$$0.sendOffer(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:888) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.33.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at offerService.filter.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:66) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238) ~[spring-security-config-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-06-23T10:57:50.751+05:30 ERROR 32733 --- [offer-service] [nio-8085-exec-8] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed: java.lang.RuntimeException: Unable to create DocuSign envelope] with root cause
+
+com.docusign.esign.client.ApiException: Error while requesting server, received a non successful HTTP code 400 with response Body: '{"error":"consent_required"}'
+	at com.docusign.esign.client.ApiClient.requestJWTUserToken(ApiClient.java:990) ~[docusign-esign-java-6.3.0.jar:na]
+	at offerService.offer.integration.DocuSignClient.createAuthenticatedClient(DocuSignClient.java:141) ~[classes/:na]
+	at offerService.offer.integration.DocuSignClient.createEnvelope(DocuSignClient.java:40) ~[classes/:na]
+	at offerService.offer.service.OfferServiceImpl.sendOffer(OfferServiceImpl.java:272) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:380) ~[spring-tx-6.2.0.jar:6.2.0]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119) ~[spring-tx-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727) ~[spring-aop-6.2.0.jar:6.2.0]
+	at offerService.offer.service.OfferServiceImpl$$SpringCGLIB$$0.sendOffer(<generated>) ~[classes/:na]
+	at offerService.offer.controller.OfferController.sendOffer(OfferController.java:83) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.proceed(AuthorizationManagerBeforeMethodInterceptor.java:268) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.attemptAuthorization(AuthorizationManagerBeforeMethodInterceptor.java:263) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor.invoke(AuthorizationManagerBeforeMethodInterceptor.java:196) ~[spring-security-core-6.4.1.jar:6.4.1]
+	at org.springframework.security.config.annotation.method.configuration.DeferringMethodInterceptor.invoke(DeferringMethodInterceptor.java:44) ~[spring-security-config-6.4.1.jar:6.4.1]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184) ~[spring-aop-6.2.0.jar:6.2.0]
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:727) ~[spring-aop-6.2.0.jar:6.2.0]
+	at offerService.offer.controller.OfferController$$SpringCGLIB$$0.sendOffer(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:255) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:188) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:986) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:891) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1088) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:978) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:888) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658) ~[tomcat-embed-core-10.1.33.jar:6.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:195) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51) ~[tomcat-embed-websocket-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:110) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:479) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:340) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:82) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:128) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at offerService.filter.JwtAuthFilter.doFilterInternal(JwtAuthFilter.java:66) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:240) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:323) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:224) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:137) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191) ~[spring-security-web-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$3(HandlerMappingIntrospector.java:243) ~[spring-webmvc-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:238) ~[spring-security-config-6.4.1.jar:6.4.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:114) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-6.2.0.jar:6.2.0]
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:164) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:140) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:483) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:344) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:397) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:905) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1741) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1190) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63) ~[tomcat-embed-core-10.1.33.jar:10.1.33]
+	at java.base/java.lang.Thread.run(Thread.java:840) ~[na:na]
+
+2026-06-23T11:06:09.056+05:30  INFO 32733 --- [offer-service] [vice-producer-1] org.apache.kafka.clients.NetworkClient   : [Producer clientId=offer-service-producer-1] Node -1 disconnected.
+2026-06-23T11:07:45.340+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T11:07:45.340+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T11:07:45.357+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Node -1 disconnected.
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+Hibernate: select ot1_0.template_id,ot1_0.active,ot1_0.created_at,ot1_0.template_content,ot1_0.template_name,ot1_0.updated_at from offer_template ot1_0 where ot1_0.active
+com.openhtmltopdf.load INFO:: SAX XMLReader in use (parser): com.sun.org.apache.xerces.internal.jaxp.SAXParserImpl$JAXPSAXParser
+com.openhtmltopdf.load INFO:: Loaded document in ~3ms
+com.openhtmltopdf.load INFO:: TIME: parse stylesheets 1ms
+com.openhtmltopdf.match INFO:: media = print
+com.openhtmltopdf.match INFO:: Matcher created with 167 selectors
+com.openhtmltopdf.general INFO:: Using fast-mode renderer. Prepare to fly.
+2026-06-23T11:08:23.510+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.offer.integration.DocuSignClient       : DocuSign envelope created successfully. envelopeId=dfb72e75-4938-8f6e-804b-35a7fa611661
+2026-06-23T11:08:23.535+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] o.kafka.producer.OfferEventProducer      : Published OFFER_SENT event to topic=offer-events for offerId=352
+2026-06-23T11:08:23.545+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=15 | eventType=OFFER_SENT
+2026-06-23T11:08:23.547+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-2] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+2026-06-23T11:08:23.548+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=15
+2026-06-23T11:08:23.549+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SENT | eventId=dbf66b15-b0d8-4d3a-aa3e-3efad6f85d1b | source=offer-service | correlationId=0e863030-6307-4233-972f-59b7b2542be6
+2026-06-23T11:08:23.549+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SENT | offerId=352
+2026-06-23T11:08:23.549+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=71 | eventType=AUDIT_LOG_ENTRY
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T11:08:23.570+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_SENT | toEmail=rishi662233@gmail.com
+2026-06-23T11:08:23.572+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=43 | eventType=NOTIFICATION_SEND
+Hibernate: select o1_0.offer_id,o1_0.application_id,o1_0.approval_chain,o1_0.approved_at,o1_0.approved_by,o1_0.base_salary,o1_0.bonus,o1_0.candidate_name,o1_0.current_approval_step,o1_0.docu_sign_id,o1_0.employment_type,o1_0.equity,o1_0.expires_at,o1_0.joining_date,o1_0.offer_status,o1_0.rejected_at,o1_0.rejected_by,o1_0.rejection_reason,o1_0.role,o1_0.sent_at,o1_0.signed_at from offer o1_0 where o1_0.offer_id=?
+2026-06-23T11:09:31.138+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-6] o.kafka.producer.OfferEventProducer      : Published OFFER_SIGNED event to topic=offer-events for offerId=352
+2026-06-23T11:09:31.141+05:30  INFO 32733 --- [offer-service] [nio-8085-exec-6] c.t.audit.client.AuditLogClient          : Audit event published | entityType=OFFER | entityId=352 | action=UPDATE
+2026-06-23T11:09:31.151+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=offer-events | partition=1 | offset=16 | eventType=OFFER_SIGNED
+2026-06-23T11:09:31.152+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=system-events | partition=0 | offset=72 | eventType=AUDIT_LOG_ENTRY
+2026-06-23T11:09:31.156+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ▶ Message received | topic=offer-events | partition=1 | offset=16
+2026-06-23T11:09:31.156+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] c.t.kafka.consumer.BaseKafkaConsumer     : [KAFKA-CONSUMER] Received event | type=OFFER_SIGNED | eventId=185e7d90-eedf-4380-bbd8-90de3faece3e | source=offer-service | correlationId=9d057af2-9427-4c7e-af99-69cb88ac7f73
+2026-06-23T11:09:31.156+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] Translating event | type=OFFER_SIGNED | offerId=352
+Hibernate: update offer set application_id=?,approval_chain=?,approved_at=?,approved_by=?,base_salary=?,bonus=?,candidate_name=?,current_approval_step=?,docu_sign_id=?,employment_type=?,equity=?,expires_at=?,joining_date=?,offer_status=?,rejected_at=?,rejected_by=?,rejection_reason=?,role=?,sent_at=?,signed_at=? where offer_id=?
+2026-06-23T11:09:31.217+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.kafka.OfferEventTranslator             : [OFFER-TRANSLATOR] ✓ NOTIFICATION_SEND published | offerId=352 | type=OFFER_SIGNED | toEmail=rishi662233@gmail.com
+2026-06-23T11:09:31.219+05:30  INFO 32733 --- [offer-service] [vice-producer-1] c.t.kafka.producer.KafkaProducerService  : Event published successfully | topic=notification.send | partition=1 | offset=45 | eventType=NOTIFICATION_SEND
+2026-06-23T11:15:37.365+05:30  INFO 32733 --- [offer-service] [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 1 class path change (0 additions, 0 deletions, 1 modification)
+2026-06-23T11:15:37.375+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Revoke previously assigned partitions offer-events-1
+2026-06-23T11:15:37.375+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Revoke previously assigned partitions offer-events-0
+2026-06-23T11:15:37.375+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Revoke previously assigned partitions offer-events-2
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions revoked: [offer-events-0]
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions revoked: [offer-events-1]
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions revoked: [offer-events-2]
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Member consumer-offer-service-group-2-8d0bcfe2-ffba-4661-ba5f-90140d9f0837 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Member consumer-offer-service-group-1-a9ed3905-07bf-4e9d-b14c-8181dabcfe32 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-06-23T11:15:37.376+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Member consumer-offer-service-group-3-a52e9013-4c0f-43a8-898d-af951a564585 sending LeaveGroup request to coordinator localhost:9092 (id: 2147483646 rack: null) due to the consumer unsubscribed from all topics
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Unsubscribed all topics or patterns and assigned partitions
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Unsubscribed all topics or patterns and assigned partitions
+2026-06-23T11:15:37.377+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Unsubscribed all topics or patterns and assigned partitions
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-3, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Resetting generation and member id due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-1, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.379+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-2, groupId=offer-service-group] Request joining group due to: consumer pro-actively leaving the group
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T11:15:37.595+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T11:15:37.599+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-offer-service-group-3 unregistered
+2026-06-23T11:15:37.599+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-offer-service-group-1 unregistered
+2026-06-23T11:15:37.605+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: Consumer stopped
+2026-06-23T11:15:37.606+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: Consumer stopped
+2026-06-23T11:15:37.831+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T11:15:37.831+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T11:15:37.831+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-06-23T11:15:37.831+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T11:15:37.834+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.consumer for consumer-offer-service-group-2 unregistered
+2026-06-23T11:15:37.837+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: Consumer stopped
+2026-06-23T11:15:37.839+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-06-23T11:15:37.844+05:30  INFO 32733 --- [offer-service] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-06-23T11:15:37.857+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.a.k.clients.producer.KafkaProducer     : [Producer clientId=offer-service-producer-1] Closing the Kafka producer with timeoutMillis = 30000 ms.
+2026-06-23T11:15:37.859+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T11:15:37.859+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T11:15:37.859+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.telemetry.internals.ClientTelemetryReporter
+2026-06-23T11:15:37.859+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T11:15:37.859+05:30  INFO 32733 --- [offer-service] [       Thread-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.producer for offer-service-producer-1 unregistered
+2026-06-23T11:15:37.870+05:30  INFO 32733 --- [offer-service] [       Thread-1] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-23T11:15:37.874+05:30  INFO 32733 --- [offer-service] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-23T11:15:37.877+05:30  INFO 32733 --- [offer-service] [       Thread-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.0)
+
+2026-06-23T11:15:37.987+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : Starting OfferServiceApplication using Java 17.0.18 with PID 32733 (/Users/spratap/TalentGridTeam2/services/offer-service/target/classes started by spratap in /Users/spratap/TalentGridTeam2/services/offer-service)
+2026-06-23T11:15:37.987+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : No active profile set, falling back to 1 default profile: "default"
+2026-06-23T11:15:38.196+05:30  INFO 32733 --- [offer-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-23T11:15:38.207+05:30  INFO 32733 --- [offer-service] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 10 ms. Found 2 JPA repository interfaces.
+2026-06-23T11:15:38.324+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8085 (http)
+2026-06-23T11:15:38.325+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-23T11:15:38.325+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-06-23T11:15:38.334+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-23T11:15:38.334+05:30  INFO 32733 --- [offer-service] [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 344 ms
+2026-06-23T11:15:38.403+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-06-23T11:15:38.414+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@5d4108f7
+2026-06-23T11:15:38.415+05:30  INFO 32733 --- [offer-service] [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-06-23T11:15:38.415+05:30  INFO 32733 --- [offer-service] [  restartedMain] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/talentgrid (PostgreSQL 18.3)
+2026-06-23T11:15:38.418+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: PostgreSQL 18.3 is newer than this version of Flyway and support has not been tested. The latest supported version of PostgreSQL is 17.
+2026-06-23T11:15:38.421+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbValidate     : Successfully validated 0 migrations (execution time 00:00.002s)
+2026-06-23T11:15:38.421+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbValidate     : No migrations found. Are your locations set up correctly?
+2026-06-23T11:15:38.432+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-06-23T11:15:38.432+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-06-23T11:15:38.448+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-23T11:15:38.450+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-23T11:15:38.454+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-23T11:15:38.458+05:30  WARN 32733 --- [offer-service] [  restartedMain] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-06-23T11:15:38.459+05:30  INFO 32733 --- [offer-service] [  restartedMain] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+	Database driver: undefined/unknown
+	Database version: 18.3
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-23T11:15:38.493+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-23T11:15:38.498+05:30  INFO 32733 --- [offer-service] [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-23T11:15:38.671+05:30  WARN 32733 --- [offer-service] [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-23T11:15:38.785+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-06-23T11:15:38.975+05:30  WARN 32733 --- [offer-service] [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : Unable to start LiveReload server
+2026-06-23T11:15:38.985+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.admin.AdminClientConfig    : AdminClientConfig values: 
+	auto.include.jmx.reporter = true
+	bootstrap.controllers = []
+	bootstrap.servers = [localhost:9092]
+	client.dns.lookup = use_all_dns_ips
+	client.id = offer-service-admin-1
+	connections.max.idle.ms = 300000
+	default.api.timeout.ms = 60000
+	enable.metrics.push = true
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 2147483647
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+
+2026-06-23T11:15:38.985+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T11:15:38.985+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T11:15:38.985+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782193538985
+2026-06-23T11:15:38.992+05:30  WARN 32733 --- [offer-service] [service-admin-1] o.a.k.clients.admin.KafkaAdminClient     : [AdminClient clientId=offer-service-admin-1] The DescribeTopicPartitions API is not supported, using Metadata API to describe topics.
+2026-06-23T11:15:38.993+05:30  INFO 32733 --- [offer-service] [service-admin-1] o.a.kafka.common.utils.AppInfoParser     : App info kafka.admin.client for offer-service-admin-1 unregistered
+2026-06-23T11:15:38.994+05:30  INFO 32733 --- [offer-service] [service-admin-1] o.apache.kafka.common.metrics.Metrics    : Metrics scheduler closed
+2026-06-23T11:15:38.994+05:30  INFO 32733 --- [offer-service] [service-admin-1] o.apache.kafka.common.metrics.Metrics    : Closing reporter org.apache.kafka.common.metrics.JmxReporter
+2026-06-23T11:15:38.994+05:30  INFO 32733 --- [offer-service] [service-admin-1] o.apache.kafka.common.metrics.Metrics    : Metrics reporters closed
+2026-06-23T11:15:38.995+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8085 (http) with context path '/'
+2026-06-23T11:15:38.995+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-4
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T11:15:38.995+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T11:15:38.997+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T11:15:38.997+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T11:15:38.997+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782193538997
+2026-06-23T11:15:38.997+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T11:15:38.999+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-5
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T11:15:38.999+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T11:15:39.000+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T11:15:39.000+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T11:15:39.000+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782193539000
+2026-06-23T11:15:39.001+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T11:15:39.001+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.clients.consumer.ConsumerConfig    : ConsumerConfig values: 
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.include.jmx.reporter = true
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-offer-service-group-6
+	client.rack = 
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = false
+	enable.metrics.push = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = offer-service-group
+	group.instance.id = null
+	group.protocol = classic
+	group.remote.assignor = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metadata.recovery.strategy = none
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor, class org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.max.ms = 1000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.connect.timeout.ms = null
+	sasl.login.read.timeout.ms = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.login.retry.backoff.max.ms = 10000
+	sasl.login.retry.backoff.ms = 100
+	sasl.mechanism = GSSAPI
+	sasl.oauthbearer.clock.skew.seconds = 30
+	sasl.oauthbearer.expected.audience = null
+	sasl.oauthbearer.expected.issuer = null
+	sasl.oauthbearer.jwks.endpoint.refresh.ms = 3600000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.max.ms = 10000
+	sasl.oauthbearer.jwks.endpoint.retry.backoff.ms = 100
+	sasl.oauthbearer.jwks.endpoint.url = null
+	sasl.oauthbearer.scope.claim.name = scope
+	sasl.oauthbearer.sub.claim.name = sub
+	sasl.oauthbearer.token.endpoint.url = null
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 45000
+	socket.connection.setup.timeout.max.ms = 30000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+
+2026-06-23T11:15:39.001+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.t.i.KafkaMetricsCollector        : initializing Kafka metrics collector
+2026-06-23T11:15:39.002+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka version: 3.8.1
+2026-06-23T11:15:39.002+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka commitId: 70d6ff42debf7e17
+2026-06-23T11:15:39.002+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.kafka.common.utils.AppInfoParser     : Kafka startTimeMs: 1782193539002
+2026-06-23T11:15:39.003+05:30  INFO 32733 --- [offer-service] [  restartedMain] o.a.k.c.c.internals.LegacyKafkaConsumer  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Subscribed to topic(s): offer-events
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.Metadata        : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Cluster ID: FZ5fgxe8QsiYlf7uOpvVWA
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Discovered group coordinator localhost:9092 (id: 2147483646 rack: null)
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.007+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.008+05:30  INFO 32733 --- [offer-service] [  restartedMain] offerService.OfferServiceApplication     : Started OfferServiceApplication in 1.032 seconds (process running for 1616.824)
+2026-06-23T11:15:39.009+05:30  INFO 32733 --- [offer-service] [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-06-23T11:15:39.011+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-5-319d2609-0c5b-40ac-a560-2ab7375d567d
+2026-06-23T11:15:39.011+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.012+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-6-0b28b47a-e594-433d-9324-d37135454ece
+2026-06-23T11:15:39.012+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.012+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Request joining group due to: need to re-join with the given member-id: consumer-offer-service-group-4-38b6bc3b-de54-4304-8c0b-8dc5b32cac8e
+2026-06-23T11:15:39.012+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] (Re-)joining group
+2026-06-23T11:15:39.013+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=14, memberId='consumer-offer-service-group-5-319d2609-0c5b-40ac-a560-2ab7375d567d', protocol='range'}
+2026-06-23T11:15:39.013+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=14, memberId='consumer-offer-service-group-6-0b28b47a-e594-433d-9324-d37135454ece', protocol='range'}
+2026-06-23T11:15:39.013+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Successfully joined group with generation Generation{generationId=14, memberId='consumer-offer-service-group-4-38b6bc3b-de54-4304-8c0b-8dc5b32cac8e', protocol='range'}
+2026-06-23T11:15:39.013+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Finished assignment for group at generation 14: {consumer-offer-service-group-5-319d2609-0c5b-40ac-a560-2ab7375d567d=Assignment(partitions=[offer-events-1]), consumer-offer-service-group-6-0b28b47a-e594-433d-9324-d37135454ece=Assignment(partitions=[offer-events-2]), consumer-offer-service-group-4-38b6bc3b-de54-4304-8c0b-8dc5b32cac8e=Assignment(partitions=[offer-events-0])}
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=14, memberId='consumer-offer-service-group-5-319d2609-0c5b-40ac-a560-2ab7375d567d', protocol='range'}
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=14, memberId='consumer-offer-service-group-6-0b28b47a-e594-433d-9324-d37135454ece', protocol='range'}
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Successfully synced group in generation Generation{generationId=14, memberId='consumer-offer-service-group-4-38b6bc3b-de54-4304-8c0b-8dc5b32cac8e', protocol='range'}
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-1])
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-2])
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Adding newly assigned partitions: offer-events-2
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Notifying assignor about the new Assignment(partitions=[offer-events-0])
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Adding newly assigned partitions: offer-events-1
+2026-06-23T11:15:39.014+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] k.c.c.i.ConsumerRebalanceListenerInvoker : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Adding newly assigned partitions: offer-events-0
+2026-06-23T11:15:39.015+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-1 to the committed offset FetchPosition{offset=17, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}
+2026-06-23T11:15:39.015+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.a.k.c.c.internals.ConsumerUtils        : Setting offset for partition offer-events-2 to the committed offset FetchPosition{offset=15, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}
+2026-06-23T11:15:39.015+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.ConsumerCoordinator  : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Found no committed offset for partition offer-events-0
+2026-06-23T11:15:39.015+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-2]
+2026-06-23T11:15:39.015+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-1]
+2026-06-23T11:15:39.018+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.a.k.c.c.internals.SubscriptionState    : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Resetting offset for partition offer-events-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[localhost:9092 (id: 1 rack: null)], epoch=2}}.
+2026-06-23T11:15:39.018+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : offer-service-group: partitions assigned: [offer-events-0]
+2026-06-23T11:24:39.131+05:30  INFO 32733 --- [offer-service] [ntainer#0-1-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-5, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T11:24:39.131+05:30  INFO 32733 --- [offer-service] [ntainer#0-0-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-4, groupId=offer-service-group] Node -1 disconnected.
+2026-06-23T11:24:39.131+05:30  INFO 32733 --- [offer-service] [ntainer#0-2-C-1] org.apache.kafka.clients.NetworkClient   : [Consumer clientId=consumer-offer-service-group-6, groupId=offer-service-group] Node -1 disconnected.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  44:33 min
+[INFO] Finished at: 2026-06-23T11:33:13+05:30
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.4.0:run (default-cli) on project offer-service: Process terminated with exit code: 137 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

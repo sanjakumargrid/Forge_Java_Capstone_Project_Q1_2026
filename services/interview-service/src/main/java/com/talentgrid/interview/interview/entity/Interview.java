@@ -48,7 +48,7 @@ public class Interview {
     private Type interviewType;
 
     @NotNull(message = "Scheduled date and time is required")
-    @Future(message = "Interview scheduled time must be in the future")
+    @FutureOrPresent(message = "Interview scheduled time must be today or in the future")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "scheduled_at", nullable = false)
     private LocalDateTime scheduledAt;

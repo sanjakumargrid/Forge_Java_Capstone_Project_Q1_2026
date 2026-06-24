@@ -1,4 +1,1 @@
 com.talentgrid.shared.config.JwtAutoConfiguration
-com.talentgrid.shared.config.KafkaConsumerAutoConfiguration
-com.talentgrid.kafka.config.KafkaAutoConfiguration
-com.talentgrid.clients.notification.NotificationClientAutoConfiguration

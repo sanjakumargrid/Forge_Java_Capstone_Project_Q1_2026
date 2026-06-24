@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 public class ScorecardController {
 
     private final ScorecardService scorecardService;
-
+    @PreAuthorize("hasAuthority('SCORECARD_CREATE')")
     @PostMapping("/interviews/{interviewId}/scorecards")
     public ResponseEntity<ScorecardResponseDto> submitScorecard(
             @PathVariable Long interviewId,
@@ -35,7 +36,7 @@ public class ScorecardController {
                 .status(HttpStatus.CREATED)
                 .body(response);
     }
-
+    @PreAuthorize("hasAuthority('SCORECARD_VIEW')")
     @GetMapping("/scorecards/{scorecardId}")
     public ResponseEntity<ScorecardResponseDto> getScorecardById(
             @PathVariable Long scorecardId
@@ -46,7 +47,7 @@ public class ScorecardController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('SCORECARD_VIEW')")
     @GetMapping("/interviews/{interviewId}/scorecards")
     public ResponseEntity<List<ScorecardSummaryDto>> getScorecardsByInterview(
             @PathVariable Long interviewId
@@ -57,7 +58,7 @@ public class ScorecardController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('SCORECARD_VIEW')")
     @GetMapping("/applications/{applicationId}/scorecards")
     public ResponseEntity<List<ScorecardSummaryDto>> getScorecardsByApplication(
             @PathVariable Long applicationId
@@ -68,7 +69,7 @@ public class ScorecardController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('SCORECARD_VIEW')")
     @GetMapping("/interviews/{interviewId}/scorecards/interviewer/{interviewerId}")
     public ResponseEntity<ScorecardResponseDto> getScorecardByInterviewer(
             @PathVariable Long interviewId,
@@ -83,7 +84,7 @@ public class ScorecardController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("hasAuthority('SCORECARD_DELETE')")
     @DeleteMapping("/scorecards/{scorecardId}")
     public ResponseEntity<Void> deleteScorecard(
             @PathVariable Long scorecardId

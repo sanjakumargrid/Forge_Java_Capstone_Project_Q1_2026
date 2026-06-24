@@ -14,7 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * <p>Consumer group: {@code notification-service-group}</p>
  * <p>Inbound topic: {@code notification.send}</p>
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.talentgrid"})
 public class NotificationServiceApplication {
 
     public static void main(String[] args) {

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -25,6 +26,11 @@ public class AiSkillSuggestionService {
         log.info("Generating AI skill suggestions for job description");
         List<Skill> candidates = candidateSkillRetrievalService.getCandidateSkills(jobDescriptionText);
         log.info("Retrieved {} candidate skills. Sending to LLM...", candidates.size());
+
+        if (candidates.isEmpty()) {
+            log.warn("No candidate skills available — skipping LLM call and returning empty suggestions");
+            return new AiSkillSuggestionResponse(new ArrayList<>(), new ArrayList<>());
+        }
 
         return skillSuggestionLlmClient.suggestSkills(jobDescriptionText, jobTitle, level, experienceYears, candidates);
     }

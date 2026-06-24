@@ -41,7 +41,7 @@ public class DemandLifecycleController {
     /**
      * Submit from {@code DRAFT}: HM → {@code PENDING_APPROVAL}; portfolio manager on same project → auto post-approval routing.
      */
-    @PostMapping("/{id}/submit")
+    @PostMapping("/{id:\\d+}/submit")
     @PreAuthorize("hasAuthority('DEMAND_SUBMIT') or hasAuthority('DEMAND_PM_APPROVE')")
     public ResponseEntity<DemandResponse> submitDemand(
             @PathVariable Long id,
@@ -55,7 +55,7 @@ public class DemandLifecycleController {
      * Only the user who is {@code project_manager_id} for the demand's project may call this
      * (scope {@code DEMAND_PM_APPROVE}; enforced in service via user-auth project lookup).
      *
-     * <p>Same behavior as {@code PUT /api/v1/project-manager/demands/{id}/approve}; offered as a
+     * <p>Same behavior as {@code PUT /api/v1/portfolio-manager/demands/{id}/approve}; offered as a
      * convenience alias if UI doesn't segment PM persona.</p> single demand URL prefix.
      *
      * <p>
@@ -66,7 +66,7 @@ public class DemandLifecycleController {
      * @param request the approval request with decision and optional comments
      * @return 200 OK
      */
-    @PostMapping("/{id}/approve")
+    @PostMapping("/{id:\\d+}/approve")
     @PreAuthorize("hasAuthority('DEMAND_PM_APPROVE')")
     public ResponseEntity<DemandResponse> approveDemand(
             @PathVariable Long id, @RequestBody ApprovalRequest request) {
@@ -93,7 +93,7 @@ public class DemandLifecycleController {
      *                applicable)
      * @return 200 OK
      */
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{id:\\d+}/status")
     @PreAuthorize("hasAuthority('DEMAND_STATUS_TRANSITION') and @demandSecurity.canTransition(#id)")
     public ResponseEntity<DemandResponse> transitionStatus(
             @PathVariable Long id, @RequestBody StatusTransitionRequest request) {
@@ -108,7 +108,7 @@ public class DemandLifecycleController {
      * @param id the demand ID
      * @return the unified pipeline view
      */
-    @GetMapping("/{id}/pipeline")
+    @GetMapping("/{id:\\d+}/pipeline")
     @PreAuthorize("hasAuthority('DEMAND_PIPELINE_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandPipelineResponse> getPipeline(@PathVariable Long id) {
         DemandPipelineResponse response = queryService.getPipeline(id);
@@ -121,7 +121,7 @@ public class DemandLifecycleController {
      * @param id the demand ID
      * @return list of status history entries
      */
-    @GetMapping("/{id}/history")
+    @GetMapping("/{id:\\d+}/history")
     @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<List<DemandStatusHistoryResponse>> getHistory(@PathVariable Long id) {
         List<DemandStatusHistoryResponse> response = queryService.getDemandHistory(id);
@@ -134,7 +134,7 @@ public class DemandLifecycleController {
      * @param id the demand ID
      * @return the demand skills (mandatory and optional)
      */
-    @GetMapping("/{id}/skills")
+    @GetMapping("/{id:\\d+}/skills")
     @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<Object> getDemandSkills(@PathVariable Long id) {
         Object response = queryService.getDemandSkills(id);

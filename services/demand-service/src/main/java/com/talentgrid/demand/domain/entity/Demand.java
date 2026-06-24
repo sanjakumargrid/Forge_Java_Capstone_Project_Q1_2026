@@ -94,16 +94,16 @@ public class Demand {
     private Integer reqUtilPerc;//
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "work_mode", nullable = false)
+    @Column(name = "work_mode")
     private WorkMode workMode;
 
-    @Column(name = "experience", nullable = false)
+    @Column(name = "experience")
     private Long experience;
 
-    @Column(name = "department", nullable = false, length = 150)
+    @Column(name = "department", length = 150)
     private String department;
 
-    @Column(name = "client_interview", nullable = false)
+    @Column(name = "client_interview")
     private Boolean clientInterview;
 
     @Column(name = "onboarding_date")

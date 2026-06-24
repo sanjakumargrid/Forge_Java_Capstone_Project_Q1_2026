@@ -6,12 +6,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpServletRequest;
+import com.talentgrid.shared.auth.jwt.JwtTokenService;
 
 @Component
 @RequiredArgsConstructor
 public class CandidateClient {
 
     private final RestClient.Builder restClientBuilder;
+    private final JwtTokenService jwtTokenService;
 
     @Value("${candidate.service.url}")
     private String candidateServiceUrl;
@@ -21,6 +27,7 @@ public class CandidateClient {
         try {
             return restClientBuilder
                     .baseUrl(candidateServiceUrl)
+                    .requestInterceptor(authHeaderInterceptor())
                     .build()
                     .get()
                     .uri("/api/v1/external-candidates/{candidateId}", candidateId)
@@ -38,5 +45,26 @@ public class CandidateClient {
                     e
             );
         }
+    }
+
+    private ClientHttpRequestInterceptor authHeaderInterceptor() {
+        return (request, body, execution) -> {
+            String token = null;
+            var attrs = RequestContextHolder.getRequestAttributes();
+            if (attrs instanceof ServletRequestAttributes servletAttrs) {
+                HttpServletRequest httpServletRequest = servletAttrs.getRequest();
+                String authHeader = httpServletRequest.getHeader("Authorization");
+                if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    token = authHeader.substring(7);
+                }
+            }
+
+            if (token == null) {
+                token = jwtTokenService.generateInternalServiceToken();
+            }
+
+            request.getHeaders().setBearerAuth(token);
+            return execution.execute(request, body);
+        };
     }
 }

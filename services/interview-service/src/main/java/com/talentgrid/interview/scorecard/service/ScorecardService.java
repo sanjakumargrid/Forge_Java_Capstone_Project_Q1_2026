@@ -12,12 +12,14 @@ import com.talentgrid.interview.scorecard.entity.Scorecard;
 import com.talentgrid.interview.scorecard.enums.Recommendation;
 import com.talentgrid.interview.scorecard.repository.ScorecardRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScorecardService {
@@ -195,24 +197,28 @@ public class ScorecardService {
             return;
         }
 
-        if (recommendation == Recommendation.STRONG_HIRE
-                || recommendation == Recommendation.HIRE) {
+        try {
+            if (recommendation == Recommendation.STRONG_HIRE
+                    || recommendation == Recommendation.HIRE) {
 
-            applicationClient.moveApplicationStage(
-                    applicationId,
-                    "FINAL_ROUND",
-                    "Interview scorecard recommendation: " + recommendation
-            );
-        }
+                applicationClient.moveApplicationStage(
+                        applicationId,
+                        "FINAL_ROUND",
+                        "Interview scorecard recommendation: " + recommendation
+                );
+            }
 
-        if (recommendation == Recommendation.NO_HIRE
-                || recommendation == Recommendation.STRONG_NO_HIRE) {
+            if (recommendation == Recommendation.NO_HIRE
+                    || recommendation == Recommendation.STRONG_NO_HIRE) {
 
-            applicationClient.moveApplicationStage(
-                    applicationId,
-                    "REJECTED",
-                    "Interview scorecard recommendation: " + recommendation
-            );
+                applicationClient.moveApplicationStage(
+                        applicationId,
+                        "REJECTED",
+                        "Interview scorecard recommendation: " + recommendation
+                );
+            }
+        } catch (Exception e) {
+            log.warn("[ScorecardService] Failed to auto-move application stage after scorecard submission: {}", e.getMessage());
         }
     }
 

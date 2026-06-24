@@ -7,6 +7,8 @@ import com.talentgrid.kafka.topics.TalentGridTopics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import offerService.offer.client.ApplicationClient;
+import offerService.offer.dto.ApplicationDto;
 import offerService.offer.entity.Offer;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +22,7 @@ public class OfferEventProducer {
     private static final String SOURCE = "offer-service";
 
     private final KafkaProducerService kafkaProducerService;
+    private final ApplicationClient applicationClient;
 
     public void publishCreated(Offer offer) {
 
@@ -52,6 +55,18 @@ public class OfferEventProducer {
         send(
                 TalentGridTopics.OFFER_EVENTS,
                 "OFFER_SUBMITTED_FOR_APPROVAL",
+                offer.getId(),
+                payload
+        );
+    }
+
+    public void publishPendingNextApproval(Offer offer) {
+
+        OfferPayload payload = buildBasePayload(offer);
+
+        send(
+                TalentGridTopics.OFFER_EVENTS,
+                "OFFER_PENDING_NEXT_APPROVAL",
                 offer.getId(),
                 payload
         );
@@ -153,9 +168,22 @@ public class OfferEventProducer {
             Offer offer
     ) {
 
+        Long demandId = null;
+        try {
+            if (offer.getApplicationId() != null) {
+                ApplicationDto app = applicationClient.getApplication(offer.getApplicationId());
+                if (app != null) {
+                    demandId = app.getDemandId();
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch demandId for applicationId: {}", offer.getApplicationId(), e);
+        }
+
         return OfferPayload.builder()
                 .offerId(offer.getId())
                 .applicationId(offer.getApplicationId())
+                .demandId(demandId)
                 .role(offer.getRole())
                 .baseSalary(offer.getBaseSalary())
                 .bonus(offer.getBonus())

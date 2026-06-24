@@ -48,7 +48,7 @@ public class NotificationOrchestrationService {
 
         // FIX: Log whether recipientEmail is present BEFORE attempting any channel.
         // This makes it immediately clear if the email field was lost upstream.
-        log.info("[NOTIFICATION] ▶ Processing | userId={} | type={} | channels={} | ref={}:{} | emailPresent={} | slaackIdPresent={}",
+        log.info("[NOTIFICATION] ▶ Processing | userId={} | type={} | channels={} | ref={}:{} | emailPresent={} | slackIdPresent={}",
                 payload.getRecipientUserId(),
                 payload.getNotificationType(),
                 channels,
