@@ -1,0 +1,6 @@
+Employee ID,Name,Email,Level,Availability Date,Location,Contract Type,Current Project,Utilisation %,Manager ID,HRIS Sync Status,Skills
+EMP001,Alice Johnson,alice@example.com,SENIOR,2026-07-01,London,FULL_TIME,Project Alpha,80,1001,SYNCED,Java|Spring|Hibernate
+EMP002,Bob Smith,bob@example.com,MID,2026-08-01,New York,CONTRACT,Project Beta,60,1002,SYNCED,Python|Django|FastAPI
+EMP003,Carol White,carol@example.com,JUNIOR,2026-09-01,Berlin,PART_TIME,,40,,PENDING,React;Node.js;TypeScript
+EMP004,David Lee,david@example.com,SENIOR,2026-07-15,Singapore,FULL_TIME,Project Gamma,100,1001,SYNCED,Go|Kubernetes|Docker
+EMP005,Eva Martinez,eva@example.com,MID,2026-08-14,Austin,CONTRACT,,0,,SYNCED,

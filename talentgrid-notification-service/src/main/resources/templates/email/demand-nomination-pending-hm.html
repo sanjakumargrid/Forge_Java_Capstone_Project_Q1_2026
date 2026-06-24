@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="${title}">Internal nomination</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.1); overflow: hidden; }
+        .header { background: #1d4ed8; color: #fff; padding: 24px 32px; }
+        .header h1 { margin: 0; font-size: 20px; }
+        .body { padding: 24px 32px; color: #111827; }
+        .field { margin-bottom: 12px; }
+        .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+        .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
+        .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1 th:text="${title}">Internal nomination</h1>
+    </div>
+    <div class="body">
+        <p th:text="${message}">An internal candidate was nominated for your demand.</p>
+        <div class="field">
+            <label>Demand</label>
+            <p th:text="${demandTitle}">—</p>
+        </div>
+        <div class="field">
+            <label>Nomination ID</label>
+            <p th:text="${nominationId}">—</p>
+        </div>
+        <div class="field">
+            <label>Nominee user ID</label>
+            <p th:text="${nomineeUserId}">—</p>
+        </div>
+    </div>
+    <div class="footer">TalentGrid · Automated notification</div>
+</div>
+</body>
+</html>

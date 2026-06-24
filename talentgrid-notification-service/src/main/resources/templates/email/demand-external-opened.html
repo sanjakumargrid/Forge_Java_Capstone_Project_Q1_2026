@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${title}">External Hiring Opened</title>
+  <style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 32px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .header { background: #7c3aed; padding: 24px 32px; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 20px; }
+    .header p { color: #ddd6fe; margin: 4px 0 0; font-size: 13px; }
+    .body { padding: 32px; color: #374151; }
+    .body h2 { font-size: 18px; color: #111827; margin-top: 0; }
+    .status-badge { background: #ede9fe; color: #5b21b6; border-radius: 4px; padding: 4px 12px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 16px; }
+    .detail-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    .detail-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
+    .detail-table td:first-child { font-weight: bold; color: #6b7280; width: 40%; }
+    .highlight { background: #faf5ff; border-left: 4px solid #7c3aed; padding: 12px 16px; margin: 16px 0; border-radius: 0 4px 4px 0; font-size: 14px; }
+    .footer { background: #f9fafb; padding: 16px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
+    .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #7c3aed; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>TalentGrid</h1>
+    <p>Workforce Intelligence Platform</p>
+  </div>
+  <div class="body">
+    <h2>🌐 External Hiring Opened</h2>
+    <span class="status-badge">OPEN FOR EXTERNAL HIRING</span>
+
+    <p>Hi <strong th:text="${raisedBy}">Team Member</strong>,</p>
+    <p>Your demand for <strong th:text="${demandTitle}">the role</strong> has been opened for external recruitment.</p>
+
+    <div class="highlight">
+      <strong th:text="${recruiterName}">The assigned recruiter</strong> has been assigned to source candidates externally.
+    </div>
+
+    <table class="detail-table">
+      <tr>
+        <td>Role</td>
+        <td><strong th:text="${demandTitle}">-</strong></td>
+      </tr>
+      <tr>
+        <td>Location</td>
+        <td th:text="${location}">Remote</td>
+      </tr>
+      <tr>
+        <td>Required Skills</td>
+        <td th:text="${skills}">Java, Spring Boot, Kafka</td>
+      </tr>
+      <tr>
+        <td>Total Positions</td>
+        <td th:text="${requiredCount}">0</td>
+      </tr>
+      <tr>
+        <td>Filled Internally</td>
+        <td th:text="${internalFilledCount}">0</td>
+      </tr>
+      <tr>
+        <td>Assigned Recruiter</td>
+        <td th:text="${recruiterName}">-</td>
+      </tr>
+    </table>
+
+    <p th:text="${message}">External sourcing details.</p>
+
+    <a href="#" class="cta-btn">Track Demand Progress</a>
+  </div>
+  <div class="footer">
+    <p>You received this notification because you are subscribed to demand updates.</p>
+    <p>© 2026 TalentGrid · <a href="#" style="color:#6b7280;">Unsubscribe</a></p>
+  </div>
+</div>
+</body>
+</html>

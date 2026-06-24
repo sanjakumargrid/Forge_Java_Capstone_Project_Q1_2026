@@ -1,0 +1,185 @@
+{
+  "info": {
+    "name": "E2E — Demand workflow (gateway)",
+    "description": "HM create/submit + PM approve against /api/v1 via API gateway. Set collection variables first (see scripts/e2e/README.md).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "gatewayUrl", "value": "http://localhost:8080" },
+    { "key": "hmEmail", "value": "hm@griddynamics.com" },
+    { "key": "hmPassword", "value": "Password@123" },
+    { "key": "pmEmail", "value": "projectmanager@griddynamics.com" },
+    { "key": "pmPassword", "value": "Password@123" },
+    { "key": "projectId", "value": "1" },
+    { "key": "accountId", "value": "1" },
+    { "key": "hmToken", "value": "" },
+    { "key": "pmToken", "value": "" },
+    { "key": "jobTitleId", "value": "" },
+    { "key": "skillId", "value": "" },
+    { "key": "demandId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1 — Login HM",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('hmToken', j.accessToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{hmEmail}}\",\n  \"password\": \"{{hmPassword}}\"\n}"
+        },
+        "url": "{{gatewayUrl}}/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "2 — Login PM",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('pmToken', j.accessToken);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{pmEmail}}\",\n  \"password\": \"{{pmPassword}}\"\n}"
+        },
+        "url": "{{gatewayUrl}}/api/v1/auth/login"
+      }
+    },
+    {
+      "name": "3 — Job titles",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const arr = pm.response.json();",
+              "if (arr && arr.length) pm.collectionVariables.set('jobTitleId', String(arr[0].jobTitleId));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{hmToken}}" }],
+        "url": "{{gatewayUrl}}/api/v1/lookups/job-titles"
+      }
+    },
+    {
+      "name": "4 — Skills",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const arr = pm.response.json();",
+              "if (arr && arr.length) pm.collectionVariables.set('skillId', String(arr[0].skillId));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{hmToken}}" }],
+        "url": "{{gatewayUrl}}/api/v1/lookups/skills"
+      }
+    },
+    {
+      "name": "5 — Create demand (DRAFT)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const d = new Date();",
+              "d.setDate(d.getDate() + 60);",
+              "pm.collectionVariables.set('targetDate', d.toISOString().slice(0, 10));"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const j = pm.response.json();",
+              "pm.collectionVariables.set('demandId', String(j.demandId));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{hmToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"E2E from Postman collection\",\n  \"level\": \"T4_STAFF\",\n  \"location\": \"Remote\",\n  \"accountId\": {{accountId}},\n  \"projectId\": {{projectId}},\n  \"businessUnit\": \"Engineering\",\n  \"jobTitleId\": {{jobTitleId}},\n  \"mandatorySkillIds\": [{{skillId}}],\n  \"budget\": 150000,\n  \"reqUtilPerc\": 80,\n  \"targetDate\": \"{{targetDate}}\",\n  \"priority\": \"MEDIUM\",\n  \"employmentType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experience\": 5,\n  \"clientInterview\": false,\n  \"benchHiring\": false\n}"
+        },
+        "url": "{{gatewayUrl}}/api/v1/demands"
+      }
+    },
+    {
+      "name": "6 — Submit demand",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{hmToken}}" }],
+        "url": "{{gatewayUrl}}/api/v1/demands/{{demandId}}/submit"
+      }
+    },
+    {
+      "name": "7 — PM approve",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{pmToken}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"decision\": \"APPROVED\",\n  \"comments\": \"Approved via Postman\"\n}"
+        },
+        "url": "{{gatewayUrl}}/api/v1/demands/{{demandId}}/approve"
+      }
+    },
+    {
+      "name": "8 — Get demand",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{hmToken}}" }],
+        "url": "{{gatewayUrl}}/api/v1/demands/{{demandId}}"
+      }
+    }
+  ]
+}

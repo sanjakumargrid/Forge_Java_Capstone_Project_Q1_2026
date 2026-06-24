@@ -1,0 +1,378 @@
+package com.talentgrid.demand.kafka.producer;
+
+import com.talentgrid.demand.domain.entity.Demand;
+import com.talentgrid.kafka.events.base.BaseEvent;
+import com.talentgrid.kafka.events.demand.DemandPayload;
+import com.talentgrid.kafka.producer.KafkaProducerService;
+import com.talentgrid.kafka.topics.TalentGridTopics;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class DemandEventProducer {
+
+    private static final String SOURCE = "demand-service";
+
+    private final KafkaProducerService kafkaProducerService;
+
+    public void publishCreated(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_CREATED", demand.getDemandId(), payload);
+    }
+
+    public void publishSubmitted(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setBudget(demand.getBudget());
+        payload.setTargetDate(demand.getTargetDate());
+        payload.setDescription(demand.getDescription());
+        payload.setWorkMode(demand.getWorkMode() != null ? demand.getWorkMode().name() : null);
+        payload.setExperience(demand.getExperience());
+        payload.setDepartment(demand.getDepartment());
+        payload.setEmploymentType(demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
+        payload.setOnboardingDate(demand.getOnboardingDate());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_SUBMITTED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * Published when a demand enters PENDING_APPROVAL.
+     * Payload contains BOTH creator fields (for creator notification)
+     * and PM fields (for PM action-required notification).
+     * PM info is resolved by the caller — it is NOT stored on the Demand entity.
+     */
+    public void publishPendingApproval(Demand demand,
+                                       Long pmUserId,
+                                       String pmName,
+                                       String pmEmail,
+                                       String pmSlackId) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        // PM routing fields (transient — not on Demand entity)
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        payload.setBudget(demand.getBudget());
+        payload.setTargetDate(demand.getTargetDate());
+        payload.setDescription(demand.getDescription());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_PENDING_APPROVAL", demand.getDemandId(), payload);
+    }
+
+    /**
+     * Published by the SLA scheduler at the 24-hour mark.
+     * Contains PM and creator fields for dual notification.
+     */
+    public void publishApprovalReminder(Demand demand,
+                                        Long pmUserId,
+                                        String pmName,
+                                        String pmEmail,
+                                        String pmSlackId,
+                                        long elapsedHours) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        payload.setElapsedHours(elapsedHours);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_REMINDER", demand.getDemandId(), payload);
+    }
+
+    /**
+     * @deprecated Use {@link #publishApprovalSlaClosed}; kept as a delegate for backward compatibility.
+     */
+    @Deprecated
+    public void publishAutoCancelled(Demand demand,
+                                     Long pmUserId,
+                                     String pmName,
+                                     String pmEmail,
+                                     String pmSlackId) {
+        publishApprovalSlaClosed(demand, pmUserId, pmName, pmEmail, pmSlackId);
+    }
+
+    public void publishApproved(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setApprovedBy(demand.getApprovedBy());
+        payload.setApproverName(demand.getApproverName());
+        payload.setApprovedAt(demand.getApprovedAt());
+        payload.setSearchStartAt(demand.getSearchStartAt());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVED", demand.getDemandId(), payload);
+    }
+
+    public void publishExternalOpened(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        payload.setDescription(demand.getDescription());
+        payload.setWorkMode(demand.getWorkMode() != null ? demand.getWorkMode().name() : null);
+        payload.setExperience(demand.getExperience());
+        payload.setDepartment(demand.getDepartment());
+        payload.setEmploymentType(demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
+        payload.setOnboardingDate(demand.getOnboardingDate());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_EXTERNAL_OPENED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * Unified fill event (internal vs external distinguished by {@code fillType} / closure_reason).
+     */
+    public void publishDemandFilled(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED", demand.getDemandId(), payload);
+    }
+
+    /**
+     * 72h approval SLA auto-close (terminal CLOSED).
+     */
+    public void publishApprovalSlaClosed(Demand demand,
+                                         Long pmUserId,
+                                         String pmName,
+                                         String pmEmail,
+                                         String pmSlackId) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_SLA_CLOSED", demand.getDemandId(), payload);
+    }
+
+    public void publishFilledInternal(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_INTERNALLY", demand.getDemandId(), payload);
+    }
+
+    public void publishFilledPartially(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_PARTIALLY", demand.getDemandId(), payload);
+    }
+
+    public void publishFilledExternal(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_EXTERNALLY", demand.getDemandId(), payload);
+    }
+
+    public void publishOnHold(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        payload.setClosureReason(demand.getClosureReason());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_ON_HOLD", demand.getDemandId(), payload);
+    }
+
+    public void publishResumed(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_RESUMED", demand.getDemandId(), payload);
+    }
+
+    public void publishCancelled(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_CANCELLED", demand.getDemandId(), payload);
+    }
+
+    public void publishDuplicate(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_DUPLICATE", demand.getDemandId(), payload);
+    }
+
+    public void publishClosed(Demand demand) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setClosureReason(demand.getClosureReason());
+        payload.setIsFilled(demand.getIsFilled());
+        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
+        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
+        payload.setAssignedRm(demand.getAssignedRm());
+        payload.setAssignedRmName(demand.getAssignedRmName());
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_CLOSED", demand.getDemandId(), payload);
+    }
+
+    private DemandPayload buildBasePayload(Demand demand) {
+        return DemandPayload.builder()
+                .demandId(demand.getDemandId())
+                .title(demand.getTitle())
+                .status(demand.getStatus() != null ? demand.getStatus().name() : null)
+                .level(demand.getLevel() != null ? demand.getLevel().name() : null)
+                .mandatorySkills(demand.getDemandSkills() != null ? demand.getDemandSkills().stream()
+                        .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+                        .map(ds -> ds.getSkill().getSkillName())
+                        .toList() : null)
+                .optionalSkills(demand.getDemandSkills() != null ? demand.getDemandSkills().stream()
+                        .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+                        .map(ds -> ds.getSkill().getSkillName())
+                        .toList() : null)
+                .location(demand.getLocation())
+                .accountName(demand.getAccountName())
+                .projectName(demand.getProjectName())
+                .businessUnit(demand.getBusinessUnit())
+                .priority(demand.getPriority() != null ? demand.getPriority().name() : null)
+                .build();
+    }
+
+    private void send(String topic, String eventType, Long demandId, DemandPayload payload) {
+        String correlationId = UUID.randomUUID().toString();
+        String key = demandId != null ? demandId.toString() : correlationId;
+
+        BaseEvent<DemandPayload> event = BaseEvent.<DemandPayload>builder()
+                .eventType(eventType)
+                .source(SOURCE)
+                .correlationId(correlationId)
+                .payload(payload)
+                .build();
+
+        kafkaProducerService.sendEvent(topic, key, event);
+        log.info("[DEMAND-PRODUCER] Published {} | topic={} | demandId={} | correlationId={}",
+                eventType, topic, demandId, correlationId);
+    }
+}
