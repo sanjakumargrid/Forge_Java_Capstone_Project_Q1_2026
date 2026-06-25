@@ -15,7 +15,7 @@
 
     <groupId>com.talentgrid</groupId>
     <artifactId>job-posting-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>job-posting-service</name>
     <description>RMS Job Posting Microservice — Team 3</description>
 
