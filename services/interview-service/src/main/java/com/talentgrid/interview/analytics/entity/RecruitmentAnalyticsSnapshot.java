@@ -27,7 +27,7 @@ public class RecruitmentAnalyticsSnapshot {
     private Long snapshotId;
 
     @Column(name = "demand_id")
-    private Long demandId;
+    private Long jobPostingId;
 
     @Builder.Default
     @Column(name = "calculated_at", nullable = false, updatable = false)

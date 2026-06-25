@@ -1,5 +1,7 @@
 package com.talentgrid.application.application.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 import com.talentgrid.application.application.enums.Source;
 import com.talentgrid.application.application.enums.Stage;
 import jakarta.validation.constraints.Max;
@@ -19,7 +21,12 @@ public class ApplicationDto {
 
     private Long candidateId;
 
-    private Long demandId;
+    private ExternalCandidateDto candidate;
+
+    @JsonAlias({"job_id", "job_posting_id", "demandId", "demand_id"})
+    private Long jobPostingId;
+
+    private JobPostingDto jobPosting;
 
     private Source source;
 
@@ -33,16 +40,10 @@ public class ApplicationDto {
 
     private List<String> otherSkills;
 
-    @Size(
-            max = 300,
-            message = "AI rationale must not exceed 300 characters"
-    )
+    @Size(max = 300, message = "AI rationale must not exceed 300 characters")
     private String aiRationale;
 
-    @Size(
-            max = 100,
-            message = "Free notes must not exceed 100 characters"
-    )
+    @Size(max = 100, message = "Free notes must not exceed 100 characters")
     private String freeNotes;
 
     private Stage currentStage;
@@ -51,10 +52,7 @@ public class ApplicationDto {
     @Max(value = 100, message = "AI score must not exceed 100")
     private Integer aiScore;
 
-    @Size(
-            max = 500,
-            message = "Stage move reason must not exceed 500 characters"
-    )
+    @Size(max = 500, message = "Stage move reason must not exceed 500 characters")
     private String stageMoveReason;
 
     private LocalDateTime appliedAt;
@@ -73,16 +71,10 @@ public class ApplicationDto {
 
     private LocalDateTime rejectedAt;
 
-    @Size(
-            max = 100,
-            message = "Rejection reason must not exceed 100 characters"
-    )
+    @Size(max = 100, message = "Rejection reason must not exceed 100 characters")
     private String rejectionReason;
 
-    @Size(
-            max = 50,
-            message = "Referral code must not exceed 50 characters"
-    )
+    @Size(max = 50, message = "Referral code must not exceed 50 characters")
     private String referralCode;
 
     private Boolean blockedFromReapply;

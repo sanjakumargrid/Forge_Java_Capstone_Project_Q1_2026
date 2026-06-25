@@ -19,7 +19,7 @@ import java.util.List;
         name = "application",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "candidate_demand_unique",
+                        name = "candidate_job_posting_unique",
                         columnNames = {"candidate_id", "demand_id"}
                 )
         }
@@ -35,9 +35,9 @@ public class Application {
     @Column(name = "candidate_id", nullable = false)
     private Long candidateId;
 
-    @NotNull(message = "Demand ID is required")
+    @NotNull(message = "Job posting ID is required")
     @Column(name = "demand_id", nullable = false)
-    private Long demandId;
+    private Long jobPostingId;
 
     @NotNull(message = "Source is required")
     @Enumerated(EnumType.STRING)

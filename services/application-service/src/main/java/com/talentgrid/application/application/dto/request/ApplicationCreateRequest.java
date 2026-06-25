@@ -1,5 +1,6 @@
 package com.talentgrid.application.application.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.talentgrid.application.application.enums.Source;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,8 +15,9 @@ public class ApplicationCreateRequest {
     @NotNull(message = "Candidate ID is required")
     private Long candidateId;
 
-    @NotNull(message = "Demand ID is required")
-    private Long demandId;
+    @NotNull(message = "Job posting ID is required")
+    @JsonAlias({"job_id", "jobPostingId", "job_posting_id", "demandId", "demand_id"})
+    private Long jobPostingId;
 
     @NotNull(message = "Source is required")
     private Source source;

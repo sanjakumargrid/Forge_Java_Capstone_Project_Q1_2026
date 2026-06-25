@@ -486,7 +486,8 @@ public class OfferEventTranslator extends BaseKafkaConsumer<OfferPayload> {
                         ? offer.getJoiningDate().toString()
                         : "",
                 "status", safe(offer.getStatus()),
-                "rejectionReason", safe(offer.getRejectionReason())
+                "rejectionReason", safe(offer.getRejectionReason()),
+                "demandId", value(offer.getDemandId())
         ));
 
         if (additionalVariables != null) {

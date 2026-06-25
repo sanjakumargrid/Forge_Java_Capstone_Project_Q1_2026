@@ -1,6 +1,6 @@
 package com.talentgrid.application.client;
 
-import com.talentgrid.application.application.dto.DemandDto;
+import com.talentgrid.application.application.dto.JobPostingDto;
 import com.talentgrid.application.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -9,42 +9,37 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
-public class DemandClient {
+public class JobPostingClient {
 
     private final WebClient webClient;
 
-    public DemandClient(
-            @Qualifier("demandWebClient")
-            WebClient webClient
+    public JobPostingClient(
+            @Qualifier("jobPostingWebClient") WebClient webClient
     ) {
         this.webClient = webClient;
     }
 
-    public DemandDto getDemand(Long demandId) {
-
+    public JobPostingDto getJobPosting(Long jobPostingId) {
         try {
             return webClient.get()
-                    .uri("/api/v1/demands/{id}", demandId)
+                    .uri("/api/job-postings/{id}", jobPostingId)
                     .retrieve()
-                    .bodyToMono(DemandDto.class)
+                    .bodyToMono(JobPostingDto.class)
                     .block();
 
         } catch (WebClientResponseException.NotFound ex) {
-            throw new BusinessException(
-                    HttpStatus.NOT_FOUND,
-                    "Demand not found with id: " + demandId
-            );
+            return null;
 
         } catch (WebClientResponseException ex) {
             throw new BusinessException(
                     HttpStatus.BAD_GATEWAY,
-                    "Demand-service error: " + ex.getResponseBodyAsString()
+                    "Job-service error: " + ex.getResponseBodyAsString()
             );
 
         } catch (Exception ex) {
             throw new BusinessException(
                     HttpStatus.SERVICE_UNAVAILABLE,
-                    "Unable to connect demand-service"
+                    "Unable to connect job-service"
             );
         }
     }

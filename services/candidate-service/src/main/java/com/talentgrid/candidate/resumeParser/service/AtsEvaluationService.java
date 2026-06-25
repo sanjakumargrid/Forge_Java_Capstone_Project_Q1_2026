@@ -90,7 +90,16 @@ public class AtsEvaluationService {
 
         try {
             ResponseEntity<String> response = restTemplate.postForEntity(API_URL, entity, String.class);
-            return parseLlmResponseToDTO(response.getBody());
+            AtsEvaluationDTO dto = parseLlmResponseToDTO(response.getBody());
+            return new AtsEvaluationDTO(
+                    demand.getJobPostingId(),
+                    dto.aiScore(),
+                    dto.matchedSkills(),
+                    dto.missingSkills(),
+                    dto.otherSkills(),
+                    dto.recommendations(),
+                    dto.overallFeedback()
+            );
         } catch (Exception e) {
             throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "AI evaluation service is currently unreachable: " + e.getMessage());
         }

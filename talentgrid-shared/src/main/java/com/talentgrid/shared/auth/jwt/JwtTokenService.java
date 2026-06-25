@@ -35,7 +35,8 @@ public class JwtTokenService {
                         "CANDIDATE_VIEW", "CANDIDATE_CREATE", "CANDIDATE_UPDATE",
                         "APPLICATION_VIEW", "APPLICATION_CREATE", "APPLICATION_UPDATE",
                         "OFFER_VIEW", "OFFER_CREATE", "OFFER_UPDATE",
-                        "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE"
+                        "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE",
+                        "DEMAND_VIEW", "DEMAND_CREATE", "DEMAND_UPDATE"
                 ))
                 .id(java.util.UUID.randomUUID().toString())
                 .issuedAt(new Date(System.currentTimeMillis()))

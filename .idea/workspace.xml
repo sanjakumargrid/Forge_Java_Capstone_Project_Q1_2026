@@ -5,18 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/config/FeignConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/config/FeignConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/exception/DemandExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/exception/DemandExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/AiSkillSuggestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/AiSkillSuggestionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/CandidateSkillRetrievalService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/CandidateSkillRetrievalService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/GeminiEmbeddingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/JdEmbeddingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/JdEmbeddingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillEmbeddingService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillEmbeddingService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillSuggestionLlmClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/java/com/talentgrid/demand/service/SkillSuggestionLlmClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/demand-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/audit.log" beforeDir="false" afterPath="$PROJECT_DIR$/audit.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/ApplicationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/controller/ApplicationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/ApplicationDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/ApplicationDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/DemandDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/DemandDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/candidate/ExternalCandidateDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/candidate/ExternalCandidateDto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/request/ApplicationCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/dto/request/ApplicationCreateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/entity/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/entity/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/mapper/ApplicationMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/mapper/ApplicationMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/repository/ApplicationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/repository/ApplicationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/ApplicationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/ApplicationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/RejectionEmailDraftService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/application/service/RejectionEmailDraftService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/client/CandidateClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/client/CandidateClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/filter/JwtAuthFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/filter/JwtAuthFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/kafka/producer/ApplicationEventProducer.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/java/com/talentgrid/application/kafka/producer/ApplicationEventProducer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/client/ApplicationClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/client/ApplicationClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/controller/ExternalCandidateController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/filter/JwtAuthFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/filter/JwtAuthFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/job-service/.gitkeep" beforeDir="false" />
     </list>
-    <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,8 +44,15 @@
     </persistenceIdMap>
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="796" />
+    <option name="cachedIndexableFilesCount" value="1127" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -56,62 +79,65 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.580389479560619" />
-      <entry key="MS500" value="3.9568362170229867" />
-      <entry key="S2" value="6.740448433709235" />
-      <entry key="S5" value="7.944601429564508" />
-      <entry key="S10" value="8.442386450207351" />
-      <entry key="S30" value="8.806976818807502" />
-      <entry key="S60" value="8.902560817089558" />
-      <entry key="M2" value="8.951045909136951" />
-      <entry key="M5" value="8.980361747300972" />
-      <entry key="M10" value="8.990171430016211" />
-      <entry key="M15" value="8.993473526665639" />
-      <entry key="M30" value="9.048414224268651" />
-      <entry key="H1" value="12.662663365753993" />
-      <entry key="H2" value="48.5292311964956" />
-      <entry key="H4" value="156.73016811059378" />
-      <entry key="D1" value="756.2811717898993" />
-      <entry key="W1" value="1279.09398725623" />
+      <entry key="MS100" value="1.0000000000101144" />
+      <entry key="MS500" value="1.0109678085237166" />
+      <entry key="S2" value="1.5441546835374835" />
+      <entry key="S5" value="2.188230063303068" />
+      <entry key="S10" value="2.5415748265903506" />
+      <entry key="S30" value="2.845189985735025" />
+      <entry key="S60" value="3.0345025769062337" />
+      <entry key="M2" value="3.44397446446931" />
+      <entry key="M5" value="4.351993662337968" />
+      <entry key="M10" value="5.325275947123117" />
+      <entry key="M15" value="7.481908445922414" />
+      <entry key="M30" value="21.886945045087238" />
+      <entry key="H1" value="55.6449244747072" />
+      <entry key="H2" value="111.83308417551729" />
+      <entry key="H4" value="223.3183144316497" />
+      <entry key="D1" value="860.88802840862" />
+      <entry key="W1" value="1432.1580944426282" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="0.0" />
-      <entry key="S5" value="0.0" />
-      <entry key="S10" value="0.0" />
-      <entry key="S30" value="4.085296729803684E-234" />
-      <entry key="S60" value="2.021211698413523E-117" />
-      <entry key="M2" value="4.49578880555535E-59" />
-      <entry key="M5" value="4.582766365616435E-24" />
-      <entry key="M10" value="2.14824463625492E-12" />
-      <entry key="M15" value="1.6994162091784836E-8" />
-      <entry key="M30" value="1.4894064407443123E-4" />
-      <entry key="H1" value="0.01647788198524462" />
-      <entry key="H2" value="0.20760818519173013" />
-      <entry key="H4" value="0.9644932903345693" />
-      <entry key="D1" value="8.045486428946973" />
-      <entry key="W1" value="15.811325824805774" />
+      <entry key="MS100" value="9.1116315852668E-310" />
+      <entry key="MS500" value="1.5556762813420021E-62" />
+      <entry key="S2" value="3.531667489969962E-16" />
+      <entry key="S5" value="6.594652611563577E-7" />
+      <entry key="S10" value="8.120746648140484E-4" />
+      <entry key="S30" value="0.09335367221278479" />
+      <entry key="S60" value="0.3161351235096975" />
+      <entry key="M2" value="0.6988803725322997" />
+      <entry key="M5" value="1.4912844440922737" />
+      <entry key="M10" value="2.081783719634494" />
+      <entry key="M15" value="2.3944398818588546" />
+      <entry key="M30" value="3.063143891371075" />
+      <entry key="H1" value="3.9411940482717096" />
+      <entry key="H2" value="4.82610370386479" />
+      <entry key="H4" value="5.9134964963190795" />
+      <entry key="D1" value="13.33376379896363" />
+      <entry key="W1" value="21.623552308049142" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.5307052175003768" />
-      <entry key="MS500" value="3.911765759517169" />
-      <entry key="S2" value="6.717569524618722" />
-      <entry key="S5" value="7.933641669024561" />
-      <entry key="S10" value="8.436545431550227" />
-      <entry key="S30" value="8.804942951958639" />
-      <entry key="S60" value="8.901532582329843" />
-      <entry key="M2" value="8.950528931912093" />
-      <entry key="M5" value="8.98015426557762" />
-      <entry key="M10" value="8.990067573642825" />
-      <entry key="M15" value="8.993404280193406" />
-      <entry key="M30" value="9.048528006805272" />
-      <entry key="H1" value="12.679084436359876" />
-      <entry key="H2" value="48.73654817820192" />
-      <entry key="H4" value="157.69406671183953" />
-      <entry key="D1" value="764.3261682050248" />
-      <entry key="W1" value="1294.9052013211897" />
+      <entry key="MS100" value="7.833411008795966E-5" />
+      <entry key="MS500" value="0.1618508250041404" />
+      <entry key="S2" value="1.1667988238947788" />
+      <entry key="S5" value="2.015366887183398" />
+      <entry key="S10" value="2.4517241988697487" />
+      <entry key="S30" value="2.9043667709043057" />
+      <entry key="S60" value="3.3295544992541872" />
+      <entry key="M2" value="4.127748481224809" />
+      <entry key="M5" value="5.832388703551068" />
+      <entry key="M10" value="7.399647927964898" />
+      <entry key="M15" value="9.87064329388643" />
+      <entry key="M30" value="24.94625169074982" />
+      <entry key="H1" value="59.58340428063108" />
+      <entry key="H2" value="116.6572947249693" />
+      <entry key="H4" value="229.23038176468646" />
+      <entry key="D1" value="874.221132491347" />
+      <entry key="W1" value="1453.781506005272" />
     </decayedShown>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 2,
@@ -139,40 +165,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot.ApplicationServiceApplication.executor": "Run",
-    "Spring Boot.CandidateServiceApplication.executor": "Run",
-    "Spring Boot.NotificationServiceApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "integ-ch2",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.0",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApplicationServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.CandidateServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.NotificationServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;copilot.chat.legacySessionMetadata.migrated&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;team2-dev&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/spratap/TalentGridTeam2/services&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/services" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -188,7 +220,7 @@
           <value>
             <map>
               <entry key="CandidateServiceApplication" value="FAILED" />
-              <entry key="NotificationServiceApplication" value="FAILED" />
+              <entry key="NotificationServiceApplication" value="STOPPED" />
             </map>
           </value>
         </entry>
@@ -253,6 +285,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="JobPostingServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="job-posting-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.talentgrid.jobposting.JobPostingServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="NotificationServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <envs>
         <env name="MAIL_USERNAME" value="sirraveerapratap@gmail.com" />
@@ -282,6 +321,7 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Spring Boot.JobPostingServiceApplication" />
       <item itemvalue="Spring Boot.GatewayApplication" />
       <item itemvalue="Spring Boot.ApplicationServiceApplication" />
       <item itemvalue="Spring Boot.AuditServiceApplication" />
@@ -315,21 +355,14 @@
       <workItem from="1781959907478" duration="265000" />
       <workItem from="1781960185671" duration="10000" />
       <workItem from="1781960201185" duration="35117000" />
+      <workItem from="1782281544803" duration="9200000" />
+      <workItem from="1782299882531" duration="204000" />
+      <workItem from="1782300099048" duration="6453000" />
+      <workItem from="1782308514998" duration="636000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
 </project>

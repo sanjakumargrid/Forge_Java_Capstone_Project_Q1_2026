@@ -22,9 +22,11 @@ public class AnalyticsController {
      */
     @GetMapping("/live")
     public ResponseEntity<AnalyticsResponse> getLiveAnalytics(
-            @RequestParam(value = "demand_id", required = false) Long demandId) {
+            @RequestParam(value = "job_posting_id", required = false) Long jobPostingId,
+            @RequestParam(value = "demandId", required = false) Long demandId) {
 
-        AnalyticsResponse response = analyticsService.calculateLiveMetrics(demandId);
+        Long resolvedJobPostingId = jobPostingId != null ? jobPostingId : demandId;
+        AnalyticsResponse response = analyticsService.calculateLiveMetrics(resolvedJobPostingId);
         return ResponseEntity.ok(response);
     }
 
@@ -35,9 +37,11 @@ public class AnalyticsController {
      */
     @GetMapping("/snapshot")
     public ResponseEntity<AnalyticsResponse> getCachedAnalytics(
-            @RequestParam(value = "demand_id", required = false) Long demandId) {
+            @RequestParam(value = "job_posting_id", required = false) Long jobPostingId,
+            @RequestParam(value = "demandId", required = false) Long demandId) {
 
-        AnalyticsResponse response = analyticsService.getHistoricalSnapshot(demandId);
+        Long resolvedJobPostingId = jobPostingId != null ? jobPostingId : demandId;
+        AnalyticsResponse response = analyticsService.getHistoricalSnapshot(resolvedJobPostingId);
         return ResponseEntity.ok(response);
     }
 }

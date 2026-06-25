@@ -19,8 +19,8 @@ public class DemandServiceClient {
         this.restTemplate = restTemplate;
     }
 
-    public DemandDTO fetchDemandById(Long demandId) {
-        String url = demandServiceBaseUrl + "/api/v1/demands/" + demandId;
+    public DemandDTO fetchDemandById(Long jobPostingId) {
+        String url = demandServiceBaseUrl + "/api/v1/demands/" + jobPostingId;
         try {
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             org.springframework.web.context.request.RequestAttributes requestAttributes = org.springframework.web.context.request.RequestContextHolder.getRequestAttributes();

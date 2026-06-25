@@ -57,6 +57,7 @@ public class ExternalCandidateMapper {
 
     ExternalCandidateDto dto = new ExternalCandidateDto();
 
+    dto.setCandidateId(candidate.getCandidateId());
     dto.setFirstName(candidate.getFirstName());
     dto.setLastName(candidate.getLastName());
     dto.setEmail(candidate.getEmail());
