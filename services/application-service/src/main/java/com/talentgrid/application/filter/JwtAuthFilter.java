@@ -1,4 +1,5 @@
 package com.talentgrid.application.filter;
+
 import com.talentgrid.shared.auth.security.JwtAuthenticationProvider;
 import com.talentgrid.shared.auth.security.JwtPrincipal;
 import jakarta.servlet.FilterChain;
@@ -29,17 +30,33 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
         String method = request.getMethod();
+        String servletPath = request.getServletPath();
+        String requestUri = request.getRequestURI();
 
-        boolean publicApplicationPost =
+        boolean isCreateApplication =
                 "POST".equalsIgnoreCase(method)
                         && (
-                        "/api/v1/applications".equals(path)
-                                || "/api/v1/applications/".equals(path)
+                        "/api/v1/applications".equals(servletPath)
+                                || "/api/v1/applications/".equals(servletPath)
+                                || requestUri.endsWith("/api/v1/applications")
+                                || requestUri.endsWith("/api/v1/applications/")
                 );
 
-        return publicApplicationPost;
+        boolean isPublic =
+                isCreateApplication
+                        || "OPTIONS".equalsIgnoreCase(method)
+                        || servletPath.startsWith("/actuator")
+                        || servletPath.startsWith("/swagger-ui")
+                        || servletPath.startsWith("/v3/api-docs")
+                        || "/swagger-ui.html".equals(servletPath);
+
+        if (isPublic) {
+            log.info("Skipping JwtAuthFilter for public endpoint | method={} | servletPath={} | requestUri={}",
+                    method, servletPath, requestUri);
+        }
+
+        return isPublic;
     }
 
     @Override
@@ -86,6 +103,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     authorityNames.add("ROLE_" + cleanRole);
 
                     addCandidatePermissions(cleanRole, authorityNames);
+                    addApplicationPermissions(cleanRole, authorityNames);
                 });
             }
 
@@ -98,7 +116,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            log.info("Authenticated candidate-service userId={}, email={}, authorities={}",
+            log.info("Authenticated application-service userId={}, email={}, authorities={}",
                     principal.getUserId(),
                     principal.getEmail(),
                     authorityNames
@@ -152,6 +170,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || "INTERVIEWER".equals(cleanRole)) {
 
             authorityNames.add("CANDIDATE_VIEW");
+        }
+    }
+
+    private void addApplicationPermissions(String role, Set<String> authorityNames) {
+        String cleanRole = role.replace("ROLE_", "").toUpperCase();
+
+        if ("ADMIN".equals(cleanRole)
+                || "RECRUITER".equals(cleanRole)
+                || "TA".equals(cleanRole)
+                || "TALENT_ACQUISITION".equals(cleanRole)) {
+
+            authorityNames.add("APPLICATION_CREATE");
+            authorityNames.add("APPLICATION_VIEW");
+            authorityNames.add("APPLICATION_UPDATE");
+            authorityNames.add("APPLICATION_DELETE");
+            authorityNames.add("APPLICATION_STATUS_TRANSITION");
+        }
+
+        if ("HIRING_MANAGER".equals(cleanRole)
+                || "INTERVIEWER".equals(cleanRole)) {
+
+            authorityNames.add("APPLICATION_VIEW");
         }
     }
 

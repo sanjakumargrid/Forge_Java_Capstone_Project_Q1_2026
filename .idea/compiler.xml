@@ -7,23 +7,69 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="talentgrid-parent" />
+        <module name="talentgrid-api-gateway-service" />
       </profile>
-      <profile name="Annotation profile for TalentGrid Application Service" enabled="true">
+      <profile name="Annotation profile for TalentGrid Parent" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="application-service" />
+        <module name="demand-service" />
+        <module name="notification-client" />
+        <module name="talentgrid-notification-service" />
+        <module name="audit-client" />
+        <module name="talentgrid-shared" />
+        <module name="user-auth-service" />
+        <module name="talentgrid-kafka" />
+        <module name="talentgrid-audit-service" />
+      </profile>
+      <profile name="Annotation profile for job-posting-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="job-posting-service" />
+      </profile>
+      <profile name="Annotation profile for workforce-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.5.3.Final/mapstruct-processor-1.5.3.Final.jar" />
+        </processorPath>
+        <module name="workforce-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="application-service" target="17" />
+      <module name="candidate-service" target="17" />
+      <module name="interview-service" target="17" />
+      <module name="offer-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="application-service" options="-parameters" />
+      <module name="audit-client" options="-parameters" />
+      <module name="candidate-service" options="-parameters" />
+      <module name="demand-service" options="-parameters" />
+      <module name="interview-service" options="-parameters" />
+      <module name="job-posting-service" options="-parameters" />
+      <module name="notification-client" options="-parameters" />
+      <module name="offer-service" options="-parameters" />
+      <module name="talentgrid-api-gateway-service" options="-parameters" />
+      <module name="talentgrid-audit-service" options="-parameters" />
+      <module name="talentgrid-kafka" options="-parameters" />
+      <module name="talentgrid-notification-service" options="-parameters" />
+      <module name="talentgrid-parent" options="-parameters" />
+      <module name="talentgrid-shared" options="-parameters" />
+      <module name="user-auth-service" options="-parameters" />
+      <module name="workforce-service" options="-parameters" />
     </option>
   </component>
 </project>

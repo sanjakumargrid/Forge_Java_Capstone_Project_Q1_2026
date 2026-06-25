@@ -22,165 +22,155 @@ import java.util.List;
 public class OfferController {
 
     private final OfferService offerService;
-    @PreAuthorize("hasAuthority('OFFER_CREATE')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_CREATE', 'ADMIN', 'ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<Offer> createOffer(
             @Valid @RequestBody Offer offer
     ) {
-
-        Offer createdOffer =
-                offerService.createOffer(offer);
+        Offer createdOffer = offerService.createOffer(offer);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdOffer);
     }
-    @PreAuthorize("hasAuthority('OFFER_VIEW')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_VIEW', 'ADMIN', 'ROLE_ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Offer> getOfferById(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.getOfferById(id)
         );
     }
-    @PreAuthorize("hasAuthority('OFFER_VIEW')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_VIEW', 'ADMIN', 'ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<Offer>> getAllOffers(
             @RequestParam(required = false) Long applicationId,
             @RequestParam(required = false) Status status,
             Pageable pageable
     ) {
-
-        Page<Offer> offers =
-                offerService.getAllOffers(
-                        applicationId,
-                        status,
-                        pageable
-                );
+        Page<Offer> offers = offerService.getAllOffers(
+                applicationId,
+                status,
+                pageable
+        );
 
         return ResponseEntity.ok(offers);
     }
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'ADMIN', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Offer> updateOffer(
             @PathVariable Long id,
             @Valid @RequestBody Offer offer
     ) {
-
         return ResponseEntity.ok(
                 offerService.updateOffer(id, offer)
         );
     }
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_SEND', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/send")
     public ResponseEntity<Offer> sendOffer(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.sendOffer(id)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_SIGN', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/accept")
     public ResponseEntity<Offer> acceptOffer(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.acceptOffer(id)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_SIGN', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/reject")
     public ResponseEntity<Offer> rejectOffer(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.rejectOffer(id)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/expire")
     public ResponseEntity<Offer> expireOffer(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.expireOffer(id)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_DELETE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_DELETE', 'ADMIN', 'ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOffer(
             @PathVariable Long id
     ) {
-
         offerService.deleteOffer(id);
 
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'ADMIN', 'ROLE_ADMIN')")
     @PutMapping("/{id}/approval-chain")
     public ResponseEntity<Offer> saveApprovalChain(
             @PathVariable Long id,
             @Valid @RequestBody ApprovalChainRequestDto request
     ) {
-
         return ResponseEntity.ok(
                 offerService.saveApprovalChain(id, request)
         );
     }
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_APPROVE', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/submit-approval")
     public ResponseEntity<Offer> submitForApproval(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.submitForApproval(id)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_APPROVE', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/approve")
     public ResponseEntity<Offer> approveCurrentStep(
             @PathVariable Long id,
             @RequestParam String approverEmail
     ) {
-
         return ResponseEntity.ok(
                 offerService.approveCurrentStep(id, approverEmail)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_UPDATE')")
+    @PreAuthorize("hasAnyAuthority('OFFER_UPDATE', 'OFFER_APPROVE', 'ADMIN', 'ROLE_ADMIN')")
     @PatchMapping("/{id}/reject-approval")
     public ResponseEntity<Offer> rejectApproval(
             @PathVariable Long id,
             @RequestParam String approverEmail,
             @RequestParam String comments
     ) {
-
         return ResponseEntity.ok(
                 offerService.rejectApproval(id, approverEmail, comments)
         );
     }
 
-    @PreAuthorize("hasAuthority('OFFER_VIEW')")
+    @PreAuthorize("hasAnyAuthority('OFFER_VIEW', 'ADMIN', 'ROLE_ADMIN')")
     @GetMapping("/{id}/approval-chain")
     public ResponseEntity<List<ApprovalStepDto>> getApprovalChain(
             @PathVariable Long id
     ) {
-
         return ResponseEntity.ok(
                 offerService.getApprovalChain(id)
         );

@@ -1,17 +1,12 @@
 package offerService;
 
-import offerService.offer.integration.DocuSignProperties;
-import offerService.offer.integration.GeminiProperties;
-import offerService.offer.integration.OpenAiProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@SpringBootApplication(scanBasePackages = {"offerService", "com.talentgrid"})
-@EnableConfigurationProperties({
-        GeminiProperties.class,
-        DocuSignProperties.class,
-        OpenAiProperties.class
+@SpringBootApplication(scanBasePackages = {
+        "offerService",
+        "com.talentgrid.audit.client",
+        "com.talentgrid.kafka.producer"
 })
 public class OfferServiceApplication {
 

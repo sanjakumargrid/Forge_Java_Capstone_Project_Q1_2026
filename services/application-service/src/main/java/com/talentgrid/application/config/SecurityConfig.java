@@ -1,8 +1,8 @@
 package com.talentgrid.application.config;
 
-
 import com.talentgrid.application.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,6 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -25,13 +26,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
+        return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            log.error("ACCESS DENIED | method={} | uri={} | servletPath={} | error={}",
+                                    request.getMethod(),
+                                    request.getRequestURI(),
+                                    request.getServletPath(),
+                                    accessDeniedException.getMessage()
+                            );
+
+                            response.setStatus(403);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers(
@@ -41,25 +57,19 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // PUBLIC for external candidate apply flow
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/applications",
-                                "/api/applications",
-                                "/api/applications/",
-                                "/applications",
-                                "/applications/"
+                                "/api/v1/applications/",
+                                "/api/v1/applications/**"
                         ).permitAll()
 
-                        // Remaining application APIs need JWT
                         .requestMatchers(
-                                "/api/applications/**",
-                                "/applications/**"
+                                "/api/v1/applications/**"
                         ).authenticated()
 
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }
