@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f9bf1f0-a106-44c4-805a-336c6a057196" name="Changes" comment="">
+<<<<<<< Updated upstream
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
@@ -32,6 +33,14 @@
       <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/externalCandidate/service/ExternalCandidateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/filter/JwtAuthFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/src/main/java/com/talentgrid/candidate/filter/JwtAuthFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/job-service/.gitkeep" beforeDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/application-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/application-service/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/candidate-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/candidate-service/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/interview-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/interview-service/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/offer-service/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/services/offer-service/target/classes/application.properties" afterDir="false" />
+>>>>>>> Stashed changes
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,6 +174,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+<<<<<<< Updated upstream
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
@@ -198,6 +208,40 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+=======
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.ApplicationServiceApplication.executor": "Run",
+    "Spring Boot.CandidateServiceApplication.executor": "Run",
+    "Spring Boot.NotificationServiceApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "integ-dev",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "run.configurations.included.in.services": "true",
+    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
+>>>>>>> Stashed changes
   }
 }</component>
   <component name="RecentsManager">
