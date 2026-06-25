@@ -2,6 +2,8 @@ rbac:
   # Public paths — skip JWT check entirely
   public-paths:
     - "/api/v1/auth/**"
+    - "/oauth2/**"
+    - "/login/**"
     - "/talentgrid/**"
     - "/api/v1/careers/**"
     - "/api/v1/branding"
