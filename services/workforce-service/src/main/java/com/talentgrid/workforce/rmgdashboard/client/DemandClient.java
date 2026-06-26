@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+
 @FeignClient(name = "demand-service",
         url = "${demand-service.url:http://localhost:8082}",
         configuration = FeignAuthConfig.class)
@@ -36,5 +37,22 @@ public interface DemandClient {
 
     @PatchMapping("/api/v1/demands/{id}/status")
     DemandDto updateDemandStatus(@PathVariable("id") Long demandId, @RequestBody com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest statusUpdate);
+
+    /**
+     * Fetch a page of demands filtered by a list of statuses.
+     * Used by analytics to count demands in specific status groups.
+     * Uses multiple statuses query params: ?statuses=APPROVED&statuses=INTERNAL_SEARCH
+     *
+     * @param statuses list of status strings (e.g. ["APPROVED","INTERNAL_SEARCH"])
+     * @param page     zero-based page number
+     * @param size     page size
+     * @return paged response containing demand summaries and total element count
+     */
+    @GetMapping("/api/v1/demands")
+    DemandSummaryPageResponse getDemandsByStatusList(
+            @RequestParam(value = "statuses") List<String> statuses,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "1") int size
+    );
 
 }

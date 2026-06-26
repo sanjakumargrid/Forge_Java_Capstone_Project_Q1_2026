@@ -114,4 +114,18 @@ public class RmgAnalyticsDashboardController {
             @RequestParam(name = "sinceDays", required = false) Integer sinceDays) {
         return ResponseEntity.ok(analyticsDashboardService.getAverageNominationToDecisionTime(sinceDays));
     }
+
+    @GetMapping("/demand-count-analytics")
+    @PreAuthorize("hasAuthority('ANALYTICS_DEMAND_VIEW') or hasAuthority('DEMAND_VIEW')")
+    @Operation(
+            summary = "Get Demand Count Analytics",
+            description = "Returns four demand-count metrics sourced from demand-service via Feign:\n"
+                    + "• totalDemandCount  – all demands excluding DRAFT status\n"
+                    + "• activeDemandCount – demands in APPROVED, INTERNAL_SEARCH, or OPEN_EXTERNAL\n"
+                    + "• openExternalCount – demands in OPEN_EXTERNAL\n"
+                    + "• closedCount       – demands in CLOSED"
+    )
+    public ResponseEntity<DemandCountAnalyticsResponse> getDemandCountAnalytics() {
+        return ResponseEntity.ok(analyticsDashboardService.getDemandCountAnalytics());
+    }
 }

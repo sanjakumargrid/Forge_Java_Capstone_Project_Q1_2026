@@ -1,8 +1,10 @@
 package com.talentgrid.workforce.common.config;
 
+import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -14,7 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  */
 public class FeignAuthConfig {
 
-    @org.springframework.context.annotation.Bean
+    @Bean
     public RequestInterceptor authHeaderForwardingInterceptor() {
         return new RequestInterceptor() {
             @Override
@@ -30,5 +32,10 @@ public class FeignAuthConfig {
                 }
             }
         };
+    }
+
+    @Bean
+    public Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
     }
 }

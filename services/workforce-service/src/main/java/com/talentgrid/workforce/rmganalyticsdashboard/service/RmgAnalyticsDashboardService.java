@@ -1,3 +1,4 @@
+
 package com.talentgrid.workforce.rmganalyticsdashboard.service;
 
 import com.talentgrid.workforce.benchreport.dto.BenchReportResponse;
@@ -5,6 +6,7 @@ import com.talentgrid.workforce.benchreport.service.BenchReportService;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import com.talentgrid.workforce.rmgdashboard.client.DemandClient;
 import com.talentgrid.workforce.rmganalyticsdashboard.dto.*;
+
 import com.talentgrid.workforce.rmganalyticsdashboard.repository.RmgAnalyticsInternalEmployeeRepository;
 import com.talentgrid.workforce.rmganalyticsdashboard.repository.RmgAnalyticsInternalMatchRepository;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
@@ -23,7 +25,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Arrays;
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +48,28 @@ public class RmgAnalyticsDashboardService {
     private final BenchReportService benchReportService;
     private final RmgAnalyticsInternalMatchRepository analyticsMatchRepository;
     private final RmgAnalyticsInternalEmployeeRepository analyticsEmployeeRepository;
+
+    // ── Statuses used for demand count analytics ─────────────────────────────
+    /** All statuses that qualify as an 'active' demand. */
+    private static final List<String> ACTIVE_DEMAND_STATUSES =
+            List.of("APPROVED", "INTERNAL_SEARCH", "OPEN_EXTERNAL");
+    /** Statuses that count as 'open-external'. */
+    private static final List<String> OPEN_EXTERNAL_STATUSES =
+            List.of("OPEN_EXTERNAL");
+    /** Statuses that count as 'closed'. */
+    private static final List<String> CLOSED_STATUSES =
+            List.of("CLOSED");
+    /**
+     * All statuses except DRAFT — every status value from DemandStatus enum
+     * minus DRAFT, representing the 'total demand' pool.
+     * 
+     * Matches DemandStatus enum in demand-service:
+     * PENDING_APPROVAL, APPROVED, INTERNAL_SEARCH, OPEN_EXTERNAL, FILLED, ON_HOLD, CLOSED
+     */
+    private static final List<String> ALL_NON_DRAFT_STATUSES = Arrays.asList(
+            "PENDING_APPROVAL", "APPROVED", "INTERNAL_SEARCH", "OPEN_EXTERNAL",
+            "FILLED", "ON_HOLD", "CLOSED"
+    );
 
     @Transactional(readOnly = true)
     public OpenDemandsResponse getCurrentOpenDemands() {
@@ -243,6 +269,59 @@ public class RmgAnalyticsDashboardService {
         return NominationToDecisionTimeResponse.builder()
                 .averageDays(bd)
                 .build();
+    }
+
+    /**
+     * Returns the four demand-count analytics metrics by calling the demand-service
+     * via Feign. Each count is derived from the {@code totalElements} field of a
+     * paged response (page=0, size=1), so the call is lightweight regardless of
+     * the actual volume of demands.
+     *
+     * <ul>
+     *   <li><b>totalDemandCount</b>  – every status except DRAFT</li>
+     *   <li><b>activeDemandCount</b> – APPROVED | INTERNAL_SEARCH | OPEN_EXTERNAL</li>
+     *   <li><b>openExternalCount</b> – OPEN_EXTERNAL</li>
+     *   <li><b>closedCount</b>       – CLOSED</li>
+     * </ul>
+     *
+     * On any Feign / transport error the affected counter returns 0 and a warning
+     * is logged so the analytics endpoint degrades gracefully.
+     */
+    @Transactional(readOnly = true)
+    public DemandCountAnalyticsResponse getDemandCountAnalytics() {
+        long totalDemandCount   = fetchCount(ALL_NON_DRAFT_STATUSES,  "total (non-draft)");
+        long activeDemandCount  = fetchCount(ACTIVE_DEMAND_STATUSES,   "active");
+        long openExternalCount  = fetchCount(OPEN_EXTERNAL_STATUSES,   "open-external");
+        long closedCount        = fetchCount(CLOSED_STATUSES,          "closed");
+
+        return DemandCountAnalyticsResponse.builder()
+                .totalDemandCount(totalDemandCount)
+                .activeDemandCount(activeDemandCount)
+                .openExternalCount(openExternalCount)
+                .closedCount(closedCount)
+                .build();
+    }
+
+    /**
+     * Calls demand-service with page size 1 to read {@code totalElements}.
+     * Returns 0 on any error.
+     */
+    private long fetchCount(List<String> statuses, String label) {
+        try {
+            log.info("Fetching demand count for [{}] with statuses: {}", label, statuses);
+            DemandSummaryPageResponse response =
+                    demandServiceClient.getDemandsByStatusList(statuses, 0, 1);
+            long count = (response != null) ? response.getTotalElements() : 0L;
+            log.info("Demand count analytics [{}] = {} (response: {})", label, count, response);
+            return count;
+        } catch (FeignException e) {
+            log.error("Demand service Feign call failed for analytics [{}]: HTTP {} body {}",
+                    label, e.status(), e.contentUTF8(), e);
+            return 0L;
+        } catch (Exception e) {
+            log.error("Unexpected error fetching demand count for analytics [{}]", label, e);
+            return 0L;
+        }
     }
 
     private boolean requiresInternalNominationCapacity(DemandDto d) {
