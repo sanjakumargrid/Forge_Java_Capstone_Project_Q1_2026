@@ -16,8 +16,12 @@ public class ApplicationCreateRequest {
     private Long candidateId;
 
     @NotNull(message = "Job posting ID is required")
-    @JsonAlias({"job_id", "jobPostingId", "job_posting_id", "demandId", "demand_id"})
+    @JsonAlias({"job_id", "jobPostingId", "job_posting_id"})
     private Long jobPostingId;
+
+    @NotNull(message = "Demand ID is required")
+    @JsonAlias({"demandId", "demand_id"})
+    private Long demandId;
 
     @NotNull(message = "Source is required")
     private Source source;

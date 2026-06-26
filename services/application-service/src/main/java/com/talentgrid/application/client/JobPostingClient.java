@@ -47,23 +47,26 @@ public class JobPostingClient {
 
     public JobPostingDto getJobPostingByDemandId(Long demandId) {
         try {
-            List<JobPostingDto> allPostings = webClient.get()
-                    .uri("/api/job-postings")
+            return webClient.get()
+                    .uri("/api/job-postings/by-demand/{demandId}", demandId)
                     .retrieve()
-                    .bodyToFlux(JobPostingDto.class)
-                    .collectList()
+                    .bodyToMono(JobPostingDto.class)
                     .block();
 
-            if (allPostings == null) return null;
+        } catch (WebClientResponseException.NotFound ex) {
+            return null;
 
-            return allPostings.stream()
-                    .filter(jp -> demandId.equals(jp.getDemandId()))
-                    .findFirst()
-                    .orElse(null);
         } catch (WebClientResponseException ex) {
-            throw new BusinessException(HttpStatus.BAD_GATEWAY, "Job-service error: " + ex.getResponseBodyAsString());
+            throw new BusinessException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Job-service error: " + ex.getResponseBodyAsString()
+            );
+
         } catch (Exception ex) {
-            throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "Unable to connect job-service");
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Unable to connect job-service"
+            );
         }
     }
 }

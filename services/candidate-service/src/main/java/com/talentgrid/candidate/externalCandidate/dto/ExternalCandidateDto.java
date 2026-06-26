@@ -1,5 +1,6 @@
 package com.talentgrid.candidate.externalCandidate.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.talentgrid.candidate.externalCandidate.enums.Source;
 import jakarta.persistence.Column;
@@ -21,8 +22,12 @@ public class ExternalCandidateDto {
     private Long candidateId;
 
     @NotNull(message = "Job Posting ID is required for automatic application submission")
-    @com.fasterxml.jackson.annotation.JsonAlias({"demandId", "demand_id", "job_id"})
+    @JsonAlias({"job_id", "jobPostingId", "job_posting_id"})
     private Long jobPostingId;
+
+    @NotNull(message = "Demand ID is required for automatic application submission")
+    @JsonAlias({"demandId", "demand_id"})
+    private Long demandId;
 
     @NotBlank(message = "First name is required")
     @Size(min = 1, max = 100, message = "First name must be between 1 and 100 characters")

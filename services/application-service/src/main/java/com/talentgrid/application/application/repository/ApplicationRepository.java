@@ -7,16 +7,56 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-    boolean existsByCandidateIdAndJobPostingId(Long candidateId, Long jobPostingId);
+    boolean existsByCandidateIdAndJobPostingId(
+            Long candidateId,
+            Long jobPostingId
+    );
 
-    List<Application> findByJobPostingIdAndCurrentStageNotIn(Long jobPostingId, List<Stage> stages);
+    boolean existsByCandidateIdAndJobPostingIdAndDemandId(
+            Long candidateId,
+            Long jobPostingId,
+            Long demandId
+    );
 
-    Page<Application> findByJobPostingId(Long jobPostingId, Pageable pageable);
+    Optional<Application> findFirstByCandidateIdAndJobPostingIdAndDemandId(
+            Long candidateId,
+            Long jobPostingId,
+            Long demandId
+    );
 
-    Page<Application> findByCurrentStage(Stage currentStage, Pageable pageable);
+    List<Application> findByCandidateIdAndJobPostingIdAndDemandId(
+            Long candidateId,
+            Long jobPostingId,
+            Long demandId
+    );
+
+    List<Application> findByCandidateIdAndDemandId(
+            Long candidateId,
+            Long demandId
+    );
+
+    List<Application> findByDemandId(
+            Long demandId
+    );
+
+    List<Application> findByJobPostingIdAndCurrentStageNotIn(
+            Long jobPostingId,
+            List<Stage> stages
+    );
+
+    Page<Application> findByJobPostingId(
+            Long jobPostingId,
+            Pageable pageable
+    );
+
+    Page<Application> findByCurrentStage(
+            Stage currentStage,
+            Pageable pageable
+    );
 
     Page<Application> findByJobPostingIdAndCurrentStage(
             Long jobPostingId,
@@ -29,7 +69,12 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             Pageable pageable
     );
 
-    List<Application> findAllByIdIn(List<Long> ids);
+    List<Application> findAllByIdIn(
+            List<Long> ids
+    );
 
-    List<Application> findByCandidateIdAndJobPostingId(Long candidateId, Long jobPostingId);
+    List<Application> findByCandidateIdAndJobPostingId(
+            Long candidateId,
+            Long jobPostingId
+    );
 }

@@ -63,15 +63,31 @@ public class ApplicationService {
     public ApplicationDto createApplication(ApplicationCreateRequest request) {
 
         if (request == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Application details are required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Application details are required"
+            );
         }
 
         if (request.getCandidateId() == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Candidate id is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Candidate id is required"
+            );
         }
 
         if (request.getJobPostingId() == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Job posting id is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Job posting id is required"
+            );
+        }
+
+        if (request.getDemandId() == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Demand id is required"
+            );
         }
 
         ExternalCandidateDto candidateDto =
@@ -94,22 +110,51 @@ public class ApplicationService {
             );
         }
 
-        boolean alreadyApplied =
-                applicationRepository.existsByCandidateIdAndJobPostingId(
-                        request.getCandidateId(),
-                        request.getJobPostingId()
-                );
-
-        if (alreadyApplied) {
+        /*
+         * No job-service change needed.
+         * We are using existing API:
+         * GET /api/job-postings/{jobPostingId}
+         *
+         * If job-service response has demandId, validate it.
+         * If job-service response does not have demandId, we trust request demandId.
+         */
+        if (jobPostingDto.getDemandId() != null
+                && !request.getDemandId().equals(jobPostingDto.getDemandId())) {
             throw new BusinessException(
-                    HttpStatus.CONFLICT,
-                    "Application already exists for this candidate and job posting"
+                    HttpStatus.BAD_REQUEST,
+                    "Given demandId does not match with job posting demandId"
             );
+        }
+
+        Application existingApplication =
+                applicationRepository
+                        .findFirstByCandidateIdAndJobPostingIdAndDemandId(
+                                request.getCandidateId(),
+                                request.getJobPostingId(),
+                                request.getDemandId()
+                        )
+                        .orElse(null);
+
+        if (existingApplication != null) {
+            ApplicationDto existingDto =
+                    toDtoWithCandidateAndJobPosting(
+                            existingApplication,
+                            candidateDto,
+                            jobPostingDto
+                    );
+
+            existingDto.setApplicationAlreadyExists(true);
+            existingDto.setMessage(
+                    "Application already exists for this candidate, job posting, and demand"
+            );
+
+            return existingDto;
         }
 
         ApplicationDto applicationDto = new ApplicationDto();
         applicationDto.setCandidateId(request.getCandidateId());
         applicationDto.setJobPostingId(request.getJobPostingId());
+        applicationDto.setDemandId(request.getDemandId());
         applicationDto.setSource(request.getSource());
         applicationDto.setResumeFilePath(request.getResumeFilePath());
         applicationDto.setResumeOriginalFilename(request.getResumeOriginalFilename());
@@ -120,15 +165,20 @@ public class ApplicationService {
 
         if (applicationDto.getAiScore() < 50) {
             applicationDto.setCurrentStage(Stage.REJECTED);
-            applicationDto.setRejectionReason("ATS score is below the minimum threshold for this role.");
+            applicationDto.setRejectionReason(
+                    "ATS score is below the minimum threshold for this role."
+            );
             applicationDto.setBlockedFromReapply(true);
         } else {
             applicationDto.setCurrentStage(Stage.SCREENING);
             applicationDto.setBlockedFromReapply(false);
         }
 
-        Application application = ApplicationMapper.dtoToApplicationEntity(applicationDto);
-        Application saved = applicationRepository.save(application);
+        Application application =
+                ApplicationMapper.dtoToApplicationEntity(applicationDto);
+
+        Application saved =
+                applicationRepository.saveAndFlush(application);
 
         auditLogClient.logAction(
                 AuditLogPayload.builder()
@@ -138,10 +188,11 @@ public class ApplicationService {
                         .afterState(Map.of(
                                 "candidateId", saved.getCandidateId(),
                                 "jobPostingId", saved.getJobPostingId(),
+                                "demandId", saved.getDemandId(),
                                 "stage", saved.getCurrentStage().name()
                         ))
                         .serviceName("application-service")
-                        .endpoint("/api/applications")
+                        .endpoint("/api/v1/applications")
                         .build()
         );
 
@@ -151,7 +202,17 @@ public class ApplicationService {
             applicationEventProducer.publishApplied(saved);
         }
 
-        return toDtoWithCandidateAndJobPosting(saved, candidateDto, jobPostingDto);
+        ApplicationDto response =
+                toDtoWithCandidateAndJobPosting(
+                        saved,
+                        candidateDto,
+                        jobPostingDto
+                );
+
+        response.setApplicationAlreadyExists(false);
+        response.setMessage("Application created successfully");
+
+        return response;
     }
 
     public Page<ApplicationDto> getApplications(
@@ -166,15 +227,24 @@ public class ApplicationService {
         Page<Application> applications;
 
         if (jobPostingId != null && stage != null && !stage.isBlank()) {
-            applications = applicationRepository.findByJobPostingIdAndCurrentStage(
-                    jobPostingId,
-                    parseStage(stage),
-                    pageable
-            );
+            applications =
+                    applicationRepository.findByJobPostingIdAndCurrentStage(
+                            jobPostingId,
+                            parseStage(stage),
+                            pageable
+                    );
         } else if (jobPostingId != null) {
-            applications = applicationRepository.findByJobPostingId(jobPostingId, pageable);
+            applications =
+                    applicationRepository.findByJobPostingId(
+                            jobPostingId,
+                            pageable
+                    );
         } else if (stage != null && !stage.isBlank()) {
-            applications = applicationRepository.findByCurrentStage(parseStage(stage), pageable);
+            applications =
+                    applicationRepository.findByCurrentStage(
+                            parseStage(stage),
+                            pageable
+                    );
         } else {
             applications = applicationRepository.findAll(pageable);
         }
@@ -190,13 +260,19 @@ public class ApplicationService {
         validatePageRequest(page, size);
 
         if (minScore != null && (minScore < 0 || minScore > 100)) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Minimum score must be between 0 and 100");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Minimum score must be between 0 and 100"
+            );
         }
 
         Pageable pageable = PageRequest.of(page, size);
 
         return applicationRepository
-                .findByAiScoreGreaterThanEqual(minScore == null ? 0 : minScore, pageable)
+                .findByAiScoreGreaterThanEqual(
+                        minScore == null ? 0 : minScore,
+                        pageable
+                )
                 .map(this::toDtoWithCandidate);
     }
 
@@ -204,33 +280,46 @@ public class ApplicationService {
         return toDtoWithCandidate(getApplicationEntity(applicationId));
     }
 
+    public List<ApplicationDto> getApplicationsByCandidateAndDemand(
+            Long candidateId,
+            Long demandId
+    ) {
+        if (candidateId == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Candidate id is required"
+            );
+        }
 
-    public List<ApplicationDto> getApplicationsByCandidateAndDemand(Long candidateId, Long demandId) {
-        if (candidateId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Candidate id is required");
-        if (demandId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Demand id is required");
-
-        JobPostingDto jobPosting = jobPostingClient.getJobPostingByDemandId(demandId);
-        if (jobPosting == null) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "No job posting found for demand id: " + demandId);
+        if (demandId == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Demand id is required"
+            );
         }
 
         List<Application> applications =
-                applicationRepository.findByCandidateIdAndJobPostingId(candidateId, jobPosting.getJobPostingId());
+                applicationRepository.findByCandidateIdAndDemandId(
+                        candidateId,
+                        demandId
+                );
 
-        return applications.stream().map(this::toDtoWithCandidate).collect(Collectors.toList());
+        return applications.stream()
+                .map(this::toDtoWithCandidate)
+                .collect(Collectors.toList());
     }
 
-
     public List<ExternalCandidateDto> getCandidatesByDemand(Long demandId) {
-        if (demandId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Demand id is required");
 
-        JobPostingDto jobPosting = jobPostingClient.getJobPostingByDemandId(demandId);
-        if (jobPosting == null) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "No job posting found for demand id: " + demandId);
+        if (demandId == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Demand id is required"
+            );
         }
 
         List<Application> applications =
-                applicationRepository.findByJobPostingId(jobPosting.getJobPostingId(), Pageable.unpaged()).getContent();
+                applicationRepository.findByDemandId(demandId);
 
         return applications.stream()
                 .map(Application::getCandidateId)
@@ -247,7 +336,10 @@ public class ApplicationService {
             StageMoveRequest request
     ) {
         if (request == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Request body is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Request body is required"
+            );
         }
 
         Application application = getApplicationEntity(applicationId);
@@ -255,7 +347,11 @@ public class ApplicationService {
         Stage targetStage = parseStage(request.getTargetStage());
         String reason = request.getReason();
 
-        validateStageMovement(application.getCurrentStage(), targetStage, reason);
+        validateStageMovement(
+                application.getCurrentStage(),
+                targetStage,
+                reason
+        );
 
         Stage previousStage = application.getCurrentStage();
 
@@ -270,39 +366,43 @@ public class ApplicationService {
 
         Application updated = applicationRepository.save(application);
 
-        // If target stage is HIRED, auto-reject all other active candidates for this job posting
         if (targetStage == Stage.HIRED) {
-            List<Application> otherActiveApplications = applicationRepository.findByJobPostingIdAndCurrentStageNotIn(
-                    updated.getJobPostingId(),
-                    List.of(Stage.HIRED, Stage.REJECTED)
-            );
-            
+            List<Application> otherActiveApplications =
+                    applicationRepository.findByJobPostingIdAndCurrentStageNotIn(
+                            updated.getJobPostingId(),
+                            List.of(Stage.HIRED, Stage.REJECTED)
+                    );
+
             for (Application otherApp : otherActiveApplications) {
                 otherApp.setCurrentStage(Stage.REJECTED);
                 otherApp.setRejectionReason("Position has been filled.");
                 otherApp.setRejectedAt(LocalDateTime.now());
                 otherApp.setBlockedFromReapply(false);
+
                 applicationRepository.save(otherApp);
-                
-                // Publish rejection event which will trigger rejection emails
+
                 applicationEventProducer.publishRejected(otherApp);
             }
 
-            // Notify the recruiter that the job posting is filled and should be closed
             try {
-                JobPostingDto jobPosting = jobPostingClient.getJobPosting(updated.getJobPostingId());
-                String recruiterEmail = com.talentgrid.application.util.SecurityUtils.getCurrentUserEmail();
-                
+                JobPostingDto jobPosting =
+                        jobPostingClient.getJobPosting(updated.getJobPostingId());
+
+                String recruiterEmail =
+                        com.talentgrid.application.util.SecurityUtils
+                                .getCurrentUserEmail();
+
                 if (jobPosting != null && recruiterEmail != null) {
                     applicationEventProducer.publishJobPostingClosedNotification(
                             jobPosting.getJobPostingId(),
-                            jobPosting.getTitle() != null ? jobPosting.getTitle() : "Job Posting " + jobPosting.getJobPostingId(),
+                            jobPosting.getTitle() != null
+                                    ? jobPosting.getTitle()
+                                    : "Job Posting " + jobPosting.getJobPostingId(),
                             recruiterEmail
                     );
                 }
-            } catch (Exception e) {
-                // Log and swallow so it doesn't block the transaction
-                // log.error("Failed to notify recruiter about filled job posting", e);
+            } catch (Exception ignored) {
+                // Do not block stage movement if notification fails.
             }
         }
 
@@ -312,7 +412,10 @@ public class ApplicationService {
                         .entityId(updated.getId())
                         .action(AuditAction.STATUS_CHANGE)
                         .beforeState(Map.of("stage", previousStage.name()))
-                        .afterState(Map.of("stage", updated.getCurrentStage().name()))
+                        .afterState(Map.of(
+                                "stage",
+                                updated.getCurrentStage().name()
+                        ))
                         .serviceName("application-service")
                         .endpoint("/api/applications/" + applicationId + "/stage")
                         .build()
@@ -341,12 +444,21 @@ public class ApplicationService {
     @Transactional
     public List<ApplicationDto> bulkMoveStage(BulkStageMoveRequest request) {
 
-        if (request == null || request.getApplicationIds() == null || request.getApplicationIds().isEmpty()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "At least one application ID is required");
+        if (request == null
+                || request.getApplicationIds() == null
+                || request.getApplicationIds().isEmpty()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "At least one application ID is required"
+            );
         }
 
-        if (request.getTargetStage() == null || request.getTargetStage().isBlank()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Target stage is required");
+        if (request.getTargetStage() == null
+                || request.getTargetStage().isBlank()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Target stage is required"
+            );
         }
 
         List<ApplicationDto> result = new ArrayList<>();
@@ -365,12 +477,20 @@ public class ApplicationService {
     @Transactional
     public List<ApplicationDto> bulkReject(BulkRejectRequest request) {
 
-        if (request == null || request.getApplicationIds() == null || request.getApplicationIds().isEmpty()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "At least one application ID is required");
+        if (request == null
+                || request.getApplicationIds() == null
+                || request.getApplicationIds().isEmpty()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "At least one application ID is required"
+            );
         }
 
         if (request.getReason() == null || request.getReason().isBlank()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Rejection reason is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Rejection reason is required"
+            );
         }
 
         List<ApplicationDto> result = new ArrayList<>();
@@ -387,14 +507,24 @@ public class ApplicationService {
     }
 
     @Transactional
-    public List<ApplicationDto> bulkReassignJobPosting(BulkJobPostingReassignRequest request) {
+    public List<ApplicationDto> bulkReassignJobPosting(
+            BulkJobPostingReassignRequest request
+    ) {
 
-        if (request == null || request.getApplicationIds() == null || request.getApplicationIds().isEmpty()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "At least one application ID is required");
+        if (request == null
+                || request.getApplicationIds() == null
+                || request.getApplicationIds().isEmpty()) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "At least one application ID is required"
+            );
         }
 
         if (request.getTargetJobPostingId() == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Target job posting ID is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Target job posting ID is required"
+            );
         }
 
         JobPostingDto targetJobPosting =
@@ -403,12 +533,15 @@ public class ApplicationService {
         if (targetJobPosting == null) {
             throw new BusinessException(
                     HttpStatus.NOT_FOUND,
-                    "Job posting not found with id: " + request.getTargetJobPostingId()
+                    "Job posting not found with id: "
+                            + request.getTargetJobPostingId()
             );
         }
 
         List<Application> applications =
-                applicationRepository.findAllByIdIn(request.getApplicationIds());
+                applicationRepository.findAllByIdIn(
+                        request.getApplicationIds()
+                );
 
         List<ApplicationDto> results = new ArrayList<>();
 
@@ -434,10 +567,18 @@ public class ApplicationService {
                             .entityType("APPLICATION")
                             .entityId(saved.getId())
                             .action(AuditAction.UPDATE)
-                            .beforeState(Map.of("jobPostingId", oldJobPostingId))
-                            .afterState(Map.of("jobPostingId", request.getTargetJobPostingId()))
+                            .beforeState(Map.of(
+                                    "jobPostingId",
+                                    oldJobPostingId
+                            ))
+                            .afterState(Map.of(
+                                    "jobPostingId",
+                                    request.getTargetJobPostingId()
+                            ))
                             .serviceName("application-service")
-                            .endpoint("/api/applications/bulk/reassign-job-posting")
+                            .endpoint(
+                                    "/api/applications/bulk/reassign-job-posting"
+                            )
                             .build()
             );
 
@@ -459,29 +600,45 @@ public class ApplicationService {
         List<Application> applications;
 
         if (jobPostingId != null && stage != null && !stage.isBlank()) {
-            applications = applicationRepository
-                    .findByJobPostingIdAndCurrentStage(jobPostingId, parseStage(stage), Pageable.unpaged())
-                    .getContent();
+            applications =
+                    applicationRepository
+                            .findByJobPostingIdAndCurrentStage(
+                                    jobPostingId,
+                                    parseStage(stage),
+                                    Pageable.unpaged()
+                            )
+                            .getContent();
 
         } else if (jobPostingId != null) {
-            applications = applicationRepository
-                    .findByJobPostingId(jobPostingId, Pageable.unpaged())
-                    .getContent();
+            applications =
+                    applicationRepository
+                            .findByJobPostingId(
+                                    jobPostingId,
+                                    Pageable.unpaged()
+                            )
+                            .getContent();
 
         } else {
-            applications = applicationRepository
-                    .findByCurrentStage(parseStage(stage), Pageable.unpaged())
-                    .getContent();
+            applications =
+                    applicationRepository
+                            .findByCurrentStage(
+                                    parseStage(stage),
+                                    Pageable.unpaged()
+                            )
+                            .getContent();
         }
 
         StringBuilder csv = new StringBuilder();
 
-        csv.append("\"Application ID\",\"Candidate ID\",\"Job Posting ID\",\"Source\",\"Current Stage\",\"Applied At\",\"AI Score\"\n");
+        csv.append(
+                "\"Application ID\",\"Candidate ID\",\"Job Posting ID\",\"Demand ID\",\"Source\",\"Current Stage\",\"Applied At\",\"AI Score\"\n"
+        );
 
         for (Application app : applications) {
             csv.append(csvSafe(app.getId())).append(",")
                     .append(csvSafe(app.getCandidateId())).append(",")
                     .append(csvSafe(app.getJobPostingId())).append(",")
+                    .append(csvSafe(app.getDemandId())).append(",")
                     .append(csvSafe(app.getSource())).append(",")
                     .append(csvSafe(app.getCurrentStage())).append(",")
                     .append(csvSafe(app.getAppliedAt())).append(",")
@@ -540,25 +697,25 @@ public class ApplicationService {
                 jobPostingDto.getSkills() == null
                         ? List.of()
                         : jobPostingDto.getSkills()
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(String::trim)
-                        .filter(skill -> !skill.isBlank())
-                        .distinct()
-                        .collect(Collectors.toList());
+                          .stream()
+                          .filter(Objects::nonNull)
+                          .map(String::trim)
+                          .filter(skill -> !skill.isBlank())
+                          .distinct()
+                          .collect(Collectors.toList());
 
         List<String> candidateSkills =
                 candidateDto.getSkills() == null
                         ? List.of()
                         : candidateDto.getSkills()
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(SkillDetailDto::getSkillName)
-                        .filter(Objects::nonNull)
-                        .map(String::trim)
-                        .filter(skill -> !skill.isBlank())
-                        .distinct()
-                        .collect(Collectors.toList());
+                          .stream()
+                          .filter(Objects::nonNull)
+                          .map(SkillDetailDto::getSkillName)
+                          .filter(Objects::nonNull)
+                          .map(String::trim)
+                          .filter(skill -> !skill.isBlank())
+                          .distinct()
+                          .collect(Collectors.toList());
 
         List<String> normalizedRequiredSkills =
                 requiredSkills.stream()
@@ -573,29 +730,43 @@ public class ApplicationService {
         List<String> matchedSkills =
                 candidateSkills.stream()
                         .filter(candidateSkill ->
-                                normalizedRequiredSkills.contains(normalizeSkill(candidateSkill))
+                                normalizedRequiredSkills.contains(
+                                        normalizeSkill(candidateSkill)
+                                )
                         )
                         .collect(Collectors.toList());
 
         List<String> missingSkills =
                 requiredSkills.stream()
                         .filter(requiredSkill ->
-                                !normalizedCandidateSkills.contains(normalizeSkill(requiredSkill))
+                                !normalizedCandidateSkills.contains(
+                                        normalizeSkill(requiredSkill)
+                                )
                         )
                         .collect(Collectors.toList());
 
         List<String> otherSkills =
                 candidateSkills.stream()
                         .filter(candidateSkill ->
-                                !normalizedRequiredSkills.contains(normalizeSkill(candidateSkill))
+                                !normalizedRequiredSkills.contains(
+                                        normalizeSkill(candidateSkill)
+                                )
                         )
                         .collect(Collectors.toList());
 
         applicationDto.setMatchedSkills(matchedSkills);
         applicationDto.setMissingSkills(missingSkills);
         applicationDto.setOtherSkills(otherSkills);
-        applicationDto.setAiScore(calculateAiScore(requiredSkills, matchedSkills));
-        applicationDto.setAiRationale(buildAiRationale(matchedSkills, missingSkills, otherSkills));
+        applicationDto.setAiScore(
+                calculateAiScore(requiredSkills, matchedSkills)
+        );
+        applicationDto.setAiRationale(
+                buildAiRationale(
+                        matchedSkills,
+                        missingSkills,
+                        otherSkills
+                )
+        );
     }
 
     private Integer calculateAiScore(
@@ -606,7 +777,9 @@ public class ApplicationService {
             return 0;
         }
 
-        double score = ((double) matchedSkills.size() / requiredSkills.size()) * 100;
+        double score =
+                ((double) matchedSkills.size() / requiredSkills.size()) * 100;
+
         return (int) Math.round(score);
     }
 
@@ -615,15 +788,16 @@ public class ApplicationService {
             List<String> missingSkills,
             List<String> otherSkills
     ) {
-        String rationale = "Candidate matched "
-                + matchedSkills.size()
-                + " required skills. Matched: "
-                + matchedSkills
-                + ". Missing: "
-                + missingSkills
-                + ". Other: "
-                + otherSkills
-                + ".";
+        String rationale =
+                "Candidate matched "
+                        + matchedSkills.size()
+                        + " required skills. Matched: "
+                        + matchedSkills
+                        + ". Missing: "
+                        + missingSkills
+                        + ". Other: "
+                        + otherSkills
+                        + ".";
 
         if (rationale.length() > 300) {
             return rationale.substring(0, 297) + "...";
@@ -645,18 +819,23 @@ public class ApplicationService {
 
     private ApplicationDto toDtoWithCandidate(Application application) {
 
-        ApplicationDto dto = ApplicationMapper.applicationEntityToDto(application);
+        ApplicationDto dto =
+                ApplicationMapper.applicationEntityToDto(application);
 
         if (dto == null) {
             return null;
         }
 
         if (dto.getCandidateId() != null) {
-            dto.setCandidate(candidateClient.getCandidateById(dto.getCandidateId()));
+            dto.setCandidate(
+                    candidateClient.getCandidateById(dto.getCandidateId())
+            );
         }
 
         if (dto.getJobPostingId() != null) {
-            dto.setJobPosting(jobPostingClient.getJobPosting(dto.getJobPostingId()));
+            dto.setJobPosting(
+                    jobPostingClient.getJobPosting(dto.getJobPostingId())
+            );
         }
 
         return dto;
@@ -667,7 +846,8 @@ public class ApplicationService {
             ExternalCandidateDto candidate,
             JobPostingDto jobPosting
     ) {
-        ApplicationDto dto = ApplicationMapper.applicationEntityToDto(application);
+        ApplicationDto dto =
+                ApplicationMapper.applicationEntityToDto(application);
 
         if (dto != null) {
             dto.setCandidate(candidate);
@@ -680,7 +860,10 @@ public class ApplicationService {
     private Application getApplicationEntity(Long applicationId) {
 
         if (applicationId == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Application id is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Application id is required"
+            );
         }
 
         return applicationRepository.findById(applicationId)
@@ -693,24 +876,36 @@ public class ApplicationService {
     private Stage parseStage(String stage) {
 
         if (stage == null || stage.isBlank()) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Stage is required");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Stage is required"
+            );
         }
 
         try {
             return Stage.valueOf(stage.trim().toUpperCase(Locale.ROOT));
         } catch (Exception ex) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid stage: " + stage);
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Invalid stage: " + stage
+            );
         }
     }
 
     private void validatePageRequest(int page, int size) {
 
         if (page < 0) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Page number cannot be negative");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Page number cannot be negative"
+            );
         }
 
         if (size <= 0) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Page size must be greater than 0");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Page size must be greater than 0"
+            );
         }
     }
 
@@ -722,17 +917,24 @@ public class ApplicationService {
         if (currentStage == Stage.HIRED || currentStage == Stage.REJECTED) {
             throw new BusinessException(
                     HttpStatus.BAD_REQUEST,
-                    "Cannot move application from terminal stage: " + currentStage
+                    "Cannot move application from terminal stage: "
+                            + currentStage
             );
         }
 
         if (targetStage == Stage.APPLIED) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Cannot move back to APPLIED stage");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Cannot move back to APPLIED stage"
+            );
         }
 
         if (targetStage == Stage.REJECTED) {
             if (reason == null || reason.isBlank()) {
-                throw new BusinessException(HttpStatus.BAD_REQUEST, "Rejection reason is required");
+                throw new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "Rejection reason is required"
+                );
             }
 
             return;
@@ -805,6 +1007,7 @@ public class ApplicationService {
         }
 
         String s = value.toString().replace("\"", "\"\"");
+
         return "\"" + s + "\"";
     }
 }

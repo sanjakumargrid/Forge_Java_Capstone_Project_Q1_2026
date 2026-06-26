@@ -23,8 +23,11 @@ public class ApplicationDto {
 
     private ExternalCandidateDto candidate;
 
-    @JsonAlias({"job_id", "job_posting_id", "demandId", "demand_id"})
+    @JsonAlias({"job_id", "job_posting_id"})
     private Long jobPostingId;
+
+    @JsonAlias({"demandId", "demand_id"})
+    private Long demandId;
 
     private JobPostingDto jobPosting;
 
@@ -78,4 +81,8 @@ public class ApplicationDto {
     private String referralCode;
 
     private Boolean blockedFromReapply;
+
+    private Boolean applicationAlreadyExists;
+
+    private String message;
 }

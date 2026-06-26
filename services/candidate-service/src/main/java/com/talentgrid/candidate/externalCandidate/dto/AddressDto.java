@@ -1,6 +1,7 @@
 package com.talentgrid.candidate.externalCandidate.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,7 @@ public class AddressDto {
   @NotNull(message = "Country cannot be null")
   private String country;
 
+  @JsonAlias({"zipCode", "zip_code", "pincode"})
   @NotNull(message = "Zip code cannot be null")
   @Min(value = 100000, message = "Zip code must be 6 digits")
   @Max(value = 999999, message = "Zip code must be 6 digits")

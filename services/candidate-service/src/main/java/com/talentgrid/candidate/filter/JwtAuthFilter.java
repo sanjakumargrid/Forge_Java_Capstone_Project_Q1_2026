@@ -30,21 +30,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
         String method = request.getMethod();
+        String servletPath = request.getServletPath();
 
-        boolean publicCandidatePost =
+        boolean isPublicCandidateCreate =
                 "POST".equalsIgnoreCase(method)
                         && (
-                        "/api/v1/external-candidates".equals(path)
-                                || "/api/v1/external-candidates/".equals(path)
+                        "/api/v1/external-candidates".equals(servletPath)
+                                || "/api/v1/external-candidates/".equals(servletPath)
                 );
 
-        boolean internalCandidateGet =
-                "GET".equalsIgnoreCase(method)
-                        && path.startsWith("/api/v1/external-candidates/internal/");
+        boolean isSwaggerOrActuator =
+                servletPath.startsWith("/actuator")
+                        || servletPath.startsWith("/v3/api-docs")
+                        || servletPath.startsWith("/swagger-ui")
+                        || "/swagger-ui.html".equals(servletPath);
 
-        return publicCandidatePost || internalCandidateGet;
+        return isPublicCandidateCreate
+                || isSwaggerOrActuator
+                || "OPTIONS".equalsIgnoreCase(method);
     }
 
     @Override

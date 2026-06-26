@@ -2,6 +2,7 @@ package com.talentgrid.candidate.externalCandidate.client;
 
 import com.talentgrid.candidate.exception.BusinessException;
 import com.talentgrid.candidate.externalCandidate.dto.ApplicationRequestDto;
+import com.talentgrid.candidate.externalCandidate.dto.ApplicationResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,25 +19,36 @@ public class ApplicationClient {
         this.applicationWebClient = applicationWebClient;
     }
 
-    public void createApplication(ApplicationRequestDto request) {
+    public ApplicationResponseDto createApplication(ApplicationRequestDto request) {
         try {
-            applicationWebClient
+            ApplicationResponseDto response = applicationWebClient
                     .post()
                     .uri("/api/v1/applications")
                     .bodyValue(request)
                     .retrieve()
-                    .toBodilessEntity()
+                    .bodyToMono(ApplicationResponseDto.class)
                     .block();
 
-            log.info("Automatic application submitted successfully | candidateId={} | demandId={}",
+            if (response == null) {
+                throw new BusinessException(
+                        HttpStatus.BAD_GATEWAY,
+                        "Application-service returned empty response"
+                );
+            }
+
+            log.info(
+                    "Automatic application submitted successfully | candidateId={} | jobPostingId={} | applicationId={}",
                     request.getCandidateId(),
-                    request.getJobPostingId()
+                    request.getJobPostingId(),
+                    response.getApplicationId()
             );
 
+            return response;
+
         } catch (WebClientResponseException.Conflict ex) {
-            log.warn("Application already exists for candidateId={} and demandId={}. Skipping.",
-                    request.getCandidateId(),
-                    request.getJobPostingId()
+            throw new BusinessException(
+                    HttpStatus.CONFLICT,
+                    "Application already exists for this candidate and job posting"
             );
 
         } catch (WebClientResponseException ex) {
@@ -52,6 +64,9 @@ public class ApplicationClient {
                             + " - "
                             + ex.getResponseBodyAsString()
             );
+
+        } catch (BusinessException ex) {
+            throw ex;
 
         } catch (Exception ex) {
             log.error("Unable to connect application-service", ex);

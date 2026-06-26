@@ -35,7 +35,12 @@ public class ApplicationController {
             @Valid @RequestBody ApplicationCreateRequest request
     ) {
         ApplicationDto response = applicationService.createApplication(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        HttpStatus status = Boolean.TRUE.equals(response.getApplicationAlreadyExists())
+                ? HttpStatus.OK
+                : HttpStatus.CREATED;
+
+        return ResponseEntity.status(status).body(response);
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")

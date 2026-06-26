@@ -19,8 +19,10 @@ public class ApplicationMapper {
         Application application = new Application();
 
         application.setId(dto.getApplicationId());
+        application.setDemandId(dto.getDemandId());
         application.setCandidateId(dto.getCandidateId());
         application.setJobPostingId(dto.getJobPostingId());
+        application.setDemandId(dto.getDemandId());
         application.setSource(dto.getSource());
         application.setResumeFilePath(dto.getResumeFilePath());
         application.setResumeOriginalFilename(dto.getResumeOriginalFilename());
@@ -59,7 +61,9 @@ public class ApplicationMapper {
 
         dto.setApplicationId(application.getId());
         dto.setCandidateId(application.getCandidateId());
+        dto.setDemandId(application.getDemandId());
         dto.setJobPostingId(application.getJobPostingId());
+        dto.setDemandId(application.getDemandId());
         dto.setSource(application.getSource());
         dto.setResumeFilePath(application.getResumeFilePath());
         dto.setResumeOriginalFilename(application.getResumeOriginalFilename());

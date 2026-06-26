@@ -11,6 +11,8 @@ public class ApplicationRequestDto {
 
     private Long jobPostingId;
 
+    private Long demandId;
+
     private String source;
 
     private String resumeFilePath;

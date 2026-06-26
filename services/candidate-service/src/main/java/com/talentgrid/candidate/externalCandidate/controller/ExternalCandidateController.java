@@ -25,7 +25,7 @@ public class ExternalCandidateController {
             @Valid @RequestBody ExternalCandidateDto request
     ) {
         CandidateResponse response = externalCandidateService.createCandidate(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     // Internal - used by application-service

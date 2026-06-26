@@ -53,10 +53,15 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // Public external candidate apply/create endpoint
+                        // Public candidate create
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/external-candidates",
                                 "/api/v1/external-candidates/"
+                        ).permitAll()
+
+                        // Internal API used by application-service
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/external-candidates/internal/**"
                         ).permitAll()
 
                         .requestMatchers("/api/v1/external-candidates/**").authenticated()
