@@ -165,33 +165,35 @@ public class DemandStateRbacWorkflowTest {
     }
 
     @Test
-    void testOpenExternalToHold_allowedForRecruiter_deniedForRm() {
+    void testOpenExternalToHold_allowedForRecruiterAndRm() {
         Demand demand = createDemand(3L, DemandStatus.OPEN_EXTERNAL, 10L);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(3L)).thenReturn(Optional.of(demand));
-
-        // 1. RM tries to place on hold -> fails
-        login(40L, "RESOURCE_MANAGER");
-        assertThrows(AccessDeniedException.class, () -> {
-            lifecycleService.transitionStatus(3L, StatusTransitionRequest.builder()
-                    .targetStatus(DemandStatus.ON_HOLD)
-                    .closureReason(ClosureReason.ON_HOLD)
-                    .build());
-        });
-
-        // 2. Recruiter places on hold -> succeeds
-        login(50L, "RECRUITER");
         when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
         when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
             Demand saved = inv.getArgument(0);
             return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
         });
 
-        DemandResponse response = lifecycleService.transitionStatus(3L, StatusTransitionRequest.builder()
+        // 1. RM places on hold -> succeeds
+        login(40L, "RESOURCE_MANAGER");
+        DemandResponse rmResponse = lifecycleService.transitionStatus(3L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.ON_HOLD)
+                .closureReason(ClosureReason.ON_HOLD)
+                .build());
+        assertEquals("ON_HOLD", rmResponse.getStatus());
+        assertEquals(DemandStatus.OPEN_EXTERNAL, demand.getPreviousStatus());
+
+        demand.setStatus(DemandStatus.OPEN_EXTERNAL);
+        demand.setPreviousStatus(null);
+
+        // 2. Recruiter places on hold -> succeeds
+        login(50L, "RECRUITER");
+        DemandResponse recruiterResponse = lifecycleService.transitionStatus(3L, StatusTransitionRequest.builder()
                 .targetStatus(DemandStatus.ON_HOLD)
                 .closureReason(ClosureReason.ON_HOLD)
                 .build());
 
-        assertEquals("ON_HOLD", response.getStatus());
+        assertEquals("ON_HOLD", recruiterResponse.getStatus());
         assertEquals(DemandStatus.OPEN_EXTERNAL, demand.getPreviousStatus());
     }
 
@@ -223,25 +225,27 @@ public class DemandStateRbacWorkflowTest {
                 .build());
         assertEquals("INTERNAL_SEARCH", response1.getStatus());
 
-        // Scenario 2: Demand was in OPEN_EXTERNAL, only Recruiter can resume
+        // Scenario 2: Demand was in OPEN_EXTERNAL, RM or recruiter may resume
         Demand demand2 = createDemand(5L, DemandStatus.ON_HOLD, 10L);
         demand2.setPreviousStatus(DemandStatus.OPEN_EXTERNAL);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(5L)).thenReturn(Optional.of(demand2));
 
-        // RM tries to resume -> fails
+        // RM resumes -> succeeds
         login(40L, "RESOURCE_MANAGER");
-        assertThrows(AccessDeniedException.class, () -> {
-            lifecycleService.transitionStatus(5L, StatusTransitionRequest.builder()
-                    .targetStatus(DemandStatus.OPEN_EXTERNAL)
-                    .build());
-        });
-
-        // Recruiter resumes -> succeeds
-        login(50L, "RECRUITER");
         DemandResponse response2 = lifecycleService.transitionStatus(5L, StatusTransitionRequest.builder()
                 .targetStatus(DemandStatus.OPEN_EXTERNAL)
                 .build());
         assertEquals("OPEN_EXTERNAL", response2.getStatus());
+
+        demand2.setStatus(DemandStatus.ON_HOLD);
+        demand2.setPreviousStatus(DemandStatus.OPEN_EXTERNAL);
+
+        // Recruiter resumes -> succeeds
+        login(50L, "RECRUITER");
+        DemandResponse response3 = lifecycleService.transitionStatus(5L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.OPEN_EXTERNAL)
+                .build());
+        assertEquals("OPEN_EXTERNAL", response3.getStatus());
     }
 
     @Test
@@ -258,9 +262,9 @@ public class DemandStateRbacWorkflowTest {
                     .build());
         });
 
-        // 2. RM tries to close with incorrect reason -> fails
+        // 2. RM tries to close with incorrect reason -> fails validation (not RBAC)
         login(40L, "RESOURCE_MANAGER");
-        assertThrows(AccessDeniedException.class, () -> {
+        assertThrows(IllegalDemandTransitionException.class, () -> {
             lifecycleService.transitionStatus(6L, StatusTransitionRequest.builder()
                     .targetStatus(DemandStatus.CLOSED)
                     .closureReason(ClosureReason.SLA_APPROVAL_BREACH)
@@ -282,32 +286,32 @@ public class DemandStateRbacWorkflowTest {
     }
 
     @Test
-    void testInternalSearchToFilled_allowedForHm_deniedForRm() {
+    void testInternalSearchToFilled_allowedForHmAndRm() {
         Demand demand = createDemand(7L, DemandStatus.INTERNAL_SEARCH, 10L);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(7L)).thenReturn(Optional.of(demand));
-
-        // 1. RM tries to accept internal fill -> fails
-        login(40L, "RESOURCE_MANAGER");
-        assertThrows(AccessDeniedException.class, () -> {
-            lifecycleService.transitionStatus(7L, StatusTransitionRequest.builder()
-                    .targetStatus(DemandStatus.FILLED)
-                    .closureReason(ClosureReason.FILLED)
-                    .build());
-        });
-
-        // 2. HM accepts internal fill -> succeeds and auto-closes
-        login(10L, "HIRING_MANAGER");
         when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
         when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
             Demand saved = inv.getArgument(0);
             return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
         });
 
-        DemandResponse response = lifecycleService.transitionStatus(7L, StatusTransitionRequest.builder()
-                    .targetStatus(DemandStatus.FILLED)
-                    .closureReason(ClosureReason.FILLED)
+        // 1. RM accepts internal fill -> succeeds and auto-closes
+        login(40L, "RESOURCE_MANAGER");
+        DemandResponse rmResponse = lifecycleService.transitionStatus(7L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.FILLED)
+                .closureReason(ClosureReason.FILLED)
                 .build());
-        assertEquals("CLOSED", response.getStatus()); // Verify it transits to FILLED and auto-closes to CLOSED
+        assertEquals("CLOSED", rmResponse.getStatus());
+
+        demand.setStatus(DemandStatus.INTERNAL_SEARCH);
+
+        // 2. HM accepts internal fill -> succeeds and auto-closes
+        login(10L, "HIRING_MANAGER");
+        DemandResponse hmResponse = lifecycleService.transitionStatus(7L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.FILLED)
+                .closureReason(ClosureReason.FILLED)
+                .build());
+        assertEquals("CLOSED", hmResponse.getStatus());
     }
 
     @Test
@@ -442,17 +446,77 @@ public class DemandStateRbacWorkflowTest {
     }
 
     @Test
-    void hmRejectNomination_deniedForRm() {
+    void resourceManagerMayRejectNominationAndOpenExternal() {
         Demand demand = createDemand(15L, DemandStatus.INTERNAL_SEARCH, 10L);
         when(demandRepository.findByDemandIdAndIsDeletedFalse(15L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
 
         login(40L, "RESOURCE_MANAGER");
-        assertThrows(AccessDeniedException.class, () -> {
-            lifecycleService.transitionStatus(15L, StatusTransitionRequest.builder()
-                    .targetStatus(DemandStatus.OPEN_EXTERNAL)
-                    .closureReason(ClosureReason.HM_REJECTED_NOMINATION)
-                    .build());
+        DemandResponse response = lifecycleService.transitionStatus(15L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.OPEN_EXTERNAL)
+                .closureReason(ClosureReason.HM_REJECTED_NOMINATION)
+                .build());
+
+        assertEquals("OPEN_EXTERNAL", response.getStatus());
+    }
+
+    @Test
+    void resourceManagerMayPerformAnyLegalTransition_withoutRoleSpecificOwnership() {
+        Demand demand = createDemand(17L, DemandStatus.OPEN_EXTERNAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(17L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
         });
+
+        login(40L, "RESOURCE_MANAGER");
+        DemandResponse response = lifecycleService.transitionStatus(17L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.FILLED)
+                .closureReason(ClosureReason.FILLED)
+                .build());
+
+        assertEquals("CLOSED", response.getStatus());
+    }
+
+    @Test
+    void resourceManagerMaySubmitDraftAndAutoApprove() {
+        Demand demand = createDemand(18L, DemandStatus.DRAFT, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(18L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(40L, "RESOURCE_MANAGER");
+        DemandResponse response = lifecycleService.submitDemand(18L, "RM override");
+
+        assertEquals("APPROVED", response.getStatus());
+    }
+
+    @Test
+    void resourceManagerMayApprovePendingDemand_withoutProjectManagerCheck() {
+        Demand demand = createDemand(19L, DemandStatus.PENDING_APPROVAL, 10L);
+        demand.setProjectId(100L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(19L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(40L, "RESOURCE_MANAGER");
+        DemandResponse response = lifecycleService.approve(19L, ApprovalRequest.builder()
+                .decision(DemandStatus.APPROVED)
+                .build());
+
+        assertEquals("APPROVED", response.getStatus());
+        verify(userAuthServiceClient, never()).getProjectById(any());
     }
 
     @Test

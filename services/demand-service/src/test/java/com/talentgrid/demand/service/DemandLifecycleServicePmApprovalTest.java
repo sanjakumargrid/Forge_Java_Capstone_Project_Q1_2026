@@ -116,7 +116,7 @@ class DemandLifecycleServicePmApprovalTest {
         DemandResponse response = lifecycleService.approveAsProjectManager(7L, body);
 
         assertEquals("APPROVED", response.getStatus());
-        verifyNoInteractions(eventProducer);
+        verify(eventProducer).publishApproved(demand);
 
         ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
         verify(auditLogClient).logAction(auditCap.capture());
@@ -147,7 +147,7 @@ class DemandLifecycleServicePmApprovalTest {
         DemandResponse response = lifecycleService.approve(7L, body);
 
         assertEquals("APPROVED", response.getStatus());
-        verifyNoInteractions(eventProducer);
+        verify(eventProducer).publishApproved(demand);
 
         ArgumentCaptor<AuditLogPayload> auditCap = ArgumentCaptor.forClass(AuditLogPayload.class);
         verify(auditLogClient).logAction(auditCap.capture());
@@ -205,6 +205,6 @@ class DemandLifecycleServicePmApprovalTest {
         DemandResponse response = lifecycleService.approveAsProjectManager(7L, null);
 
         assertEquals("APPROVED", response.getStatus());
-        verifyNoInteractions(eventProducer);
+        verify(eventProducer).publishApproved(demand);
     }
 }

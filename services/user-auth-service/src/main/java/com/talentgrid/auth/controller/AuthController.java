@@ -1,8 +1,8 @@
 package com.talentgrid.auth.controller;
 
 import com.talentgrid.auth.dto.request.LoginRequest;
-import com.talentgrid.auth.dto.request.OAuthTokenExchangeRequest;
 import com.talentgrid.auth.dto.request.RegisterRequest;
+import com.talentgrid.auth.oauth.OAuthExchangeCodeCookieSupport;
 import com.talentgrid.auth.dto.response.LoginResponse;
 import com.talentgrid.auth.dto.response.RegisterResponse;
 import com.talentgrid.auth.entity.User;
@@ -47,6 +47,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final JwtBlacklistService jwtBlacklistService;
     private final RefreshTokenService refreshTokenService;
+    private final OAuthExchangeCodeCookieSupport oauthExchangeCodeCookieSupport;
 
     /**
      * Registers a new user.
@@ -75,14 +76,18 @@ public class AuthController {
     /**
      * Exchanges a one-time Google OAuth code for JWT and refresh tokens.
      *
-     * <p>Called by the SPA after the browser redirect from {@code /login/oauth2/code/google}.
+     * <p>Called by the SPA after redirect to {@code /auth/callback}. The exchange code is
+     * read from the HttpOnly {@code FORGE_OAUTH_EXCHANGE} cookie (send with {@code withCredentials: true}).
      */
     @PostMapping("/oauth/token")
     public ResponseEntity<LoginResponse> exchangeOAuthToken(
-            @Valid @RequestBody OAuthTokenExchangeRequest request,
+            HttpServletRequest request,
             HttpServletResponse response
     ) {
-        return ResponseEntity.ok(authService.exchangeOAuthCode(request.getCode(), response));
+        String exchangeCode = oauthExchangeCodeCookieSupport.readExchangeCodeCookie(request)
+                .orElseThrow(() -> new RuntimeException("OAuth exchange code missing"));
+
+        return ResponseEntity.ok(authService.exchangeOAuthCode(exchangeCode, response));
     }
 
     @PostMapping("/login")

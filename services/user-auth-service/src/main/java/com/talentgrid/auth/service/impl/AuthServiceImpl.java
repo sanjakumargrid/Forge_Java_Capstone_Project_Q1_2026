@@ -13,6 +13,7 @@ import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.oauth.OAuthAuthorizationCodeService;
+import com.talentgrid.auth.oauth.OAuthExchangeCodeCookieSupport;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AuthService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
@@ -58,6 +59,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtBlacklistService jwtBlacklistService;
     private final UserCreatedEventPublisher userCreatedEventPublisher;
     private final OAuthAuthorizationCodeService oauthAuthorizationCodeService;
+    private final OAuthExchangeCodeCookieSupport oauthExchangeCodeCookieSupport;
 
 
     @Override
@@ -301,6 +303,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         response.addHeader("Set-Cookie", refreshCookie.toString());
+
+        oauthExchangeCodeCookieSupport.clearExchangeCodeCookie(response);
 
         return LoginResponse.builder()
                 .accessToken(accessToken)

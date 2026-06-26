@@ -10,6 +10,7 @@ import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.mapper.DemandMapper;
 import com.talentgrid.demand.repository.DemandRepository;
+import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
 import com.talentgrid.shared.auth.security.JwtPrincipal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.lenient;
 class DemandServiceSkillUpdateTest {
 
     @Mock private DemandRepository demandRepository;
+    @Mock private DemandStatusHistoryRepository demandStatusHistoryRepository;
     @Mock private DemandMapper demandMapper;
     @Spy private DemandValidationService validationService = new DemandValidationService();
     @Mock private AuditLogClient auditLogClient;
@@ -77,7 +79,7 @@ class DemandServiceSkillUpdateTest {
 
     @Test
     void updateDemand_resubmitsSameSkillIds_replacesCollectionWithoutRepositoryBulkDelete() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = updateRequest();
         request.setMandatorySkillIds(List.of(1L));
         request.setOptionalSkillIds(List.of(10L, 11L));
 
@@ -96,7 +98,7 @@ class DemandServiceSkillUpdateTest {
 
     @Test
     void updateDemand_partialOptionalPatch_mergesMandatoryFromLoadedCollection() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = updateRequest();
         request.setOptionalSkillIds(List.of(10L, 12L));
 
         demandService.updateDemand(3L, request);
@@ -113,7 +115,7 @@ class DemandServiceSkillUpdateTest {
 
     @Test
     void updateDemand_replacesSkillsViaCollectionSync() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = updateRequest();
         request.setMandatorySkillIds(List.of(4L));
         request.setOptionalSkillIds(List.of(5L));
 
@@ -131,7 +133,7 @@ class DemandServiceSkillUpdateTest {
 
     @Test
     void updateDemand_overlapBetweenMandatoryAndOptional_returnsValidationError() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = updateRequest();
         request.setMandatorySkillIds(List.of(1L));
         request.setOptionalSkillIds(List.of(1L, 2L));
 
@@ -139,6 +141,12 @@ class DemandServiceSkillUpdateTest {
                 () -> demandService.updateDemand(3L, request));
         assertTrue(ex.getMessage().contains("both mandatorySkillIds and optionalSkillIds"));
         verify(demandRepository, never()).save(any());
+    }
+
+    private DemandRequest updateRequest() {
+        DemandRequest request = new DemandRequest();
+        request.setReasonForEdit("Skill update for unit test");
+        return request;
     }
 
     private DemandSkill mandatorySkill(long skillId) {

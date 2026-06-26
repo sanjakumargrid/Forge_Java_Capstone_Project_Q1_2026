@@ -54,8 +54,6 @@ public class ApprovalSlaWorkflowTest {
     private AuditLogClient auditLogClient;
     @Mock
     private UserAuthServiceClient userAuthServiceClient;
-    @Mock
-    private ApprovalReminderService approvalReminderService;
 
     @InjectMocks
     private DemandLifecycleService lifecycleService;
@@ -67,7 +65,6 @@ public class ApprovalSlaWorkflowTest {
         slaScheduler = new ApprovalSlaScheduler(
                 demandRepository,
                 historyRepository,
-                approvalReminderService,
                 userAuthServiceClient,
                 eventProducer
         );
@@ -158,6 +155,7 @@ public class ApprovalSlaWorkflowTest {
 
         DemandResponse response = lifecycleService.approveAsProjectManager(2L, ApprovalRequest.builder().decision(DemandStatus.APPROVED).build());
         assertEquals("APPROVED", response.getStatus());
+        verify(eventProducer).publishApproved(demand);
     }
 
     @Test
@@ -183,12 +181,11 @@ public class ApprovalSlaWorkflowTest {
         when(userAuthServiceClient.getUserById(20L)).thenReturn(
                 UserDto.builder().id(20L).name("PM Manager").email("pm@company.com").slackId("SLACK_PM").build());
 
-        // Stub reminder service to return true (sent)
-        when(approvalReminderService.sendApprovalReminder(eq(demand), any(), eq(25L))).thenReturn(true);
-
+        // Stub reminder publish via Kafka
         slaScheduler.checkApprovalSla();
 
         // Verify reminder sent flag was updated in database
+        verify(eventProducer).publishApprovalReminder(eq(demand), eq(20L), eq("PM Manager"), eq("pm@company.com"), eq("SLACK_PM"), eq(25L));
         verify(demandRepository).save(demand);
         assertTrue(demand.getApprovalReminderSent());
     }
@@ -221,8 +218,9 @@ public class ApprovalSlaWorkflowTest {
         assertEquals(DemandStatus.CLOSED, demand.getStatus());
         assertEquals(ClosureReason.SLA_APPROVAL_BREACH.name(), demand.getClosureReason());
         verify(demandRepository).save(demand);
-        // Verify SLA breach event was published
         verify(eventProducer).publishApprovalSlaClosed(eq(demand), eq(20L), eq("PM Manager"), eq("pm@company.com"), eq("SLACK_PM"));
+        verify(eventProducer, never()).publishApprovalEscalation(any(), any(), any(), any(), any(), anyLong());
+        verify(eventProducer, never()).publishClosed(demand);
     }
 
     @Test
@@ -244,8 +242,8 @@ public class ApprovalSlaWorkflowTest {
 
         DemandResponse response = lifecycleService.submitDemand(5L, "Auto-approve PM created demand");
 
-        // PM submit leaves demand APPROVED; SearchActivationScheduler activates search
+        // PM submit leaves demand APPROVED and notifies creator immediately
         assertEquals("APPROVED", response.getStatus());
-        verifyNoInteractions(eventProducer);
+        verify(eventProducer).publishApproved(demand);
     }
 }

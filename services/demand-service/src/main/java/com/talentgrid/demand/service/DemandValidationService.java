@@ -37,12 +37,6 @@ public class DemandValidationService {
      */
     public void validateCreate(DemandRequest request) {
         List<String> errors = new ArrayList<>();
-//
-//        if (request.getTitle() == null || request.getTitle().isBlank()) {
-//            errors.add("title is required");
-//        } else if (request.getTitle().length() > 255) {
-//            errors.add("title must not exceed 255 characters");
-//        }
 
         if (request.getJobTitleId() == null) {
             errors.add("jobTitleId is required");
@@ -88,10 +82,6 @@ public class DemandValidationService {
             errors.add("targetDate is required");
         }
 
-        if (request.getJobTitleId() == null) {
-            errors.add("jobTitleId is required");
-        }
-
         boolean hasMandatory = request.getMandatorySkillIds() != null && !request.getMandatorySkillIds().isEmpty();
         boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
         if (!hasMandatory && !hasOptional) {
@@ -109,12 +99,19 @@ public class DemandValidationService {
 
     /**
      * Validates an update demand request. Only non-null fields are validated.
+     * {@code reasonForEdit} is always required on every update.
      *
      * @param request the update request to validate
      * @throws IllegalArgumentException if validation fails
      */
     public void validateUpdate(DemandRequest request) {
         List<String> errors = new ArrayList<>();
+
+        if (request.getReasonForEdit() == null || request.getReasonForEdit().isBlank()) {
+            errors.add("reasonForEdit is required for demand updates");
+        } else if (request.getReasonForEdit().length() > 1000) {
+            errors.add("reasonForEdit must not exceed 1000 characters");
+        }
 
         if (request.getTitle() != null) {
             if (request.getTitle().isBlank()) {
@@ -129,9 +126,14 @@ public class DemandValidationService {
         }
 
         if (request.getMandatorySkillIds() != null || request.getOptionalSkillIds() != null) {
-            boolean hasMandatory = request.getMandatorySkillIds() != null && !request.getMandatorySkillIds().isEmpty();
-            boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
-            if (!hasMandatory && !hasOptional) {
+            boolean mandatoryPresent = request.getMandatorySkillIds() != null;
+            boolean optionalPresent = request.getOptionalSkillIds() != null;
+            boolean mandatoryEmpty = mandatoryPresent && request.getMandatorySkillIds().isEmpty();
+            boolean optionalEmpty = optionalPresent && request.getOptionalSkillIds().isEmpty();
+
+            // Only reject when the client explicitly clears both lists in the same PATCH.
+            // A single empty list is allowed; merged validation runs in DemandService.syncDemandSkills.
+            if (mandatoryPresent && optionalPresent && mandatoryEmpty && optionalEmpty) {
                 errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty when updating skills");
             } else {
                 validateSkillListShape(request.getMandatorySkillIds(), request.getOptionalSkillIds(), errors);
@@ -144,6 +146,14 @@ public class DemandValidationService {
 
         if (request.getBusinessUnit() != null && request.getBusinessUnit().length() > 150) {
             errors.add("businessUnit must not exceed 150 characters");
+        }
+
+        if (request.getDepartment() != null) {
+            if (request.getDepartment().isBlank()) {
+                errors.add("department must not be blank");
+            } else if (request.getDepartment().length() > 150) {
+                errors.add("department must not exceed 150 characters");
+            }
         }
 
         if (!errors.isEmpty()) {

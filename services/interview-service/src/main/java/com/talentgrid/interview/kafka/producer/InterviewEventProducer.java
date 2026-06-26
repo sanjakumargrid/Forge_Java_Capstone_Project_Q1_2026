@@ -1,6 +1,7 @@
 package com.talentgrid.interview.kafka.producer;
 
 import com.talentgrid.interview.interview.entity.Interview;
+import com.talentgrid.interview.interview.entity.Interviewer;
 import com.talentgrid.kafka.events.base.BaseEvent;
 import com.talentgrid.kafka.events.interview.InterviewPayload;
 import com.talentgrid.kafka.producer.KafkaProducerService;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -79,7 +81,7 @@ public class InterviewEventProducer {
         return InterviewPayload.builder()
                 .interviewId(interview.getInterviewId())
                 .applicationId(interview.getApplicationId())
-                .interviewerIds(interview.getInterviewers())
+                .interviewerIds(interview.getInterviewers().stream().map(Interviewer::getEmployeeId).collect(Collectors.toList()))
                 .type(
                         interview.getInterviewType() != null
                                 ? interview.getInterviewType().name()
@@ -113,7 +115,7 @@ public class InterviewEventProducer {
                         : correlationId;
 
         BaseEvent<InterviewPayload> event =
-                BaseEvent.<InterviewPayload>builder()
+                BaseEvent.<InterviewPayload> builder()
                         .eventType(eventType)
                         .source(SOURCE)
                         .correlationId(correlationId)

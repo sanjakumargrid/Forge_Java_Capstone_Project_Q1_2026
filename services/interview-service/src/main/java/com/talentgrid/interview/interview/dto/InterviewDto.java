@@ -1,8 +1,11 @@
 package com.talentgrid.interview.interview.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.talentgrid.interview.interview.entity.Interviewer;
 import com.talentgrid.interview.interview.enums.Status;
 import com.talentgrid.interview.interview.enums.Type;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,13 +22,15 @@ public class InterviewDto {
     @NotNull(message = "Application id is required")
     private Long applicationId;
 
-    @NotEmpty(message = "At least one interviewer is required")
-    @Size(max = 5, message = "Maximum 5 interviewers are allowed")
-    private List<
-            @NotNull(message = "Interviewer employee ID cannot be null")
-            @Positive(message = "Interviewer employee ID must be positive")
-                    Long
-            > interviewers;
+//    @NotEmpty(message = "At least one interviewer is required")
+//    @Size(max = 5, message = "Maximum 5 interviewers are allowed")
+//    private List<
+//            @NotNull(message = "Interviewer employee ID cannot be null")
+//            @Positive(message = "Interviewer employee ID must be positive")
+//                    Long
+//            > interviewers;
+    @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Interviewer> interviewers;
 
     @NotNull(message = "Interview type is required")
     private Type interviewType;

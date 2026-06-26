@@ -66,7 +66,7 @@ public class DemandLifecycleService {
     protected DemandResponse approveAsProjectManager(Long id, ApprovalRequest request, String auditEndpoint) {
         Demand demand = findActiveOrThrow(id);
         assertPendingApprovalOrThrow(id, demand);
-        if (!SecurityUtils.isPlatformAdmin()) {
+        if (!SecurityUtils.isPlatformAdmin() && !SecurityUtils.isResourceManager()) {
             assertCurrentUserIsPortfolioManagerForDemand(demand);
         }
         ApprovalRequest effective = normalizeProjectManagerApprovalRequest(request);
@@ -93,6 +93,9 @@ public class DemandLifecycleService {
             assertCurrentUserIsPortfolioManagerForDemand(demand);
             transitionValidator.validate(demand, DemandStatus.APPROVED, null);
             applyPostApprovalRouting(demand, from, comments);
+        } else if (SecurityUtils.isResourceManager()) {
+            transitionValidator.validate(demand, DemandStatus.APPROVED, null);
+            applyPostApprovalRouting(demand, from, comments);
         } else if (SecurityUtils.isHiringManager()) {
             if (!SecurityUtils.getCurrentUserId().equals(demand.getCreatedBy())) {
                 throw new AccessDeniedException("Only the demand owner can submit for approval.");
@@ -105,7 +108,7 @@ public class DemandLifecycleService {
             auditStatusChange(saved, from, DemandStatus.PENDING_APPROVAL, "/api/v1/demands/" + id + "/submit");
             return demandMapper.toResponse(saved);
         } else {
-            throw new AccessDeniedException("Only HM, portfolio manager, or platform admin may submit a demand from draft.");
+            throw new AccessDeniedException("Only HM, portfolio manager, resource manager, or platform admin may submit a demand from draft.");
         }
 
         Demand saved = demandRepository.save(demand);
@@ -249,6 +252,7 @@ public class DemandLifecycleService {
 
         demand.setStatus(DemandStatus.APPROVED);
         writeHistory(demand, fromStatus, DemandStatus.APPROVED, null, comments);
+        eventProducer.publishApproved(demand);
     }
 
     /**
@@ -309,7 +313,6 @@ public class DemandLifecycleService {
 
         demandRepository.save(demand);
 
-        eventProducer.publishApproved(demand);
         if (targetStatus == DemandStatus.OPEN_EXTERNAL) {
             eventProducer.publishExternalOpened(demand);
         }
@@ -428,7 +431,7 @@ public class DemandLifecycleService {
     }
 
     private void assertTransitionPermissions(Demand demand, DemandStatus targetStatus, ClosureReason closureReason) {
-        if (SecurityUtils.isPlatformAdmin()) {
+        if (SecurityUtils.canManageDemandLifecycle()) {
             return;
         }
 
@@ -544,10 +547,6 @@ public class DemandLifecycleService {
             } catch (Exception e) {
                 log.error("[LIFECYCLE] Could not resolve PM for demandId={} projectId={}: {}",
                         demand.getDemandId(), demand.getProjectId(), e.getMessage());
-                pmUserId = 99L;
-                pmName = "Project Manager";
-                pmEmail = "pm@example.com";
-                pmSlackId = null;
             }
         } else {
             log.warn("[LIFECYCLE] demandId={} has no projectId — PM notification will not be sent",
@@ -597,7 +596,7 @@ public class DemandLifecycleService {
     private void publishEventForTransition(Demand demand, DemandStatus fromStatus, DemandStatus targetStatus) {
         switch (targetStatus) {
             case OPEN_EXTERNAL -> {
-                if (fromStatus == DemandStatus.INTERNAL_SEARCH) {
+                if (fromStatus == DemandStatus.INTERNAL_SEARCH || fromStatus == DemandStatus.ON_HOLD) {
                     eventProducer.publishExternalOpened(demand);
                 }
             }

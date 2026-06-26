@@ -28,19 +28,28 @@ public class Interview {
     @Column(name = "application_id", nullable = false)
     private Long applicationId;
 
-    @NotEmpty(message = "At least one interviewer is required")
-    @Size(max = 5, message = "Maximum 5 interviewers are allowed")
-    @ElementCollection
-    @CollectionTable(
-            name = "interview_interviewers",
-            joinColumns = @JoinColumn(name = "interview_id")
-    )
-    @Column(name = "employee_id", nullable = false)
-    private List<
-            @NotNull(message = "Interviewer employee ID cannot be null")
-            @Positive(message = "Interviewer employee ID must be positive")
-                    Long
-            > interviewers;
+//    @NotEmpty(message = "At least one interviewer is required")
+//    @Size(max = 5, message = "Maximum 5 interviewers are allowed")
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "interview_interviewers",
+//            joinColumns = @JoinColumn(name = "interview_id")
+//    )
+//    @Column(name = "employee_id", nullable = false)
+//    private List<
+//            @NotNull(message = "Interviewer employee ID cannot be null")
+//            @Positive(message = "Interviewer employee ID must be positive")
+//                    Long
+//            > interviewers;
+
+    // REMOVE THIS OLD BLOCK:
+// @ElementCollection
+// @CollectionTable(name = "interview_interviewers", ...)
+// private List<Long> interviewers;
+
+// REPLACE WITH THIS:
+    @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Interviewer> interviewers;
 
     @NotNull(message = "Interview type is required")
     @Enumerated(EnumType.STRING)

@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 
 import java.util.List;
 
@@ -66,6 +67,23 @@ public class ApplicationController {
             @PathVariable Long applicationId
     ) {
         return applicationService.getApplicationById(applicationId);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
+    @GetMapping("/by-candidate-and-demand")
+    public List<ApplicationDto> getApplicationsByCandidateAndDemand(
+            @RequestParam Long candidateId,
+            @RequestParam Long demandId
+    ) {
+        return applicationService.getApplicationsByCandidateAndDemand(candidateId, demandId);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
+    @GetMapping("/candidates/by-demand/{demandId}")
+    public List<ExternalCandidateDto> getCandidatesByDemand(
+            @PathVariable Long demandId
+    ) {
+        return applicationService.getCandidatesByDemand(demandId);
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_UPDATE')")

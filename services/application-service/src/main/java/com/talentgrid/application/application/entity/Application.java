@@ -36,7 +36,7 @@ public class Application {
     private Long candidateId;
 
     @NotNull(message = "Job posting ID is required")
-    @Column(name = "demand_id", nullable = false)
+    @Column(name = "job_id", nullable = false)
     private Long jobPostingId;
 
     @NotNull(message = "Source is required")

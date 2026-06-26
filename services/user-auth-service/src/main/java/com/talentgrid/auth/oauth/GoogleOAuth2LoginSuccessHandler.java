@@ -9,17 +9,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Handles successful Google OAuth2 login by issuing a one-time exchange code redirect.
+ * Handles successful Google OAuth2 login by storing a one-time exchange code in an
+ * HttpOnly cookie and redirecting the browser to the frontend callback page.
  *
- * <p>JWTs are never placed in the browser URL. The SPA exchanges the code via
- * {@code POST /api/v1/auth/oauth/token}.
+ * <p>JWTs and exchange codes are never placed in the browser URL. The browser is redirected
+ * through the API Gateway cookie bridge, then the SPA exchanges the cookie via
+ * {@code POST /api/v1/auth/oauth/token} with {@code withCredentials: true}.
  */
 @Component
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class GoogleOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
     private final OAuthProperties oauthProperties;
     private final GoogleOAuthLoginService googleOAuthLoginService;
     private final OAuthAuthorizationCodeService oauthAuthorizationCodeService;
+    private final OAuthBridgeTokenService oauthBridgeTokenService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -44,14 +46,16 @@ public class GoogleOAuth2LoginSuccessHandler implements AuthenticationSuccessHan
                     oauthProperties.getExchangeCodeTtlSeconds()
             );
 
-            String redirectUrl = UriComponentsBuilder
-                    .fromUriString(oauthProperties.getFrontendBaseUrl())
-                    .path(oauthProperties.getCallbackPath())
-                    .queryParam("code", exchangeCode)
-                    .build()
-                    .toUriString();
+            String bridgeToken = oauthBridgeTokenService.createBridgeToken(
+                    exchangeCode,
+                    oauthProperties.getExchangeCodeTtlSeconds()
+            );
 
-            response.sendRedirect(redirectUrl);
+            String bridgeUrl = oauthProperties.getGatewayPublicBaseUrl()
+                    + "/api/v1/auth/oauth/bridge/"
+                    + bridgeToken;
+
+            response.sendRedirect(bridgeUrl);
         } catch (OAuthLoginException ex) {
             redirectToLoginError(response, ex.getErrorCode());
         }

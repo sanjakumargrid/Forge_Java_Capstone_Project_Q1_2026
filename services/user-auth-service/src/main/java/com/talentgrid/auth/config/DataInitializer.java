@@ -102,23 +102,11 @@ public class DataInitializer implements CommandLineRunner {
         );
         Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
         addScopes(portfolioManagerRole, demandView, demandPipelineView, demandPmApprove,
-                demandStatusTransition, demandSubmit,candidateView, candidateDelete,
-
-                applicationView, applicationUpdate,
-
-                interviewCreate, interviewView, interviewUpdate, interviewDelete,
-
-                offerCreate, offerView, offerUpdate, offerDelete);
+                demandStatusTransition, demandSubmit);
 
         Role hiringManagerRole = upsertRole("HIRING_MANAGER");
         addScopes(hiringManagerRole, demandView, demandCreate, demandUpdate, demandSubmit,
-                demandStatusTransition, demandPipelineView, demandHmNominationDecide,candidateView, candidateDelete,
-
-                applicationView, applicationUpdate,
-
-                interviewCreate, interviewView, interviewUpdate, interviewDelete,
-
-                offerCreate, offerView, offerUpdate, offerDelete);
+                demandStatusTransition, demandPipelineView, demandHmNominationDecide);
 
         Role resourceManagerRole = upsertRole("RESOURCE_MANAGER");
         addScopes(resourceManagerRole, demandView, demandStatusTransition, demandNominate, demandPipelineView,

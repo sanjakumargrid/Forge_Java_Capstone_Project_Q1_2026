@@ -134,6 +134,16 @@ public class SecurityUtils {
         return hasAnyRole("RESOURCE_MANAGER");
     }
 
+    /** May perform any state-machine-legal demand transition (same operational scope as platform admin for lifecycle). */
+    public static boolean canManageDemandLifecycle() {
+        return isPlatformAdmin() || isResourceManager();
+    }
+
+    /** May view demands in any lifecycle status (list search and detail endpoints). */
+    public static boolean canViewAllDemands() {
+        return isPlatformAdmin() || isResourceManager() || isPortfolioManager();
+    }
+
     public static boolean isRecruiter() {
         return hasAnyRole("RECRUITER");
     }

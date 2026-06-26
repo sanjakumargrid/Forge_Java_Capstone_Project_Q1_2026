@@ -16,6 +16,7 @@
         .detail-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         .detail-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
         .detail-table td:first-child { font-weight: bold; color: #6b7280; width: 38%; }
+        .skill-optional { color: #6b7280; font-style: italic; }
         .footer { background: #f9fafb; padding: 16px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
         .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #059669; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
     </style>
@@ -41,10 +42,18 @@
                 <td>Approved By</td>
                 <td th:text="${approverName}">-</td>
             </tr>
+            <tr>
+                <td>Mandatory Skills</td>
+                <td th:text="${mandatorySkills}">-</td>
+            </tr>
+            <tr>
+                <td>Optional Skills</td>
+                <td class="skill-optional" th:text="${optionalSkills}">-</td>
+            </tr>
         </table>
 
         <p th:text="${message}">The talent acquisition team will begin sourcing candidates shortly.</p>
-        <a href="#" class="cta-btn">Track Demand Progress</a>
+        <a th:href="@{http://localhost:4200/demands/{id}(id=${demandId} ?: ${referenceId})}" class="cta-btn">Track Demand Progress</a>
     </div>
     <div class="footer">
         <p>© 2026 TalentGrid · <a href="#" style="color:#6b7280;">Unsubscribe</a></p>

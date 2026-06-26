@@ -76,7 +76,7 @@ TARGET_DATE=$(python3 -c "from datetime import date,timedelta; print((date.today
 
 CREATE_PAYLOAD="$(cat <<JSON
 {
-  "description": "E2E demand from demand-workflow-via-gateway.sh",
+  "description": "E2E demand from demand-workflow-via-gateway.sh. This description is intentionally padded to be over 250 characters long to pass the strict validation rules enforced by DemandValidationService. This ensures that the demand creation endpoint does not reject the request due to the description being too short. We need at least 250 chars. Padding padding padding padding padding padding.",
   "level": "T4_STAFF",
   "location": "Remote",
   "accountId": ${ACCOUNT_ID},

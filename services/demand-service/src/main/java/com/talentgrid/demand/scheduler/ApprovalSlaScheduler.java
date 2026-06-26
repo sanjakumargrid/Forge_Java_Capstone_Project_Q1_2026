@@ -10,7 +10,6 @@ import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.kafka.producer.DemandEventProducer;
 import com.talentgrid.demand.repository.DemandRepository;
 import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
-import com.talentgrid.demand.service.ApprovalReminderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,7 +27,7 @@ import java.util.Optional;
  * <p>Runs every hour and checks all active PENDING_APPROVAL demands:
  * <ul>
  *   <li>≥ 24h: Send one-time reminder to PM (action required) and Creator (info).</li>
- *   <li>≥ 72h: Auto-close the demand (CLOSED), publish DEMAND_APPROVAL_SLA_CLOSED, notify PM + Creator.</li>
+ *   <li>≥ 72h: Auto-close the demand (CLOSED + SLA_APPROVAL_BREACH), then notify PM and Creator via DEMAND_APPROVAL_SLA_CLOSED.</li>
  * </ul>
  *
  * <p>Both actions are idempotent:
@@ -47,14 +46,13 @@ public class ApprovalSlaScheduler {
 
   private final DemandRepository demandRepository;
   private final DemandStatusHistoryRepository historyRepository;
-  private final ApprovalReminderService approvalReminderService;
   private final UserAuthServiceClient userAuthServiceClient;
   private final DemandEventProducer eventProducer;
 
   /**
-   * Runs every hour. For testing, lower the cron to "0 * * * * *" (every minute).
+   * Runs hourly by default. Override via {@code demand.scheduler.approval-sla.cron} for faster local testing.
    */
-  @Scheduled(cron = "0 * * * * *")
+  @Scheduled(cron = "${demand.scheduler.approval-sla.cron:0 0 * * * *}")
   @Transactional
   public void checkApprovalSla() {
     log.info("[SLA-SCHEDULER] Starting approval SLA check");
@@ -117,14 +115,18 @@ public class ApprovalSlaScheduler {
       log.warn("[SLA-SCHEDULER] 24h SLA threshold reached for demandId={} ({} hours pending)",
               demand.getDemandId(), elapsedHours);
 
-      boolean sent = approvalReminderService.sendApprovalReminder(demand, pm, elapsedHours);
+      eventProducer.publishApprovalReminder(
+              demand,
+              pm.userId(),
+              pm.name(),
+              pm.email(),
+              pm.slackId(),
+              elapsedHours);
 
-      if (sent) {
-        demand.setApprovalReminderSent(true);
-        demandRepository.save(demand);
-        log.info("[SLA-SCHEDULER] 24h reminder sent and flag set for demandId={}",
-                demand.getDemandId());
-      }
+      demand.setApprovalReminderSent(true);
+      demandRepository.save(demand);
+      log.info("[SLA-SCHEDULER] 24h reminder published and flag set for demandId={}",
+              demand.getDemandId());
     }
   }
 
@@ -132,7 +134,8 @@ public class ApprovalSlaScheduler {
    * Auto-closes the demand after 72 hours in PENDING_APPROVAL (SLA breach).
    */
   private void autoCloseDemandAfterSla(Demand demand, PmInfo pm, long elapsedHours) {
-    log.warn("[SLA-SCHEDULER] 72h SLA breached for demandId={} — auto-closing", demand.getDemandId());
+    log.warn("[SLA-SCHEDULER] 72h SLA breached for demandId={} — auto-closing",
+            demand.getDemandId());
 
     DemandStatus previousStatus = demand.getStatus();
     demand.setStatus(DemandStatus.CLOSED);
@@ -158,8 +161,7 @@ public class ApprovalSlaScheduler {
             pm.userId(),
             pm.name(),
             pm.email(),
-            pm.slackId()
-    );
+            pm.slackId());
   }
 
   /**
@@ -187,10 +189,9 @@ public class ApprovalSlaScheduler {
       }
       return new PmInfo(pmUser.getId(), pmUser.getName(), pmUser.getEmail(), pmUser.getSlackId());
     } catch (Exception e) {
-      log.error("[SLA-SCHEDULER] 💥 Feign Client Failed! Could not resolve PM for demandId={}. Error: {}",
+      log.error("[SLA-SCHEDULER] Could not resolve PM for demandId={}: {}",
               demand.getDemandId(), e.getMessage());
-      log.info("[SLA-SCHEDULER] 🛠️ Applying fallback PM details to bypass Feign security block...");
-      return new PmInfo(99L, "Project Manager", "mmathiyalagan@griddynamics.com", "U12345678");
+      return PmInfo.empty();
     }
   }
 

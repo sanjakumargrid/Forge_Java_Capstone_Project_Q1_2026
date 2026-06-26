@@ -1,18 +1,19 @@
 package com.talentgrid.auth.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Request body for exchanging a one-time Google OAuth code for JWT tokens.
+ * Legacy request body for OAuth token exchange.
+ *
+ * <p>Exchange codes are now delivered via the HttpOnly {@code FORGE_OAUTH_EXCHANGE} cookie;
+ * this DTO is retained for compatibility but is no longer used by {@code POST /oauth/token}.
  */
 @Getter
 @Setter
 @NoArgsConstructor
 public class OAuthTokenExchangeRequest {
 
-    @NotBlank(message = "OAuth exchange code is required")
     private String code;
 }

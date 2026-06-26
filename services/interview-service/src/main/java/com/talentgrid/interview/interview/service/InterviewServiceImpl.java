@@ -13,21 +13,25 @@ import com.talentgrid.clients.notification.NotificationEventPublisher;
 import com.talentgrid.interview.interview.dto.ApplicationDto;
 import com.talentgrid.interview.interview.dto.InterviewDto;
 import com.talentgrid.interview.interview.entity.Interview;
+import com.talentgrid.interview.interview.entity.Interviewer;
 import com.talentgrid.interview.interview.enums.Status;
 import com.talentgrid.interview.interview.enums.Type;
 import com.talentgrid.interview.interview.integration.GoogleCalendarClient;
 import com.talentgrid.interview.interview.integration.GoogleCalendarResponse;
 import com.talentgrid.interview.interview.mapper.InterviewMapper;
 import com.talentgrid.interview.interview.repository.InterviewRepository;
+import com.talentgrid.interview.interview.repository.InterviewerRepository;
 import com.talentgrid.interview.kafka.producer.InterviewEventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -36,6 +40,7 @@ import java.util.Map;
 public class InterviewServiceImpl implements InterviewService {
 
     private final InterviewRepository interviewRepository;
+    private final InterviewerRepository interviewerRepository;
 
     private final ApplicationClient applicationClient;
 
@@ -113,7 +118,7 @@ public class InterviewServiceImpl implements InterviewService {
         String interviewerName = "Our Team";
         if (interview.getInterviewers() != null && !interview.getInterviewers().isEmpty()) {
             try {
-                EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0));
+                EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0).getEmployeeId());
                 if (primaryInterviewer != null && primaryInterviewer.getName() != null) {
                     interviewerName = primaryInterviewer.getName();
                 }
@@ -150,12 +155,12 @@ public class InterviewServiceImpl implements InterviewService {
 
         // Send emails to all Interviewers
         if (interview.getInterviewers() != null) {
-            for (Long interviewerId : interview.getInterviewers()) {
+            for (Interviewer interviewer : interview.getInterviewers()) {
                 try {
-                    EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+                    EmployeeDto employee = employeeClient.getEmployee(interviewer.getEmployeeId());
                     if (employee != null && employee.getEmail() != null) {
                         notificationEventPublisher.sendInAppAndEmail(
-                                String.valueOf(interviewerId),
+                                String.valueOf(interviewer.getEmployeeId()),
                                 employee.getEmail(),
                                 null,
                                 "INTERVIEW_INVITATION",
@@ -178,7 +183,7 @@ public class InterviewServiceImpl implements InterviewService {
                     }
                 } catch (Exception e) {
                     // Log error but don't fail the interview creation
-                    log.error("[InterviewService] Failed to send email to interviewer {}: {}", interviewerId, e.getMessage());
+                    log.error("[InterviewService] Failed to send email to interviewer {}: {}", interviewer.getEmployeeId(), e.getMessage());
                 }
             }
         }
@@ -434,5 +439,15 @@ public class InterviewServiceImpl implements InterviewService {
                         .endpoint("/api/v1/interviews/" + id)
                         .build()
         );
+
+
     }
+
+    @Override
+    @Transactional
+    public List<Interview> getInterviewsForEmployee(Long employeeId) {
+        // 1. Fetch all interviewer records for this employee
+        List<Interviewer> assignments = interviewerRepository.findByEmployeeId(employeeId);
+        // 2. Extract the actual Interview objects from those records
+        return assignments.stream() .map(Interviewer::getInterview) .toList(); }
 }

@@ -4,22 +4,23 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Stores short-lived, one-time OAuth exchange codes in Redis.
  *
- * <p>After Google login succeeds, the browser is redirected with a {@code code} query
- * parameter instead of a JWT. The SPA exchanges that code for tokens via
- * {@code POST /api/v1/auth/oauth/token}.
+ * <p>After Google login succeeds, the exchange code is placed in an HttpOnly cookie.
+ * The SPA exchanges it for tokens via {@code POST /api/v1/auth/oauth/token}.
  */
 @Service
 @RequiredArgsConstructor
 public class OAuthAuthorizationCodeService {
 
     private static final String KEY_PREFIX = "auth:oauth:code:";
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -31,13 +32,19 @@ public class OAuthAuthorizationCodeService {
      * @return opaque exchange code
      */
     public String createCode(Long userId, long ttlSeconds) {
-        String code = UUID.randomUUID().toString();
+        String code = generateSecureCode();
         redisTemplate.opsForValue().set(
                 KEY_PREFIX + code,
                 String.valueOf(userId),
                 Duration.ofSeconds(ttlSeconds)
         );
         return code;
+    }
+
+    private String generateSecureCode() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     /**

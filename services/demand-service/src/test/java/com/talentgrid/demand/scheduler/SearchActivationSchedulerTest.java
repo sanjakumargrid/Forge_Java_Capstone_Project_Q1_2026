@@ -65,7 +65,7 @@ class SearchActivationSchedulerTest {
 
         assertEquals(DemandStatus.INTERNAL_SEARCH, demand.getStatus());
         assertNotNull(demand.getSearchStartAt());
-        verify(eventProducer).publishApproved(demand);
+        verify(eventProducer, never()).publishApproved(demand);
         verify(eventProducer, never()).publishExternalOpened(any());
     }
 
@@ -78,7 +78,7 @@ class SearchActivationSchedulerTest {
         scheduler.activateApprovedDemands();
 
         assertEquals(DemandStatus.OPEN_EXTERNAL, demand.getStatus());
-        verify(eventProducer).publishApproved(demand);
+        verify(eventProducer, never()).publishApproved(demand);
         verify(eventProducer).publishExternalOpened(demand);
     }
 

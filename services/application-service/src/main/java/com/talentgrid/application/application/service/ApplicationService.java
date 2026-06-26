@@ -204,6 +204,43 @@ public class ApplicationService {
         return toDtoWithCandidate(getApplicationEntity(applicationId));
     }
 
+
+    public List<ApplicationDto> getApplicationsByCandidateAndDemand(Long candidateId, Long demandId) {
+        if (candidateId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Candidate id is required");
+        if (demandId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Demand id is required");
+
+        JobPostingDto jobPosting = jobPostingClient.getJobPostingByDemandId(demandId);
+        if (jobPosting == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No job posting found for demand id: " + demandId);
+        }
+
+        List<Application> applications =
+                applicationRepository.findByCandidateIdAndJobPostingId(candidateId, jobPosting.getJobPostingId());
+
+        return applications.stream().map(this::toDtoWithCandidate).collect(Collectors.toList());
+    }
+
+
+    public List<ExternalCandidateDto> getCandidatesByDemand(Long demandId) {
+        if (demandId == null) throw new BusinessException(HttpStatus.BAD_REQUEST, "Demand id is required");
+
+        JobPostingDto jobPosting = jobPostingClient.getJobPostingByDemandId(demandId);
+        if (jobPosting == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND, "No job posting found for demand id: " + demandId);
+        }
+
+        List<Application> applications =
+                applicationRepository.findByJobPostingId(jobPosting.getJobPostingId(), Pageable.unpaged()).getContent();
+
+        return applications.stream()
+                .map(Application::getCandidateId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(candidateClient::getCandidateById)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public ApplicationDto moveStage(
             Long applicationId,

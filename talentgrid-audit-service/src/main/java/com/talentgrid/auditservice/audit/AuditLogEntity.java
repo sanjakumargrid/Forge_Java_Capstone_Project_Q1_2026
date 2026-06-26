@@ -58,6 +58,14 @@ public class AuditLogEntity {
   @Column(name = "user_agent", columnDefinition = "TEXT")
   private String userAgent;
 
+  /**
+   * Human-readable reason for the change. Populated for demand edits and any
+   * other operation that requires a justification. Stored as a dedicated column
+   * so it is directly queryable without parsing the afterState JSON blob.
+   */
+  @Column(name = "reason_for_edit", columnDefinition = "TEXT")
+  private String reasonForEdit;
+
   @Column(name = "created_at", nullable = false, updatable = false)
   private OffsetDateTime createdAt;
 

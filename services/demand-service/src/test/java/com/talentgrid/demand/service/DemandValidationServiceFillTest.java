@@ -91,15 +91,16 @@ class DemandValidationServiceFillTest {
     // ─── validateUpdate ───────────────────────────────────────────────────────
 
     @Test
-    void validateUpdate_emptyRequestPassesWithoutErrors() {
-        // A fully null update is a no-op — should not throw
-        assertDoesNotThrow(() -> validationService.validateUpdate(new DemandRequest()));
+    void validateUpdate_requiresReasonForEdit() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateUpdate(new DemandRequest()));
+        assertTrue(ex.getMessage().contains("reasonForEdit"));
     }
 
     @Test
     void validateUpdate_doesNotRejectAbsenceOfRequiredCount() {
         // requiredCount removal: any update that doesn't specify requiredCount is fine
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = validUpdateRequest();
         request.setLocation("Berlin");
 
         assertDoesNotThrow(() -> validationService.validateUpdate(request),
@@ -108,7 +109,7 @@ class DemandValidationServiceFillTest {
 
     @Test
     void validateUpdate_failsOnNegativeBudget() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = validUpdateRequest();
         request.setBudget(BigDecimal.valueOf(-500));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
@@ -118,7 +119,7 @@ class DemandValidationServiceFillTest {
 
     @Test
     void validateUpdate_failsWhenSkillsUpdatedButBothEmpty() {
-        DemandRequest request = new DemandRequest();
+        DemandRequest request = validUpdateRequest();
         request.setMandatorySkillIds(java.util.List.of());
         request.setOptionalSkillIds(java.util.List.of());
 
@@ -157,6 +158,12 @@ class DemandValidationServiceFillTest {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    private DemandRequest validUpdateRequest() {
+        DemandRequest req = new DemandRequest();
+        req.setReasonForEdit("Test update reason");
+        return req;
+    }
 
     private DemandRequest validCreateRequest() {
         DemandRequest req = new DemandRequest();

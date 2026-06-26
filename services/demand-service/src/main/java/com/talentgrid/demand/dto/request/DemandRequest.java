@@ -5,6 +5,8 @@ import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
 import com.talentgrid.demand.domain.enums.WorkMode;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,6 +36,9 @@ import java.util.List;
 public class DemandRequest {
 
     private String title;
+
+    @NotBlank(message = "Description is required.")
+    @Size(min = 250, max = 2000, message = "Description must be between 250 and 2000 characters.")
     private String description;
     private SeniorityLevel level;
     private String location;
@@ -59,6 +64,12 @@ public class DemandRequest {
 
     /** When true, post-approval flow skips internal search (bench hiring). */
     private Boolean benchHiring;
+
+    /**
+     * Mandatory reason explaining why this demand is being edited.
+     * Required for all PATCH /demands/{id} requests; persisted to edit history for audit.
+     */
+    private String reasonForEdit;
 
 }
 

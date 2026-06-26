@@ -16,6 +16,7 @@
     .detail-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
     .detail-table td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
     .detail-table td:first-child { font-weight: bold; color: #6b7280; width: 40%; }
+    .skill-optional { color: #6b7280; font-style: italic; }
     .highlight { background: #faf5ff; border-left: 4px solid #7c3aed; padding: 12px 16px; margin: 16px 0; border-radius: 0 4px 4px 0; font-size: 14px; }
     .footer { background: #f9fafb; padding: 16px 32px; text-align: center; font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; }
     .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #7c3aed; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
@@ -48,16 +49,12 @@
         <td th:text="${location}">Remote</td>
       </tr>
       <tr>
-        <td>Required Skills</td>
-        <td th:text="${skills}">Java, Spring Boot, Kafka</td>
+        <td>Mandatory Skills</td>
+        <td th:text="${mandatorySkills}">-</td>
       </tr>
       <tr>
-        <td>Total Positions</td>
-        <td th:text="${requiredCount}">0</td>
-      </tr>
-      <tr>
-        <td>Filled Internally</td>
-        <td th:text="${internalFilledCount}">0</td>
+        <td>Optional Skills</td>
+        <td class="skill-optional" th:text="${optionalSkills}">-</td>
       </tr>
       <tr>
         <td>Assigned Recruiter</td>
@@ -67,7 +64,7 @@
 
     <p th:text="${message}">External sourcing details.</p>
 
-    <a href="#" class="cta-btn">Track Demand Progress</a>
+    <a th:href="@{http://localhost:4200/demands/{id}(id=${demandId} ?: ${referenceId})}" class="cta-btn">Track Demand Progress</a>
   </div>
   <div class="footer">
     <p>You received this notification because you are subscribed to demand updates.</p>

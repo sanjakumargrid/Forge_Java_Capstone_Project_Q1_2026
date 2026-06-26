@@ -15,9 +15,11 @@
         .field { margin-bottom: 12px; }
         .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
         .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
+        .field p.optional { color: #6b7280; font-style: italic; }
         .warning-box { background: #fffbeb; border-left: 4px solid #d97706;
             padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
         .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+        .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #d97706; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -59,6 +61,14 @@
             <label>Time Pending</label>
             <p><strong th:text="${elapsedHours}">24</strong> hours</p>
         </div>
+        <div class="field">
+            <label>Mandatory Skills</label>
+            <p th:text="${mandatorySkills}">—</p>
+        </div>
+        <div class="field">
+            <label>Optional Skills</label>
+            <p class="optional" th:text="${optionalSkills}">—</p>
+        </div>
 
         <!-- PM Footer Warning -->
         <p th:if="${recipientRole == 'Project Manager'}" style="color:#b45309;margin-top:16px;line-height:1.5;">
@@ -69,6 +79,10 @@
         <p th:if="${recipientRole != 'Project Manager'}" style="color:#047857;margin-top:16px;">
             We have sent an automated reminder to the Project Manager to review your request. No further action is required from you at this time.
         </p>
+
+        <a th:href="@{http://localhost:4200/demands/{id}(id=${demandId} ?: ${referenceId})}"
+           th:text="${recipientRole == 'Project Manager'} ? 'Review & Approve Demand' : 'View Demand in TalentGrid'"
+           class="cta-btn">View Demand in TalentGrid</a>
     </div>
     <div class="footer">TalentGrid · This is an automated notification.</div>
 </div>

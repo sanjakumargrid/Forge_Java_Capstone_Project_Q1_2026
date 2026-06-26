@@ -73,4 +73,11 @@ public class AuditLogPayload {
    * Browser/client user agent.
    */
   private String userAgent;
+
+  /**
+   * Human-readable reason for the change. Mandatory for demand edits;
+   * optional for other entity types. Persisted as a dedicated column
+   * so it is directly queryable without parsing the afterState JSON.
+   */
+  private String reasonForEdit;
 }

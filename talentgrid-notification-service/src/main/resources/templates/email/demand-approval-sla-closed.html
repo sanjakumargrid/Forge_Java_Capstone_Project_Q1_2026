@@ -18,6 +18,7 @@
         .info-box { background: #fffbeb; border-left: 4px solid #b45309;
             padding: 16px 20px; border-radius: 4px; margin: 20px 0; }
         .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+        .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #b45309; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -61,6 +62,8 @@
         <p th:if="${recipientRole != 'Project Manager'}" style="margin-top:16px; color:#374151;">
             If the role is still needed, submit a new demand when ready.
         </p>
+
+        <a th:href="@{http://localhost:4200/demands/{id}(id=${demandId} ?: ${referenceId})}" class="cta-btn">View Demand in TalentGrid</a>
     </div>
     <div class="footer">TalentGrid · Automated notification</div>
 </div>

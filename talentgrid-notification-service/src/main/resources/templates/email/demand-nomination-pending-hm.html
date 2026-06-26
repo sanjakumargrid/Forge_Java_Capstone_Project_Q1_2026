@@ -14,6 +14,7 @@
         .field label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
         .field p { margin: 4px 0 0; font-size: 15px; color: #111; }
         .footer { background: #f9fafb; padding: 16px 32px; font-size: 12px; color: #9ca3af; }
+        .cta-btn { display: inline-block; margin-top: 20px; padding: 12px 28px; background: #1d4ed8; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -35,6 +36,8 @@
             <label>Nominee user ID</label>
             <p th:text="${nomineeUserId}">—</p>
         </div>
+
+        <a th:href="@{http://localhost:4200/demands/{id}(id=${demandId} ?: ${referenceId})}" class="cta-btn">Review Nomination</a>
     </div>
     <div class="footer">TalentGrid · Automated notification</div>
 </div>

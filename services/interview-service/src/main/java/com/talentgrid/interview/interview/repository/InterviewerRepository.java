@@ -15,4 +15,5 @@ public interface InterviewerRepository extends JpaRepository<Interviewer, Long> 
 
     List<Interviewer> findByLocation(String location);
 
+    List<Interviewer> findByEmployeeId(long EmployeeId);
 }

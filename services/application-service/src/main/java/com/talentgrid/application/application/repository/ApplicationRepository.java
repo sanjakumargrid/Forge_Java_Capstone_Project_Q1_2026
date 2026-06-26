@@ -30,4 +30,6 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     );
 
     List<Application> findAllByIdIn(List<Long> ids);
+
+    List<Application> findByCandidateIdAndJobPostingId(Long candidateId, Long jobPostingId);
 }

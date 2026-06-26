@@ -1,9 +1,6 @@
 package com.talentgrid.interview.interview.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,5 +29,8 @@ public class Interviewer {
     @Column(name = "grade")
     private String grade;
 
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "interview_id",nullable=false)
+    private Interview interview;
 }
 

@@ -16,7 +16,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for DemandAnalyticsService position-level metrics.
+ * Unit tests for {@link DemandAnalyticsService} — demand-level (single-person) model.
+ * Each demand = one person, so fill rate = filled demands / total demands.
  */
 class DemandAnalyticsServiceTest {
 
@@ -34,14 +35,14 @@ class DemandAnalyticsServiceTest {
     @Test
     void testGetAnalyticsWithDefaultWindow() {
         // Arrange
-        when(demandRepository.sumRequiredPositionsBetween(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(1000L);
-        when(demandRepository.sumFilledPositionsBetween(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(800L);
-        when(demandRepository.sumInternalFilledCountBetween(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(550L);
-        when(demandRepository.sumExternalFilledCountBetween(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(250L);
+        when(demandRepository.countTotalDemandsBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(100L);
+        when(demandRepository.countFilledDemandsBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(80L);
+        when(demandRepository.countFilledDemandsInternalBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(55L);
+        when(demandRepository.countFilledDemandsExternalBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(25L);
         when(demandRepository.averageTimeToFillBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(26.45);
         when(demandRepository.minTimeToFillBetween(any(LocalDate.class), any(LocalDate.class)))
@@ -59,16 +60,16 @@ class DemandAnalyticsServiceTest {
         assertNotNull(response.getMetadata());
         assertEquals(LocalDate.now(), response.getMetadata().getEndDate());
 
-        // Verify fill rate
+        // Verify fill rate — 80 filled out of 100 total = 80%
         assertNotNull(response.getFillRate());
-        assertEquals(1000L, response.getFillRate().getTotalRequiredPositions());
-        assertEquals(800L, response.getFillRate().getTotalFilledPositions());
+        assertEquals(100L, response.getFillRate().getTotalRequiredPositions()); // total demands
+        assertEquals(80L, response.getFillRate().getTotalFilledPositions());    // filled demands
         assertEquals(80.0, response.getFillRate().getFillRatePercent());
 
-        // Verify internal vs external split
+        // Verify internal vs external split (55 internal, 25 external → 68.75% / 31.25%)
         assertNotNull(response.getInternalVsExternalSplit());
-        assertEquals(550L, response.getInternalVsExternalSplit().getInternalFilledCount());
-        assertEquals(250L, response.getInternalVsExternalSplit().getExternalFilledCount());
+        assertEquals(55L, response.getInternalVsExternalSplit().getInternalFilledCount());
+        assertEquals(25L, response.getInternalVsExternalSplit().getExternalFilledCount());
         assertEquals(68.75, response.getInternalVsExternalSplit().getInternalPercentage());
         assertEquals(31.25, response.getInternalVsExternalSplit().getExternalPercentage());
 
@@ -86,22 +87,14 @@ class DemandAnalyticsServiceTest {
         LocalDate startDate = LocalDate.of(2026, 5, 15);
         LocalDate endDate = LocalDate.of(2026, 6, 14);
 
-        when(demandRepository.sumRequiredPositionsBetween(startDate, endDate))
-                .thenReturn(500L);
-        when(demandRepository.sumFilledPositionsBetween(startDate, endDate))
-                .thenReturn(400L);
-        when(demandRepository.sumInternalFilledCountBetween(startDate, endDate))
-                .thenReturn(280L);
-        when(demandRepository.sumExternalFilledCountBetween(startDate, endDate))
-                .thenReturn(120L);
-        when(demandRepository.averageTimeToFillBetween(startDate, endDate))
-                .thenReturn(20.0);
-        when(demandRepository.minTimeToFillBetween(startDate, endDate))
-                .thenReturn(2.0);
-        when(demandRepository.maxTimeToFillBetween(startDate, endDate))
-                .thenReturn(45.0);
-        when(demandRepository.countDemandsWithFilledPositionsBetween(startDate, endDate))
-                .thenReturn(40L);
+        when(demandRepository.countTotalDemandsBetween(startDate, endDate)).thenReturn(50L);
+        when(demandRepository.countFilledDemandsBetween(startDate, endDate)).thenReturn(40L);
+        when(demandRepository.countFilledDemandsInternalBetween(startDate, endDate)).thenReturn(28L);
+        when(demandRepository.countFilledDemandsExternalBetween(startDate, endDate)).thenReturn(12L);
+        when(demandRepository.averageTimeToFillBetween(startDate, endDate)).thenReturn(20.0);
+        when(demandRepository.minTimeToFillBetween(startDate, endDate)).thenReturn(2.0);
+        when(demandRepository.maxTimeToFillBetween(startDate, endDate)).thenReturn(45.0);
+        when(demandRepository.countDemandsWithFilledPositionsBetween(startDate, endDate)).thenReturn(40L);
 
         // Act
         DemandAnalyticsMetricsResponse response = analyticsService.getAnalytics(startDate, endDate);
@@ -112,19 +105,19 @@ class DemandAnalyticsServiceTest {
         assertEquals(endDate, response.getMetadata().getEndDate());
         assertEquals(31, response.getMetadata().getWindowDays()); // 31 days inclusive
 
-        assertEquals(80.0, response.getFillRate().getFillRatePercent());
+        assertEquals(80.0, response.getFillRate().getFillRatePercent()); // 40/50 = 80%
     }
 
     @Test
-    void testGetAnalyticsWithZeroFilledPositions() {
+    void testGetAnalyticsWithZeroFilledDemands() {
         // Arrange
-        when(demandRepository.sumRequiredPositionsBetween(any(LocalDate.class), any(LocalDate.class)))
-                .thenReturn(100L);
-        when(demandRepository.sumFilledPositionsBetween(any(LocalDate.class), any(LocalDate.class)))
+        when(demandRepository.countTotalDemandsBetween(any(LocalDate.class), any(LocalDate.class)))
+                .thenReturn(10L);
+        when(demandRepository.countFilledDemandsBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(0L);
-        when(demandRepository.sumInternalFilledCountBetween(any(LocalDate.class), any(LocalDate.class)))
+        when(demandRepository.countFilledDemandsInternalBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(0L);
-        when(demandRepository.sumExternalFilledCountBetween(any(LocalDate.class), any(LocalDate.class)))
+        when(demandRepository.countFilledDemandsExternalBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(0L);
         when(demandRepository.averageTimeToFillBetween(any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(0.0);
@@ -144,4 +137,3 @@ class DemandAnalyticsServiceTest {
         assertEquals(0.0, response.getInternalVsExternalSplit().getExternalPercentage());
     }
 }
-

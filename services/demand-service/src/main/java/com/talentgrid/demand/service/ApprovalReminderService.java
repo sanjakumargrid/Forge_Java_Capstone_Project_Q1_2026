@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -69,13 +70,15 @@ public class ApprovalReminderService {
                 "DEMAND",
                 "HIGH",
                 "demand-approval-reminder",
-                Map.of(
-                        "demandId",       String.valueOf(demand.getDemandId()),
-                        "demandTitle",    demand.getTitle() != null ? demand.getTitle() : "",
-                        "elapsedHours",   String.valueOf(elapsedHours),
-                        "creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown",
-                        "recipientRole",  "Project Manager",
-                        "projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""
+                Map.ofEntries(
+                        Map.entry("demandId",       String.valueOf(demand.getDemandId())),
+                        Map.entry("demandTitle",    demand.getTitle() != null ? demand.getTitle() : ""),
+                        Map.entry("elapsedHours",   String.valueOf(elapsedHours)),
+                        Map.entry("creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown"),
+                        Map.entry("recipientRole",  "Project Manager"),
+                        Map.entry("projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""),
+                        Map.entry("mandatorySkills", formatMandatorySkills(demand)),
+                        Map.entry("optionalSkills",  formatOptionalSkills(demand))
                 ),
                 correlationId
         );
@@ -113,13 +116,15 @@ public class ApprovalReminderService {
                   "DEMAND",
                   "NORMAL",
                   "demand-approval-reminder",
-                  Map.of(
-                          "demandId",       String.valueOf(demand.getDemandId()),
-                          "demandTitle",    demand.getTitle() != null ? demand.getTitle() : "",
-                          "elapsedHours",   String.valueOf(elapsedHours),
-                          "creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown",
-                          "recipientRole",  "Demand Creator",
-                          "projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""
+                  Map.ofEntries(
+                          Map.entry("demandId",       String.valueOf(demand.getDemandId())),
+                          Map.entry("demandTitle",    demand.getTitle() != null ? demand.getTitle() : ""),
+                          Map.entry("elapsedHours",   String.valueOf(elapsedHours)),
+                          Map.entry("creatorName",    demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown"),
+                          Map.entry("recipientRole",  "Demand Creator"),
+                          Map.entry("projectName",    demand.getProjectName() != null ? demand.getProjectName() : ""),
+                          Map.entry("mandatorySkills", formatMandatorySkills(demand)),
+                          Map.entry("optionalSkills",  formatOptionalSkills(demand))
                   ),
                   correlationId
           );
@@ -155,5 +160,148 @@ public class ApprovalReminderService {
     }
 
     return anySent;
+  }
+
+  /**
+   * Sends 72-hour escalation to PM (action required) and Creator (information)
+   * before the demand is auto-closed for SLA breach.
+   */
+  public boolean sendApprovalEscalation(
+          Demand demand,
+          ApprovalSlaScheduler.PmInfo pm,
+          long elapsedHours) {
+
+    boolean anySent = false;
+    String correlationId = UUID.randomUUID().toString();
+
+    if (pm.userId() != null && pm.email() != null) {
+      try {
+        notificationEventPublisher.sendInAppAndEmail(
+                String.valueOf(pm.userId()),
+                pm.email(),
+                pm.slackId(),
+                "DEMAND_APPROVAL_ESCALATION",
+                "Urgent: Demand Approval Overdue — " + elapsedHours + "h",
+                String.format(
+                        "Demand '%s' (ID: %d) has been awaiting your approval for %d hours. "
+                                + "It will be auto-closed imminently if no action is taken.",
+                        demand.getTitle(),
+                        demand.getDemandId(),
+                        elapsedHours),
+                "demand-service",
+                String.valueOf(demand.getDemandId()),
+                "DEMAND",
+                "HIGH",
+                "demand-approval-reminder",
+                Map.ofEntries(
+                        Map.entry("demandId", String.valueOf(demand.getDemandId())),
+                        Map.entry("demandTitle", demand.getTitle() != null ? demand.getTitle() : ""),
+                        Map.entry("elapsedHours", String.valueOf(elapsedHours)),
+                        Map.entry("creatorName", demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown"),
+                        Map.entry("recipientRole", "Project Manager"),
+                        Map.entry("projectName", demand.getProjectName() != null ? demand.getProjectName() : ""),
+                        Map.entry("mandatorySkills", formatMandatorySkills(demand)),
+                        Map.entry("optionalSkills", formatOptionalSkills(demand))
+                ),
+                correlationId
+        );
+        log.info("[ESCALATION] 72h escalation sent to PM userId={} for demandId={}",
+                pm.userId(), demand.getDemandId());
+        anySent = true;
+      } catch (Exception e) {
+        log.error("[ESCALATION] Failed to notify PM for demandId={}: {}",
+                demand.getDemandId(), e.getMessage(), e);
+      }
+    } else {
+      log.warn("[ESCALATION] PM info not available for demandId={} — PM escalation skipped",
+              demand.getDemandId());
+    }
+
+    if (demand.getCreatedBy() != null) {
+      try {
+        UserDto creator = userAuthServiceClient.getUserById(demand.getCreatedBy());
+        if (creator != null && creator.getEmail() != null) {
+          notificationEventPublisher.sendInAppAndEmail(
+                  String.valueOf(creator.getId()),
+                  creator.getEmail(),
+                  creator.getSlackId(),
+                  "DEMAND_APPROVAL_ESCALATION",
+                  "Urgent: Your Demand Approval is Overdue",
+                  String.format(
+                          "Your demand '%s' (ID: %d) has been in PENDING_APPROVAL for %d hours. "
+                                  + "It will be auto-closed shortly if the project manager does not act.",
+                          demand.getTitle(),
+                          demand.getDemandId(),
+                          elapsedHours),
+                  "demand-service",
+                  String.valueOf(demand.getDemandId()),
+                  "DEMAND",
+                  "HIGH",
+                  "demand-approval-reminder",
+                  Map.ofEntries(
+                          Map.entry("demandId", String.valueOf(demand.getDemandId())),
+                          Map.entry("demandTitle", demand.getTitle() != null ? demand.getTitle() : ""),
+                          Map.entry("elapsedHours", String.valueOf(elapsedHours)),
+                          Map.entry("creatorName", demand.getCreatorName() != null ? demand.getCreatorName() : "Unknown"),
+                          Map.entry("recipientRole", "Demand Creator"),
+                          Map.entry("projectName", demand.getProjectName() != null ? demand.getProjectName() : ""),
+                          Map.entry("mandatorySkills", formatMandatorySkills(demand)),
+                          Map.entry("optionalSkills", formatOptionalSkills(demand))
+                  ),
+                  correlationId
+          );
+          log.info("[ESCALATION] 72h escalation sent to Creator userId={} for demandId={}",
+                  creator.getId(), demand.getDemandId());
+          anySent = true;
+        }
+      } catch (Exception e) {
+        log.error("[ESCALATION] Failed to notify Creator for demandId={}: {}",
+                demand.getDemandId(), e.getMessage(), e);
+      }
+    }
+
+    try {
+      auditLogClient.logAction(AuditLogPayload.builder()
+              .entityType("DEMAND")
+              .entityId(demand.getDemandId())
+              .action(AuditAction.STATUS_CHANGE)
+              .actorId(0L)
+              .beforeState(null)
+              .afterState(Map.of(
+                      "event", "APPROVAL_SLA_72H_ESCALATION",
+                      "status", demand.getStatus().name(),
+                      "demandId", demand.getDemandId(),
+                      "elapsedHours", elapsedHours
+              ))
+              .serviceName("demand-service")
+              .endpoint("/scheduler/approval-sla")
+              .build());
+    } catch (Exception e) {
+      log.warn("[ESCALATION] Audit log failed for demandId={}: {}", demand.getDemandId(), e.getMessage());
+    }
+
+    return anySent;
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Skill formatting helpers
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  private String formatMandatorySkills(Demand demand) {
+    if (demand.getDemandSkills() == null) return "None specified";
+    List<String> skills = demand.getDemandSkills().stream()
+            .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
+            .map(ds -> ds.getSkill().getSkillName())
+            .toList();
+    return skills.isEmpty() ? "None specified" : String.join(", ", skills);
+  }
+
+  private String formatOptionalSkills(Demand demand) {
+    if (demand.getDemandSkills() == null) return "None specified";
+    List<String> skills = demand.getDemandSkills().stream()
+            .filter(ds -> !Boolean.TRUE.equals(ds.getIsMandatory()))
+            .map(ds -> ds.getSkill().getSkillName())
+            .toList();
+    return skills.isEmpty() ? "None specified" : String.join(", ", skills);
   }
 }

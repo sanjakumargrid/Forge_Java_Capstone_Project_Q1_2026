@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -45,6 +47,16 @@ public class DemandExceptionHandler {
             org.springframework.security.access.AccessDeniedException ex) {
         log.warn("Access denied: {}", ex.getMessage());
         return buildResponse(HttpStatus.FORBIDDEN, "You do not have permission to perform this action");
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(FieldError::getDefaultMessage)
+                .orElse("Validation failed");
+        log.warn("Bean validation error: {}", message);
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

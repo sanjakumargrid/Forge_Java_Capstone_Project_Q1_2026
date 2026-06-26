@@ -128,8 +128,8 @@ public class DemandQueryService {
                 predicates.add(cb.equal(root.get("employmentType"), employmentType));
             }
 
-            // Role-based visibility: ADMIN and RM see all; others are scoped
-            if (!SecurityUtils.isPlatformAdmin() && !SecurityUtils.isResourceManager()) {
+            // Role-based visibility: unscoped roles see all active demands; others are filtered
+            if (!SecurityUtils.canViewAllDemands()) {
                 if (SecurityUtils.isRecruiter()) {
                     predicates.add(root.get("status").in(
                         DemandStatus.OPEN_EXTERNAL,

@@ -266,6 +266,7 @@ docker stop talentgrid-redis 2>/dev/null || true
 | File | Purpose |
 |------|---------|
 | `demand-workflow-via-gateway.sh` | bash + `curl` + `python3` (+ optional `jq`) |
+| `demand-edit-flow-via-gateway.sh` | Verifies PATCH edit rules: `reasonForEdit`, status gates, post-approval field locks, history |
 | `E2E-Demand-Workflow.postman_collection.json` | Postman collection |
 
 ---

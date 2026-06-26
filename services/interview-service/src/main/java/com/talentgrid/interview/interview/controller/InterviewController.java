@@ -1,6 +1,7 @@
 package com.talentgrid.interview.interview.controller;
 
 import com.talentgrid.interview.interview.dto.InterviewDto;
+import com.talentgrid.interview.interview.entity.Interview;
 import com.talentgrid.interview.interview.enums.Status;
 import com.talentgrid.interview.interview.enums.Type;
 import com.talentgrid.interview.interview.service.InterviewService;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/interviews")
@@ -45,6 +48,14 @@ public class InterviewController {
 
         return ResponseEntity.ok(interview);
     }
+
+    @GetMapping("/my-interviews")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    // Automatically blocks non-Employees
+    public ResponseEntity<List<Interview>> getMyInterviews(@RequestParam Long employeeId) {
+        List<Interview> interviews = interviewService.getInterviewsForEmployee(employeeId);
+        return ResponseEntity.ok(interviews); }
+
     @PreAuthorize("hasAuthority('INTERVIEW_VIEW')")
     @GetMapping
     public ResponseEntity<Page<InterviewDto>> getAllInterviews(

@@ -29,10 +29,7 @@ public class OfferController {
             @Valid @RequestBody Offer offer
     ) {
         Offer createdOffer = offerService.createOffer(offer);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(createdOffer);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdOffer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_VIEW')")
@@ -40,9 +37,8 @@ public class OfferController {
     public ResponseEntity<Offer> getOfferById(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.getOfferById(id)
-        );
+        Offer offer = offerService.getOfferById(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_VIEW')")
@@ -52,12 +48,7 @@ public class OfferController {
             @RequestParam(required = false) Status status,
             Pageable pageable
     ) {
-        Page<Offer> offers = offerService.getAllOffers(
-                applicationId,
-                status,
-                pageable
-        );
-
+        Page<Offer> offers = offerService.getAllOffers(applicationId, status, pageable);
         return ResponseEntity.ok(offers);
     }
 
@@ -67,9 +58,8 @@ public class OfferController {
             @PathVariable Long id,
             @Valid @RequestBody Offer offer
     ) {
-        return ResponseEntity.ok(
-                offerService.updateOffer(id, offer)
-        );
+        Offer updatedOffer = offerService.updateOffer(id, offer);
+        return ResponseEntity.ok(updatedOffer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -77,9 +67,8 @@ public class OfferController {
     public ResponseEntity<Offer> sendOffer(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.sendOffer(id)
-        );
+        Offer offer = offerService.sendOffer(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -87,9 +76,8 @@ public class OfferController {
     public ResponseEntity<Offer> acceptOffer(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.acceptOffer(id)
-        );
+        Offer offer = offerService.acceptOffer(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -97,9 +85,8 @@ public class OfferController {
     public ResponseEntity<Offer> rejectOffer(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.rejectOffer(id)
-        );
+        Offer offer = offerService.rejectOffer(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -107,9 +94,8 @@ public class OfferController {
     public ResponseEntity<Offer> expireOffer(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.expireOffer(id)
-        );
+        Offer offer = offerService.expireOffer(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_DELETE')")
@@ -118,7 +104,6 @@ public class OfferController {
             @PathVariable Long id
     ) {
         offerService.deleteOffer(id);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -128,9 +113,8 @@ public class OfferController {
             @PathVariable Long id,
             @Valid @RequestBody ApprovalChainRequestDto request
     ) {
-        return ResponseEntity.ok(
-                offerService.saveApprovalChain(id, request)
-        );
+        Offer offer = offerService.saveApprovalChain(id, request);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -138,9 +122,8 @@ public class OfferController {
     public ResponseEntity<Offer> submitForApproval(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.submitForApproval(id)
-        );
+        Offer offer = offerService.submitForApproval(id);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -149,9 +132,8 @@ public class OfferController {
             @PathVariable Long id,
             @RequestParam String approverEmail
     ) {
-        return ResponseEntity.ok(
-                offerService.approveCurrentStep(id, approverEmail)
-        );
+        Offer offer = offerService.approveCurrentStep(id, approverEmail);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_UPDATE')")
@@ -161,9 +143,8 @@ public class OfferController {
             @RequestParam String approverEmail,
             @RequestParam String comments
     ) {
-        return ResponseEntity.ok(
-                offerService.rejectApproval(id, approverEmail, comments)
-        );
+        Offer offer = offerService.rejectApproval(id, approverEmail, comments);
+        return ResponseEntity.ok(offer);
     }
 
     @PreAuthorize("hasAuthority('OFFER_VIEW')")
@@ -171,8 +152,7 @@ public class OfferController {
     public ResponseEntity<List<ApprovalStepDto>> getApprovalChain(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(
-                offerService.getApprovalChain(id)
-        );
+        List<ApprovalStepDto> stepDto = offerService.getApprovalChain(id);
+        return ResponseEntity.ok(stepDto);
     }
 }

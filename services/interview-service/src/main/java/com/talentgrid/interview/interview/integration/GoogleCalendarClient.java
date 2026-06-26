@@ -19,6 +19,7 @@ import com.talentgrid.interview.client.dto.EmployeeDto;
 import com.talentgrid.interview.config.GoogleOAuthTokenService;
 import com.talentgrid.interview.exception.BusinessException;
 import com.talentgrid.interview.interview.entity.Interview;
+import com.talentgrid.interview.interview.entity.Interviewer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -288,8 +289,8 @@ public class GoogleCalendarClient {
 
         List<FreeBusyRequestItem> items = new ArrayList<>();
 
-        for (Long interviewerId : interview.getInterviewers()) {
-            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+        for (Interviewer interviewer : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewer.getEmployeeId());
             items.add(new FreeBusyRequestItem()
                     .setId(employee.getEmail()));
         }
@@ -306,8 +307,8 @@ public class GoogleCalendarClient {
 
         List<String> busyInterviewers = new ArrayList<>();
 
-        for (Long interviewerId : interview.getInterviewers()) {
-            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+        for (Interviewer interviewer : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewer.getEmployeeId());
             String calendarId = employee.getEmail();
             FreeBusyCalendar calendarBusy = freeBusyResponse.getCalendars().get(calendarId);
 
@@ -337,8 +338,8 @@ public class GoogleCalendarClient {
 
         List<EventAttendee> attendees = new ArrayList<>();
 
-        for (Long interviewerId : interview.getInterviewers()) {
-            EmployeeDto employee = employeeClient.getEmployee(interviewerId);
+        for (Interviewer interviewer : interview.getInterviewers()) {
+            EmployeeDto employee = employeeClient.getEmployee(interviewer.getEmployeeId());
             EventAttendee attendee = new EventAttendee();
             attendee.setEmail(employee.getEmail());
             attendee.setDisplayName(employee.getName());

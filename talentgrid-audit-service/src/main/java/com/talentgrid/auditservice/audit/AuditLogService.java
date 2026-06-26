@@ -23,6 +23,7 @@ public class AuditLogService {
               .actorId(payload.getActorId())
               .beforeState(payload.getBeforeState())
               .afterState(payload.getAfterState())
+              .reasonForEdit(payload.getReasonForEdit())
               .traceId(payload.getTraceId())
               .serviceName(payload.getServiceName())
               .endpoint(payload.getEndpoint())

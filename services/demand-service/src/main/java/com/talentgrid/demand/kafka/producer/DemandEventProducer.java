@@ -109,6 +109,31 @@ public class DemandEventProducer {
     }
 
     /**
+     * Published by the SLA scheduler at the 72-hour mark (before auto-close).
+     */
+    public void publishApprovalEscalation(Demand demand,
+                                          Long pmUserId,
+                                          String pmName,
+                                          String pmEmail,
+                                          String pmSlackId,
+                                          long elapsedHours) {
+        DemandPayload payload = buildBasePayload(demand);
+        payload.setCreatedBy(demand.getCreatedBy());
+        payload.setCreatorName(demand.getCreatorName());
+        payload.setRecipientEmail(demand.getCreatorEmail());
+        payload.setRecipientSlackId(demand.getCreatorSlackId());
+        payload.setRaisedBy(demand.getCreatorName() != null
+                ? demand.getCreatorName()
+                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
+        payload.setPmUserId(pmUserId);
+        payload.setPmName(pmName);
+        payload.setPmEmail(pmEmail);
+        payload.setPmSlackId(pmSlackId);
+        payload.setElapsedHours(elapsedHours);
+        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_ESCALATION", demand.getDemandId(), payload);
+    }
+
+    /**
      * @deprecated Use {@link #publishApprovalSlaClosed}; kept as a delegate for backward compatibility.
      */
     @Deprecated
@@ -204,56 +229,6 @@ public class DemandEventProducer {
         payload.setPmEmail(pmEmail);
         payload.setPmSlackId(pmSlackId);
         send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_APPROVAL_SLA_CLOSED", demand.getDemandId(), payload);
-    }
-
-    public void publishFilledInternal(Demand demand) {
-        DemandPayload payload = buildBasePayload(demand);
-        payload.setClosureReason(demand.getClosureReason());
-        payload.setIsFilled(demand.getIsFilled());
-        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
-        payload.setCreatedBy(demand.getCreatedBy());
-        payload.setCreatorName(demand.getCreatorName());
-        payload.setRecipientEmail(demand.getCreatorEmail());
-        payload.setRecipientSlackId(demand.getCreatorSlackId());
-        payload.setRaisedBy(demand.getCreatorName() != null
-                ? demand.getCreatorName()
-                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
-        payload.setAssignedRm(demand.getAssignedRm());
-        payload.setAssignedRmName(demand.getAssignedRmName());
-        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_INTERNALLY", demand.getDemandId(), payload);
-    }
-
-    public void publishFilledPartially(Demand demand) {
-        DemandPayload payload = buildBasePayload(demand);
-        payload.setIsFilled(demand.getIsFilled());
-        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
-        payload.setCreatedBy(demand.getCreatedBy());
-        payload.setCreatorName(demand.getCreatorName());
-        payload.setRecipientEmail(demand.getCreatorEmail());
-        payload.setRecipientSlackId(demand.getCreatorSlackId());
-        payload.setRaisedBy(demand.getCreatorName() != null
-                ? demand.getCreatorName()
-                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
-        payload.setAssignedRm(demand.getAssignedRm());
-        payload.setAssignedRmName(demand.getAssignedRmName());
-        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_PARTIALLY", demand.getDemandId(), payload);
-    }
-
-    public void publishFilledExternal(Demand demand) {
-        DemandPayload payload = buildBasePayload(demand);
-        payload.setClosureReason(demand.getClosureReason());
-        payload.setIsFilled(demand.getIsFilled());
-        payload.setFillType(demand.getFillType() != null ? demand.getFillType().name() : null);
-        payload.setCreatedBy(demand.getCreatedBy());
-        payload.setCreatorName(demand.getCreatorName());
-        payload.setRecipientEmail(demand.getCreatorEmail());
-        payload.setRecipientSlackId(demand.getCreatorSlackId());
-        payload.setRaisedBy(demand.getCreatorName() != null
-                ? demand.getCreatorName()
-                : (demand.getCreatedBy() != null ? demand.getCreatedBy().toString() : null));
-        payload.setAssignedRecruiter(demand.getAssignedRecruiter());
-        payload.setAssignedRecruiterName(demand.getAssignedRecruiterName());
-        send(TalentGridTopics.DEMAND_EVENTS, "DEMAND_FILLED_EXTERNALLY", demand.getDemandId(), payload);
     }
 
     public void publishOnHold(Demand demand) {

@@ -7,6 +7,7 @@ import com.talentgrid.demand.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Slf4j
 @Component
+@DependsOn("entityManagerFactory")   // ← ensures schema is applied before seeding
 @RequiredArgsConstructor
 public class SkillDataInitializer implements CommandLineRunner {
 
@@ -23,53 +25,63 @@ public class SkillDataInitializer implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        long skillCount = skillRepository.count();
-        log.info("=================================================");
-        log.info("SKILLS TABLE COUNT ACCORDING TO SPRING BOOT: {}", skillCount);
-        log.info("=================================================");
+        try {
+            long skillCount = skillRepository.count();
+            log.info("=================================================");
+            log.info("SKILLS TABLE COUNT ACCORDING TO SPRING BOOT: {}", skillCount);
+            log.info("=================================================");
 
-        if (skillCount == 0) {
-            log.info("No skills found. Seeding initial skills...");
-            skillRepository.saveAll(List.of(
-                    createSkill(1L, "Java"),
-                    createSkill(2L, "Spring Boot"),
-                    createSkill(3L, "Kafka"),
-                    createSkill(4L, "PostgreSQL"),
-                    createSkill(5L, "Microservices"),
-                    createSkill(6L, "Docker"),
-                    createSkill(7L, "Kubernetes"),
-                    createSkill(8L, "AWS"),
-                    createSkill(9L, "Azure"),
-                    createSkill(10L, "REST API"),
-                    createSkill(11L, "Hibernate"),
-                    createSkill(12L, "JUnit"),
-                    createSkill(13L, "React"),
-                    createSkill(14L, "Angular"),
-                    createSkill(15L, "Python")
-            ));
-            log.info("Initial skills seeded.");
-        }
+            if (skillCount == 0) {
+                log.info("No skills found. Seeding initial skills...");
+                skillRepository.saveAll(List.of(
+                        createSkill(1L, "Java"),
+                        createSkill(2L, "Spring Boot"),
+                        createSkill(3L, "Kafka"),
+                        createSkill(4L, "PostgreSQL"),
+                        createSkill(5L, "Microservices"),
+                        createSkill(6L, "Docker"),
+                        createSkill(7L, "Kubernetes"),
+                        createSkill(8L, "AWS"),
+                        createSkill(9L, "Azure"),
+                        createSkill(10L, "REST API"),
+                        createSkill(11L, "Hibernate"),
+                        createSkill(12L, "JUnit"),
+                        createSkill(13L, "React"),
+                        createSkill(14L, "Angular"),
+                        createSkill(15L, "Python")
+                ));
+                log.info("Initial skills seeded.");
+            }
 
-        if (jobTitleRepository.count() == 0) {
-            log.info("No job titles found. Seeding initial job titles...");
-            jobTitleRepository.saveAll(List.of(
-                    createJobTitle(1L, "Software Engineer"),
-                    createJobTitle(2L, "Senior Software Engineer"),
-                    createJobTitle(3L, "Lead Software Engineer"),
-                    createJobTitle(4L, "Staff Engineer"),
-                    createJobTitle(5L, "Principal Engineer"),
-                    createJobTitle(6L, "Engineering Manager"),
-                    createJobTitle(7L, "Technical Architect"),
-                    createJobTitle(8L, "Backend Engineer"),
-                    createJobTitle(9L, "Frontend Engineer"),
-                    createJobTitle(10L, "Full Stack Engineer"),
-                    createJobTitle(11L, "DevOps Engineer"),
-                    createJobTitle(12L, "Cloud Engineer"),
-                    createJobTitle(13L, "Data Engineer"),
-                    createJobTitle(14L, "QA Engineer"),
-                    createJobTitle(15L, "SDET")
-            ));
-            log.info("Initial job titles seeded.");
+            if (jobTitleRepository.count() == 0) {
+                log.info("No job titles found. Seeding initial job titles...");
+                jobTitleRepository.saveAll(List.of(
+                        createJobTitle(1L, "Software Engineer"),
+                        createJobTitle(2L, "Senior Software Engineer"),
+                        createJobTitle(3L, "Lead Software Engineer"),
+                        createJobTitle(4L, "Staff Engineer"),
+                        createJobTitle(5L, "Principal Engineer"),
+                        createJobTitle(6L, "Engineering Manager"),
+                        createJobTitle(7L, "Technical Architect"),
+                        createJobTitle(8L, "Backend Engineer"),
+                        createJobTitle(9L, "Frontend Engineer"),
+                        createJobTitle(10L, "Full Stack Engineer"),
+                        createJobTitle(11L, "DevOps Engineer"),
+                        createJobTitle(12L, "Cloud Engineer"),
+                        createJobTitle(13L, "Data Engineer"),
+                        createJobTitle(14L, "QA Engineer"),
+                        createJobTitle(15L, "SDET")
+                ));
+                log.info("Initial job titles seeded.");
+            }
+        } catch (Exception ex) {
+            log.error("=================================================");
+            log.error("SkillDataInitializer FAILED — the 'skills' or 'job_titles' table may not exist yet.");
+            log.error("Fix: ensure the pgvector extension is installed and the schema has been created.");
+            log.error("Run on your PostgreSQL DB:  CREATE EXTENSION IF NOT EXISTS vector;");
+            log.error("Then restart the service. Underlying error: {}", ex.getMessage());
+            log.error("=================================================");
+            throw ex;   // re-throw so the boot failure is still explicit
         }
     }
 

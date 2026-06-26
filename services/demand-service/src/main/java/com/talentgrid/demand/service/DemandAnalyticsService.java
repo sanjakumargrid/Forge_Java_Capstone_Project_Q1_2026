@@ -44,24 +44,24 @@ public class DemandAnalyticsService {
 
         int windowDays = (int) java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
 
-        // ── Fill Rate (Position-Level) ──────────────────────────────────────────────
-        long totalRequiredPositions = demandRepository.sumRequiredPositionsBetween(start, end);
-        long totalFilledPositions = demandRepository.sumFilledPositionsBetween(start, end);
+        // ── Fill Rate (Demand-Level: one demand = one person) ───────────────────────
+        long totalDemands = demandRepository.countTotalDemandsBetween(start, end);
+        long filledDemands = demandRepository.countFilledDemandsBetween(start, end);
 
         double fillRatePercent = 0.0;
-        if (totalRequiredPositions > 0) {
-            fillRatePercent = Math.round(((double) totalFilledPositions / totalRequiredPositions * 100.0) * 100.0) / 100.0;
+        if (totalDemands > 0) {
+            fillRatePercent = Math.round(((double) filledDemands / totalDemands * 100.0) * 100.0) / 100.0;
         }
 
         FillRate fillRate = FillRate.builder()
-                .totalRequiredPositions(totalRequiredPositions)
-                .totalFilledPositions(totalFilledPositions)
+                .totalRequiredPositions(totalDemands)   // re-uses existing field as "total demands"
+                .totalFilledPositions(filledDemands)    // re-uses existing field as "filled demands"
                 .fillRatePercent(fillRatePercent)
                 .build();
 
-        // ── Internal vs External Split ──────────────────────────────────────────────
-        long internalFilledCount = demandRepository.sumInternalFilledCountBetween(start, end);
-        long externalFilledCount = demandRepository.sumExternalFilledCountBetween(start, end);
+        // ── Internal vs External Split (by fill_type) ───────────────────────────────
+        long internalFilledCount = demandRepository.countFilledDemandsInternalBetween(start, end);
+        long externalFilledCount = demandRepository.countFilledDemandsExternalBetween(start, end);
 
         double internalPercentage = 0.0;
         double externalPercentage = 0.0;
@@ -78,7 +78,7 @@ public class DemandAnalyticsService {
                 .externalPercentage(externalPercentage)
                 .build();
 
-        // ── Average Time-to-Fill ───────────────────────────────────────────────────
+        // ── Average Time-to-Fill (via status_history transitions) ──────────────────
         double avgTimeToFillDays;
         double minTimeToFillDays;
         double maxTimeToFillDays;
@@ -118,7 +118,7 @@ public class DemandAnalyticsService {
                 .timeToFill(timeToFill)
                 .build();
 
-        log.info("Successfully computed position-level demand analytics for window [{}, {}]", start, end);
+        log.info("Successfully computed demand analytics for window [{}, {}]", start, end);
         return response;
     }
 

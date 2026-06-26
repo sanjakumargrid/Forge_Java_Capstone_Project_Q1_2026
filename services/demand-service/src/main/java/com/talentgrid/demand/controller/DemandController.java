@@ -9,6 +9,7 @@ import com.talentgrid.demand.dto.response.DemandSummaryResponse;
 import com.talentgrid.demand.service.DemandQueryService;
 import com.talentgrid.demand.service.DemandService;
 import com.talentgrid.demand.service.PmDemandQueryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -30,8 +31,10 @@ import java.util.List;
  * <li>{@code POST   /api/v1/demands} — create a new workforce demand (status:
  * DRAFT)</li>
  * <li>{@code GET    /api/v1/demands/{id}} — get detailed demand information</li>
- * <li>{@code PATCH  /api/v1/demands/{id}} — update editable fields (DRAFT
- * only)</li>
+ * <li>{@code PATCH  /api/v1/demands/{id}} — update editable fields
+ *     (allowed in DRAFT, PENDING_APPROVAL, APPROVED, INTERNAL_SEARCH,
+ *     OPEN_EXTERNAL, ON_HOLD; blocked in FILLED/CLOSED; fields locked
+ *     after APPROVED; {@code reasonForEdit} required)</li>
  * <li>{@code DELETE /api/v1/demands/{id}} — soft delete a draft demand</li>
  * </ul>
  */
@@ -107,7 +110,7 @@ public class DemandController {
      */
     @PostMapping
     @PreAuthorize("hasAuthority('DEMAND_CREATE')")
-    public ResponseEntity<DemandResponse> createDemand(@RequestBody DemandRequest request) {
+    public ResponseEntity<DemandResponse> createDemand(@Valid @RequestBody DemandRequest request) {
         DemandResponse response = demandService.createDemand(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -125,12 +128,20 @@ public class DemandController {
     }
 
     /**
-     * Updates editable demand fields. Only allowed when demand is in {@code DRAFT}
-     * status.
-     * Uses PATCH semantics — null fields in the request are ignored.
+     * Updates editable demand fields. Allowed when demand is in {@code DRAFT},
+     * {@code PENDING_APPROVAL}, {@code APPROVED}, {@code INTERNAL_SEARCH},
+     * {@code OPEN_EXTERNAL}, or {@code ON_HOLD} status. Blocked for
+     * {@code FILLED} and {@code CLOSED} demands.
+     *
+     * <p>After {@code APPROVED}, the following fields are locked and will be
+     * rejected if provided: Role Title, Client Account, Business Unit,
+     * Project Name, Priority, Seniority Level, Employment Type, Department.
+     *
+     * <p>Uses PATCH semantics — null fields in the request are ignored.
+     * {@code reasonForEdit} is mandatory on every request.
      *
      * @param id      the demand ID
-     * @param request the partial update request
+     * @param request the partial update request (must include {@code reasonForEdit})
      * @return the updated demand response
      */
     @PatchMapping("/{id:\\d+}")

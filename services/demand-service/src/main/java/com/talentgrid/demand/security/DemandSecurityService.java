@@ -68,16 +68,16 @@ public class DemandSecurityService {
             return currentUserId != null && currentUserId.equals(demand.getCreatedBy());
         }
 
+        if (SecurityUtils.canViewAllDemands()) {
+            return true;
+        }
+
         Long currentUserId = SecurityUtils.getCurrentUserId();
         if (currentUserId != null && currentUserId.equals(demand.getCreatedBy())) {
             return true;
         }
 
         DemandStatus status = demand.getStatus();
-
-        if (SecurityUtils.isPortfolioManager()) {
-            return true;
-        }
 
         if (SecurityUtils.isRecruiter()) {
             return status == DemandStatus.OPEN_EXTERNAL
@@ -95,13 +95,6 @@ public class DemandSecurityService {
                 return true;
             }
             return status == DemandStatus.OPEN_EXTERNAL;
-        }
-
-        if (SecurityUtils.isResourceManager()) {
-            return status == DemandStatus.INTERNAL_SEARCH
-                    || status == DemandStatus.ON_HOLD
-                    || status == DemandStatus.OPEN_EXTERNAL
-                    || status == DemandStatus.CLOSED;
         }
 
         if (SecurityUtils.isTaManager()) {
@@ -131,22 +124,20 @@ public class DemandSecurityService {
             return true;
         }
 
+        if (SecurityUtils.isResourceManager()) {
+            return true;
+        }
+
         if (SecurityUtils.isPortfolioManager()) {
             return true;
         }
 
-        if (SecurityUtils.isResourceManager()) {
-            return status == DemandStatus.INTERNAL_SEARCH
-                    || status == DemandStatus.ON_HOLD
-                    || status == DemandStatus.OPEN_EXTERNAL;
+        if (SecurityUtils.isRecruiter()) {
+            return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.ON_HOLD;
         }
 
         if (SecurityUtils.isTaManager()) {
             return status == DemandStatus.OPEN_EXTERNAL;
-        }
-
-        if (SecurityUtils.isRecruiter()) {
-            return status == DemandStatus.OPEN_EXTERNAL || status == DemandStatus.ON_HOLD;
         }
 
         return false;
