@@ -1,5 +1,6 @@
 package com.talentgrid.workforce.skillgapheatmap.service.impl;
 
+import com.talentgrid.kafka.events.demand.DemandPayload;
 import com.talentgrid.workforce.skillgapheatmap.client.SkillGapAuthContext;
 import com.talentgrid.workforce.skillgapheatmap.dto.*;
 import com.talentgrid.workforce.skillgapheatmap.entity.GapLevel;
@@ -12,6 +13,7 @@ import com.talentgrid.workforce.skillgapheatmap.provider.WorkforceProvider;
 import com.talentgrid.workforce.skillgapheatmap.provider.model.DemandResponse;
 import com.talentgrid.workforce.skillgapheatmap.provider.model.EngineerResponse;
 import com.talentgrid.workforce.skillgapheatmap.repository.SkillGapAnalyticsQueryRepository;
+import com.talentgrid.workforce.skillgapheatmap.service.SkillGapActiveDemandRegistry;
 import com.talentgrid.workforce.skillgapheatmap.service.SkillGapRefreshCoordinator;
 import com.talentgrid.workforce.skillgapheatmap.service.SkillGapService;
 import com.talentgrid.workforce.skillgapheatmap.service.SkillGapSnapshotWriter;
@@ -34,6 +36,7 @@ public class SkillGapServiceImpl implements SkillGapService {
     private final SkillGapSnapshotWriter snapshotWriter;
     private final DemandProvider demandProvider;
     private final WorkforceProvider workforceProvider;
+    private final SkillGapActiveDemandRegistry activeDemandRegistry;
 
     @Value("${skill-gap.retention-days:30}")
     private int retentionDays;
@@ -59,10 +62,7 @@ public class SkillGapServiceImpl implements SkillGapService {
     @Override
     public RefreshResponse refresh() {
         if (!SkillGapAuthContext.hasAuthorization()) {
-            return RefreshResponse.builder()
-                    .status("SKIPPED_NO_AUTH")
-                    .processedSkills(0)
-                    .build();
+            return refreshBenchFromDatabase();
         }
 
         if (refreshCoordinator.isDebounced()) {
@@ -93,6 +93,55 @@ public class SkillGapServiceImpl implements SkillGapService {
         }
     }
 
+    @Override
+    public RefreshResponse refreshBenchFromDatabase() {
+        if (refreshCoordinator.isDebounced()) {
+            RefreshResponse debounced = refreshCoordinator.debouncedResponse();
+            if (debounced != null) {
+                return debounced;
+            }
+        }
+
+        if (!refreshCoordinator.tryAcquireLock()) {
+            return refreshCoordinator.skippedInProgressResponse();
+        }
+
+        try {
+            if (refreshCoordinator.isDebounced()) {
+                RefreshResponse debounced = refreshCoordinator.debouncedResponse();
+                if (debounced != null) {
+                    return debounced;
+                }
+            }
+
+            Map<String, Integer> demandCounts = activeDemandRegistry.aggregateDemandSkillCounts();
+            Map<String, Integer> benchCounts = buildBenchSkillMap(workforceProvider.getBenchEngineers());
+            return persistMergedSnapshot(demandCounts, benchCounts);
+        } finally {
+            refreshCoordinator.releaseLock();
+        }
+    }
+
+    @Override
+    public void onActiveDemandEntered(DemandPayload payload) {
+        if (payload == null || payload.getDemandId() == null) {
+            return;
+        }
+        if (!activeDemandRegistry.isActiveStatus(payload.getStatus())) {
+            log.debug("[SKILL-GAP] Ignoring demand {} — status {} is not active.",
+                    payload.getDemandId(), payload.getStatus());
+            return;
+        }
+        activeDemandRegistry.upsertActiveDemand(payload.getDemandId(), payload.getMandatorySkills());
+        refreshBenchFromDatabase();
+    }
+
+    @Override
+    public void onActiveDemandRemoved(Long demandId) {
+        activeDemandRegistry.removeDemand(demandId);
+        refreshBenchFromDatabase();
+    }
+
     private void refreshForViewer() {
         if (!SkillGapAuthContext.hasAuthorization()) {
             throw new DemandServiceUnavailableException(
@@ -103,11 +152,15 @@ public class SkillGapServiceImpl implements SkillGapService {
 
     private RefreshResponse executeRefresh() {
         List<DemandResponse> demands = demandProvider.getOpenDemands();
-        List<EngineerResponse> engineers = workforceProvider.getBenchEngineers();
+        activeDemandRegistry.replaceAll(demands);
 
         Map<String, Integer> demandCounts = buildDemandSkillMap(demands);
-        Map<String, Integer> benchCounts = buildBenchSkillMap(engineers);
+        Map<String, Integer> benchCounts = buildBenchSkillMap(workforceProvider.getBenchEngineers());
+        return persistMergedSnapshot(demandCounts, benchCounts);
+    }
 
+    private RefreshResponse persistMergedSnapshot(Map<String, Integer> demandCounts,
+                                                  Map<String, Integer> benchCounts) {
         Set<String> allSkills = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         allSkills.addAll(demandCounts.keySet());
         allSkills.addAll(benchCounts.keySet());
@@ -127,7 +180,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                     .demandCount(demandCount)
                     .benchCount(benchCount)
                     .gapScore(gapScore)
-                    .gapLevel(determineGapLevel(gapScore))
+                    .gapLevel(determineGapLevel(demandCount, benchCount))
                     .trendDirection(determineTrend(skill, gapScore, previousGapScores))
                     .calculatedAt(snapshotTime)
                     .build());
@@ -142,7 +195,7 @@ public class SkillGapServiceImpl implements SkillGapService {
                 .build();
 
         refreshCoordinator.markSuccess(response);
-        log.debug("[SKILL-GAP] Refresh complete — {} skills.", rows.size());
+        log.debug("[SKILL-GAP] Snapshot persisted — {} skills.", rows.size());
         return response;
     }
 
@@ -317,14 +370,20 @@ public class SkillGapServiceImpl implements SkillGapService {
         return normalized.isEmpty() ? null : normalized;
     }
 
-    private GapLevel determineGapLevel(int gapScore) {
-        if (gapScore >= 10) {
+    private GapLevel determineGapLevel(int demandCount, int benchCount) {
+
+        if (demandCount <= 0) {
+            return GapLevel.LOW;
+        }
+        int gapCount = Math.max(demandCount - benchCount, 0);
+        double gapPercentage = ((double) gapCount / demandCount) * 100.0;
+        if (gapCount >= 10 || gapPercentage >= 80.0) {
             return GapLevel.CRITICAL;
         }
-        if (gapScore >= 5) {
+        if (gapCount >= 5 || gapPercentage >= 50.0) {
             return GapLevel.HIGH;
         }
-        if (gapScore >= 2) {
+        if (gapCount >= 2 || gapPercentage >= 20.0) {
             return GapLevel.MEDIUM;
         }
         return GapLevel.LOW;
