@@ -20,6 +20,11 @@ public class OAuthProperties {
     private String frontendBaseUrl = "http://localhost:4200";
 
     /**
+     * API Gateway public base URL (no trailing slash).
+     */
+    private String gatewayPublicBaseUrl = "http://localhost:8080";
+
+    /**
      * Allowed email domain suffix (case-insensitive), e.g. {@code @griddynamics.com}.
      */
     private String allowedEmailDomain = "@griddynamics.com";
