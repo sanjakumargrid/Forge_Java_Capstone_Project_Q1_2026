@@ -5,5 +5,5 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record DemandPageResponse(
-        List<Team1DemandApiDto> content
+        List<DemandApiDto> content
 ) {}

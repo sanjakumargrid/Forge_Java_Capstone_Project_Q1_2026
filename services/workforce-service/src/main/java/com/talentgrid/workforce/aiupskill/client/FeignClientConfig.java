@@ -22,9 +22,19 @@ public class FeignClientConfig {
                     String authorizationHeader = request.getHeader("Authorization");
                     if (authorizationHeader != null) {
                         template.header("Authorization", authorizationHeader);
+                        
                     }
                 }
             }
         };
     }
 }
+
+
+                            
+
+                            
+
+                            
+
+                            

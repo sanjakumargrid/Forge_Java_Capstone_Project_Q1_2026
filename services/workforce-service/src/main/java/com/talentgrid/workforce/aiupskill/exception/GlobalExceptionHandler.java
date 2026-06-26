@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
                                 LocalDateTime.now(),
                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                 "INTERNAL_SERVER_ERROR",
-                                "An unexpected error occurred. Please contact system support.",
+                                "An unexpected error occurred: " + ex.getClass().getName() + " - " + ex.getMessage(),
                                 request.getRequestURI());
                 return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }

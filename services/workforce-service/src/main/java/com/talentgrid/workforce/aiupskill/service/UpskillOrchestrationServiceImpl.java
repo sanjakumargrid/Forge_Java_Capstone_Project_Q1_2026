@@ -3,15 +3,15 @@ package com.talentgrid.workforce.aiupskill.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.talentgrid.workforce.aiupskill.client.AiUpskillingClient;
-import com.talentgrid.workforce.aiupskill.client.Team1DemandClient;
-import com.talentgrid.workforce.aiupskill.client.Team5EngineerClient;
+import com.talentgrid.workforce.aiupskill.client.DemandClient;
 import com.talentgrid.workforce.aiupskill.dto.DemandPageResponse;
 import com.talentgrid.workforce.aiupskill.dto.MissingSkillsRequest;
-import com.talentgrid.workforce.aiupskill.dto.Team1DemandApiDto;
-import com.talentgrid.workforce.aiupskill.dto.Team5EngineerApiDto;
+import com.talentgrid.workforce.aiupskill.dto.DemandApiDto;
 import com.talentgrid.workforce.aiupskill.dto.UpskillingRecommendationResponse;
 import com.talentgrid.workforce.aiupskill.entity.UpskillHistoryEntity;
 import com.talentgrid.workforce.aiupskill.repository.UpskillHistoryRepository;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
+import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,21 +25,21 @@ public class UpskillOrchestrationServiceImpl implements UpskillOrchestrationServ
     private static final int    TOP_SKILL_LIMIT        = 5;
 
     private final AiUpskillingClient aiClient;
-    private final Team1DemandClient team1DemandClient;
-    private final Team5EngineerClient team5EngineerClient;
+    private final DemandClient demandClient;
+    private final InternalEmployeeService internalEmployeeService;
     private final UpskillHistoryRepository historyRepository;
     private final ObjectMapper             objectMapper;
 
     public UpskillOrchestrationServiceImpl(AiUpskillingClient aiClient,
-                                           Team1DemandClient team1DemandClient,
-                                           Team5EngineerClient team5EngineerClient,
+                                           DemandClient demandClient,
+                                           InternalEmployeeService internalEmployeeService,
                                            UpskillHistoryRepository historyRepository,
                                            ObjectMapper objectMapper) {
-        this.aiClient            = aiClient;
-        this.team1DemandClient   = team1DemandClient;
-        this.team5EngineerClient = team5EngineerClient;
-        this.historyRepository   = historyRepository;
-        this.objectMapper        = objectMapper;
+        this.aiClient                = aiClient;
+        this.demandClient = demandClient;
+        this.internalEmployeeService = internalEmployeeService;
+        this.historyRepository       = historyRepository;
+        this.objectMapper            = objectMapper;
     }
 
     /**
@@ -57,18 +57,18 @@ public class UpskillOrchestrationServiceImpl implements UpskillOrchestrationServ
     public UpskillingRecommendationResponse generateAndLogUpskillingPath(String employeeId) {
 
         // Step A: Fetch all demands from Team 1 — filter to keep only OPEN status
-        DemandPageResponse pageResponse = team1DemandClient.getDemandsPage(500);
-        List<Team1DemandApiDto> allDemands = pageResponse != null && pageResponse.content() != null
+        DemandPageResponse pageResponse = demandClient.getDemandsPage(500);
+        List<DemandApiDto> allDemands = pageResponse != null && pageResponse.content() != null
                 ? pageResponse.content()
                 : Collections.emptyList();
 
         Set<String> openStatuses = Set.of("INTERNAL_SEARCH", "OPEN_EXTERNAL", "FILLED_PARTIALLY", "OPEN");
 
-        List<Team1DemandApiDto> openDemands = allDemands.stream()
+        List<DemandApiDto> openDemands = allDemands.stream()
                 .filter(demand -> demand.status() != null && openStatuses.contains(demand.status().toUpperCase()))
                 .map(d -> {
                     try {
-                        return team1DemandClient.getDemandById(d.demandId());
+                        return demandClient.getDemandById(d.demandId());
                     } catch (Exception e) {
                         return null;
                     }
@@ -77,37 +77,55 @@ public class UpskillOrchestrationServiceImpl implements UpskillOrchestrationServ
                 .collect(Collectors.toList());
 
         // Step B: Fetch the engineer profile directly by employeeId
-        Team5EngineerApiDto targetEngineer = team5EngineerClient.getEngineerById(employeeId);
-        if (targetEngineer == null) {
+        Long empIdLong;
+        try {
+            empIdLong = Long.valueOf(employeeId);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Invalid employee ID format: " + employeeId);
+        }
+
+        InternalEmployeeResponse targetEmployee = internalEmployeeService.getEmployeeDetailsById(empIdLong);
+        if (targetEmployee == null) {
             throw new RuntimeException("Employee profile not found for ID: " + employeeId);
         }
 
-        Set<String> engineerSkills = new HashSet<>(
-                targetEngineer.skills() != null ? targetEngineer.skills() : Collections.emptyList());
+        Set<String> engineerSkillsLower = targetEmployee.getSkills() != null
+                ? Arrays.stream(targetEmployee.getSkills())
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toSet())
+                : Collections.emptySet();
 
         // Step C & D & E: Cross-compare this single employee against ALL open demands.
         // Aggregate missing skill frequencies: value = number of open demands requiring that skill.
-        Map<String, Integer> skillGapFrequency = new HashMap<>();
+        Map<String, Integer> skillGapFrequencyLower = new HashMap<>();
+        Map<String, String> lowerToOriginalCase = new HashMap<>();
 
-        for (Team1DemandApiDto demand : openDemands) {
-            Set<String> demandedSkills = new HashSet<>(
-                    demand.skills() != null ? demand.skills() : Collections.emptyList());
+        for (DemandApiDto demand : openDemands) {
+            List<String> demandSkills = demand.skills();
+            if (demandSkills == null) {
+                continue;
+            }
 
-            // Missing skills = Demand Skills − Employee Skills
-            Set<String> missingSkills = new HashSet<>(demandedSkills);
-            missingSkills.removeAll(engineerSkills);
-
-            // Each gap increments the frequency counter for that skill
-            for (String skill : missingSkills) {
-                skillGapFrequency.merge(skill, 1, Integer::sum);
+            for (String skill : demandSkills) {
+                if (skill == null || skill.trim().isEmpty()) {
+                    continue;
+                }
+                String skillTrimmed = skill.trim();
+                String skillLower = skillTrimmed.toLowerCase();
+                if (!engineerSkillsLower.contains(skillLower)) {
+                    skillGapFrequencyLower.merge(skillLower, 1, Integer::sum);
+                    lowerToOriginalCase.putIfAbsent(skillLower, skillTrimmed);
+                }
             }
         }
 
         // Step F: Sort descending by frequency — take the top 3 to 5 most critical gaps
-        List<String> topMissingSkills = skillGapFrequency.entrySet().stream()
+        List<String> topMissingSkills = skillGapFrequencyLower.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(TOP_SKILL_LIMIT)
-                .map(Map.Entry::getKey)
+                .map(entry -> lowerToOriginalCase.get(entry.getKey()))
                 .collect(Collectors.toList());
 
         // Guard: Employee already possesses all skills required by all open demands

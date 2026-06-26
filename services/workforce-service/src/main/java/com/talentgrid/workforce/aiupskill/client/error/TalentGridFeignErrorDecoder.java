@@ -24,6 +24,10 @@ public class TalentGridFeignErrorDecoder implements ErrorDecoder {
             return new DownstreamBadResponseException("Downstream resource not found: " + url);
         }
 
+        if (status == 401 || status == 403) {
+            return new DownstreamBadResponseException("Downstream authorization failed (status: " + status + ") for url: " + url);
+        }
+
         if (status == 408 || status == 504) {
             return new DownstreamTimeoutException("Downstream service timed out.");
         }
