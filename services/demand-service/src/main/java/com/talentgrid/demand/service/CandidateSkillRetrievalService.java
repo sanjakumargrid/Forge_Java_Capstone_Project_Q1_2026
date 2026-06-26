@@ -1,6 +1,7 @@
 package com.talentgrid.demand.service;
 
 import com.talentgrid.demand.ai.AllAiProvidersFailedException;
+import com.talentgrid.demand.config.EmbeddingDimensionConfig;
 import com.talentgrid.demand.domain.entity.Skill;
 import com.talentgrid.demand.domain.enums.SkillSuggestionMode;
 import com.talentgrid.demand.repository.SkillRepository;
@@ -18,6 +19,7 @@ public class CandidateSkillRetrievalService {
     private final AiSkillSuggestionConfigService configService;
     private final SkillRepository skillRepository;
     private final JdEmbeddingService jdEmbeddingService;
+    private final EmbeddingDimensionConfig embeddingDimensionConfig;
 
     public List<Skill> getCandidateSkills(String jobDescriptionText) {
         SkillSuggestionMode mode = configService.getCurrentMode();
@@ -31,6 +33,10 @@ public class CandidateSkillRetrievalService {
 
             try {
                 float[] jdEmbedding = jdEmbeddingService.embedWithCache(jobDescriptionText);
+                log.info("JD embedding for similarity search: textLength={}, dimension={}, expected={}",
+                        jobDescriptionText.length(), jdEmbedding.length,
+                        embeddingDimensionConfig.getExpectedDimension());
+                embeddingDimensionConfig.validate(jdEmbedding, "JD similarity search");
                 String vectorStr = formatVector(jdEmbedding);
                 List<Skill> nearest = skillRepository.findNearestSkills(vectorStr, topN);
                 if (nearest.isEmpty()) {
@@ -45,6 +51,10 @@ public class CandidateSkillRetrievalService {
                 return nearest;
             } catch (AllAiProvidersFailedException e) {
                 log.warn("Embedding unavailable in TOP_N_SIMILARITY mode; falling back to FULL_CATALOG: {}",
+                        e.getMessage());
+                return skillRepository.findAllByOrderBySkillNameAsc();
+            } catch (IllegalStateException e) {
+                log.warn("JD embedding dimension mismatch in TOP_N_SIMILARITY mode; falling back to FULL_CATALOG: {}",
                         e.getMessage());
                 return skillRepository.findAllByOrderBySkillNameAsc();
             }

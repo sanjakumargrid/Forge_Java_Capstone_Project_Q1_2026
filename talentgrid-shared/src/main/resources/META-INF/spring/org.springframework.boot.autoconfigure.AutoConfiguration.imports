@@ -1,0 +1,2 @@
+com.talentgrid.shared.config.JwtAutoConfiguration
+com.talentgrid.shared.config.KafkaConsumerAutoConfiguration

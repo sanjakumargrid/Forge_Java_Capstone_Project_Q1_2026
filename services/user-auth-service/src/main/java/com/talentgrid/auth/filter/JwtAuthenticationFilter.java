@@ -96,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // ==========================================
             String jti = jwtService.extractJti(jwtToken);
             String tokenType = jwtService.extractTokenType(jwtToken);
-            
+
             if (!JwtConstants.ACCESS_TOKEN.equals(tokenType)) {
                 sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid token type");
                 return;
@@ -107,7 +107,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Long userId = Long.valueOf(jwtService.extractUserId(jwtToken));
+            String userEmail = jwtService.extractEmail(jwtToken);
+            boolean internalServiceToken =
+                    JwtConstants.INTERNAL_SERVICE_EMAIL.equals(userEmail);
+
+            Long userId = internalServiceToken
+                    ? 0L
+                    : parseUserId(jwtService.extractUserId(jwtToken));
             CachedUserContext cachedUser = null;
             if (userId != 0L) {
                 Long jwtVersion = jwtService.extractAuthVersion(jwtToken);
@@ -118,7 +124,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Session expired. Please login again.");
                     return;
                 }
-                
+
                 if (!Boolean.TRUE.equals(cachedUser.getEnabled())) {
                     sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Account has been disabled.");
                     return;
@@ -129,8 +135,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     return;
                 }
             }
-
-            String userEmail = jwtService.extractEmail(jwtToken);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -166,14 +170,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     // For internal tokens (userId == 0), assign ROLE_SYSTEM
                     authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
-                    
+
                     CachedUserPrincipal principal = CachedUserPrincipal.builder()
                             .userId(0L)
                             .email(userEmail)
                             .enabled(true)
                             .authVersion(1L)
                             .build();
-                            
+
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
                                     principal,
@@ -198,7 +202,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-    
+
+    private Long parseUserId(String subject) {
+        if (subject == null) {
+            return 0L;
+        }
+        try {
+            return Long.valueOf(subject);
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
+    }
+
     /**
      * Utility to write JSON error responses.
      */

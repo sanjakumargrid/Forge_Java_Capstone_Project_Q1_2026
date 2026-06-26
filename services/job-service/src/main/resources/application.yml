@@ -1,14 +1,16 @@
 server:
-  port: 8082
+  port: ${JOB_SERVICE_PORT:8089}
 
 spring:
+  config:
+    import: optional:file:../.env[.properties],optional:file:../../.env[.properties]
   application:
     name: job-posting-service
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/job_posting_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_HOST_PORT:5432}/${DB_NAME:talentgrid}}
+    username: ${DB_USERNAME:talentgrid}
+    password: ${DB_PASSWORD:talentgrid}
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -28,7 +30,7 @@ spring:
         format_sql: true
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: job-posting-group
       auto-offset-reset: earliest

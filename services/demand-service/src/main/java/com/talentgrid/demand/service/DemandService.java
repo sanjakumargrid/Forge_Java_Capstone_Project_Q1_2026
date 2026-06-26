@@ -21,12 +21,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.talentgrid.demand.domain.entity.JobTitle;
 import com.talentgrid.demand.domain.entity.Skill;
 import com.talentgrid.demand.domain.entity.DemandSkill;
-import com.talentgrid.demand.repository.DemandSkillRepository;
 
 /**
  * Handles demand CRUD operations (create, update, soft-delete).
@@ -53,7 +54,6 @@ public class DemandService {
     private final UserAuthServiceClient userAuthServiceClient;
     private final JobTitleLookupService jobTitleLookupService;
     private final SkillLookupService skillLookupService;
-    private final DemandSkillRepository demandSkillRepository;
 
     /**
      * Creates a new workforce demand in {@code DRAFT} status.
@@ -90,11 +90,10 @@ public class DemandService {
 
         Demand saved = demandRepository.save(demand);
 
-        // Persist DemandSkill mappings
         List<DemandSkill> demandSkills = createDemandSkills(saved, request.getMandatorySkillIds(), request.getOptionalSkillIds());
         if (!demandSkills.isEmpty()) {
-            demandSkillRepository.saveAll(demandSkills);
-            saved.setDemandSkills(demandSkills);
+            saved.setDemandSkills(new ArrayList<>(demandSkills));
+            saved = demandRepository.save(saved);
         }
 
         // Publish audit event
@@ -139,19 +138,12 @@ public class DemandService {
         }
 
         demandMapper.applyUpdate(request, demand);
-        Demand saved = demandRepository.save(demand);
 
         if (request.getMandatorySkillIds() != null || request.getOptionalSkillIds() != null) {
-            demandSkillRepository.deleteByDemandDemandId(saved.getDemandId());
-            List<DemandSkill> newSkills = createDemandSkills(saved, 
-                request.getMandatorySkillIds() != null ? request.getMandatorySkillIds() : getExistingSkillIds(saved, true),
-                request.getOptionalSkillIds() != null ? request.getOptionalSkillIds() : getExistingSkillIds(saved, false)
-            );
-            if (!newSkills.isEmpty()) {
-                demandSkillRepository.saveAll(newSkills);
-                saved.setDemandSkills(newSkills);
-            }
+            syncDemandSkills(demand, request.getMandatorySkillIds(), request.getOptionalSkillIds());
         }
+
+        Demand saved = demandRepository.save(demand);
 
         // Publish audit event
         auditLogClient.logAction(AuditLogPayload.builder()
@@ -224,35 +216,68 @@ public class DemandService {
         }
     }
 
+    /**
+     * Replaces skill associations via the parent {@link Demand} collection.
+     *
+     * <p>Existing rows are removed through {@code orphanRemoval} on {@code demandSkills}
+     * (not a bulk repository delete), so Hibernate's persistence context stays consistent
+     * with the database. New associations are persisted by {@code cascade = ALL} when
+     * the demand is saved — a separate {@code saveAll} is not used, avoiding duplicate
+     * INSERTs for the same {@code (demand_id, skill_id)}.
+     */
+    private void syncDemandSkills(Demand demand, List<Long> requestMandatory, List<Long> requestOptional) {
+        List<Long> existingMandatory = extractSkillIds(demand.getDemandSkills(), true);
+        List<Long> existingOptional = extractSkillIds(demand.getDemandSkills(), false);
+
+        List<Long> mandatoryIds = requestMandatory != null ? requestMandatory : existingMandatory;
+        List<Long> optionalIds = requestOptional != null ? requestOptional : existingOptional;
+
+        validationService.validateSkillLists(mandatoryIds, optionalIds);
+
+        List<DemandSkill> newSkills = createDemandSkills(demand, mandatoryIds, optionalIds);
+        if (demand.getDemandSkills() == null) {
+            demand.setDemandSkills(new ArrayList<>(newSkills));
+        } else {
+            demand.getDemandSkills().clear();
+            demand.getDemandSkills().addAll(newSkills);
+        }
+    }
+
     private List<DemandSkill> createDemandSkills(Demand demand, List<Long> mandatoryIds, List<Long> optionalIds) {
         List<DemandSkill> demandSkills = new ArrayList<>();
+        Set<Long> assignedSkillIds = new HashSet<>();
+
         if (mandatoryIds != null && !mandatoryIds.isEmpty()) {
-            List<Skill> mandatory = skillLookupService.resolveSkillIds(mandatoryIds);
-            for (Skill skill : mandatory) {
-                DemandSkill ds = new DemandSkill();
-                ds.setDemand(demand);
-                ds.setSkill(skill);
-                ds.setIsMandatory(true);
-                demandSkills.add(ds);
+            for (Skill skill : skillLookupService.resolveSkillIds(mandatoryIds)) {
+                if (assignedSkillIds.add(skill.getSkillId())) {
+                    demandSkills.add(newDemandSkill(demand, skill, true));
+                }
             }
         }
         if (optionalIds != null && !optionalIds.isEmpty()) {
-            List<Skill> optional = skillLookupService.resolveSkillIds(optionalIds);
-            for (Skill skill : optional) {
-                DemandSkill ds = new DemandSkill();
-                ds.setDemand(demand);
-                ds.setSkill(skill);
-                ds.setIsMandatory(false);
-                demandSkills.add(ds);
+            for (Skill skill : skillLookupService.resolveSkillIds(optionalIds)) {
+                if (assignedSkillIds.add(skill.getSkillId())) {
+                    demandSkills.add(newDemandSkill(demand, skill, false));
+                }
             }
         }
         return demandSkills;
     }
 
-    private List<Long> getExistingSkillIds(Demand demand, boolean isMandatory) {
-        if (demand.getDemandSkills() == null) return List.of();
-        return demand.getDemandSkills().stream()
-                .filter(ds -> ds.getIsMandatory() == isMandatory)
+    private DemandSkill newDemandSkill(Demand demand, Skill skill, boolean mandatory) {
+        DemandSkill ds = new DemandSkill();
+        ds.setDemand(demand);
+        ds.setSkill(skill);
+        ds.setIsMandatory(mandatory);
+        return ds;
+    }
+
+    private List<Long> extractSkillIds(List<DemandSkill> demandSkills, boolean isMandatory) {
+        if (demandSkills == null || demandSkills.isEmpty()) {
+            return List.of();
+        }
+        return demandSkills.stream()
+                .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()) == isMandatory)
                 .map(ds -> ds.getSkill().getSkillId())
                 .toList();
     }

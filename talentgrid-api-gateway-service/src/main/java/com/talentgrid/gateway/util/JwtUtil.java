@@ -63,12 +63,12 @@ public class JwtUtil {
      * @throws io.jsonwebtoken.JwtException if the token is expired, malformed, or has an invalid signature
      */
     public Claims validateAndParse(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(signingKey)
+        return Jwts.parser()
+                .verifyWith(signingKey)
                 .requireIssuer(issuer)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**

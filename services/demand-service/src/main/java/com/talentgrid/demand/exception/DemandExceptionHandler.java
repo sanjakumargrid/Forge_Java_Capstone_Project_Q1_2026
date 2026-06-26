@@ -2,6 +2,7 @@ package com.talentgrid.demand.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -49,7 +50,7 @@ public class DemandExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleValidation(IllegalArgumentException ex) {
         log.warn("Validation error: {}", ex.getMessage());
-        return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(org.springframework.dao.InvalidDataAccessApiUsageException.class)
@@ -75,6 +76,16 @@ public class DemandExceptionHandler {
         log.warn("All AI providers failed: {}", ex.getMessage());
         return buildResponse(HttpStatus.SERVICE_UNAVAILABLE,
                 "AI service is temporarily unavailable. Please try again shortly.");
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMessage());
+        String message = "Invalid data: duplicate or conflicting values supplied";
+        if (ex.getMessage() != null && ex.getMessage().contains("uq_demand_skill")) {
+            message = "Duplicate skill association for this demand; each skill can appear only once";
+        }
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(Exception.class)

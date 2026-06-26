@@ -13,9 +13,13 @@ import java.util.List;
 public class EmbedContentRequest {
     private String model;
     private Content content;
+    private Integer outputDimensionality;
 
-    public static EmbedContentRequest of(String model, String text) {
-        return new EmbedContentRequest(model, new Content(Collections.singletonList(new Part(text))));
+    public static EmbedContentRequest of(String model, String text, int outputDimensionality) {
+        return new EmbedContentRequest(
+                model,
+                new Content(Collections.singletonList(new Part(text))),
+                outputDimensionality);
     }
 
     @Data

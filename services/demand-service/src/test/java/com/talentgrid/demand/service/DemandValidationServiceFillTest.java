@@ -126,6 +126,36 @@ class DemandValidationServiceFillTest {
                 () -> validationService.validateUpdate(request));
     }
 
+    @Test
+    void validateCreate_failsWhenSkillAppearsInBothLists() {
+        DemandRequest request = validCreateRequest();
+        request.setMandatorySkillIds(java.util.List.of(1L, 2L));
+        request.setOptionalSkillIds(java.util.List.of(2L, 3L));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateCreate(request));
+        assertTrue(ex.getMessage().contains("both mandatorySkillIds and optionalSkillIds"));
+    }
+
+    @Test
+    void validateCreate_failsWhenMandatorySkillsContainDuplicates() {
+        DemandRequest request = validCreateRequest();
+        request.setMandatorySkillIds(java.util.List.of(1L, 1L));
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateCreate(request));
+        assertTrue(ex.getMessage().contains("duplicate skill IDs"));
+    }
+
+    @Test
+    void validateSkillLists_failsWhenMergedListsOverlap() {
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateSkillLists(
+                        java.util.List.of(1L),
+                        java.util.List.of(1L, 2L)));
+        assertTrue(ex.getMessage().contains("both mandatorySkillIds and optionalSkillIds"));
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private DemandRequest validCreateRequest() {

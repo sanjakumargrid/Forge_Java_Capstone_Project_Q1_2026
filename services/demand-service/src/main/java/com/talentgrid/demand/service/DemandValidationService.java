@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Validates demand request DTOs before persistence.
@@ -94,6 +96,8 @@ public class DemandValidationService {
         boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
         if (!hasMandatory && !hasOptional) {
             errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty");
+        } else {
+            validateSkillListShape(request.getMandatorySkillIds(), request.getOptionalSkillIds(), errors);
         }
 
         if (!errors.isEmpty()) {
@@ -129,6 +133,8 @@ public class DemandValidationService {
             boolean hasOptional = request.getOptionalSkillIds() != null && !request.getOptionalSkillIds().isEmpty();
             if (!hasMandatory && !hasOptional) {
                 errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty when updating skills");
+            } else {
+                validateSkillListShape(request.getMandatorySkillIds(), request.getOptionalSkillIds(), errors);
             }
         }
 
@@ -144,6 +150,60 @@ public class DemandValidationService {
             String errorMsg = "Validation failed: " + String.join("; ", errors);
             log.warn("Update demand: {}", errorMsg);
             throw new IllegalArgumentException(errorMsg);
+        }
+    }
+
+    /**
+     * Validates merged mandatory/optional skill lists after PATCH partial merge.
+     */
+    public void validateSkillLists(List<Long> mandatoryIds, List<Long> optionalIds) {
+        List<String> errors = new ArrayList<>();
+
+        boolean hasMandatory = mandatoryIds != null && !mandatoryIds.isEmpty();
+        boolean hasOptional = optionalIds != null && !optionalIds.isEmpty();
+        if (!hasMandatory && !hasOptional) {
+            errors.add("at least one of mandatorySkillIds or optionalSkillIds must be non-empty");
+        } else {
+            validateSkillListShape(mandatoryIds, optionalIds, errors);
+        }
+
+        if (!errors.isEmpty()) {
+            String errorMsg = "Validation failed: " + String.join("; ", errors);
+            log.warn("Skill list validation: {}", errorMsg);
+            throw new IllegalArgumentException(errorMsg);
+        }
+    }
+
+    private void validateSkillListShape(List<Long> mandatoryIds, List<Long> optionalIds, List<String> errors) {
+        collectDuplicateSkillIds(mandatoryIds, "mandatorySkillIds", errors);
+        collectDuplicateSkillIds(optionalIds, "optionalSkillIds", errors);
+        collectMandatoryOptionalOverlap(mandatoryIds, optionalIds, errors);
+    }
+
+    private void collectDuplicateSkillIds(List<Long> skillIds, String fieldName, List<String> errors) {
+        if (skillIds == null || skillIds.isEmpty()) {
+            return;
+        }
+        Set<Long> seen = new HashSet<>();
+        Set<Long> duplicates = new HashSet<>();
+        for (Long skillId : skillIds) {
+            if (skillId != null && !seen.add(skillId)) {
+                duplicates.add(skillId);
+            }
+        }
+        if (!duplicates.isEmpty()) {
+            errors.add(fieldName + " contains duplicate skill IDs: " + duplicates);
+        }
+    }
+
+    private void collectMandatoryOptionalOverlap(List<Long> mandatoryIds, List<Long> optionalIds, List<String> errors) {
+        if (mandatoryIds == null || optionalIds == null || mandatoryIds.isEmpty() || optionalIds.isEmpty()) {
+            return;
+        }
+        Set<Long> overlap = new HashSet<>(mandatoryIds);
+        overlap.retainAll(optionalIds);
+        if (!overlap.isEmpty()) {
+            errors.add("skill IDs cannot appear in both mandatorySkillIds and optionalSkillIds: " + overlap);
         }
     }
 }

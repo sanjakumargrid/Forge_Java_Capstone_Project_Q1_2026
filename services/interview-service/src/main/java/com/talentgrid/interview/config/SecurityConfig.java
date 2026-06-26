@@ -1,6 +1,7 @@
 package com.talentgrid.interview.config;
 
 import com.talentgrid.interview.filter.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,11 +31,21 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
+                )
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Swagger / actuator
                         .requestMatchers(
                                 "/actuator/**",
                                 "/v3/api-docs/**",
@@ -42,16 +53,16 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // Google OAuth endpoints should be public
                         .requestMatchers(
                                 "/api/google/oauth/**",
                                 "/api/v1/google/oauth/**",
                                 "/google/oauth/**"
                         ).permitAll()
 
-                        // Remaining interview APIs need JWT
                         .requestMatchers(
                                 "/api/v1/interviews/**",
+                                "/api/v1/scorecards/**",
+                                "/api/v1/applications/*/scorecards/**",
                                 "/api/interviews/**",
                                 "/interviews/**"
                         ).authenticated()

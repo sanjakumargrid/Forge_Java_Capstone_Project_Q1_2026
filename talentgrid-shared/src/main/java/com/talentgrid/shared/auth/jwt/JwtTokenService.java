@@ -3,7 +3,6 @@ package com.talentgrid.shared.auth.jwt;
 import com.talentgrid.shared.auth.constants.JwtConstants;
 import com.talentgrid.shared.auth.dto.JwtUserContext;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -28,8 +27,9 @@ public class JwtTokenService {
      */
     public String generateInternalServiceToken() {
         return Jwts.builder()
-                .subject("system")
-                .claim(JwtConstants.EMAIL, "system@talentgrid.internal")
+                .subject("0")
+                .claim(JwtConstants.EMAIL, JwtConstants.INTERNAL_SERVICE_EMAIL)
+                .claim(JwtConstants.TOKEN_TYPE, JwtConstants.ACCESS_TOKEN)
                 .claim(JwtConstants.ROLES, List.of("ROLE_SYSTEM"))
                 .claim(JwtConstants.SCOPES, List.of(
                         "CANDIDATE_VIEW", "CANDIDATE_CREATE", "CANDIDATE_UPDATE",

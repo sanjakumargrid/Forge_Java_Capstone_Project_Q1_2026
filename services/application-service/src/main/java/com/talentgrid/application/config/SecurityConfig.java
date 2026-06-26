@@ -1,6 +1,7 @@
 package com.talentgrid.application.config;
 
 import com.talentgrid.application.filter.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +34,11 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
                             log.error("ACCESS DENIED | method={} | uri={} | servletPath={} | error={}",
                                     request.getMethod(),
@@ -41,13 +47,12 @@ public class SecurityConfig {
                                     accessDeniedException.getMessage()
                             );
 
-                            response.setStatus(403);
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType("application/json");
                             response.getWriter().write("{\"error\":\"Forbidden\"}");
                         })
                 )
                 .authorizeHttpRequests(auth -> auth
-
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers(
@@ -57,15 +62,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
+                        // Public Apply Now flow
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/applications",
-                                "/api/v1/applications/",
-                                "/api/v1/applications/**"
+                                "/api/v1/applications/"
                         ).permitAll()
 
-                        .requestMatchers(
-                                "/api/v1/applications/**"
-                        ).authenticated()
+                        .requestMatchers("/api/v1/applications/**").authenticated()
 
                         .anyRequest().authenticated()
                 )

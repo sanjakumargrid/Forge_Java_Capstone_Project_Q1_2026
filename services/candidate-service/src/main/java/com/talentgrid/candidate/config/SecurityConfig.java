@@ -1,6 +1,7 @@
 package com.talentgrid.candidate.config;
 
 import com.talentgrid.candidate.filter.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,11 +25,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
+        return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Forbidden\"}");
+                        })
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -40,26 +53,17 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        // PUBLIC candidate create/apply
+                        // Public external candidate apply/create endpoint
                         .requestMatchers(HttpMethod.POST,
                                 "/api/v1/external-candidates",
                                 "/api/v1/external-candidates/"
                         ).permitAll()
 
-                        // PUBLIC internal endpoint for application-service
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/external-candidates/internal/**"
-                        ).permitAll()
-
-                        // Remaining candidate APIs secured
-                        .requestMatchers(
-                                "/api/v1/external-candidates/**"
-                        ).authenticated()
+                        .requestMatchers("/api/v1/external-candidates/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 }

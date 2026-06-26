@@ -64,11 +64,38 @@ public class DataInitializer implements CommandLineRunner {
         Scope demandNominate = upsertScope("DEMAND_NOMINATE", "Create internal nominations");
         Scope demandHmNominationDecide = upsertScope("DEMAND_HM_NOMINATION_DECIDE", "HM accept/reject internal nomination");
 
-        Role adminRole = upsertRole("ADMIN");
-        addScopes(adminRole, userCreate, userDelete, userView, demandCreate, demandUpdate, demandDelete,
-                demandView, demandStatusTransition, demandPipelineView, demandPmApprove,
-                demandSubmit, demandNominate, demandHmNominationDecide);
+        Scope candidateView = upsertScope("CANDIDATE_VIEW", "Candidate View");
+        Scope candidateDelete = upsertScope("CANDIDATE_DELETE", "Candidate delete");
 
+        Scope applicationView = upsertScope("APPLICATION_VIEW", "Application view");
+        Scope applicationUpdate = upsertScope("APPLICATION_UPDATE", "Application update");
+
+        Scope interviewCreate = upsertScope("INTERVIEW_CREATE", "Interview Create");
+        Scope interviewView = upsertScope("INTERVIEW_VIEW", "Interview view");
+        Scope interviewUpdate = upsertScope("INTERVIEW_UPDATE", "Interview update");
+        Scope interviewDelete = upsertScope("INTERVIEW_DELETE", "Interview Delete");
+
+        Scope offerCreate = upsertScope("OFFER_CREATE", "Offer create");
+        Scope offerView = upsertScope("OFFER_VIEW", "Offer view");
+        Scope offerUpdate = upsertScope("OFFER_UPDATE", "Offer update");
+        Scope offerDelete = upsertScope("OFFER_DELETE", "Offer delete");
+
+        Role adminRole = upsertRole("ADMIN");
+        addScopes(adminRole,
+                userCreate, userDelete, userView,
+
+                demandCreate, demandUpdate, demandDelete,
+                demandView, demandStatusTransition, demandPipelineView,
+                demandPmApprove, demandSubmit, demandNominate, demandHmNominationDecide,
+
+                candidateView, candidateDelete,
+
+                applicationView, applicationUpdate,
+
+                interviewCreate, interviewView, interviewUpdate, interviewDelete,
+
+                offerCreate, offerView, offerUpdate, offerDelete
+        );
         Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
         addScopes(portfolioManagerRole, demandView, demandPipelineView, demandPmApprove,
                 demandStatusTransition, demandSubmit);
@@ -82,7 +109,16 @@ public class DataInitializer implements CommandLineRunner {
                 demandCreate, demandUpdate);
 
         Role recruiterRole = upsertRole("RECRUITER");
-        addScopes(recruiterRole, demandView, demandStatusTransition, demandPipelineView);
+        addScopes(recruiterRole,
+                demandView, demandStatusTransition, demandPipelineView,
+                candidateView, candidateDelete,
+
+                applicationView, applicationUpdate,
+
+                interviewCreate, interviewView, interviewUpdate, interviewDelete,
+
+                offerCreate, offerView, offerUpdate, offerDelete
+        );
 
         Role taManagerRole = upsertRole("TA_MANAGER");
         addScopes(taManagerRole, demandView, demandStatusTransition, demandPipelineView);
