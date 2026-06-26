@@ -1,44 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0          https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>com.talentgrid</groupId>
-    <artifactId>talentgrid-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../../pom.xml</relativePath>
-  </parent>
-  <artifactId>notification-client</artifactId>
-  <name>TalentGrid Notification Client</name>
-  <description>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.talentgrid</groupId>
+        <artifactId>talentgrid-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>notification-client</artifactId>
+    <name>TalentGrid Notification Client</name>
+    <description>
         Reusable Kafka notification publisher for all TalentGrid domain services.
         Import this module to publish NOTIFICATION_SEND events to notification.send topic
         without duplicating event construction logic.
     </description>
-  <packaging>jar</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.talentgrid</groupId>
-      <artifactId>talentgrid-kafka</artifactId>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-            </path>
-          </annotationProcessorPaths>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Spring Boot base (for @Component, @Service auto-wiring) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- TalentGrid Kafka (KafkaProducerService, BaseEvent, NotificationPayload, TalentGridTopics) -->
+        <dependency>
+            <groupId>com.talentgrid</groupId>
+            <artifactId>talentgrid-kafka</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <!-- NOTE: No spring-boot-maven-plugin — this is a library JAR, not runnable -->
+        </plugins>
+    </build>
+
 </project>

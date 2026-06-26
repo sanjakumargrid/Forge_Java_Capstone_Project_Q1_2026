@@ -169,28 +169,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- Repo-root .env support for all modules (runnable services use spring.config.import too) -->
-    <dependencies>
-        <dependency>
-            <groupId>me.paulschwarz</groupId>
-            <artifactId>spring-dotenv</artifactId>
-        </dependency>
-
-        <!-- Lombok (used by almost all modules) -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Testing (used by almost all modules) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <pluginManagement>
             <plugins>

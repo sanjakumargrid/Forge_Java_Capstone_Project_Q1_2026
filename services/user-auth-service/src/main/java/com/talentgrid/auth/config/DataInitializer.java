@@ -75,6 +75,10 @@ public class DataInitializer implements CommandLineRunner {
         Scope interviewUpdate = upsertScope("INTERVIEW_UPDATE", "Interview update");
         Scope interviewDelete = upsertScope("INTERVIEW_DELETE", "Interview Delete");
 
+        Scope scorecardCreate = upsertScope("SCORECARD_CREATE", "Scorecard create");
+        Scope scorecardView = upsertScope("SCORECARD_VIEW", "Scorecard view");
+        Scope scorecardDelete = upsertScope("SCORECARD_DELETE", "Scorecard delete");
+
         Scope offerCreate = upsertScope("OFFER_CREATE", "Offer create");
         Scope offerView = upsertScope("OFFER_VIEW", "Offer view");
         Scope offerUpdate = upsertScope("OFFER_UPDATE", "Offer update");
@@ -98,19 +102,33 @@ public class DataInitializer implements CommandLineRunner {
         );
         Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
         addScopes(portfolioManagerRole, demandView, demandPipelineView, demandPmApprove,
-                demandStatusTransition, demandSubmit);
+                demandStatusTransition, demandSubmit,candidateView, candidateDelete,
+
+                applicationView, applicationUpdate,
+
+                interviewCreate, interviewView, interviewUpdate, interviewDelete,
+
+                offerCreate, offerView, offerUpdate, offerDelete);
 
         Role hiringManagerRole = upsertRole("HIRING_MANAGER");
         addScopes(hiringManagerRole, demandView, demandCreate, demandUpdate, demandSubmit,
-                demandStatusTransition, demandPipelineView, demandHmNominationDecide);
+                demandStatusTransition, demandPipelineView, demandHmNominationDecide,candidateView, candidateDelete,
+
+                applicationView, applicationUpdate,
+
+                interviewCreate, interviewView, interviewUpdate, interviewDelete,
+
+                offerCreate, offerView, offerUpdate, offerDelete);
 
         Role resourceManagerRole = upsertRole("RESOURCE_MANAGER");
         addScopes(resourceManagerRole, demandView, demandStatusTransition, demandNominate, demandPipelineView,
                 demandCreate, demandUpdate);
 
+
         Role recruiterRole = upsertRole("RECRUITER");
         addScopes(recruiterRole,
                 demandView, demandStatusTransition, demandPipelineView,
+
                 candidateView, candidateDelete,
 
                 applicationView, applicationUpdate,
@@ -121,10 +139,17 @@ public class DataInitializer implements CommandLineRunner {
         );
 
         Role taManagerRole = upsertRole("TA_MANAGER");
-        addScopes(taManagerRole, demandView, demandStatusTransition, demandPipelineView);
+        addScopes(taManagerRole, demandView, demandStatusTransition, demandPipelineView,candidateView, candidateDelete,
+
+                applicationView, applicationUpdate,
+
+                interviewCreate, interviewView, interviewUpdate, interviewDelete,
+
+                offerCreate, offerView, offerUpdate, offerDelete);
 
         Role employeeRole = upsertRole("EMPLOYEE");
-        addScopes(employeeRole, demandView);
+        addScopes(employeeRole, demandView ,scorecardView,scorecardCreate,scorecardDelete,applicationView);
+
 
         if (!userRepository.existsByEmail("username@griddynamics.com")) {
             userRepository.save(User.builder()
