@@ -49,8 +49,11 @@ public class HmApprovalServiceImpl implements HmApprovalService {
     @Override
     public List<HmNominatedEngineerResponse> getPendingNominationsForDemand(Long demandId) {
         log.info("Fetching PENDING_REVIEW nominations for demandId={}", demandId);
-        return internalMatchRepository.findByDemandIdAndIsDeletedFalse(demandId).stream()
-                .filter(m -> MatchStatus.PENDING_REVIEW.equals(m.getMatchStatus()))
+        
+        // FIX: Filter at database level instead of Java stream filtering
+        return internalMatchRepository
+                .findByDemandIdAndMatchStatusAndIsDeletedFalse(demandId, MatchStatus.PENDING_REVIEW)
+                .stream()
                 .map(this::toNominatedEngineerResponse)
                 .collect(Collectors.toList());
     }

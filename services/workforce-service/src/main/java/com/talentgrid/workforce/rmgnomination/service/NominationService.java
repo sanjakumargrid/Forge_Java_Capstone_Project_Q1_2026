@@ -65,12 +65,19 @@ public class NominationService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Engineer already nominated for this demand");
         }
 
-        // 4. One engineer can be nominated to maximum two active demands.
-        long activeDemandCount = internalMatchRepository.countByEmployee_IdAndIsDeletedFalse(employeeId);
-        if (activeDemandCount >= 2) {
+        // 4. One engineer can be allocated to maximum two demands (accepted matches only).
+        //    PENDING_REVIEW and REJECTED matches do NOT count toward this limit.
+        long acceptedAllocations = internalMatchRepository.countByEmployee_IdAndMatchStatusAndIsDeletedFalse(
+                employeeId, MatchStatus.ACCEPTED);
+        
+        if (acceptedAllocations >= 2) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Engineer already has maximum 2 active demand nominations");
+                    String.format("Engineer already has maximum 2 accepted allocations (current: %d). " +
+                                  "Cannot nominate for additional demands.", acceptedAllocations));
         }
+        
+        log.info("Engineer {} has {} accepted allocations (limit: 2). Nomination allowed.", 
+                 employeeId, acceptedAllocations);
 
         if ("APPROVED".equals(currentStatus)) {
             demand = transitionApprovedToInternalSearch(request.getDemandId(), demand);
@@ -160,13 +167,27 @@ public class NominationService {
     }
 
     public List<NominationResponse> getNominationsByDemand(Long demandId) {
-        return internalMatchRepository.findByDemandIdAndIsDeletedFalse(demandId).stream()
+        // FIX: Only return active nominations (PENDING_REVIEW + ACCEPTED), exclude REJECTED
+        List<MatchStatus> activeStatuses = Arrays.asList(MatchStatus.PENDING_REVIEW, MatchStatus.ACCEPTED);
+        
+        List<InternalMatch> activeMatches = internalMatchRepository
+                .findByDemandIdAndIsDeletedFalse(demandId)
+                .stream()
+                .filter(m -> activeStatuses.contains(m.getMatchStatus()))
+                .collect(Collectors.toList());
+        
+        return activeMatches.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public List<NominationResponse> getNominationsByEngineer(Long employeeId) {
-        return internalMatchRepository.findByEmployee_IdAndIsDeletedFalse(employeeId).stream()
+        // FIX: Only return active nominations (PENDING_REVIEW + ACCEPTED), exclude REJECTED
+        List<MatchStatus> activeStatuses = Arrays.asList(MatchStatus.PENDING_REVIEW, MatchStatus.ACCEPTED);
+        
+        return internalMatchRepository
+                .findByEmployee_IdAndMatchStatusInAndIsDeletedFalse(employeeId, activeStatuses)
+                .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
