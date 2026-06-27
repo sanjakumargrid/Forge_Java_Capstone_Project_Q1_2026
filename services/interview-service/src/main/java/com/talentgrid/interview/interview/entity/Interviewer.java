@@ -1,11 +1,8 @@
 package com.talentgrid.interview.interview.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "interviewer")
@@ -20,7 +17,7 @@ public class Interviewer {
     @Column(name = "employee_id")
     private Long employeeId;
 
-    @Column(name = "domain_name", nullable = false)
+    @Column(name = "domain_name")
     private String domainName;
 
     @Column(name = "location")
@@ -29,8 +26,10 @@ public class Interviewer {
     @Column(name = "grade")
     private String grade;
 
-    @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "interview_id",nullable=false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "interview_id", nullable = false)
     private Interview interview;
 }
-

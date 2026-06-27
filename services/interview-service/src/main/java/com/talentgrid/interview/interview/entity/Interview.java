@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -48,8 +49,12 @@ public class Interview {
 // private List<Long> interviewers;
 
 // REPLACE WITH THIS:
-    @OneToMany(mappedBy = "interview", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Interviewer> interviewers;
+    @OneToMany(
+            mappedBy = "interview",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Interviewer> interviewers = new ArrayList<>();
 
     @NotNull(message = "Interview type is required")
     @Enumerated(EnumType.STRING)

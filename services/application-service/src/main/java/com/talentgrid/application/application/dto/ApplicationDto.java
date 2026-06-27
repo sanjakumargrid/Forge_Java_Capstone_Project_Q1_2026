@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.talentgrid.application.application.dto.candidate.ExternalCandidateDto;
 import com.talentgrid.application.application.enums.Source;
 import com.talentgrid.application.application.enums.Stage;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,14 @@ import java.util.List;
 @Setter
 public class ApplicationDto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "application_seq")
+    @SequenceGenerator(
+            name = "application_seq",
+            sequenceName = "application_seq",
+            allocationSize = 1
+    )
+    @Column(name = "application_id")
     private Long applicationId;
 
     private Long candidateId;

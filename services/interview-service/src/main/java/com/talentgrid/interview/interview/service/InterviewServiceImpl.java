@@ -3,13 +3,13 @@ package com.talentgrid.interview.interview.service;
 import com.talentgrid.audit.client.AuditLogClient;
 import com.talentgrid.audit.dto.AuditAction;
 import com.talentgrid.audit.dto.AuditLogPayload;
+import com.talentgrid.clients.notification.NotificationEventPublisher;
 import com.talentgrid.interview.client.ApplicationClient;
 import com.talentgrid.interview.client.CandidateClient;
 import com.talentgrid.interview.client.EmployeeClient;
 import com.talentgrid.interview.client.dto.CandidateDto;
 import com.talentgrid.interview.client.dto.EmployeeDto;
 import com.talentgrid.interview.exception.BusinessException;
-import com.talentgrid.clients.notification.NotificationEventPublisher;
 import com.talentgrid.interview.interview.dto.ApplicationDto;
 import com.talentgrid.interview.interview.dto.InterviewDto;
 import com.talentgrid.interview.interview.entity.Interview;
@@ -31,8 +31,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -43,24 +45,32 @@ public class InterviewServiceImpl implements InterviewService {
     private final InterviewerRepository interviewerRepository;
 
     private final ApplicationClient applicationClient;
-
     private final EmployeeClient employeeClient;
-
     private final GoogleCalendarClient googleCalendarClient;
-
     private final InterviewEventProducer interviewEventProducer;
-
     private final AuditLogClient auditLogClient;
-    
     private final CandidateClient candidateClient;
-    
     private final NotificationEventPublisher notificationEventPublisher;
 
     @Override
     @Transactional
     public InterviewDto createInterview(InterviewDto interviewDto) {
 
+        if (interviewDto == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Interview details are required"
+            );
+        }
+
         Long applicationId = interviewDto.getApplicationId();
+
+        if (applicationId == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Application id is required"
+            );
+        }
 
         ApplicationDto applicationDto =
                 applicationClient.getApplication(applicationId);
@@ -86,13 +96,21 @@ public class InterviewServiceImpl implements InterviewService {
             );
         }
 
-        // REQ: Fetch Candidate early to avoid orphaned Calendar events if candidate fetch fails
         if (applicationDto.getCandidateId() == null) {
-            throw new BusinessException(HttpStatus.BAD_REQUEST, "Application does not have an associated candidate");
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Application does not have an associated candidate"
+            );
         }
-        CandidateDto candidate = candidateClient.getCandidate(applicationDto.getCandidateId());
+
+        CandidateDto candidate =
+                candidateClient.getCandidate(applicationDto.getCandidateId());
+
         if (candidate == null) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, "Candidate not found");
+            throw new BusinessException(
+                    HttpStatus.NOT_FOUND,
+                    "Candidate not found"
+            );
         }
 
         Interview interview =
@@ -102,42 +120,95 @@ public class InterviewServiceImpl implements InterviewService {
             interview.setStatus(Status.SCHEDULED);
         }
 
-        // Save first to avoid orphaned calendar events if DB save fails
-        Interview savedInterview = interviewRepository.save(interview);
+        /*
+         * Important:
+         * This sets interview_id in interviewer table.
+         */
+        attachInterviewersToInterview(interview);
 
-        GoogleCalendarResponse response = new GoogleCalendarResponse(null, null);
+        /*
+         * Save interview first, then create Google Calendar event.
+         */
+        Interview savedInterview =
+                interviewRepository.saveAndFlush(interview);
+
+        /*
+         * Real Google Meet link creation.
+         * Do not continue silently when Google Calendar fails.
+         */
+        GoogleCalendarResponse response;
+
         try {
             response = googleCalendarClient.createEvent(savedInterview);
+
+            if (response == null
+                    || response.getEventId() == null
+                    || response.getMeetLink() == null
+                    || response.getMeetLink().isBlank()) {
+                throw new BusinessException(
+                        HttpStatus.SERVICE_UNAVAILABLE,
+                        "Google Meet link was not generated. Please check Google Calendar OAuth and conferenceDataVersion."
+                );
+            }
+
             savedInterview.setCalendarEventId(response.getEventId());
             savedInterview.setMeetLink(response.getMeetLink());
+
             savedInterview = interviewRepository.save(savedInterview);
+
+        } catch (BusinessException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("[InterviewService] Google Calendar creation failed. Continuing without Meet link: {}", e.getMessage());
+            log.error(
+                    "[InterviewService] Google Calendar creation failed",
+                    e
+            );
+
+            throw new BusinessException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Google Calendar creation failed: " + e.getMessage()
+            );
         }
-        
+
         String interviewerName = "Our Team";
-        if (interview.getInterviewers() != null && !interview.getInterviewers().isEmpty()) {
+
+        if (savedInterview.getInterviewers() != null
+                && !savedInterview.getInterviewers().isEmpty()) {
             try {
-                EmployeeDto primaryInterviewer = employeeClient.getEmployee(interview.getInterviewers().get(0).getEmployeeId());
-                if (primaryInterviewer != null && primaryInterviewer.getName() != null) {
+                Interviewer firstInterviewer =
+                        savedInterview.getInterviewers().get(0);
+
+                EmployeeDto primaryInterviewer =
+                        employeeClient.getEmployee(firstInterviewer.getEmployeeId());
+
+                if (primaryInterviewer != null
+                        && primaryInterviewer.getName() != null) {
                     interviewerName = primaryInterviewer.getName();
                 }
             } catch (Exception e) {
-                log.warn("[InterviewService] Could not resolve primary interviewer name for id={}: {}",
-                        interview.getInterviewers().get(0), e.getMessage());
+                log.warn(
+                        "[InterviewService] Could not resolve primary interviewer name: {}",
+                        e.getMessage()
+                );
             }
         }
 
-        String candidateName = candidate.getFirstName() + (candidate.getLastName() != null ? " " + candidate.getLastName() : "");
-        
-        // Send email to Candidate
+        String candidateName =
+                buildCandidateName(candidate);
+
+        String meetLink =
+                savedInterview.getMeetLink() != null
+                        ? savedInterview.getMeetLink()
+                        : "TBD";
+
         notificationEventPublisher.sendInAppAndEmail(
                 applicationDto.getCandidateId().toString(),
                 candidate.getEmail(),
                 null,
                 "INTERVIEW_INVITATION",
                 "Interview Invitation from Grid Dynamics",
-                "You have been invited to an interview. Please join using the Google Meet link: " + response.getMeetLink(),
+                "You have been invited to an interview. Please join using the Google Meet link: "
+                        + meetLink,
                 "interview-service",
                 savedInterview.getInterviewId().toString(),
                 "INTERVIEW",
@@ -146,26 +217,38 @@ public class InterviewServiceImpl implements InterviewService {
                 Map.of(
                         "candidateName", candidateName,
                         "companyName", "Grid Dynamics",
-                        "interviewDate", savedInterview.getScheduledAt() != null ? savedInterview.getScheduledAt().toString() : "TBD",
-                        "meetLink", response.getMeetLink() != null ? response.getMeetLink() : "TBD",
+                        "interviewDate",
+                        savedInterview.getScheduledAt() != null
+                                ? savedInterview.getScheduledAt().toString()
+                                : "TBD",
+                        "meetLink", meetLink,
                         "interviewerName", interviewerName
                 ),
-                java.util.UUID.randomUUID().toString()
+                UUID.randomUUID().toString()
         );
 
-        // Send emails to all Interviewers
-        if (interview.getInterviewers() != null) {
-            for (Interviewer interviewer : interview.getInterviewers()) {
+        if (savedInterview.getInterviewers() != null) {
+            for (Interviewer interviewer : savedInterview.getInterviewers()) {
                 try {
-                    EmployeeDto employee = employeeClient.getEmployee(interviewer.getEmployeeId());
+                    EmployeeDto employee =
+                            employeeClient.getEmployee(interviewer.getEmployeeId());
+
                     if (employee != null && employee.getEmail() != null) {
+                        String employeeName =
+                                employee.getName() != null
+                                        ? employee.getName()
+                                        : "Interviewer";
+
                         notificationEventPublisher.sendInAppAndEmail(
                                 String.valueOf(interviewer.getEmployeeId()),
                                 employee.getEmail(),
                                 null,
                                 "INTERVIEW_INVITATION",
                                 "Interview Scheduled: " + candidateName,
-                                "You have been scheduled to interview " + candidateName + ". Please join using the Google Meet link: " + response.getMeetLink(),
+                                "You have been scheduled to interview "
+                                        + candidateName
+                                        + ". Please join using the Google Meet link: "
+                                        + meetLink,
                                 "interview-service",
                                 savedInterview.getInterviewId().toString(),
                                 "INTERVIEW",
@@ -174,16 +257,22 @@ public class InterviewServiceImpl implements InterviewService {
                                 Map.of(
                                         "candidateName", candidateName,
                                         "companyName", "Grid Dynamics",
-                                        "interviewDate", savedInterview.getScheduledAt() != null ? savedInterview.getScheduledAt().toString() : "TBD",
-                                        "meetLink", response.getMeetLink() != null ? response.getMeetLink() : "TBD",
-                                        "interviewerName", employee.getName()
+                                        "interviewDate",
+                                        savedInterview.getScheduledAt() != null
+                                                ? savedInterview.getScheduledAt().toString()
+                                                : "TBD",
+                                        "meetLink", meetLink,
+                                        "interviewerName", employeeName
                                 ),
-                                java.util.UUID.randomUUID().toString()
+                                UUID.randomUUID().toString()
                         );
                     }
                 } catch (Exception e) {
-                    // Log error but don't fail the interview creation
-                    log.error("[InterviewService] Failed to send email to interviewer {}: {}", interviewer.getEmployeeId(), e.getMessage());
+                    log.error(
+                            "[InterviewService] Failed to send email to interviewer {}: {}",
+                            interviewer.getEmployeeId(),
+                            e.getMessage()
+                    );
                 }
             }
         }
@@ -197,7 +286,9 @@ public class InterviewServiceImpl implements InterviewService {
                         .action(AuditAction.CREATE)
                         .afterState(Map.of(
                                 "applicationId", savedInterview.getApplicationId(),
-                                "status", savedInterview.getStatus().name()
+                                "status", savedInterview.getStatus().name(),
+                                "meetLink", savedInterview.getMeetLink(),
+                                "calendarEventId", savedInterview.getCalendarEventId()
                         ))
                         .serviceName("interview-service")
                         .endpoint("/api/v1/interviews")
@@ -233,13 +324,14 @@ public class InterviewServiceImpl implements InterviewService {
             Pageable pageable
     ) {
 
-        Page<Interview> interviews = interviewRepository.findWithFilters(
-                applicationId,
-                status,
-                interviewType,
-                interviewerId,
-                pageable
-        );
+        Page<Interview> interviews =
+                interviewRepository.findWithFilters(
+                        applicationId,
+                        status,
+                        interviewType,
+                        interviewerId,
+                        pageable
+                );
 
         return interviews.map(InterviewMapper::entityToDto);
     }
@@ -251,6 +343,13 @@ public class InterviewServiceImpl implements InterviewService {
             InterviewDto interviewDto
     ) {
 
+        if (interviewDto == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Interview details are required"
+            );
+        }
+
         Interview existingInterview =
                 interviewRepository.findById(id)
                         .orElseThrow(() ->
@@ -261,7 +360,8 @@ public class InterviewServiceImpl implements InterviewService {
                         );
 
         if (interviewDto.getApplicationId() != null
-                && !interviewDto.getApplicationId().equals(existingInterview.getApplicationId())) {
+                && !interviewDto.getApplicationId()
+                .equals(existingInterview.getApplicationId())) {
 
             ApplicationDto applicationDto =
                     applicationClient.getApplication(interviewDto.getApplicationId());
@@ -269,14 +369,18 @@ public class InterviewServiceImpl implements InterviewService {
             if (applicationDto == null || applicationDto.getApplicationId() == null) {
                 throw new BusinessException(
                         HttpStatus.NOT_FOUND,
-                        "Application not found with id: " + interviewDto.getApplicationId()
+                        "Application not found with id: "
+                                + interviewDto.getApplicationId()
                 );
             }
 
             existingInterview.setApplicationId(interviewDto.getApplicationId());
         }
 
-        existingInterview.setInterviewers(interviewDto.getInterviewers());
+        if (interviewDto.getInterviewers() != null) {
+            replaceInterviewers(existingInterview, interviewDto.getInterviewers());
+        }
+
         existingInterview.setInterviewType(interviewDto.getInterviewType());
         existingInterview.setScheduledAt(interviewDto.getScheduledAt());
         existingInterview.setDurationMins(interviewDto.getDurationMins());
@@ -446,8 +550,66 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     @Transactional
     public List<Interview> getInterviewsForEmployee(Long employeeId) {
-        // 1. Fetch all interviewer records for this employee
-        List<Interviewer> assignments = interviewerRepository.findByEmployeeId(employeeId);
-        // 2. Extract the actual Interview objects from those records
-        return assignments.stream() .map(Interviewer::getInterview) .toList(); }
+
+        List<Interviewer> assignments =
+                interviewerRepository.findByEmployeeId(employeeId);
+
+        return assignments.stream()
+                .map(Interviewer::getInterview)
+                .toList();
+    }
+
+    private void attachInterviewersToInterview(Interview interview) {
+
+        if (interview == null || interview.getInterviewers() == null) {
+            return;
+        }
+
+        for (Interviewer interviewer : interview.getInterviewers()) {
+            interviewer.setInterview(interview);
+        }
+    }
+
+    private void replaceInterviewers(
+            Interview interview,
+            List<Interviewer> newInterviewers
+    ) {
+
+        if (interview == null || newInterviewers == null) {
+            return;
+        }
+
+        if (interview.getInterviewers() == null) {
+            interview.setInterviewers(new ArrayList<>());
+        } else {
+            interview.getInterviewers().clear();
+        }
+
+        for (Interviewer interviewer : newInterviewers) {
+            interviewer.setInterview(interview);
+            interview.getInterviewers().add(interviewer);
+        }
+    }
+
+    private String buildCandidateName(CandidateDto candidate) {
+
+        if (candidate == null) {
+            return "Candidate";
+        }
+
+        String firstName =
+                candidate.getFirstName() != null
+                        ? candidate.getFirstName()
+                        : "";
+
+        String lastName =
+                candidate.getLastName() != null
+                        ? candidate.getLastName()
+                        : "";
+
+        String fullName =
+                (firstName + " " + lastName).trim();
+
+        return fullName.isBlank() ? "Candidate" : fullName;
+    }
 }

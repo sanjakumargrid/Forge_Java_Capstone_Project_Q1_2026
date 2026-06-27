@@ -27,7 +27,12 @@ import java.util.List;
 public class Application {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "application_seq")
+    @SequenceGenerator(
+            name = "application_seq",
+            sequenceName = "application_seq",
+            allocationSize = 1
+    )
     @Column(name = "application_id")
     private Long id;
 
