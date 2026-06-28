@@ -3,6 +3,7 @@ package com.talentgrid.demand;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * for Kafka configuration, Audit client integration, and Feign clients.
  */
 @EnableScheduling
+@EnableAsync
 @SpringBootApplication(scanBasePackages = {"com.talentgrid"})
 @EnableFeignClients(basePackages = {"com.talentgrid.demand.client", "com.talentgrid.demand.ai"})
 public class DemandServiceApplication {

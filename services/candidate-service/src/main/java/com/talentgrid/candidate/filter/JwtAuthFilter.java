@@ -1,5 +1,6 @@
 package com.talentgrid.candidate.filter;
 
+import com.talentgrid.shared.auth.constants.JwtConstants;
 import com.talentgrid.shared.auth.security.JwtAuthenticationProvider;
 import com.talentgrid.shared.auth.security.JwtPrincipal;
 import jakarta.servlet.FilterChain;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -40,6 +42,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                 || "/api/v1/external-candidates/".equals(servletPath)
                 );
 
+        boolean isPublicAiEngine = servletPath.startsWith("/api/v1/aiengine");
+
         boolean isSwaggerOrActuator =
                 servletPath.startsWith("/actuator")
                         || servletPath.startsWith("/v3/api-docs")
@@ -47,6 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                         || "/swagger-ui.html".equals(servletPath);
 
         return isPublicCandidateCreate
+                || isPublicAiEngine
                 || isSwaggerOrActuator
                 || "OPTIONS".equalsIgnoreCase(method);
     }
@@ -69,49 +74,51 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             JwtPrincipal principal = jwtAuthenticationProvider.authenticate(token);
 
-            if (principal.getUserId() != null && principal.getUserId() != 0) {
+            boolean internalServiceToken = isInternalServiceToken(principal);
+
+            if (!internalServiceToken && isRealUser(principal.getUserId())) {
                 String redisKey = "auth:user:" + principal.getUserId();
                 Boolean exists = objectRedisTemplate.hasKey(redisKey);
 
                 if (!Boolean.TRUE.equals(exists)) {
                     SecurityContextHolder.clearContext();
                     sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
-                            "Authorization changed. Please login again.");
+                            "Session expired. Please login again.");
                     return;
                 }
             }
 
-            Set<String> authorityNames = new LinkedHashSet<>();
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                Set<String> authorityNames = new LinkedHashSet<>();
 
-            if (principal.getScopes() != null) {
-                principal.getScopes().forEach(scope -> addAuthority(scope, authorityNames));
+                if (internalServiceToken) {
+                    authorityNames.add("ROLE_SYSTEM");
+                    authorityNames.add("SYSTEM");
+                    authorityNames.add("CANDIDATE_VIEW");
+                } else {
+                    addUserAuthorities(principal, authorityNames);
+                }
+
+                var authorities = authorityNames.stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
+
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(principal, null, authorities);
+
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.info("Authenticated candidate-service userId={}, email={}, internalServiceToken={}, authorities={}",
+                        principal.getUserId(),
+                        principal.getEmail(),
+                        internalServiceToken,
+                        authorityNames
+                );
             }
-
-            if (principal.getRoles() != null) {
-                principal.getRoles().forEach(role -> {
-                    addAuthority(role, authorityNames);
-
-                    String cleanRole = normalize(role).replace("ROLE_", "");
-                    authorityNames.add("ROLE_" + cleanRole);
-
-                    addCandidatePermissions(cleanRole, authorityNames);
-                });
-            }
-
-            var authorities = authorityNames.stream()
-                    .map(SimpleGrantedAuthority::new)
-                    .toList();
-
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            log.info("Authenticated candidate-service userId={}, email={}, authorities={}",
-                    principal.getUserId(),
-                    principal.getEmail(),
-                    authorityNames
-            );
 
         } catch (Exception e) {
             log.warn("JWT validation failed: {}", e.getMessage());
@@ -119,28 +126,52 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
 
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED,
-                    "Invalid or expired token");
+                    "Invalid or expired JWT");
             return;
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void addAuthority(String value, Set<String> authorityNames) {
-        if (value == null || value.isBlank()) {
+    private void addUserAuthorities(JwtPrincipal principal, Set<String> authorityNames) {
+        if (principal.getRoles() != null) {
+            principal.getRoles().forEach(role -> {
+                String cleanRole = normalize(role).replace("ROLE_", "");
+                authorityNames.add("ROLE_" + cleanRole);
+
+                addCandidatePermissions(cleanRole, authorityNames);
+            });
+        }
+
+        if (principal.getScopes() != null) {
+            principal.getScopes().forEach(scope -> addScopeAuthority(scope, authorityNames));
+        }
+    }
+
+    private boolean isInternalServiceToken(JwtPrincipal principal) {
+        return principal != null
+                && JwtConstants.INTERNAL_SERVICE_EMAIL.equals(principal.getEmail());
+    }
+
+    private boolean isRealUser(Long userId) {
+        return userId != null && userId != 0L;
+    }
+
+    private void addScopeAuthority(String scope, Set<String> authorityNames) {
+        if (scope == null || scope.isBlank()) {
             return;
         }
 
-        String cleanValue = normalize(value);
-        authorityNames.add(cleanValue);
+        String cleanScope = scope.trim();
+        authorityNames.add(cleanScope);
 
-        String permission = cleanValue
+        String normalizedScope = cleanScope
                 .replace(":", "_")
                 .replace("-", "_")
                 .replace(".", "_")
                 .toUpperCase();
 
-        authorityNames.add(permission);
+        authorityNames.add(normalizedScope);
     }
 
     private void addCandidatePermissions(String role, Set<String> authorityNames) {
@@ -149,6 +180,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if ("ADMIN".equals(cleanRole)
                 || "RECRUITER".equals(cleanRole)
                 || "TA".equals(cleanRole)
+                || "TA_MANAGER".equals(cleanRole)
                 || "TALENT_ACQUISITION".equals(cleanRole)) {
 
             authorityNames.add("CANDIDATE_CREATE");

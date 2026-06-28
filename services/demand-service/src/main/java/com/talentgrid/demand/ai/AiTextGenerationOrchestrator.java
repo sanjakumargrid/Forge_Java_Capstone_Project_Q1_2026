@@ -19,13 +19,12 @@ public class AiTextGenerationOrchestrator {
     private final String primaryProviderName;
 
     public AiTextGenerationOrchestrator(
-            GeminiTextGenerationProvider geminiProvider,
-            GroqTextGenerationProvider groqProvider,
+            TalentGridAiTextGenerationProvider aiProvider,
             @Value("${ai.failover.failure-threshold:3}") int failureThreshold,
             @Value("${ai.failover.open-duration-seconds:120}") long openDurationSeconds) {
 
-        this.providers = List.of(geminiProvider, groqProvider);
-        this.primaryProviderName = geminiProvider.name();
+        this.providers = List.of(aiProvider);
+        this.primaryProviderName = aiProvider.name();
         this.circuitBreakers = new HashMap<>();
         Duration openDuration = Duration.ofSeconds(openDurationSeconds);
 

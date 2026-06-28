@@ -20,6 +20,7 @@ public class CandidateSkillRetrievalService {
     private final SkillRepository skillRepository;
     private final JdEmbeddingService jdEmbeddingService;
     private final EmbeddingDimensionConfig embeddingDimensionConfig;
+    private final SkillEmbeddingBackfillAsyncService skillEmbeddingBackfillAsyncService;
 
     public List<Skill> getCandidateSkills(String jobDescriptionText) {
         SkillSuggestionMode mode = configService.getCurrentMode();
@@ -39,6 +40,7 @@ public class CandidateSkillRetrievalService {
                 embeddingDimensionConfig.validate(jdEmbedding, "JD similarity search");
                 String vectorStr = formatVector(jdEmbedding);
                 List<Skill> nearest = skillRepository.findNearestSkills(vectorStr, topN);
+                skillEmbeddingBackfillAsyncService.backfillMissingInBackground();
                 if (nearest.isEmpty()) {
                     long withEmbeddings = skillRepository.findAllByEmbeddingIsNotNull().size();
                     long total = skillRepository.count();

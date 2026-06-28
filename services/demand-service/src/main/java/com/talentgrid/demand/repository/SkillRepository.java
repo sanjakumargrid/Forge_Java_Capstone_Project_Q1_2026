@@ -16,7 +16,7 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     @Query(value = """
             SELECT * FROM skills
             WHERE embedding IS NOT NULL
-            ORDER BY embedding <=> CAST(:vector AS vector(768))
+            ORDER BY embedding <=> CAST(:vector AS vector(1536))
             LIMIT :limit
             """, nativeQuery = true)
     List<Skill> findNearestSkills(@Param("vector") String vector, @Param("limit") int limit);

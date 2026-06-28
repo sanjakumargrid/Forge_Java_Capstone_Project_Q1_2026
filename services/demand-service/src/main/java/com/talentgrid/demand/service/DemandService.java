@@ -284,6 +284,7 @@ public class DemandService {
     /**
      * Validates that no locked fields are included in the request when the demand
      * has already reached or passed {@code APPROVED} status.
+
      *
      * <p>Locked fields: Role Title ({@code jobTitleId/title}), Client Account
      * ({@code accountId}), Business Unit ({@code businessUnit}), Project
@@ -373,30 +374,51 @@ public class DemandService {
     }
 
     /**
-     * Replaces skill associations via the parent {@link Demand} collection.
+     * Replaces all skill associations for the given demand with the supplied lists.
      *
-     * <p>Existing rows are removed through {@code orphanRemoval} on {@code demandSkills}
-     * (not a bulk repository delete), so Hibernate's persistence context stays consistent
-     * with the database. New associations are persisted by {@code cascade = ALL} when
-     * the demand is saved — a separate {@code saveAll} is not used, avoiding duplicate
-     * INSERTs for the same {@code (demand_id, skill_id)}.
+     * <p><strong>Semantics (PATCH-friendly):</strong>
+     * A {@code null} argument means "not provided by the client — keep the existing skills
+     * for that category". A non-null argument (even an empty list) means "replace that
+     * category entirely with this list".
+     *
+     * <p><strong>Flush ordering:</strong>
+     * We clear the managed {@code demandSkills} collection and immediately call
+     * {@code saveAndFlush} so Hibernate issues all orphan-removal DELETE statements
+     * to the database <em>before</em> inserting the new skill rows. This prevents
+     * unique-constraint violations on {@code uq_demand_skill(demand_id, skill_id)}
+     * when a skill ID is retained across the update, and also avoids the
+     * {@code ObjectOptimisticLockingFailureException} that arises when a bulk
+     * {@code @Modifying} DELETE bypasses the Hibernate session cache while managed
+     * entity references are still tracked.
      */
     private void syncDemandSkills(Demand demand, List<Long> requestMandatory, List<Long> requestOptional) {
-        List<Long> existingMandatory = extractSkillIds(demand.getDemandSkills(), true);
-        List<Long> existingOptional = extractSkillIds(demand.getDemandSkills(), false);
+        // Determine the final desired state for each category.
+        // null → not sent by client → keep the existing skills for that category.
+        // non-null (even empty) → client wants full replacement for that category.
+        List<Long> mandatoryIds = requestMandatory != null
+                ? requestMandatory
+                : extractSkillIds(demand.getDemandSkills(), true);
 
-        List<Long> mandatoryIds = requestMandatory != null ? requestMandatory : existingMandatory;
-        List<Long> optionalIds = requestOptional != null ? requestOptional : existingOptional;
+        List<Long> optionalIds = requestOptional != null
+                ? requestOptional
+                : extractSkillIds(demand.getDemandSkills(), false);
 
         validationService.validateSkillLists(mandatoryIds, optionalIds);
 
-        List<DemandSkill> newSkills = createDemandSkills(demand, mandatoryIds, optionalIds);
-        if (demand.getDemandSkills() == null) {
-            demand.setDemandSkills(new ArrayList<>(newSkills));
-        } else {
+        // Clear the managed collection so Hibernate schedules orphan-removal DELETEs.
+        if (demand.getDemandSkills() != null) {
             demand.getDemandSkills().clear();
-            demand.getDemandSkills().addAll(newSkills);
+        } else {
+            demand.setDemandSkills(new ArrayList<>());
         }
+
+        // Flush DELETEs to the DB now, before any new INSERT — prevents unique-constraint
+        // violations when the same skill ID appears in the replacement list.
+        demandRepository.saveAndFlush(demand);
+
+        // Rebuild the in-memory collection with the new desired state.
+        List<DemandSkill> newSkills = createDemandSkills(demand, mandatoryIds, optionalIds);
+        demand.getDemandSkills().addAll(newSkills);
     }
 
     private List<DemandSkill> createDemandSkills(Demand demand, List<Long> mandatoryIds, List<Long> optionalIds) {

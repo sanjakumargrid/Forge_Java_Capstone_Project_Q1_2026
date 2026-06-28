@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -52,7 +53,18 @@ public class ScorecardService {
             );
         }
 
-        if (!interview.getInterviewers().contains(requestDto.getInterviewerId())) {
+        boolean interviewerAssigned =
+                interview.getInterviewers() != null
+                        && interview.getInterviewers()
+                        .stream()
+                        .anyMatch(interviewer ->
+                                Objects.equals(
+                                        interviewer.getEmployeeId(),
+                                        requestDto.getInterviewerId()
+                                )
+                        );
+
+        if (!interviewerAssigned) {
             throw new BusinessException(
                     HttpStatus.BAD_REQUEST,
                     "Interviewer " + requestDto.getInterviewerId()

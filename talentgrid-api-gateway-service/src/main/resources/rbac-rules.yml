@@ -390,10 +390,18 @@ rbac:
       allowed-scopes: [OFFER_DELETE]
 
     - path: "/api/v1/offers/**/approve"
-      methods: [PATCH]
+      methods: [ PATCH,PUT ]
+      allowed-scopes: [ OFFER_UPDATE, OFFER_APPROVE ]
+
+    - path: "/api/v1/offers/**/approval-chain"
+      methods: [PATCH,PUT,GET]
       allowed-scopes: [OFFER_UPDATE, OFFER_APPROVE]
 
-    - path: "/api/v1/offers/**/reject"
+    - path: "/api/v1/offers/**/submit-approval"
+      methods: [ PATCH,PUT ]
+      allowed-scopes: [ OFFER_UPDATE, OFFER_APPROVE ]
+
+    - path: "/api/v1/offers/**/reject-approval"
       methods: [PATCH]
       allowed-scopes: [OFFER_UPDATE, OFFER_REJECT]
 

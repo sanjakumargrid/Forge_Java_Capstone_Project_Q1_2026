@@ -60,6 +60,8 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // Internal API used by application-service
+                        .requestMatchers("/api/v1/aiengine/**").permitAll()
+
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/external-candidates/internal/**"
                         ).permitAll()

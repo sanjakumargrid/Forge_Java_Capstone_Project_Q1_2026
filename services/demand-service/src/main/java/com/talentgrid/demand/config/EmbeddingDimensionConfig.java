@@ -5,12 +5,12 @@ import org.springframework.stereotype.Component;
 
 /**
  * Expected embedding vector size — must match {@code skills.embedding vector(N)} in PostgreSQL
- * and {@code gemini.embedding.output-dimension} sent to the Gemini API.
+ * and {@code ai.service.embedding.expected-dimension} for the AI gateway embedding model.
  */
 @Component
 public class EmbeddingDimensionConfig {
 
-    @Value("${gemini.embedding.output-dimension:768}")
+    @Value("${ai.service.embedding.expected-dimension:1536}")
     private int expectedDimension;
 
     public int getExpectedDimension() {

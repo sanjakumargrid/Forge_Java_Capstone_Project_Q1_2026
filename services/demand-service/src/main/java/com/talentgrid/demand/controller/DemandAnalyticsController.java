@@ -1,6 +1,5 @@
 package com.talentgrid.demand.controller;
 
-import com.talentgrid.demand.dto.response.DemandAnalyticsMetricsResponse;
 import com.talentgrid.demand.dto.response.DemandAnalyticsV1Response;
 import com.talentgrid.demand.service.DemandAnalyticsService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -47,11 +47,13 @@ public class SkillEmbeddingService {
     @Transactional
     public void backfillAllMissingEmbeddings() {
         List<Skill> allSkills = skillRepository.findAll();
-        long missingCount = allSkills.stream().filter(s -> s.getEmbedding() == null).count();
+        long missingCount = allSkills.stream()
+                .filter(s -> s.getEmbedding() == null || s.getEmbedding().length == 0)
+                .count();
         log.info("Found {} skills missing embeddings. Starting backfill...", missingCount);
 
         for (Skill skill : allSkills) {
-            if (skill.getEmbedding() == null) {
+            if (skill.getEmbedding() == null || skill.getEmbedding().length == 0) {
                 try {
                     embedAndPersist(skill);
                 } catch (Exception e) {
@@ -60,5 +62,16 @@ public class SkillEmbeddingService {
             }
         }
         log.info("Backfill complete.");
+    }
+
+    @Transactional
+    public void embedIfMissing(Skill skill) {
+        if (skill.getEmbedding() == null || skill.getEmbedding().length == 0) {
+            try {
+                embedAndPersist(skill);
+            } catch (Exception e) {
+                log.error("Failed to embed skill {}: {}", skill.getSkillId(), e.getMessage());
+            }
+        }
     }
 }

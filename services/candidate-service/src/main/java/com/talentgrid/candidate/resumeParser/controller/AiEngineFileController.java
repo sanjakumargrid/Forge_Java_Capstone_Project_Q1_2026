@@ -88,9 +88,9 @@ public class AiEngineFileController {
     }
 
     // Notice we REMOVED the applicationId parameter from the path and the inter-service call
-    @PostMapping("/evaluate/{jobPostingId}")
+    @PostMapping("/evaluate/{demandId}")
     public ResponseEntity<?> evaluate(
-            @PathVariable Long jobPostingId,
+            @PathVariable Long demandId,
             @RequestParam("file") MultipartFile file) {
 
         try {
@@ -104,7 +104,7 @@ public class AiEngineFileController {
                 throw new BusinessException(HttpStatus.BAD_REQUEST, "Invalid file type. Please upload a PDF, DOCX, or TXT file.");
             }
 
-            DemandDTO demand = demandServiceClient.fetchDemandById(jobPostingId);
+            DemandDTO demand = demandServiceClient.fetchDemandById(demandId);
 
             if (demand == null) {
                 throw new BusinessException(HttpStatus.NOT_FOUND, "Demand not found.");

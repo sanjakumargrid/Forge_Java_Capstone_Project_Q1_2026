@@ -4,7 +4,6 @@ import com.talentgrid.demand.domain.entity.AiSkillSuggestionConfig;
 import com.talentgrid.demand.domain.enums.SkillSuggestionMode;
 import com.talentgrid.demand.service.AiSkillSuggestionConfigService;
 import com.talentgrid.demand.util.SecurityUtils;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

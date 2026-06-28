@@ -49,12 +49,14 @@ public class Interview {
 // private List<Long> interviewers;
 
 // REPLACE WITH THIS:
+
     @OneToMany(
             mappedBy = "interview",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<Interviewer> interviewers = new ArrayList<>();
+
 
     @NotNull(message = "Interview type is required")
     @Enumerated(EnumType.STRING)

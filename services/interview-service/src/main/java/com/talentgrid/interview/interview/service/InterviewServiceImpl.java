@@ -612,4 +612,6 @@ public class InterviewServiceImpl implements InterviewService {
 
         return fullName.isBlank() ? "Candidate" : fullName;
     }
+
+
 }

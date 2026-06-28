@@ -24,17 +24,17 @@ public class AiEmbeddingOrchestrator {
 
     public record EmbeddingResult(float[] values, String providerName) {}
 
-    private final GeminiEmbeddingProvider geminiProvider;
+    private final TalentGridAiEmbeddingProvider aiProvider;
     private final EmbeddingDimensionConfig embeddingDimensionConfig;
     private final SimpleCircuitBreaker circuitBreaker;
 
     public AiEmbeddingOrchestrator(
-            GeminiEmbeddingProvider geminiProvider,
+            TalentGridAiEmbeddingProvider aiProvider,
             EmbeddingDimensionConfig embeddingDimensionConfig,
             @Value("${ai.failover.failure-threshold:3}") int failureThreshold,
             @Value("${ai.failover.open-duration-seconds:120}") long openDurationSeconds) {
 
-        this.geminiProvider = geminiProvider;
+        this.aiProvider = aiProvider;
         this.embeddingDimensionConfig = embeddingDimensionConfig;
         this.circuitBreaker = new SimpleCircuitBreaker(
                 failureThreshold, Duration.ofSeconds(openDurationSeconds));
@@ -42,23 +42,23 @@ public class AiEmbeddingOrchestrator {
 
     public EmbeddingResult embedContent(String text) {
         if (circuitBreaker.isOpen()) {
-            log.warn("Skipping AI embedding provider '{}' — circuit breaker is open", geminiProvider.name());
+            log.warn("Skipping AI embedding provider '{}' — circuit breaker is open", aiProvider.name());
             throw new AllAiProvidersFailedException(
-                    "Embedding provider '" + geminiProvider.name() + "' circuit breaker is open");
+                    "Embedding provider '" + aiProvider.name() + "' circuit breaker is open");
         }
 
         try {
-            float[] values = geminiProvider.embedContent(text);
+            float[] values = aiProvider.embedContent(text);
             embeddingDimensionConfig.validate(values, "Embedding orchestrator");
             log.info("Embedding orchestrator: textLength={}, dimension={}, provider={}",
-                    text.length(), values.length, geminiProvider.name());
+                    text.length(), values.length, aiProvider.name());
             circuitBreaker.recordSuccess();
-            return new EmbeddingResult(values, geminiProvider.name());
+            return new EmbeddingResult(values, aiProvider.name());
         } catch (AiProviderException e) {
             circuitBreaker.recordFailure();
-            log.warn("AI embedding provider '{}' failed: {}", geminiProvider.name(), e.getMessage());
+            log.warn("AI embedding provider '{}' failed: {}", aiProvider.name(), e.getMessage());
             throw new AllAiProvidersFailedException(
-                    "Embedding provider '" + geminiProvider.name() + "' failed: " + e.getMessage(), e);
+                    "Embedding provider '" + aiProvider.name() + "' failed: " + e.getMessage(), e);
         }
     }
 }

@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -194,45 +195,90 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (businessUnitRepository.count() == 0) {
-            BusinessUnit engBu = businessUnitRepository.save(
-                    BusinessUnit.builder().businessUnitName("Engineering").build());
-            BusinessUnit hrBu = businessUnitRepository.save(
-                    BusinessUnit.builder().businessUnitName("Human Resources").build());
-            BusinessUnit finBu = businessUnitRepository.save(
-                    BusinessUnit.builder().businessUnitName("Finance").build());
-            BusinessUnit opsBu = businessUnitRepository.save(
-                    BusinessUnit.builder().businessUnitName("Operations").build());
+            List<BusinessUnit> businessUnits = List.of(
+                    "Engineering",
+                    "Human Resources",
+                    "Finance & Accounting",
+                    "Operations",
+                    "Sales",
+                    "Marketing",
+                    "Legal",
+                    "IT",
+                    "Talent Acquisition",
+                    "Executive"
+            ).stream()
+                    .map(name -> businessUnitRepository.save(
+                            BusinessUnit.builder().businessUnitName(name).build()))
+                    .toList();
 
-            accountBusinessUnitMappingRepository.save(
-                    AccountBusinessUnitMapping.builder().account(account).businessUnit(engBu).build());
-            accountBusinessUnitMappingRepository.save(
-                    AccountBusinessUnitMapping.builder().account(account).businessUnit(hrBu).build());
-            accountBusinessUnitMappingRepository.save(
-                    AccountBusinessUnitMapping.builder().account(account).businessUnit(finBu).build());
-            accountBusinessUnitMappingRepository.save(
-                    AccountBusinessUnitMapping.builder().account(account).businessUnit(opsBu).build());
-            log.info("Default business units seeded.");
+            businessUnits.forEach(bu -> accountBusinessUnitMappingRepository.save(
+                    AccountBusinessUnitMapping.builder().account(account).businessUnit(bu).build()));
+
+            log.info("Default business units seeded ({} entries).", businessUnits.size());
         }
 
         if (locationRepository.count() == 0) {
-            locationRepository.save(Location.builder().country("India").locationName("Chennai").build());
-            locationRepository.save(Location.builder().country("India").locationName("Bengaluru").build());
-            locationRepository.save(Location.builder().country("India").locationName("Hyderabad").build());
-            locationRepository.save(Location.builder().country("USA").locationName("Atlanta").build());
-            locationRepository.save(Location.builder().country("USA").locationName("New York").build());
-            locationRepository.save(Location.builder().country("UK").locationName("London").build());
-            log.info("Default locations seeded.");
+            Map.of(
+                    "India", List.of("Chennai", "Bengaluru", "Hyderabad"),
+                    "USA", List.of("Atlanta", "New York"),
+                    "UK", List.of("London")
+            ).forEach((country, cities) -> cities.forEach(city ->
+                    locationRepository.save(Location.builder()
+                            .country(country)
+                            .locationName(city)
+                            .build())
+            ));
+            log.info("Default locations seeded ({} entries).", locationRepository.count());
         }
 
         if (departmentRepository.count() == 0) {
-            departmentRepository.save(Department.builder().departmentName("Software Engineering").build());
-            departmentRepository.save(Department.builder().departmentName("Quality Assurance").build());
-            departmentRepository.save(Department.builder().departmentName("DevOps").build());
-            departmentRepository.save(Department.builder().departmentName("Product Management").build());
-            departmentRepository.save(Department.builder().departmentName("Data Science").build());
-            departmentRepository.save(Department.builder().departmentName("Human Resources").build());
-            departmentRepository.save(Department.builder().departmentName("Finance").build());
-            log.info("Default departments seeded.");
+            List.of(
+                    "Account Administration",
+                    "Client Services",
+                    "Contractors Experience and Operations",
+                    "Engineering: .NET",
+                    "Engineering: Analysis",
+                    "Engineering: BigData",
+                    "Engineering: CTO",
+                    "Engineering: Custom Development",
+                    "Engineering: Customer Support Analysis",
+                    "Engineering: Data Analysis",
+                    "Engineering: Data Science",
+                    "Engineering: Design",
+                    "Engineering: DevOps",
+                    "Engineering: Engineering Management",
+                    "Engineering: Java",
+                    "Engineering: Machine Learning",
+                    "Engineering: Management",
+                    "Engineering: Mobile",
+                    "Engineering: Other Technologies",
+                    "Engineering: Physical AI",
+                    "Engineering: Python",
+                    "Engineering: Quality Engineering",
+                    "Engineering: Search",
+                    "Engineering: UI",
+                    "Executive",
+                    "Finance & Accounting",
+                    "Global Mobility",
+                    "HQ",
+                    "HR Compliance and Shared Services",
+                    "HR Systems and Operational Analytics",
+                    "HR: Business Partnership",
+                    "HR: Compensation and Benefits",
+                    "HR: Culture and Engagement",
+                    "HR: Training and Development",
+                    "IT",
+                    "Language Training",
+                    "Legal Support and Contract Management",
+                    "Marketing",
+                    "Operations",
+                    "Sales",
+                    "Security",
+                    "Talent Acquisition",
+                    "Training"
+            ).forEach(name -> departmentRepository.save(
+                    Department.builder().departmentName(name).build()));
+            log.info("Default departments seeded ({} entries).", departmentRepository.count());
         }
     }
 

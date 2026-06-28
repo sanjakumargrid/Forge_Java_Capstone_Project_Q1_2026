@@ -121,8 +121,8 @@ public class DemandController {
      * @param id the demand ID
      * @return the full demand response
      */
+    @PreAuthorize("hasAuthority('ROLE_SYSTEM') or hasAuthority('SYSTEM') or (hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id))")
     @GetMapping("/{id:\\d+}")
-    @PreAuthorize("hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id)")
     public ResponseEntity<DemandResponse> getDemandById(@PathVariable Long id) {
         return ResponseEntity.ok(demandQueryService.getDemandById(id));
     }
