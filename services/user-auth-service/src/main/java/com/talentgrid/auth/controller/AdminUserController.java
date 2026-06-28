@@ -31,7 +31,7 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CREATE_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_CREATE')")
     public ResponseEntity<AdminUserResponse> createUser(
             @Valid @RequestBody AdminCreateUserRequest request
     ) {
@@ -39,7 +39,7 @@ public class AdminUserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_UPDATE')")
     public ResponseEntity<AdminUserResponse> updateUser(
             @PathVariable Long id,
             @Valid @RequestBody AdminUpdateUserRequest request
@@ -48,7 +48,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('DELETE_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_DELETE')")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long id
     ) {
@@ -57,7 +57,7 @@ public class AdminUserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('VIEW_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_VIEW')")
     public ResponseEntity<AdminUserResponse> getUserById(
             @PathVariable Long id
     ) {
@@ -65,13 +65,22 @@ public class AdminUserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('VIEW_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_VIEW')")
     public ResponseEntity<List<AdminUserResponse>> getAllUsers() {
         return ResponseEntity.ok(adminUserService.getAllUsers());
     }
 
+    @PutMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ASSIGN')")
+    public ResponseEntity<AdminUserResponse> assignUserRole(
+            @PathVariable Long id,
+            @Valid @RequestBody ChangeRoleRequest request
+    ) {
+        return ResponseEntity.ok(adminUserService.changeUserRole(id, request));
+    }
+
     @PatchMapping("/{id}/role")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('MANAGE_ROLES')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('ROLE_ASSIGN')")
     public ResponseEntity<AdminUserResponse> changeUserRole(
             @PathVariable Long id,
             @Valid @RequestBody ChangeRoleRequest request
@@ -80,7 +89,7 @@ public class AdminUserController {
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_USER')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_UPDATE')")
     public ResponseEntity<AdminUserResponse> toggleUserStatus(
             @PathVariable Long id,
             @Valid @RequestBody UserStatusRequest request

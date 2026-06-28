@@ -1,35 +1,38 @@
 package com.talentgrid.auth.config;
 
+import com.talentgrid.auth.constants.ScopeCatalog;
+import com.talentgrid.auth.entity.Account;
+import com.talentgrid.auth.entity.AccountBusinessUnitMapping;
+import com.talentgrid.auth.entity.BusinessUnit;
+import com.talentgrid.auth.entity.Department;
+import com.talentgrid.auth.entity.Location;
+import com.talentgrid.auth.entity.Project;
 import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
-import com.talentgrid.auth.entity.Account;
-import com.talentgrid.auth.entity.Project;
-import com.talentgrid.auth.entity.BusinessUnit;
-import com.talentgrid.auth.entity.AccountBusinessUnitMapping;
-import com.talentgrid.auth.entity.Location;
-import com.talentgrid.auth.entity.Department;
+import com.talentgrid.auth.repository.AccountBusinessUnitMappingRepository;
 import com.talentgrid.auth.repository.AccountRepository;
+import com.talentgrid.auth.repository.BusinessUnitRepository;
+import com.talentgrid.auth.repository.DepartmentRepository;
+import com.talentgrid.auth.repository.LocationRepository;
 import com.talentgrid.auth.repository.ProjectRepository;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.ScopeRepository;
 import com.talentgrid.auth.repository.UserRepository;
-import com.talentgrid.auth.repository.BusinessUnitRepository;
-import com.talentgrid.auth.repository.AccountBusinessUnitMappingRepository;
-import com.talentgrid.auth.repository.LocationRepository;
-import com.talentgrid.auth.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Seeds scopes and roles for local/dev. Align scope names with
- * {@code talentgrid-api-gateway-service} {@code rbac-rules.yml} and demand-service {@code @PreAuthorize}.
+ * {@code talentgrid-api-gateway-service} {@code rbac-rules.yml} and downstream {@code @PreAuthorize}.
  */
 @Slf4j
 @Component
@@ -49,100 +52,82 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        Scope userCreate = upsertScope("USER_CREATE", "Create users");
-        Scope userDelete = upsertScope("USER_DELETE", "Delete users");
-        Scope userView = upsertScope("USER_VIEW", "View users");
-
-        Scope demandView = upsertScope("DEMAND_VIEW", "View demands");
-        Scope demandCreate = upsertScope("DEMAND_CREATE", "Create demands");
-        Scope demandUpdate = upsertScope("DEMAND_UPDATE", "Update demands");
-        Scope demandDelete = upsertScope("DEMAND_DELETE", "Delete demands");
-        Scope demandStatusTransition = upsertScope("DEMAND_STATUS_TRANSITION", "Demand status transitions");
-        Scope demandPipelineView = upsertScope("DEMAND_PIPELINE_VIEW", "View demand pipeline");
-        Scope demandPmApprove = upsertScope("DEMAND_PM_APPROVE", "Project manager demand actions");
-        Scope demandSubmit = upsertScope("DEMAND_SUBMIT", "Submit demand from draft (HM path)");
-        Scope demandNominate = upsertScope("DEMAND_NOMINATE", "Create internal nominations");
-        Scope demandHmNominationDecide = upsertScope("DEMAND_HM_NOMINATION_DECIDE", "HM accept/reject internal nomination");
-
-        Scope candidateView = upsertScope("CANDIDATE_VIEW", "Candidate View");
-        Scope candidateDelete = upsertScope("CANDIDATE_DELETE", "Candidate delete");
-
-        Scope applicationView = upsertScope("APPLICATION_VIEW", "Application view");
-        Scope applicationUpdate = upsertScope("APPLICATION_UPDATE", "Application update");
-
-        Scope interviewCreate = upsertScope("INTERVIEW_CREATE", "Interview Create");
-        Scope interviewView = upsertScope("INTERVIEW_VIEW", "Interview view");
-        Scope interviewUpdate = upsertScope("INTERVIEW_UPDATE", "Interview update");
-        Scope interviewDelete = upsertScope("INTERVIEW_DELETE", "Interview Delete");
-
-        Scope scorecardCreate = upsertScope("SCORECARD_CREATE", "Scorecard create");
-        Scope scorecardView = upsertScope("SCORECARD_VIEW", "Scorecard view");
-        Scope scorecardDelete = upsertScope("SCORECARD_DELETE", "Scorecard delete");
-
-        Scope offerCreate = upsertScope("OFFER_CREATE", "Offer create");
-        Scope offerView = upsertScope("OFFER_VIEW", "Offer view");
-        Scope offerUpdate = upsertScope("OFFER_UPDATE", "Offer update");
-        Scope offerDelete = upsertScope("OFFER_DELETE", "Offer delete");
+        Map<String, Scope> scopesByName = seedAllScopes();
 
         Role adminRole = upsertRole("ADMIN");
-        addScopes(adminRole,
-                userCreate, userDelete, userView,
+        addScopes(adminRole, ScopeCatalog.allScopeNames().stream().map(scopesByName::get).toArray(Scope[]::new));
 
-                demandCreate, demandUpdate, demandDelete,
-                demandView, demandStatusTransition, demandPipelineView,
-                demandPmApprove, demandSubmit, demandNominate, demandHmNominationDecide,
-
-                candidateView, candidateDelete,
-
-                applicationView, applicationUpdate,
-
-                interviewCreate, interviewView, interviewUpdate, interviewDelete,
-
-                offerCreate, offerView, offerUpdate, offerDelete
-        );
         Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
-        addScopes(portfolioManagerRole, demandView, demandPipelineView, demandPmApprove,
-                demandStatusTransition, demandSubmit);
+        addScopes(portfolioManagerRole, scopes(scopesByName,
+                "DEMAND_VIEW", "DEMAND_CREATE", "DEMAND_UPDATE", "DEMAND_PIPELINE_VIEW",
+                "DEMAND_PM_APPROVE", "DEMAND_STATUS_TRANSITION", "DEMAND_SUBMIT",
+                "ANALYTICS_DEMAND_VIEW", "USER_VIEW"));
 
         Role hiringManagerRole = upsertRole("HIRING_MANAGER");
-        addScopes(hiringManagerRole, demandView, demandCreate, demandUpdate, demandSubmit,
-                demandStatusTransition, demandPipelineView, demandHmNominationDecide);
+        addScopes(hiringManagerRole, scopes(scopesByName,
+                "DEMAND_VIEW", "DEMAND_CREATE", "DEMAND_UPDATE", "DEMAND_SUBMIT",
+                "DEMAND_STATUS_TRANSITION", "DEMAND_PIPELINE_VIEW", "DEMAND_HM_NOMINATION_DECIDE",
+                "HM_NOMINATION_VIEW", "HM_NOMINATION_REVIEW"));
 
         Role resourceManagerRole = upsertRole("RESOURCE_MANAGER");
-        addScopes(resourceManagerRole, demandView, demandStatusTransition, demandNominate, demandPipelineView,
-                demandCreate, demandUpdate);
-
+        addScopes(resourceManagerRole, scopes(scopesByName,
+                "DEMAND_VIEW", "DEMAND_CREATE", "DEMAND_UPDATE", "DEMAND_STATUS_TRANSITION",
+                "DEMAND_NOMINATE", "DEMAND_PIPELINE_VIEW",
+                "WORKFORCE_BENCH_SEARCH", "WORKFORCE_NOMINATION_VIEW", "WORKFORCE_NOMINATION_CREATE",
+                "WORKFORCE_NOMINATION_DELETE", "WORKFORCE_SKILLGAP_VIEW", "WORKFORCE_SKILLGAP_REFRESH",
+                "WORKFORCE_ANALYTICS_VIEW", "WORKFORCE_REPORT_EXPORT", "WORKFORCE_AI_UPSKILL_VIEW"));
 
         Role recruiterRole = upsertRole("RECRUITER");
-        addScopes(recruiterRole,
-                demandView, demandStatusTransition, demandPipelineView,
-
-                candidateView, candidateDelete,
-
-                applicationView, applicationUpdate,
-
-                interviewCreate, interviewView, interviewUpdate, interviewDelete,
-
-                offerCreate, offerView, offerUpdate, offerDelete
-        );
+        addScopes(recruiterRole, scopes(scopesByName,
+                "DEMAND_VIEW", "DEMAND_STATUS_TRANSITION", "DEMAND_PIPELINE_VIEW",
+                "CANDIDATE_VIEW", "CANDIDATE_CREATE", "CANDIDATE_UPDATE", "CANDIDATE_DELETE",
+                "CANDIDATE_NOTE_CREATE", "RESUME_UPLOAD",
+                "APPLICATION_VIEW", "APPLICATION_CREATE", "APPLICATION_UPDATE",
+                "APPLICATION_BULK_ACTION", "APPLICATION_STAGE_MOVE",
+                "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE", "INTERVIEW_DELETE",
+                "INTERVIEW_CALENDAR_VIEW",
+                "SCORECARD_CREATE", "SCORECARD_SUBMIT", "SCORECARD_VIEW", "SCORECARD_DELETE",
+                "OFFER_CREATE", "OFFER_VIEW", "OFFER_UPDATE", "OFFER_DELETE",
+                "AI_CANDIDATE_SCORE", "AI_REJECTION_EMAIL_GENERATE", "AI_REJECTION_EMAIL_SEND",
+                "AI_INTERVIEW_QUESTIONS"));
 
         Role taManagerRole = upsertRole("TA_MANAGER");
-        addScopes(taManagerRole, demandView, demandStatusTransition, demandPipelineView,candidateView, candidateDelete,
-
-                applicationView, applicationUpdate,
-
-                interviewCreate, interviewView, interviewUpdate, interviewDelete,
-
-                offerCreate, offerView, offerUpdate, offerDelete);
+        addScopes(taManagerRole, scopes(scopesByName,
+                "DEMAND_VIEW", "DEMAND_STATUS_TRANSITION", "DEMAND_PIPELINE_VIEW",
+                "CANDIDATE_VIEW", "CANDIDATE_CREATE", "CANDIDATE_UPDATE", "CANDIDATE_DELETE",
+                "APPLICATION_VIEW", "APPLICATION_CREATE", "APPLICATION_UPDATE",
+                "INTERVIEW_VIEW", "INTERVIEW_CREATE", "INTERVIEW_UPDATE", "INTERVIEW_DELETE",
+                "SCORECARD_CREATE", "SCORECARD_SUBMIT", "SCORECARD_VIEW", "SCORECARD_DELETE",
+                "OFFER_CREATE", "OFFER_VIEW", "OFFER_UPDATE", "OFFER_DELETE",
+                "ANALYTICS_PIPELINE_VIEW"));
 
         Role employeeRole = upsertRole("EMPLOYEE");
-        addScopes(employeeRole, demandView ,scorecardView,scorecardCreate,scorecardDelete,applicationView);
+        addScopes(employeeRole, scopes(scopesByName,
+                "DEMAND_VIEW", "SCORECARD_VIEW", "SCORECARD_CREATE", "SCORECARD_DELETE",
+                "APPLICATION_VIEW", "ENGINEER_SELF_UPDATE", "WORKFORCE_AI_UPSKILL_VIEW",
+                "WORKFORCE_PROFILE_VIEW", "WORKFORCE_PROFILE_UPDATE"));
 
+        seedDefaultUsers(adminRole, portfolioManagerRole, hiringManagerRole, resourceManagerRole);
+        seedReferenceData();
+    }
 
-        if (!userRepository.existsByEmail("username@griddynamics.com")) {
+    private Map<String, Scope> seedAllScopes() {
+        Map<String, Scope> scopesByName = new HashMap<>();
+        ScopeCatalog.allScopes().forEach((name, description) ->
+                scopesByName.put(name, upsertScope(name, description)));
+        return scopesByName;
+    }
+
+    private Scope[] scopes(Map<String, Scope> scopesByName, String... names) {
+        return java.util.Arrays.stream(names).map(scopesByName::get).toArray(Scope[]::new);
+    }
+
+    private void seedDefaultUsers(Role adminRole, Role portfolioManagerRole,
+                                  Role hiringManagerRole, Role resourceManagerRole) {
+        if (!userRepository.existsByEmail("admin@griddynamics.com")) {
             userRepository.save(User.builder()
-                    .username("User-Name")
-                    .email("username@griddynamics.com")
+                    .username("Admin")
+                    .email("admin@griddynamics.com")
                     .password(passwordEncoder.encode("Password@123"))
                     .enabled(true)
                     .roles(Set.of(adminRole))
@@ -183,46 +168,41 @@ public class DataInitializer implements CommandLineRunner {
                     .build());
             log.info("Default resource manager user created.");
         }
+    }
 
-        // Create Default Account
-        Account account = null;
+    private void seedReferenceData() {
+        Account account;
         if (accountRepository.count() == 0) {
-            account = Account.builder()
+            account = accountRepository.save(Account.builder()
                     .name("Mock Account")
-                    .accountManagerId(1L) // Admin user
-                    .build();
-            account = accountRepository.save(account);
+                    .accountManagerId(1L)
+                    .build());
             log.info("Default account created.");
         } else {
             account = accountRepository.findAll().get(0);
         }
 
-        // Create Default Project
         if (projectRepository.count() == 0) {
-            User pmUser = userRepository.findByEmail("projectmanager@griddynamics.com").orElse(null);
-            if (pmUser != null) {
-                Project project = Project.builder()
+            userRepository.findByEmail("projectmanager@griddynamics.com").ifPresent(pmUser -> {
+                projectRepository.save(Project.builder()
                         .name("Unknown Project")
                         .account(account)
                         .projectManagerId(pmUser.getId())
-                        .build();
-                projectRepository.save(project);
+                        .build());
                 log.info("Default project created.");
-            }
+            });
         }
 
-        // ── Seed Business Units ───────────────────────────────────────────────────
         if (businessUnitRepository.count() == 0) {
             BusinessUnit engBu = businessUnitRepository.save(
                     BusinessUnit.builder().businessUnitName("Engineering").build());
-            BusinessUnit hrBu  = businessUnitRepository.save(
+            BusinessUnit hrBu = businessUnitRepository.save(
                     BusinessUnit.builder().businessUnitName("Human Resources").build());
             BusinessUnit finBu = businessUnitRepository.save(
                     BusinessUnit.builder().businessUnitName("Finance").build());
             BusinessUnit opsBu = businessUnitRepository.save(
                     BusinessUnit.builder().businessUnitName("Operations").build());
 
-            // Map BUs to the default account (account variable is already declared above)
             accountBusinessUnitMappingRepository.save(
                     AccountBusinessUnitMapping.builder().account(account).businessUnit(engBu).build());
             accountBusinessUnitMappingRepository.save(
@@ -234,7 +214,6 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Default business units seeded.");
         }
 
-        // ── Seed Locations ────────────────────────────────────────────────────────
         if (locationRepository.count() == 0) {
             locationRepository.save(Location.builder().country("India").locationName("Chennai").build());
             locationRepository.save(Location.builder().country("India").locationName("Bengaluru").build());
@@ -245,7 +224,6 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Default locations seeded.");
         }
 
-        // ── Seed Departments ──────────────────────────────────────────────────────
         if (departmentRepository.count() == 0) {
             departmentRepository.save(Department.builder().departmentName("Software Engineering").build());
             departmentRepository.save(Department.builder().departmentName("Quality Assurance").build());
@@ -270,9 +248,9 @@ public class DataInitializer implements CommandLineRunner {
 
     private void addScopes(Role role, Scope... scopes) {
         boolean changed = false;
-        for (Scope s : scopes) {
-            if (!role.getScopes().contains(s)) {
-                role.getScopes().add(s);
+        for (Scope scope : scopes) {
+            if (scope != null && !role.getScopes().contains(scope)) {
+                role.getScopes().add(scope);
                 changed = true;
             }
         }

@@ -19,8 +19,6 @@ public class OAuthProperties {
      */
     private String frontendBaseUrl = "http://localhost:4200";
 
-    private String gatewayPublicBaseUrl;
-
     /**
      * API Gateway public base URL (no trailing slash).
      */

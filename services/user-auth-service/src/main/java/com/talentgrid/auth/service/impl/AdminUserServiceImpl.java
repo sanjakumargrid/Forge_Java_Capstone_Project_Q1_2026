@@ -5,23 +5,20 @@ import com.talentgrid.auth.dto.request.AdminUpdateUserRequest;
 import com.talentgrid.auth.dto.request.ChangeRoleRequest;
 import com.talentgrid.auth.dto.response.AdminUserResponse;
 import com.talentgrid.auth.entity.Role;
-import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
-import com.talentgrid.auth.kafka.AuthUserEventPublisher;
 import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.mapper.UserMapper;
 import com.talentgrid.auth.repository.RoleRepository;
 import com.talentgrid.auth.repository.UserRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AdminUserService;
-import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
+import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.kafka.events.auth.UserCreatedPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.talentgrid.kafka.events.auth.AuthUserPayload;
 
 import java.util.List;
 import java.util.Set;
@@ -39,9 +36,8 @@ public class AdminUserServiceImpl implements AdminUserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
-    private final UserSecurityCacheService userSecurityCacheService;
+    private final UserSecurityRefreshService userSecurityRefreshService;
     private final RefreshTokenService refreshTokenService;
-    private final AuthUserEventPublisher authUserEventPublisher;
     private final UserCreatedEventPublisher userCreatedEventPublisher;
 
     @Override
@@ -109,7 +105,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         User savedUser = userRepository.save(user);
 
-        User updatedUser = refreshUserSecurity(savedUser);
+        User updatedUser = userSecurityRefreshService.refreshUser(savedUser);
 
         return userMapper.toAdminUserResponse(updatedUser);
     }
@@ -129,8 +125,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         // Revoke refresh tokens
         refreshTokenService.revokeRefreshToken(savedUser);
 
-        // Update cache so enabled=false propagates immediately
-        refreshUserSecurity(savedUser);
+        userSecurityRefreshService.refreshUser(savedUser);
         
         log.info("User {} soft-deleted and sessions invalidated.", user.getEmail());
     }
@@ -168,7 +163,7 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         User savedUser = userRepository.save(user);
 
-        User updatedUser = refreshUserSecurity(savedUser);
+        User updatedUser = userSecurityRefreshService.refreshUser(savedUser);
 
         return userMapper.toAdminUserResponse(updatedUser);
     }
@@ -189,35 +184,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         User savedUser = userRepository.save(user);
 
-        User updatedUser = refreshUserSecurity(savedUser);
+        User updatedUser = userSecurityRefreshService.refreshUser(savedUser);
 
         return userMapper.toAdminUserResponse(updatedUser);
-    }
-
-    /**
-     * Increments the user's authorization version and updates the Redis cache.
-     * This invalidates all previously issued JWTs.
-     */
-    private User refreshUserSecurity(User user) {
-
-        user.setAuthVersion(user.getAuthVersion() + 1);
-        User savedUser = userRepository.save(user);
-        userSecurityCacheService.cacheUser(savedUser);
-
-        AuthUserPayload payload = AuthUserPayload.builder()
-                .userId(savedUser.getId())
-                .authVersion(savedUser.getAuthVersion())
-                .enabled(savedUser.getEnabled())
-                .roles(savedUser.getRoles().stream()
-                        .map(Role::getName)
-                        .collect(Collectors.toSet()))
-                .scopes(savedUser.getRoles().stream()
-                        .flatMap(role -> role.getScopes().stream())
-                        .map(Scope::getName)
-                        .collect(Collectors.toSet()))
-                .build();
-
-        authUserEventPublisher.publishUserUpdated(payload);
-        return savedUser;
     }
 }
