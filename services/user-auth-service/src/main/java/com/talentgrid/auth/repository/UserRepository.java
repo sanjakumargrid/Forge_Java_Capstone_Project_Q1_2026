@@ -20,4 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             String roleName);
 
     java.util.List<User> findByLocationAndIsInterviewerEligible(String location, Boolean isInterviewerEligible);
+
+    java.util.List<User> findByRolesContaining(com.talentgrid.auth.entity.Role role);
 }
