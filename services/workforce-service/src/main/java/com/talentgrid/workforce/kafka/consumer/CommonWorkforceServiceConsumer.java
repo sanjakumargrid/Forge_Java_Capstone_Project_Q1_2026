@@ -25,7 +25,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
     private final InternalEmployeeService internalEmployeeService;
     private final ResumeParserService resumeParserService;
 
-    @KafkaListener(topics = TalentGridTopics.WORKFORCE_EVENTS, groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = {TalentGridTopics.WORKFORCE_EVENTS, TalentGridTopics.AUTH_USER_CREATED}, groupId = "${spring.kafka.consumer.group-id}")
     public void consume(BaseEvent<Map<String, Object>> event) {
         process(event);
     }
@@ -44,7 +44,21 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
     }
 
     private void syncInternalEmployee(BaseEvent<Map<String, Object>> event) {
-        UserDto userDto = objectMapper.convertValue(event.getPayload(), UserDto.class);
+        Map<String, Object> payload = event.getPayload();
+        UserDto userDto;
+
+        if (payload != null && (payload.containsKey("userId") || payload.containsKey("username"))) {
+            userDto = new UserDto();
+            Number userIdNum = (Number) payload.get("userId");
+            userDto.setEmployeeId(userIdNum != null ? userIdNum.longValue() : null);
+            userDto.setEmail((String) payload.get("email"));
+            userDto.setName((String) payload.get("username"));
+            userDto.setLocation((String) payload.get("location"));
+            userDto.setIsActive(true);
+        } else {
+            userDto = objectMapper.convertValue(payload, UserDto.class);
+        }
+
         InternalEmployeeResponse response = internalEmployeeService.syncEmployeeFromKafka(userDto);
 
         log.info("[WORKFORCE-CONSUMER] Internal employee synced | eventType={} | eventId={} | employeeId={} | email={}",
