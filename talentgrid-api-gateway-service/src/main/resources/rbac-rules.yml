@@ -697,6 +697,10 @@ rbac:
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
 
+    - path: "/api/v1/rmg/demands/search"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
+
     - path: "/api/v1/rmg/demands/**/cancel"
       methods: [ PATCH ]
       allowed-scopes: [ DEMAND_STATUS_TRANSITION ]

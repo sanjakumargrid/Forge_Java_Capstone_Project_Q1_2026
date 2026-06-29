@@ -40,13 +40,13 @@ class RmgSearchServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        alice = buildEmployee(1L, "Alice", Level.SENIOR, ContractType.FULL_TIME,
+        alice = buildEmployee(1L, 1001L, "Alice", "alice@example.com", Level.SENIOR, ContractType.FULL_TIME,
                 "New York", LocalDate.now().plusDays(5), "Java", "Spring");
-        dan   = buildEmployee(4L, "Dan",   Level.SENIOR, ContractType.PART_TIME,
+        dan   = buildEmployee(4L, 1004L, "Dan", "dan@example.com", Level.SENIOR, ContractType.PART_TIME,
                 "Berlin",   LocalDate.now().plusDays(10), "Java");
-        bob   = buildEmployee(2L, "Bob",   Level.MID,    ContractType.CONTRACT,
+        bob   = buildEmployee(2L, 1002L, "Bob", "bob@example.com", Level.MID, ContractType.CONTRACT,
                 "London",   LocalDate.now().plusDays(35), "Python", "Django");
-        carol = buildEmployee(3L, "Carol", Level.JUNIOR, ContractType.FULL_TIME,
+        carol = buildEmployee(3L, 1003L, "Carol", "carol@example.com", Level.JUNIOR, ContractType.FULL_TIME,
                 "New York",  LocalDate.now().plusDays(65), "Java", "React");
     }
 
@@ -54,12 +54,14 @@ class RmgSearchServiceImplTest {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private BenchEmployeeDto buildEmployee(Long id, String name, Level level,
+    private BenchEmployeeDto buildEmployee(Long id, Long employeeCode, String name, String email, Level level,
                                            ContractType contractType, String location,
                                            LocalDate availabilityDate, String... skills) {
         BenchEmployeeDto dto = new BenchEmployeeDto();
         dto.setEmployeeId(id);
+        dto.setEmployeeCode(employeeCode);
         dto.setName(name);
+        dto.setEmail(email);
         dto.setLevel(level);
         dto.setContractType(contractType);
         dto.setLocation(location);
@@ -95,7 +97,7 @@ class RmgSearchServiceImplTest {
         void returnsAllEmployeesFromAllBuckets() {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
-            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest());
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 0, 10);
 
             assertThat(response.getTotalResults()).isEqualTo(4);
             assertThat(response.getResults())
@@ -108,7 +110,7 @@ class RmgSearchServiceImplTest {
         void returnsEmptyWhenBenchReportIsEmpty() {
             when(benchReportService.getBenchReport()).thenReturn(new BenchReportResponse());
 
-            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest());
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 0, 10);
 
             assertThat(response.getTotalResults()).isEqualTo(0);
             assertThat(response.getResults()).isEmpty();
@@ -119,7 +121,7 @@ class RmgSearchServiceImplTest {
         void responseContainsQueriedAtTimestamp() {
             when(benchReportService.getBenchReport()).thenReturn(new BenchReportResponse());
 
-            assertThat(rmgSearchService.search(new RmgSearchRequest()).getQueriedAt()).isNotNull();
+            assertThat(rmgSearchService.search(new RmgSearchRequest(), 0, 10).getQueriedAt()).isNotNull();
         }
     }
 
@@ -137,9 +139,9 @@ class RmgSearchServiceImplTest {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Java");
+            request.setSkills(List.of("Java"));
 
-            RmgSearchResponse response = rmgSearchService.search(request);
+            RmgSearchResponse response = rmgSearchService.search(request, 0, 10);
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
@@ -153,9 +155,9 @@ class RmgSearchServiceImplTest {
                     .thenReturn(reportWith(List.of(alice), List.of(), List.of()));
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("JAVA");
+            request.setSkills(List.of("JAVA"));
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(1);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(1);
         }
 
         @Test
@@ -164,15 +166,15 @@ class RmgSearchServiceImplTest {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Rust");
+            request.setSkills(List.of("Rust"));
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(0);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(0);
         }
 
         @Test
         @DisplayName("excludes employees whose skills list is null")
         void excludesEmployeesWithNullSkillsList() {
-            BenchEmployeeDto noSkills = buildEmployee(99L, "Eve", Level.MID,
+            BenchEmployeeDto noSkills = buildEmployee(99L, 1099L, "Eve", "eve@example.com", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
             noSkills.setSkills(null);
 
@@ -180,15 +182,15 @@ class RmgSearchServiceImplTest {
                     .thenReturn(reportWith(List.of(noSkills), List.of(), List.of()));
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Java");
+            request.setSkills(List.of("Java"));
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(0);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(0);
         }
 
         @Test
         @DisplayName("excludes employees whose skills list is empty")
         void excludesEmployeesWithEmptySkillsList() {
-            BenchEmployeeDto emptySkills = buildEmployee(98L, "Fay", Level.MID,
+            BenchEmployeeDto emptySkills = buildEmployee(98L, 1098L, "Fay", "fay@example.com", Level.MID,
                     ContractType.FULL_TIME, "Oslo", LocalDate.now().plusDays(20));
             emptySkills.setSkills(List.of());
 
@@ -196,20 +198,33 @@ class RmgSearchServiceImplTest {
                     .thenReturn(reportWith(List.of(emptySkills), List.of(), List.of()));
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Java");
+            request.setSkills(List.of("Java"));
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(0);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(0);
         }
 
         @Test
-        @DisplayName("blank skill string acts as no filter")
-        void blankSkillActsAsNoFilter() {
+        @DisplayName("blank skill entries act as no filter")
+        void blankSkillsActAsNoFilter() {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("   ");
+            request.setSkills(List.of("   "));
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(4);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(4);
+        }
+
+        @Test
+        @DisplayName("multiple skills use OR logic")
+        void multipleSkillsUseOrLogic() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setSkills(List.of("Python", "React"));
+
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactlyInAnyOrder(2L, 3L);
         }
     }
 
@@ -229,7 +244,7 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setAvailabilityDateFrom(LocalDate.now().plusDays(11));
 
-            RmgSearchResponse response = rmgSearchService.search(request);
+            RmgSearchResponse response = rmgSearchService.search(request, 0, 10);
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
@@ -245,7 +260,7 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setAvailabilityDateTo(LocalDate.now().plusDays(30));
 
-            RmgSearchResponse response = rmgSearchService.search(request);
+            RmgSearchResponse response = rmgSearchService.search(request, 0, 10);
 
             assertThat(response.getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
@@ -261,7 +276,7 @@ class RmgSearchServiceImplTest {
             request.setAvailabilityDateFrom(LocalDate.now().plusDays(6));
             request.setAvailabilityDateTo(LocalDate.now().plusDays(40));
 
-            RmgSearchResponse response = rmgSearchService.search(request);
+            RmgSearchResponse response = rmgSearchService.search(request, 0, 10);
 
             // alice (+5d) is excluded, dan (+10d) and bob (+35d) are included, carol (+65d) is excluded
             assertThat(response.getResults())
@@ -286,7 +301,7 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setLocation("new york");
 
-            assertThat(rmgSearchService.search(request).getResults())
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
                     .containsExactlyInAnyOrder(1L, 3L);
         }
@@ -299,7 +314,7 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setLocation("Tokyo");
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(0);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(0);
         }
 
         @Test
@@ -310,7 +325,68 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setLocation("  ");
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(4);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(4);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Employee identity filters
+    // -------------------------------------------------------------------------
+
+    @Nested
+    @DisplayName("Employee identity filters")
+    class EmployeeIdentityFilters {
+
+        @Test
+        @DisplayName("name filter is a case-insensitive substring match")
+        void nameFilterMatchesSubstring() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setName("ali");
+
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(1L);
+        }
+
+        @Test
+        @DisplayName("email filter is a case-insensitive substring match")
+        void emailFilterMatchesSubstring() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setEmail("BOB@EXAMPLE");
+
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(2L);
+        }
+
+        @Test
+        @DisplayName("employeeId filter matches employee code")
+        void employeeIdFilterMatchesEmployeeCode() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setEmployeeId("1003");
+
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(3L);
+        }
+
+        @Test
+        @DisplayName("blank identity filters act as no filter")
+        void blankIdentityFiltersActAsNoFilter() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setName("  ");
+            request.setEmail("  ");
+            request.setEmployeeId("  ");
+
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(4);
         }
     }
 
@@ -330,9 +406,22 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setSeniority(Level.SENIOR);
 
-            assertThat(rmgSearchService.search(request).getResults())
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
                     .containsExactlyInAnyOrder(1L, 4L);
+        }
+
+        @Test
+        @DisplayName("level param filters by exact level enum")
+        void exactLevelMatch() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchRequest request = new RmgSearchRequest();
+            request.setLevel(Level.JUNIOR);
+
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(3L);
         }
 
         @Test
@@ -340,7 +429,7 @@ class RmgSearchServiceImplTest {
         void nullSeniorityActsAsNoFilter() {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
-            assertThat(rmgSearchService.search(new RmgSearchRequest()).getTotalResults()).isEqualTo(4);
+            assertThat(rmgSearchService.search(new RmgSearchRequest(), 0, 10).getTotalResults()).isEqualTo(4);
         }
     }
 
@@ -360,7 +449,7 @@ class RmgSearchServiceImplTest {
             RmgSearchRequest request = new RmgSearchRequest();
             request.setContractType(ContractType.FULL_TIME);
 
-            assertThat(rmgSearchService.search(request).getResults())
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
                     .containsExactlyInAnyOrder(1L, 3L);
         }
@@ -370,7 +459,7 @@ class RmgSearchServiceImplTest {
         void nullContractTypeActsAsNoFilter() {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
-            assertThat(rmgSearchService.search(new RmgSearchRequest()).getTotalResults()).isEqualTo(4);
+            assertThat(rmgSearchService.search(new RmgSearchRequest(), 0, 10).getTotalResults()).isEqualTo(4);
         }
     }
 
@@ -388,12 +477,12 @@ class RmgSearchServiceImplTest {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Java");
+            request.setSkills(List.of("Java"));
             request.setSeniority(Level.SENIOR);
             request.setContractType(ContractType.FULL_TIME);
             request.setLocation("New York");
 
-            RmgSearchResponse response = rmgSearchService.search(request);
+            RmgSearchResponse response = rmgSearchService.search(request, 0, 10);
 
             // Only Alice satisfies every criterion
             assertThat(response.getTotalResults()).isEqualTo(1);
@@ -406,10 +495,10 @@ class RmgSearchServiceImplTest {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Python");   // only Bob
+            request.setSkills(List.of("Python"));   // only Bob
             request.setSeniority(Level.SENIOR); // Bob is MID — contradiction
 
-            assertThat(rmgSearchService.search(request).getTotalResults()).isEqualTo(0);
+            assertThat(rmgSearchService.search(request, 0, 10).getTotalResults()).isEqualTo(0);
         }
 
         @Test
@@ -418,11 +507,11 @@ class RmgSearchServiceImplTest {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
             RmgSearchRequest request = new RmgSearchRequest();
-            request.setSkill("Java");
+            request.setSkills(List.of("Java"));
             request.setLocation("New York");
 
             // alice (1L) and carol (3L) are Java engineers in New York; dan (4L) is in Berlin
-            assertThat(rmgSearchService.search(request).getResults())
+            assertThat(rmgSearchService.search(request, 0, 10).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
                     .containsExactlyInAnyOrder(1L, 3L);
         }
@@ -441,7 +530,7 @@ class RmgSearchServiceImplTest {
         void resultsSortedByAvailabilityDateAscending() {
             when(benchReportService.getBenchReport()).thenReturn(fullReport());
 
-            List<LocalDate> dates = rmgSearchService.search(new RmgSearchRequest())
+            List<LocalDate> dates = rmgSearchService.search(new RmgSearchRequest(), 0, 10)
                     .getResults()
                     .stream()
                     .map(BenchEmployeeDto::getAvailabilityDate)
@@ -453,14 +542,14 @@ class RmgSearchServiceImplTest {
         @Test
         @DisplayName("employees with null availabilityDate appear last")
         void nullAvailabilityDateSortedLast() {
-            BenchEmployeeDto noDate = buildEmployee(99L, "Zara", Level.MID,
+            BenchEmployeeDto noDate = buildEmployee(99L, 1099L, "Zara", "zara@example.com", Level.MID,
                     ContractType.FULL_TIME, "Oslo", null);
             noDate.setAvailabilityDate(null);
 
             when(benchReportService.getBenchReport())
                     .thenReturn(reportWith(List.of(alice, noDate), List.of(), List.of()));
 
-            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest());
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 0, 10);
 
             assertThat(response.getResults())
                     .last()
@@ -477,9 +566,59 @@ class RmgSearchServiceImplTest {
 
             // Expected ascending order: alice(+5) → dan(+10) → bob(+35) → carol(+65)
             // even though alice was placed in the 30–60 bucket above
-            assertThat(rmgSearchService.search(new RmgSearchRequest()).getResults())
+            assertThat(rmgSearchService.search(new RmgSearchRequest(), 0, 10).getResults())
                     .extracting(BenchEmployeeDto::getEmployeeId)
                     .containsExactly(1L, 4L, 2L, 3L);
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Pagination
+    // -------------------------------------------------------------------------
+
+    @Nested
+    @DisplayName("Pagination")
+    class Pagination {
+
+        @Test
+        @DisplayName("returns only the requested page slice")
+        void returnsRequestedPageSlice() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 0, 2);
+
+            assertThat(response.getTotalResults()).isEqualTo(4);
+            assertThat(response.getResults()).hasSize(2);
+            assertThat(response.getPage()).isEqualTo(0);
+            assertThat(response.getSize()).isEqualTo(2);
+            assertThat(response.getTotalPages()).isEqualTo(2);
+            assertThat(response.getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(1L, 4L);
+        }
+
+        @Test
+        @DisplayName("second page returns remaining results")
+        void secondPageReturnsRemainingResults() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 1, 2);
+
+            assertThat(response.getResults())
+                    .extracting(BenchEmployeeDto::getEmployeeId)
+                    .containsExactly(2L, 3L);
+        }
+
+        @Test
+        @DisplayName("page beyond last returns empty results")
+        void pageBeyondLastReturnsEmpty() {
+            when(benchReportService.getBenchReport()).thenReturn(fullReport());
+
+            RmgSearchResponse response = rmgSearchService.search(new RmgSearchRequest(), 5, 10);
+
+            assertThat(response.getTotalResults()).isEqualTo(4);
+            assertThat(response.getResults()).isEmpty();
+            assertThat(response.getTotalPages()).isEqualTo(1);
         }
     }
 }
