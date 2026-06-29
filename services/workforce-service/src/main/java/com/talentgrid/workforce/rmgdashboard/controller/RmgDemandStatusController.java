@@ -65,8 +65,7 @@ public class RmgDemandStatusController {
     @Operation(summary = "Cancel a demand by ID", description = "Update the status of the specified demand to CANCELLED")
     public ResponseEntity<DemandDto> cancelDemand(@PathVariable("id") Long id) {
         log.info("Received request to cancel demand - id={}", id);
-        // CANCELLED is the required ClosureReason enum value when transitioning to CANCELLED status
-        DemandDto response = rmgService.updateDemandStatus(id, "CANCELLED", "CANCELLED", null);
+        DemandDto response = rmgService.updateDemandStatus(id, "CANCELLED", null, null);
         return ResponseEntity.ok(response);
     }
 

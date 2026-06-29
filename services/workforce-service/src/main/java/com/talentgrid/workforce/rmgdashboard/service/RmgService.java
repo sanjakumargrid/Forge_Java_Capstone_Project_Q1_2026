@@ -6,8 +6,8 @@ import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandStatusTransitionRequest;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryDto;
 import com.talentgrid.workforce.rmgdashboard.dto.DemandSummaryPageResponse;
-import com.talentgrid.workforce.rmgdashboard.enums.DemandClosureReason;
-import com.talentgrid.workforce.rmgdashboard.enums.DemandTransitionStatus;
+import com.talentgrid.workforce.rmgdashboard.mapper.DemandStatusMapper;
+import com.talentgrid.workforce.rmgdashboard.mapper.DemandStatusMapper.MappedTransition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -26,13 +25,6 @@ import java.util.List;
 public class RmgService {
 
     private final DemandClient demandClient;
-    private static final EnumSet<DemandTransitionStatus> CLOSURE_REASON_REQUIRED_FOR = EnumSet.of(
-            DemandTransitionStatus.FILLED_INTERNAL,
-            DemandTransitionStatus.FILLED_EXTERNAL,
-            DemandTransitionStatus.CANCELLED,
-            DemandTransitionStatus.ON_HOLD,
-            DemandTransitionStatus.DUPLICATE
-    );
 
     public Page<DemandDto> getDemandsByStatus(String status, Pageable pageable) {
         // Backward compatibility method - convert single status to list
@@ -72,19 +64,13 @@ public class RmgService {
         log.info("Updating demand {} status to {} (closureReason={}, comments={})",
                 demandId, status, closureReason, comments);
 
-        DemandTransitionStatus targetStatus = parseTargetStatus(status);
-        DemandClosureReason parsedClosureReason = parseClosureReason(closureReason);
-
-        if (CLOSURE_REASON_REQUIRED_FOR.contains(targetStatus) && parsedClosureReason == null) {
-            throw new IllegalArgumentException(
-                    "closureReason is required for target status " + targetStatus
-                            + ". Allowed closure reasons: " + String.join(", ", enumNames(DemandClosureReason.values()))
-            );
-        }
+        MappedTransition mapped = DemandStatusMapper.toDemandService(status, closureReason);
+        log.debug("Mapped demand transition for demand {}: targetStatus={}, closureReason={}",
+                demandId, mapped.targetStatus(), mapped.closureReason());
 
         DemandStatusTransitionRequest feignRequest = DemandStatusTransitionRequest.builder()
-                .targetStatus(targetStatus)
-                .closureReason(parsedClosureReason)
+                .targetStatus(mapped.targetStatus())
+                .closureReason(mapped.closureReason())
                 .comments(comments)
                 .build();
         try {
@@ -97,40 +83,6 @@ public class RmgService {
                     : ex.getMessage();
             throw new ResponseStatusException(resolved, message, ex);
         }
-    }
-
-    private DemandTransitionStatus parseTargetStatus(String value) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(
-                    "status is required. Allowed values: " + String.join(", ", enumNames(DemandTransitionStatus.values()))
-            );
-        }
-        try {
-            return DemandTransitionStatus.valueOf(value.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException(
-                    "Invalid status '" + value + "'. Allowed values: "
-                            + String.join(", ", enumNames(DemandTransitionStatus.values()))
-            );
-        }
-    }
-
-    private DemandClosureReason parseClosureReason(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        try {
-            return DemandClosureReason.valueOf(value.trim().toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException(
-                    "Invalid closureReason '" + value + "'. Allowed values: "
-                            + String.join(", ", enumNames(DemandClosureReason.values()))
-            );
-        }
-    }
-
-    private String[] enumNames(Enum<?>[] values) {
-        return java.util.Arrays.stream(values).map(Enum::name).toArray(String[]::new);
     }
 
     private DemandDto toDemandDtoFromSummary(DemandSummaryDto summary) {

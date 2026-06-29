@@ -1,7 +1,9 @@
 package com.talentgrid.workforce.benchreport.service.impl;
 
 import com.talentgrid.workforce.benchreport.dto.BenchEmployeeDto;
+import com.talentgrid.workforce.benchreport.dto.BenchReportPageResponse;
 import com.talentgrid.workforce.benchreport.dto.BenchReportResponse;
+import com.talentgrid.workforce.benchreport.dto.BenchWindowPage;
 import com.talentgrid.workforce.benchreport.repository.BenchReportRepository;
 import com.talentgrid.workforce.benchreport.service.BenchReportService;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
@@ -36,6 +38,40 @@ public class BenchReportServiceImpl implements BenchReportService {
     @Override
     public BenchReportResponse getBenchReport() {
         return cachedReport.get();
+    }
+
+    @Override
+    public BenchReportPageResponse getBenchReport(int page, int size) {
+        if (page < 0) {
+            throw new IllegalArgumentException("page must be >= 0");
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("size must be > 0");
+        }
+
+        BenchReportResponse report = cachedReport.get();
+        BenchReportPageResponse response = new BenchReportPageResponse();
+        response.setRefreshedAt(report.getRefreshedAt());
+        response.setUnder30Days(paginateWindow(report.getUnder30Days(), page, size));
+        response.setThirtyToSixtyDays(paginateWindow(report.getThirtyToSixtyDays(), page, size));
+        response.setSixtyToNinetyDays(paginateWindow(report.getSixtyToNinetyDays(), page, size));
+        return response;
+    }
+
+    private BenchWindowPage paginateWindow(List<BenchEmployeeDto> employees, int page, int size) {
+        List<BenchEmployeeDto> source = employees != null ? employees : List.of();
+        long totalElements = source.size();
+        int totalPages = totalElements == 0 ? 0 : (int) Math.ceil((double) totalElements / size);
+        int fromIndex = Math.min(page * size, source.size());
+        int toIndex = Math.min(fromIndex + size, source.size());
+
+        return new BenchWindowPage(
+                source.subList(fromIndex, toIndex),
+                page,
+                size,
+                totalElements,
+                totalPages
+        );
     }
 
     @Override
