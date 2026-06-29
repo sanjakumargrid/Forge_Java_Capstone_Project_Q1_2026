@@ -8,7 +8,7 @@ import com.talentgrid.workforce.skillgapheatmap.dto.SkillTrendResponse;
 
 public interface SkillGapService {
 
-    SkillGapResponse getSkillGap();
+    SkillGapResponse getSkillGap(int page, int size, String sortBy, String sortDirection, String gapLevel);
 
     SkillGapSummaryResponse getSummary();
 

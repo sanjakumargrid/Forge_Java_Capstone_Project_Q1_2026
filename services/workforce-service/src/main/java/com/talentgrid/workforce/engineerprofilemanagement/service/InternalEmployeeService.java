@@ -1,6 +1,7 @@
 package com.talentgrid.workforce.engineerprofilemanagement.service;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.SkillCatalogEntryDto;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public interface InternalEmployeeService {
     org.springframework.data.domain.Page<InternalEmployeeResponse> getAllEngineers(int page, int size);
 
     InternalEmployeeResponse updateOwnProfile(String emailId, UpdateEngineerProfileRequest request, String requestId);
+
+    List<SkillCatalogEntryDto> getSkillCatalog();
 
     InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto);
 }

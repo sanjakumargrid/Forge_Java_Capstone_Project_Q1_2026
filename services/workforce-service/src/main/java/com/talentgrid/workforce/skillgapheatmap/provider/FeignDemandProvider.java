@@ -22,6 +22,7 @@ import java.util.Objects;
 public class FeignDemandProvider implements DemandProvider {
 
     private static final List<String> OPEN_STATUSES = List.of(
+            "APPROVED",
             "INTERNAL_SEARCH",
             "OPEN_EXTERNAL"
     );

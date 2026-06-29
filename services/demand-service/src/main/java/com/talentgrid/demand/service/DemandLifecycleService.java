@@ -112,6 +112,7 @@ public class DemandLifecycleService {
         }
 
         Demand saved = demandRepository.save(demand);
+        eventProducer.publishApproved(saved);
         auditStatusChange(saved, from, saved.getStatus(), "/api/v1/demands/" + id + "/submit");
         return demandMapper.toResponse(saved);
     }
@@ -224,6 +225,10 @@ public class DemandLifecycleService {
         }
 
         Demand saved = demandRepository.save(demand);
+
+        if (decision == DemandStatus.APPROVED) {
+            eventProducer.publishApproved(saved);
+        }
 
         auditLogClient.logAction(AuditLogPayload.builder()
                 .entityType("DEMAND")

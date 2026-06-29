@@ -42,9 +42,9 @@ public class SkillGapServiceImpl implements SkillGapService {
     private int retentionDays;
 
     @Override
-    public SkillGapResponse getSkillGap() {
+    public SkillGapResponse getSkillGap(int page, int size, String sortBy, String sortDirection, String gapLevel) {
         refreshForViewer();
-        return buildSkillGapResponse();
+        return buildSkillGapResponse(page, size, sortBy, sortDirection, gapLevel);
     }
 
     @Override
@@ -199,7 +199,8 @@ public class SkillGapServiceImpl implements SkillGapService {
         return response;
     }
 
-    private SkillGapResponse buildSkillGapResponse() {
+    private SkillGapResponse buildSkillGapResponse(int page, int size, String sortBy,
+                                                   String sortDirection, String gapLevel) {
         List<SkillGapAnalytics> latestSnapshot = queryRepository.getLatestSnapshot();
 
         if (latestSnapshot.isEmpty()) {
@@ -208,15 +209,71 @@ public class SkillGapServiceImpl implements SkillGapService {
 
         List<SkillGapRowDto> rows = latestSnapshot.stream()
                 .map(this::mapToRow)
+                .filter(row -> matchesGapLevel(row, gapLevel))
+                .sorted((left, right) -> compareRows(left, right, sortBy, sortDirection))
                 .toList();
+
+        int safePage = Math.max(page, 0);
+        int safeSize = size < 1 ? 100 : size;
+        int fromIndex = Math.min(safePage * safeSize, rows.size());
+        int toIndex = Math.min(fromIndex + safeSize, rows.size());
+        List<SkillGapRowDto> pageRows = rows.subList(fromIndex, toIndex);
 
         return SkillGapResponse.builder()
                 .generatedAt(queryRepository.getLatestSnapshotTime())
                 .totalSkills(rows.size())
-                .skills(rows)
+                .skills(pageRows)
                 .degraded(refreshCoordinator.isDegraded())
                 .degradedReason(refreshCoordinator.isDegraded() ? refreshCoordinator.getDegradedReason() : null)
                 .build();
+    }
+
+    private boolean matchesGapLevel(SkillGapRowDto row, String gapLevel) {
+        if (gapLevel == null || gapLevel.isBlank()) {
+            return true;
+        }
+        return gapLevel.equalsIgnoreCase(row.getGapLevel());
+    }
+
+    private int compareRows(SkillGapRowDto left, SkillGapRowDto right, String sortBy, String sortDirection) {
+        if (sortBy == null || sortBy.isBlank()) {
+            return left.getSkillName().compareToIgnoreCase(right.getSkillName());
+        }
+
+        int comparison = switch (sortBy) {
+            case "demandCount" -> Integer.compare(left.getDemandCount(), right.getDemandCount());
+            case "benchCount" -> Integer.compare(left.getBenchCount(), right.getBenchCount());
+            case "gapScore" -> Integer.compare(left.getGapScore(), right.getGapScore());
+            case "gapLevel" -> Integer.compare(
+                    gapLevelOrder(left.getGapLevel()),
+                    gapLevelOrder(right.getGapLevel()));
+            case "trendDirection" -> Integer.compare(
+                    trendOrder(left.getTrendDirection()),
+                    trendOrder(right.getTrendDirection()));
+            default -> left.getSkillName().compareToIgnoreCase(right.getSkillName());
+        };
+
+        if ("DESC".equalsIgnoreCase(sortDirection)) {
+            return -comparison;
+        }
+        return comparison;
+    }
+
+    private int gapLevelOrder(String gapLevel) {
+        return switch (gapLevel) {
+            case "CRITICAL" -> 0;
+            case "HIGH" -> 1;
+            case "MEDIUM" -> 2;
+            default -> 3;
+        };
+    }
+
+    private int trendOrder(String trendDirection) {
+        return switch (trendDirection) {
+            case "UP" -> 0;
+            case "STABLE" -> 1;
+            default -> 2;
+        };
     }
 
     private SkillGapSummaryResponse buildSummaryResponse() {

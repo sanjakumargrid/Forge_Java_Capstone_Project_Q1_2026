@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Skill Gap Heatmap", description = "Skill gap analysis between open demands and bench engineers")
@@ -23,11 +24,16 @@ public class SkillGapController {
 
     private final SkillGapService skillGapService;
 
-    @Operation(summary = "Get full skill gap heatmap", description = "Returns all skills with demand count, bench count, gap score, gap level and trend direction")
+    @Operation(summary = "Get full skill gap heatmap", description = "Returns skills with demand count, bench count, gap score, gap level and trend direction")
     @GetMapping("/heatmap")
     @PreAuthorize("hasAuthority('WORKFORCE_SKILLGAP_VIEW')")
-    public ResponseEntity<SkillGapResponse> getSkillGap() {
-        return ResponseEntity.ok(skillGapService.getSkillGap());
+    public ResponseEntity<SkillGapResponse> getSkillGap(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false) String sortDirection,
+            @RequestParam(required = false) String gapLevel) {
+        return ResponseEntity.ok(skillGapService.getSkillGap(page, size, sortBy, sortDirection, gapLevel));
     }
 
     @Operation(summary = "Get skill gap summary", description = "Returns aggregated counts per gap level (CRITICAL / HIGH / MEDIUM / LOW)")

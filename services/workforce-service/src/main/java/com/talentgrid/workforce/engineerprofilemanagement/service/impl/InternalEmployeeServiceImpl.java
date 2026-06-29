@@ -2,14 +2,18 @@ package com.talentgrid.workforce.engineerprofilemanagement.service.impl;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.EmployeeProfileUpdatedPayload;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.SkillCatalogEntryDto;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
+import com.talentgrid.workforce.engineerprofilemanagement.entity.SkillCatalogEntry;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
 import com.talentgrid.workforce.engineerprofilemanagement.exception.ResourceNotFoundException;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UserDto;
 import com.talentgrid.workforce.kafka.producer.WorkforceKafkaProducer;
 import com.talentgrid.workforce.engineerprofilemanagement.repository.InternalEmployeeRepository;
+import com.talentgrid.workforce.engineerprofilemanagement.repository.SkillCatalogRepository;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
+import com.talentgrid.workforce.engineerprofilemanagement.service.SkillCatalogValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,6 +21,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -29,11 +34,17 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     private static final Pattern MARKDOWN_LINK_PATTERN = Pattern.compile("^\\[(?:[^\\]]*)\\]\\((https?://[^)]+)\\)$");
 
     private final InternalEmployeeRepository repository;
+    private final SkillCatalogRepository skillCatalogRepository;
+    private final SkillCatalogValidator skillCatalogValidator;
     private final WorkforceKafkaProducer workforceKafkaProducer;
 
     public InternalEmployeeServiceImpl(InternalEmployeeRepository repository,
+                                       SkillCatalogRepository skillCatalogRepository,
+                                       SkillCatalogValidator skillCatalogValidator,
                                        WorkforceKafkaProducer workforceKafkaProducer) {
         this.repository = repository;
+        this.skillCatalogRepository = skillCatalogRepository;
+        this.skillCatalogValidator = skillCatalogValidator;
         this.workforceKafkaProducer = workforceKafkaProducer;
     }
 
@@ -79,6 +90,13 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
     }
 
     @Override
+    public List<SkillCatalogEntryDto> getSkillCatalog() {
+        return skillCatalogRepository.findAllByOrderBySkillNameAsc().stream()
+                .map(this::mapToSkillCatalogDto)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public InternalEmployeeResponse updateOwnProfile(String emailId,
                                                      UpdateEngineerProfileRequest request,
@@ -101,7 +119,8 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
         // Handle skills update safely
         if (request.getSkills() != null) {
-            String[] newSkills = request.getSkills().toArray(new String[0]);
+            List<String> validatedSkills = skillCatalogValidator.resolveCanonicalSkills(request.getSkills());
+            String[] newSkills = validatedSkills.toArray(new String[0]);
             skillsChanged = !Arrays.equals(employee.getSkills(), newSkills);
 
             if (skillsChanged) {
@@ -125,14 +144,12 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
         if (request.getResumeDriveLink() != null) {
             String newResumeDriveLink = sanitizeResumeDriveLink(request.getResumeDriveLink());
-            if (!StringUtils.hasText(newResumeDriveLink)) {
-                throw new IllegalArgumentException("resumeDriveLink cannot be blank when provided");
+            if (StringUtils.hasText(newResumeDriveLink)) {
+                resumeChanged = !Objects.equals(employee.getResumeDriveLink(), newResumeDriveLink);
+                if (resumeChanged) {
+                    employee.setResumeDriveLink(newResumeDriveLink);
+                }
             }
-
-            // Treat any provided resume link as a resume update so the Kafka event
-            // always carries the link for downstream parsing.
-            resumeChanged = true;
-            employee.setResumeDriveLink(newResumeDriveLink);
         }
 
         // No actual changes
@@ -160,7 +177,11 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                 EmployeeProfileUpdatedPayload.builder()
                         .employeeId(saved.getEmployeeId())
                         .updatedFields(updatedFields)
-                        .skills(skillsChanged ? List.of(saved.getSkills()) : null)
+                        .skills(skillsChanged
+                                ? (saved.getSkills() != null
+                                        ? Arrays.asList(saved.getSkills())
+                                        : Collections.emptyList())
+                                : null)
                         .availabilityDate(availabilityChanged ? saved.getAvailabilityDate() : null)
                         .resumeDriveLink(resumeChanged ? saved.getResumeDriveLink() : null)
                         .build(),
@@ -182,6 +203,13 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         }
 
         return trimmed;
+    }
+
+    private SkillCatalogEntryDto mapToSkillCatalogDto(SkillCatalogEntry entry) {
+        return SkillCatalogEntryDto.builder()
+                .skillId(entry.getSkillId())
+                .skillName(entry.getSkillName())
+                .build();
     }
 
     private InternalEmployeeResponse mapToResponse(InternalEmployee employee) {

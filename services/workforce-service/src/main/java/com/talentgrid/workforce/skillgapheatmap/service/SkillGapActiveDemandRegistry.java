@@ -13,7 +13,11 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SkillGapActiveDemandRegistry {
 
-    private static final Set<String> ACTIVE_STATUSES = Set.of("INTERNAL_SEARCH", "OPEN_EXTERNAL");
+    private static final Set<String> ACTIVE_STATUSES = Set.of(
+            "APPROVED",
+            "INTERNAL_SEARCH",
+            "OPEN_EXTERNAL"
+    );
 
     private final SkillGapActiveDemandRepository repository;
 

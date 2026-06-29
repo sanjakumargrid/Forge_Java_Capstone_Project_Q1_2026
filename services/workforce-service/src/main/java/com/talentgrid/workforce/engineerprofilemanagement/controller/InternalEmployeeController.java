@@ -1,6 +1,7 @@
 package com.talentgrid.workforce.engineerprofilemanagement.controller;
 
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.SkillCatalogEntryDto;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/engineer-profile")
 @RequiredArgsConstructor
@@ -18,6 +21,14 @@ import org.springframework.web.bind.annotation.*;
 public class InternalEmployeeController {
 
     private final InternalEmployeeService internalEmployeeService;
+
+    @Operation(summary = "List skills from the shared catalog",
+            description = "Returns skill names from the demand-service skills table for profile editing.")
+    @GetMapping("/employees/skills-catalog")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    public ResponseEntity<List<SkillCatalogEntryDto>> getSkillCatalog() {
+        return ResponseEntity.ok(internalEmployeeService.getSkillCatalog());
+    }
 
     @Operation(summary = "Get internal employee by employee ID",
             description = "Returns internal employee profile details for a given employee_id")
