@@ -15,5 +15,8 @@ public class RmgSearchResponse {
 
     private List<BenchEmployeeDto> results;
     private int totalResults;
+    private int page;
+    private int size;
+    private int totalPages;
     private Instant queriedAt;
 }
