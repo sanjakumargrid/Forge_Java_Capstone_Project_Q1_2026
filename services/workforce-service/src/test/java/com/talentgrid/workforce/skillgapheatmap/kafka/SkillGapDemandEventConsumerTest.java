@@ -34,6 +34,23 @@ class SkillGapDemandEventConsumerTest {
     }
 
     @Test
+    @DisplayName("DEMAND_APPROVED with APPROVED status registers demand")
+    void demandApprovedWithApprovedStatusRegistersDemand() {
+        BaseEvent<Map<String, Object>> event = new BaseEvent<>();
+        event.setEventType("DEMAND_APPROVED");
+        event.setEventId("evt-approved");
+        event.setPayload(Map.of(
+                "demandId", 6L,
+                "status", "APPROVED",
+                "mandatorySkills", List.of("Python")
+        ));
+
+        consumer.consume(event);
+
+        verify(skillGapService).onActiveDemandEntered(any(DemandPayload.class));
+    }
+
+    @Test
     @DisplayName("DEMAND_APPROVED with active status registers demand")
     void demandApprovedRegistersActiveDemand() {
         BaseEvent<Map<String, Object>> event = new BaseEvent<>();

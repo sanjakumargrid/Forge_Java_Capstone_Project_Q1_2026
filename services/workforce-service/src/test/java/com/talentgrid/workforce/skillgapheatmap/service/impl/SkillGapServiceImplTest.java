@@ -76,11 +76,33 @@ class SkillGapServiceImplTest {
     }
 
     @Test
+    @DisplayName("onActiveDemandEntered accepts APPROVED demand status")
+    void onActiveDemandEnteredAcceptsApprovedStatus() {
+        when(activeDemandRegistry.isActiveStatus("APPROVED")).thenReturn(true);
+        when(refreshCoordinator.isDebounced()).thenReturn(false);
+        when(refreshCoordinator.tryAcquireLock()).thenReturn(true);
+        when(activeDemandRegistry.aggregateDemandSkillCounts()).thenReturn(Map.of("Java", 1));
+        when(workforceProvider.getBenchEngineers()).thenReturn(List.of());
+        when(snapshotWriter.fetchPreviousGapScores()).thenReturn(Map.of());
+
+        DemandPayload payload = DemandPayload.builder()
+                .demandId(11L)
+                .status("APPROVED")
+                .mandatorySkills(List.of("Java"))
+                .build();
+
+        skillGapService.onActiveDemandEntered(payload);
+
+        verify(activeDemandRegistry).upsertActiveDemand(11L, List.of("Java"));
+        verify(snapshotWriter).persistSnapshot(anyList(), any(), anyInt());
+    }
+
+    @Test
     @DisplayName("onActiveDemandEntered ignores non-active demand status")
     void onActiveDemandEnteredIgnoresNonActiveStatus() {
         DemandPayload payload = DemandPayload.builder()
                 .demandId(10L)
-                .status("APPROVED")
+                .status("DRAFT")
                 .mandatorySkills(List.of("Java"))
                 .build();
 

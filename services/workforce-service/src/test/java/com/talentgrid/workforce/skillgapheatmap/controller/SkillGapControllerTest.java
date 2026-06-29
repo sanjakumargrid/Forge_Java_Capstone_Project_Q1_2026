@@ -46,7 +46,7 @@ class SkillGapControllerTest {
     @DisplayName("GET /heatmap returns 200 with skill rows")
     @WithMockUser(authorities = "WORKFORCE_SKILLGAP_VIEW")
     void heatmapReturns200() throws Exception {
-        when(skillGapService.getSkillGap()).thenReturn(SkillGapResponse.builder()
+        when(skillGapService.getSkillGap(0, 100, null, null, null)).thenReturn(SkillGapResponse.builder()
                 .generatedAt(LocalDateTime.parse("2026-06-26T10:00:00"))
                 .totalSkills(1)
                 .degraded(false)
