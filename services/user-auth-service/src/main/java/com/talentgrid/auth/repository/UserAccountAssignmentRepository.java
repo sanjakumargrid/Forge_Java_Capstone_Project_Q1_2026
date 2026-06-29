@@ -54,4 +54,6 @@ public interface UserAccountAssignmentRepository extends JpaRepository<UserAccou
      * @return whether the assignment tuple already exists
      */
     boolean existsByUserIdAndAccountIdAndProjectId(Long userId, Long accountId, Long projectId);
+
+    void deleteByUserId(Long userId);
 }

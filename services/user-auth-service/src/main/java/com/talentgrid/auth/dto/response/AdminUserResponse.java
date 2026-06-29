@@ -22,4 +22,6 @@ public class AdminUserResponse {
     private final Set<String> roles;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
+    private final Long projectId;
+    private final String projectName;
 }

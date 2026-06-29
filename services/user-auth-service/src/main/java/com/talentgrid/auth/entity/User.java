@@ -69,6 +69,9 @@ public class User implements Serializable {
      * Incremented when permissions change; embedded in JWT for invalidation.
      * DB default avoids failed {@code ddl-auto=update} when adding NOT NULL to a non-empty {@code users} table.
      */
+    @Column(name = "project_id")
+    private Long projectId;
+
     @Column(name = "auth_version", nullable = false)
     @ColumnDefault("1")
     @Builder.Default

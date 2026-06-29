@@ -52,4 +52,6 @@ public class UserDto {
     private OffsetDateTime updatedAt;
 
     private OffsetDateTime availableFrom;
+
+    private String currentProject;
 }

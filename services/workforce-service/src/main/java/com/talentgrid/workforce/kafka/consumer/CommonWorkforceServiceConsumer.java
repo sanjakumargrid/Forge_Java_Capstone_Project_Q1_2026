@@ -25,7 +25,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
     private final InternalEmployeeService internalEmployeeService;
     private final ResumeParserService resumeParserService;
 
-    @KafkaListener(topics = {TalentGridTopics.WORKFORCE_EVENTS, TalentGridTopics.AUTH_USER_CREATED}, groupId = "${spring.kafka.consumer.group-id}")
+    @KafkaListener(topics = {TalentGridTopics.WORKFORCE_EVENTS, TalentGridTopics.AUTH_USER_CREATED, TalentGridTopics.AUTH_USER_UPDATED}, groupId = "${spring.kafka.consumer.group-id}")
     public void consume(BaseEvent<Map<String, Object>> event) {
         process(event);
     }
@@ -34,6 +34,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
     protected void handleEvent(BaseEvent<Map<String, Object>> event) {
         switch (event.getEventType()) {
             case "USER_CREATED" -> handleUserCreated(event);
+            case "USER_DELETED" -> handleUserDeleted(event);
             case "EMPLOYEE_PROFILE_UPDATED" -> handleEngineerResumeUpdated(event);
             default -> log.warn(
                     "[WORKFORCE-CONSUMER] Unsupported event type={} eventId={}",
@@ -54,6 +55,7 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
             userDto.setEmail((String) payload.get("email"));
             userDto.setName((String) payload.get("username"));
             userDto.setLocation((String) payload.get("location"));
+            userDto.setCurrentProject((String) payload.get("projectName"));
             userDto.setIsActive(true);
         } else {
             userDto = objectMapper.convertValue(payload, UserDto.class);
@@ -91,6 +93,16 @@ public class CommonWorkforceServiceConsumer extends BaseKafkaConsumer<Map<String
             log.error("[WORKFORCE-CONSUMER] Resume parsing failed | eventId={} | employeeId={} | resumeDriveLink={} | error={}",
                     event.getEventId(), payload.getEmployeeId(), payload.getResumeDriveLink(), ex.getMessage(), ex);
             throw ex;
+        }
+    }
+
+    private void handleUserDeleted(BaseEvent<Map<String, Object>> event) {
+        Map<String, Object> payload = event.getPayload();
+        if (payload != null && payload.containsKey("userId")) {
+            Number userIdNum = (Number) payload.get("userId");
+            if (userIdNum != null) {
+                internalEmployeeService.deleteEmployeeByEmployeeId(userIdNum.longValue());
+            }
         }
     }
 

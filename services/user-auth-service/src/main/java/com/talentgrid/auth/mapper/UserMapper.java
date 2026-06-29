@@ -1,8 +1,10 @@
 package com.talentgrid.auth.mapper;
 
 import com.talentgrid.auth.dto.response.AdminUserResponse;
+import com.talentgrid.auth.entity.Project;
 import com.talentgrid.auth.entity.Role;
 import com.talentgrid.auth.entity.User;
+import com.talentgrid.auth.repository.ProjectRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
@@ -13,6 +15,12 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
+    private final ProjectRepository projectRepository;
+
+    public UserMapper(ProjectRepository projectRepository) {
+        this.projectRepository = projectRepository;
+    }
+
     /**
      * Maps a User entity to an AdminUserResponse DTO.
      *
@@ -22,6 +30,13 @@ public class UserMapper {
     public AdminUserResponse toAdminUserResponse(User user) {
         if (user == null) {
             return null;
+        }
+
+        String projectName = null;
+        if (user.getProjectId() != null) {
+            projectName = projectRepository.findById(user.getProjectId())
+                    .map(Project::getName)
+                    .orElse(null);
         }
 
         return AdminUserResponse.builder()
@@ -37,6 +52,8 @@ public class UserMapper {
                         .collect(Collectors.toSet()))
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
+                .projectId(user.getProjectId())
+                .projectName(projectName)
                 .build();
     }
 }

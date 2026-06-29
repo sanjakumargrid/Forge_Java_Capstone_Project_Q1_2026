@@ -2,6 +2,7 @@ package com.talentgrid.auth.service.interfaces;
 
 import com.talentgrid.auth.dto.request.AdminCreateUserRequest;
 import com.talentgrid.auth.dto.request.AdminUpdateUserRequest;
+import com.talentgrid.auth.dto.request.AdminPatchUserRequest;
 import com.talentgrid.auth.dto.request.ChangeRoleRequest;
 import com.talentgrid.auth.dto.response.AdminUserResponse;
 
@@ -75,4 +76,13 @@ public interface AdminUserService {
      * @return the updated user
      */
     AdminUserResponse toggleUserStatus(Long id, boolean enabled);
+
+    /**
+     * Performs a partial update on an existing user.
+     *
+     * @param id      the user ID
+     * @param request the partial update details
+     * @return the updated user details
+     */
+    AdminUserResponse patchUser(Long id, AdminPatchUserRequest request);
 }

@@ -23,4 +23,6 @@ public interface InternalEmployeeService {
     InternalEmployeeResponse updateOwnProfile(String emailId, UpdateEngineerProfileRequest request, String requestId);
 
     InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto);
+
+    void deleteEmployeeByEmployeeId(Long employeeId);
 }

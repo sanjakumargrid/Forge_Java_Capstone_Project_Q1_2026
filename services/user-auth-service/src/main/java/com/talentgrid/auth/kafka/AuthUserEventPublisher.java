@@ -29,4 +29,18 @@ public class AuthUserEventPublisher {
                 event
         );
     }
+
+    public void publishUserDeleted(Long userId) {
+        BaseEvent<java.util.Map<String, Object>> event = BaseEvent.<java.util.Map<String, Object>>builder()
+                .eventType("USER_DELETED")
+                .source("user-auth-service")
+                .payload(java.util.Map.of("userId", userId))
+                .build();
+
+        kafkaProducerService.sendEvent(
+                TalentGridTopics.AUTH_USER_UPDATED,
+                String.valueOf(userId),
+                event
+        );
+    }
 }

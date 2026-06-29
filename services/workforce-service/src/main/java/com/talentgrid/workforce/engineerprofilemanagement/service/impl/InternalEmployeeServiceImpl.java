@@ -28,6 +28,8 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
     private static final Pattern MARKDOWN_LINK_PATTERN = Pattern.compile("^\\[(?:[^\\]]*)\\]\\((https?://[^)]+)\\)$");
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(InternalEmployeeServiceImpl.class);
+
     private final InternalEmployeeRepository repository;
     private final WorkforceKafkaProducer workforceKafkaProducer;
 
@@ -226,6 +228,7 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
         employee.setName(userDto.getName());
         employee.setEmail(userDto.getEmail());
         employee.setLocation(userDto.getLocation());
+        employee.setCurrentProject(userDto.getCurrentProject());
         employee.setAvailabilityDate(userDto.getAvailableFrom() != null ? userDto.getAvailableFrom().toLocalDate() : null);
         employee.setHrisSyncStatus(HrisSyncStatus.SYNCED);
         employee.setIsDeleted(Boolean.FALSE);
@@ -238,5 +241,16 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
 
         InternalEmployee savedEmployee = repository.save(employee);
         return mapToResponse(savedEmployee);
+    }
+
+    @Override
+    @Transactional
+    public void deleteEmployeeByEmployeeId(Long employeeId) {
+        repository.findByEmployeeIdAndIsDeletedFalse(employeeId).ifPresent(employee -> {
+            employee.setIsDeleted(true);
+            employee.setDeletedAt(LocalDateTime.now());
+            repository.save(employee);
+            log.info("Employee {} soft-deleted in workforce-service", employeeId);
+        });
     }
 }

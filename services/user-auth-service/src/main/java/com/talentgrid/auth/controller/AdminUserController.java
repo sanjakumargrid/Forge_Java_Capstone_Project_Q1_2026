@@ -2,6 +2,7 @@ package com.talentgrid.auth.controller;
 
 import com.talentgrid.auth.dto.request.AdminCreateUserRequest;
 import com.talentgrid.auth.dto.request.AdminUpdateUserRequest;
+import com.talentgrid.auth.dto.request.AdminPatchUserRequest;
 import com.talentgrid.auth.dto.request.ChangeRoleRequest;
 import com.talentgrid.auth.dto.request.UserStatusRequest;
 import com.talentgrid.auth.dto.response.AdminUserResponse;
@@ -45,6 +46,15 @@ public class AdminUserController {
             @Valid @RequestBody AdminUpdateUserRequest request
     ) {
         return ResponseEntity.ok(adminUserService.updateUser(id, request));
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('USER_UPDATE')")
+    public ResponseEntity<AdminUserResponse> patchUser(
+            @PathVariable Long id,
+            @RequestBody AdminPatchUserRequest request
+    ) {
+        return ResponseEntity.ok(adminUserService.patchUser(id, request));
     }
 
     @DeleteMapping("/{id}")
