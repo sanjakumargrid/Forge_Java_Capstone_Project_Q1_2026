@@ -19,6 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.time.Instant;
 import java.util.List;
@@ -48,6 +52,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     private final RbacProperties rbacProperties;
     private final GatewayErrorWriter gatewayErrorWriter;
     private final JwtBlacklistService jwtBlacklistService;
+    private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
+    private final ObjectMapper objectMapper;
 
     /**
      * Constructs a new {@code JwtAuthenticationFilter}.
@@ -56,13 +62,22 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
      * @param rbacProperties      configuration containing public paths and RBAC rules
      * @param gatewayErrorWriter  utility for writing standardized JSON error responses
      * @param jwtBlacklistService service to verify token revocation status
+     * @param reactiveRedisTemplate the reactive Redis template for caching lookups
+     * @param objectMapper        Jackson object mapper for JSON parsing
      */
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, RbacProperties rbacProperties,
-            GatewayErrorWriter gatewayErrorWriter, JwtBlacklistService jwtBlacklistService) {
+    public JwtAuthenticationFilter(
+            JwtUtil jwtUtil,
+            RbacProperties rbacProperties,
+            GatewayErrorWriter gatewayErrorWriter,
+            JwtBlacklistService jwtBlacklistService,
+            @Qualifier("reactiveRedisTemplate") ReactiveRedisTemplate<String, String> reactiveRedisTemplate,
+            ObjectMapper objectMapper) {
         this.jwtUtil = jwtUtil;
         this.rbacProperties = rbacProperties;
         this.gatewayErrorWriter = gatewayErrorWriter;
         this.jwtBlacklistService = jwtBlacklistService;
+        this.reactiveRedisTemplate = reactiveRedisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -106,6 +121,8 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             Claims claims = jwtUtil.validateAndParse(token);
 
             String jti = jwtUtil.extractJti(claims);
+            Object authVersionObj = claims.get("authVersion");
+            Long jwtVersion = authVersionObj != null ? ((Number) authVersionObj).longValue() : null;
 
             return jwtBlacklistService.isBlacklisted(jti).flatMap(isBlacklisted -> {
                 if (Boolean.TRUE.equals(isBlacklisted)) {
@@ -115,25 +132,38 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
                 }
 
                 String userId = jwtUtil.extractUserId(claims);
-                List<String> roles = jwtUtil.extractRoles(claims);
-                List<String> scopes = jwtUtil.extractScopes(claims);
-                String email = jwtUtil.extractEmail(claims);
 
-                String rolesHeader = String.join(",", roles);
-                String scopesHeader = String.join(",", scopes);
+                return reactiveRedisTemplate.opsForValue().get("auth:user:" + userId)
+                        .flatMap(json -> {
+                            try {
+                                JsonNode node = objectMapper.readTree(json);
+                                JsonNode contextNode = node.isArray() && node.size() > 1 ? node.get(1) : node;
 
-                ServerHttpRequest.Builder requestBuilder = cleanExchange.getRequest().mutate()
-                        .header(HeaderConstants.USER_ID, userId)
-                        .header(HeaderConstants.USER_ROLES, rolesHeader)
-                        .header(HeaderConstants.USER_SCOPES, scopesHeader)
-                        .header(HeaderConstants.AUTH_TIME, Instant.now().toString());
+                                if (contextNode != null) {
+                                    if (contextNode.has("enabled")) {
+                                        boolean enabled = contextNode.get("enabled").asBoolean();
+                                        if (!enabled) {
+                                            log.warn("User {} is disabled in cache", userId);
+                                            return gatewayErrorWriter.write(cleanExchange, HttpStatus.FORBIDDEN,
+                                                    "Account has been disabled.", GatewayErrorCodes.FORBIDDEN);
+                                        }
+                                    }
 
-                if (email != null && !email.isEmpty()) {
-                    requestBuilder.header(HeaderConstants.USER_EMAIL, email);
-                }
-
-                ServerHttpRequest mutatedRequest = requestBuilder.build();
-                return chain.filter(cleanExchange.mutate().request(mutatedRequest).build());
+                                    if (contextNode.has("authVersion")) {
+                                        long cachedVersion = contextNode.get("authVersion").asLong();
+                                        if (jwtVersion != null && jwtVersion != cachedVersion) {
+                                            log.warn("Auth version mismatch for user {}: jwt={} cached={}", userId, jwtVersion, cachedVersion);
+                                            return gatewayErrorWriter.write(cleanExchange, HttpStatus.UNAUTHORIZED,
+                                                    "Authorization changed. Please login again.", GatewayErrorCodes.UNAUTHORIZED);
+                                        }
+                                    }
+                                }
+                            } catch (Exception e) {
+                                log.error("Failed to parse cached user json for user {}: {}", userId, e.getMessage());
+                            }
+                            return proceedWithFilter(cleanExchange, chain, claims, userId);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> proceedWithFilter(cleanExchange, chain, claims, userId)));
             });
 
         } catch (JwtException e) {
@@ -141,6 +171,28 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
             return gatewayErrorWriter.write(cleanExchange, HttpStatus.UNAUTHORIZED,
                     "Invalid or expired token", GatewayErrorCodes.UNAUTHORIZED);
         }
+    }
+
+    private Mono<Void> proceedWithFilter(ServerWebExchange exchange, GatewayFilterChain chain, Claims claims, String userId) {
+        List<String> roles = jwtUtil.extractRoles(claims);
+        List<String> scopes = jwtUtil.extractScopes(claims);
+        String email = jwtUtil.extractEmail(claims);
+
+        String rolesHeader = String.join(",", roles);
+        String scopesHeader = String.join(",", scopes);
+
+        ServerHttpRequest.Builder requestBuilder = exchange.getRequest().mutate()
+                .header(HeaderConstants.USER_ID, userId)
+                .header(HeaderConstants.USER_ROLES, rolesHeader)
+                .header(HeaderConstants.USER_SCOPES, scopesHeader)
+                .header(HeaderConstants.AUTH_TIME, Instant.now().toString());
+
+        if (email != null && !email.isEmpty()) {
+            requestBuilder.header(HeaderConstants.USER_EMAIL, email);
+        }
+
+        ServerHttpRequest mutatedRequest = requestBuilder.build();
+        return chain.filter(exchange.mutate().request(mutatedRequest).build());
     }
 
     @SuppressWarnings("null")

@@ -26,4 +26,6 @@ public interface InternalEmployeeService {
     List<SkillCatalogEntryDto> getSkillCatalog();
 
     InternalEmployeeResponse syncEmployeeFromKafka(UserDto userDto);
+
+    void deleteEmployeeByEmployeeId(Long employeeId);
 }

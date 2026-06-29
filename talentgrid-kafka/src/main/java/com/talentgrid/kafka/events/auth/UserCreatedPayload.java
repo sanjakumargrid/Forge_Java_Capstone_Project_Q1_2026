@@ -14,5 +14,6 @@ public class UserCreatedPayload {
     private String email;
     private String role;
     private String location;
+    private String projectName;
     private String source; // "SELF_REGISTER" or "ADMIN_CREATED"
 }

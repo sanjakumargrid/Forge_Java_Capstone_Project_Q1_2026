@@ -26,7 +26,8 @@ public class UserSecurityRefreshServiceImpl implements UserSecurityRefreshServic
     @Override
     @Transactional
     public User refreshUser(User user) {
-        user.setAuthVersion(user.getAuthVersion() + 1);
+        Long currentVersion = user.getAuthVersion();
+        user.setAuthVersion(currentVersion == null ? 1L : currentVersion + 1);
         User savedUser = userRepository.save(user);
         userSecurityCacheService.cacheUser(savedUser);
         publishUpdate(savedUser);

@@ -32,4 +32,6 @@ public class AdminCreateUserRequest {
     private String role;
 
     private String slackId;
+
+    private Long projectId;
 }
