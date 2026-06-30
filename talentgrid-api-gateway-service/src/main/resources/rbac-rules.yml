@@ -515,6 +515,10 @@ rbac:
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
 
+    - path: "/api/v1/engineer-profile/engineers/analytics"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
+
     - path: "/api/v1/engineer-profile/employees/email/*"
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
@@ -522,6 +526,10 @@ rbac:
     - path: "/api/v1/engineer-profile/update/**"
       methods: [ PATCH ]
       allowed-scopes: [ WORKFORCE_PROFILE_UPDATE ]
+
+    - path: "/api/v1/engineer-profile/engineers/analytics"
+      methods: [ GET ]
+      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
 
     - path: "/api/v1/engineer-profile/engineers"
       methods: [ GET ]
