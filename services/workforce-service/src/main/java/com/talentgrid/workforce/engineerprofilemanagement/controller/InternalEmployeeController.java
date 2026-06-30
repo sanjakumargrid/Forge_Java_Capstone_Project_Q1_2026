@@ -3,6 +3,7 @@ package com.talentgrid.workforce.engineerprofilemanagement.controller;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.SkillCatalogEntryDto;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
+import com.talentgrid.workforce.engineerprofilemanagement.dto.WorkforceAnalyticsResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.service.InternalEmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -74,6 +75,15 @@ public class InternalEmployeeController {
         return ResponseEntity.ok(response);
     }
 
+
+    @GetMapping("/engineers/analytics")
+    @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
+    @Operation(summary = "Workforce availability analytics",
+            description = "Returns total workforce count and engineer counts by availability window "
+                    + "(0–30 days, 31–60 days, 61–90 days from today). Aligns with bench-report windows.")
+    public ResponseEntity<WorkforceAnalyticsResponse> getWorkforceAnalytics() {
+        return ResponseEntity.ok(internalEmployeeService.getWorkforceAnalytics());
+    }
 
     @GetMapping("/engineers")
     @PreAuthorize("hasAuthority('WORKFORCE_PROFILE_VIEW')")
