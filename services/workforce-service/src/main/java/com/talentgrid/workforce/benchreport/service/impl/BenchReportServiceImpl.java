@@ -59,16 +59,24 @@ public class BenchReportServiceImpl implements BenchReportService {
     }
 
     BenchReportResponse buildBenchReport(LocalDate today) {
+        LocalDate thirtyDaysOut = today.plusDays(30);
+        LocalDate sixtyDaysOut = today.plusDays(60);
         LocalDate ninetyDaysOut = today.plusDays(90);
 
-        List<InternalEmployee> employees = benchReportRepository
-                .findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(today, ninetyDaysOut);
+        List<InternalEmployee> under30Employees = benchReportRepository
+                .findByAvailabilityDateLessThanEqualAndIsDeletedFalseOrderByAvailabilityDateAsc(thirtyDaysOut);
+        List<InternalEmployee> thirtyToSixtyEmployees = benchReportRepository
+                .findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                        today.plusDays(31), sixtyDaysOut);
+        List<InternalEmployee> sixtyToNinetyEmployees = benchReportRepository
+                .findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                        today.plusDays(61), ninetyDaysOut);
 
         BenchReportResponse response = new BenchReportResponse();
         response.setRefreshedAt(Instant.now());
-        response.setUnder30Days(groupEmployeesWithinRange(employees, today, today.plusDays(30)));
-        response.setThirtyToSixtyDays(groupEmployeesWithinRange(employees, today.plusDays(31), today.plusDays(60)));
-        response.setSixtyToNinetyDays(groupEmployeesWithinRange(employees, today.plusDays(61), ninetyDaysOut));
+        response.setUnder30Days(mapEmployees(under30Employees));
+        response.setThirtyToSixtyDays(mapEmployees(thirtyToSixtyEmployees));
+        response.setSixtyToNinetyDays(mapEmployees(sixtyToNinetyEmployees));
         return response;
     }
 
@@ -88,15 +96,9 @@ public class BenchReportServiceImpl implements BenchReportService {
         );
     }
 
-    private List<BenchEmployeeDto> groupEmployeesWithinRange(
-            List<InternalEmployee> employees,
-            LocalDate start,
-            LocalDate end
-    ) {
+    private List<BenchEmployeeDto> mapEmployees(List<InternalEmployee> employees) {
         return employees.stream()
                 .filter(employee -> employee.getAvailabilityDate() != null)
-                .filter(employee -> !employee.getAvailabilityDate().isBefore(start))
-                .filter(employee -> !employee.getAvailabilityDate().isAfter(end))
                 .sorted(Comparator
                         .comparing(InternalEmployee::getAvailabilityDate)
                         .thenComparing(InternalEmployee::getName, Comparator.nullsLast(String::compareToIgnoreCase)))

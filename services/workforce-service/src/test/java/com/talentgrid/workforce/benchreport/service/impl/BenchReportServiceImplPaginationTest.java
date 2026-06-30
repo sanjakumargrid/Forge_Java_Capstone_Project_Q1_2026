@@ -1,68 +1,90 @@
 package com.talentgrid.workforce.benchreport.service.impl;
 
-import com.talentgrid.workforce.benchreport.dto.BenchEmployeeDto;
 import com.talentgrid.workforce.benchreport.dto.BenchReportPageResponse;
 import com.talentgrid.workforce.benchreport.dto.BenchReportResponse;
+import com.talentgrid.workforce.benchreport.repository.BenchReportRepository;
+import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class BenchReportServiceImplPaginationTest {
+
+    private static final LocalDate TODAY = LocalDate.of(2026, 6, 29);
+
+    @Mock
+    private BenchReportRepository benchReportRepository;
 
     private BenchReportServiceImpl benchReportService;
 
     @BeforeEach
-    void setUp() throws Exception {
-        benchReportService = new BenchReportServiceImpl(null);
-
-        BenchReportResponse cached = new BenchReportResponse();
-        cached.setRefreshedAt(Instant.parse("2026-06-29T06:00:00Z"));
-        cached.setUnder30Days(buildEmployees(15));
-        cached.setThirtyToSixtyDays(buildEmployees(5));
-        cached.setSixtyToNinetyDays(List.of());
-
-        var cachedReportField = BenchReportServiceImpl.class.getDeclaredField("cachedReport");
-        cachedReportField.setAccessible(true);
-        @SuppressWarnings("unchecked")
-        var ref = (java.util.concurrent.atomic.AtomicReference<BenchReportResponse>) cachedReportField.get(benchReportService);
-        ref.set(cached);
+    void setUp() {
+        benchReportService = new BenchReportServiceImpl(benchReportRepository);
     }
 
     @Test
-    void returnsFullReportWithoutPaginationParams() {
-        BenchReportResponse response = benchReportService.getBenchReport();
+    void under30DaysIncludesPastAvailabilityDates() {
+        when(benchReportRepository.findByAvailabilityDateLessThanEqualAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(TODAY.plusDays(30))))
+                .thenReturn(List.of(
+                        employee("Past Employee", TODAY.minusDays(10)),
+                        employee("assha Doe", LocalDate.of(2026, 7, 8))
+                ));
+        when(benchReportRepository.findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(TODAY.plusDays(31)), eq(TODAY.plusDays(60))))
+                .thenReturn(List.of(employee("Kabir Kulkarni", LocalDate.of(2026, 8, 20))));
+        when(benchReportRepository.findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(TODAY.plusDays(61)), eq(TODAY.plusDays(90))))
+                .thenReturn(List.of());
 
-        assertEquals(15, response.getUnder30Days().size());
-        assertEquals(5, response.getThirtyToSixtyDays().size());
+        BenchReportResponse response = benchReportService.buildBenchReport(TODAY);
+
+        assertEquals(2, response.getUnder30Days().size());
+        assertEquals("Past Employee", response.getUnder30Days().get(0).getName());
+        assertEquals(1, response.getThirtyToSixtyDays().size());
         assertEquals(0, response.getSixtyToNinetyDays().size());
     }
 
     @Test
-    void returnsFirstPageWithDefaultSizeTenPerWindow() {
+    void paginatesEachWindowIndependently() {
+        List<InternalEmployee> under30 = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            under30.add(employee("Under30-" + i, TODAY.plusDays(10)));
+        }
+        List<InternalEmployee> thirtyToSixty = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            thirtyToSixty.add(employee("ThirtyToSixty-" + i, TODAY.plusDays(40)));
+        }
+
+        when(benchReportRepository.findByAvailabilityDateLessThanEqualAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(LocalDate.now().plusDays(30))))
+                .thenReturn(under30);
+        when(benchReportRepository.findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(LocalDate.now().plusDays(31)), eq(LocalDate.now().plusDays(60))))
+                .thenReturn(thirtyToSixty);
+        when(benchReportRepository.findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(
+                eq(LocalDate.now().plusDays(61)), eq(LocalDate.now().plusDays(90))))
+                .thenReturn(List.of());
+
         BenchReportPageResponse response = benchReportService.getBenchReport(0, 10);
 
         assertEquals(10, response.getUnder30Days().getContent().size());
         assertEquals(15, response.getUnder30Days().getTotalElements());
         assertEquals(2, response.getUnder30Days().getTotalPages());
-        assertEquals(0, response.getUnder30Days().getPage());
-        assertEquals(10, response.getUnder30Days().getSize());
-
         assertEquals(5, response.getThirtyToSixtyDays().getContent().size());
         assertEquals(0, response.getSixtyToNinetyDays().getContent().size());
-    }
-
-    @Test
-    void returnsSecondPageForLargeWindow() {
-        BenchReportPageResponse response = benchReportService.getBenchReport(1, 10);
-
-        assertEquals(5, response.getUnder30Days().getContent().size());
-        assertEquals(1, response.getUnder30Days().getPage());
     }
 
     @Test
@@ -71,14 +93,13 @@ class BenchReportServiceImplPaginationTest {
         assertThrows(IllegalArgumentException.class, () -> benchReportService.getBenchReport(0, 0));
     }
 
-    private List<BenchEmployeeDto> buildEmployees(int count) {
-        List<BenchEmployeeDto> employees = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            BenchEmployeeDto dto = new BenchEmployeeDto();
-            dto.setEmployeeId((long) i + 1);
-            dto.setName("Employee " + (i + 1));
-            employees.add(dto);
-        }
-        return employees;
+    private InternalEmployee employee(String name, LocalDate availabilityDate) {
+        InternalEmployee employee = new InternalEmployee();
+        employee.setId((long) name.hashCode());
+        employee.setEmployeeId((long) name.hashCode());
+        employee.setName(name);
+        employee.setAvailabilityDate(availabilityDate);
+        employee.setIsDeleted(false);
+        return employee;
     }
 }

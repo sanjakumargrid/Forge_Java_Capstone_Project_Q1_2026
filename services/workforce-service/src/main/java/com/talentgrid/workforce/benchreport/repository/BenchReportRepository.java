@@ -14,4 +14,9 @@ public interface BenchReportRepository extends JpaRepository<InternalEmployee, L
             LocalDate start,
             LocalDate end
     );
+
+    /** Includes overdue availability (past dates) through the given end date. */
+    List<InternalEmployee> findByAvailabilityDateLessThanEqualAndIsDeletedFalseOrderByAvailabilityDateAsc(
+            LocalDate end
+    );
 }
