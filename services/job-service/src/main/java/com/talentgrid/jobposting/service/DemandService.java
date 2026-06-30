@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import java.util.List;
 
@@ -74,11 +77,30 @@ public class DemandService {
         demand.setStatus(p.getStatus());
         demand.setPriority(p.getPriority());
         demand.setPreviousStatus(p.getPreviousStatus());
-        demand.setTargetDate(p.getTargetDate());
-        demand.setSearchStartAt(p.getSearchStartAt());
-        demand.setApprovedAt(p.getApprovedAt());
-        demand.setSourceCreatedAt(p.getCreatedAt());
-        demand.setSourceUpdatedAt(p.getUpdatedAt());
+        demand.setTargetDate(
+                p.getTargetDate() == null
+                        ? null
+                        : p.getTargetDate().atOffset(ZoneOffset.UTC).toLocalDate());
+
+        demand.setSearchStartAt(
+                p.getSearchStartAt() == null
+                        ? null
+                        : p.getSearchStartAt().atOffset(ZoneOffset.UTC));
+
+        demand.setApprovedAt(
+                p.getApprovedAt() == null
+                        ? null
+                        : p.getApprovedAt().atOffset(ZoneOffset.UTC));
+
+        demand.setCreatedAt(
+                p.getCreatedAt() == null
+                        ? null
+                        : p.getCreatedAt().atOffset(ZoneOffset.UTC));
+
+        demand.setUpdatedAt(
+                p.getUpdatedAt() == null
+                        ? null
+                        : p.getUpdatedAt().atOffset(ZoneOffset.UTC));
         demand.setClosureReason(p.getClosureReason());
         demand.setCreatedBy(p.getCreatedBy());
         demand.setAssignedRecruiter(p.getAssignedRecruiter());
@@ -97,9 +119,9 @@ public class DemandService {
 
         // External-posting specifics
         if (p.getWorkMode() != null) demand.setWorkMode(p.getWorkMode());
-        if (p.getExperience() != null) demand.setExperience(p.getExperience());
+        if (p.getExperience() != null) demand.setExperience(Long.valueOf(p.getExperience()));
         if (p.getDepartment() != null) demand.setDepartment(p.getDepartment());
-        if (p.getOnboardingDate() != null) demand.setOnboardingDate(p.getOnboardingDate());
+        if (p.getOnboardingDate() != null) demand.setOnboardingDate(LocalDate.parse(p.getOnboardingDate()));
 
         // Notification & creator routing
         if (p.getRecipientEmail() != null) demand.setRecipientEmail(p.getRecipientEmail());

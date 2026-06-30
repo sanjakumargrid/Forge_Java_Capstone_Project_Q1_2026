@@ -111,7 +111,7 @@ rbac:
       allowed-roles: [ADMIN]
 
     # --- Demands ---
-    - path: "/api/v1/demands"
+    - path: "/api/v1/demands/**"
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
@@ -119,7 +119,7 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
-    - path: "/api/v1/demands"
+    - path: "/api/v1/demands/*"
       methods: [POST]
       allowed-scopes: [DEMAND_CREATE]
 
@@ -440,6 +440,9 @@ rbac:
     - path: "/api/v1/job-postings/from-demand/**"
       methods: [POST]
       allowed-scopes: [JOB_POSTING_CREATE]
+    - path: "/api/v1/job-postings/submit"
+      methods: [ POST ]
+      allowed-scopes: [ JOB_POSTING_CREATE ]
 
     - path: "/api/v1/job-postings/*"
       methods: [GET]

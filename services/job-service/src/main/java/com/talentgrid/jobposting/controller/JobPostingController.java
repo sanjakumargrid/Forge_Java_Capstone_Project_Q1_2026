@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/job-postings")
+@RequestMapping("/api/v1/job-postings")
 @RequiredArgsConstructor
 public class JobPostingController {
 

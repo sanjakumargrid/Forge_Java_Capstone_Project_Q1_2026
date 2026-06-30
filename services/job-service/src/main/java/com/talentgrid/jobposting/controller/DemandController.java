@@ -15,7 +15,7 @@ import java.util.List;
  * used to pre-fill job postings.
  */
 @RestController
-@RequestMapping("/api/demands")
+@RequestMapping("/api/v1/demands")
 @RequiredArgsConstructor
 @Tag(name = "Demands", description = "Hiring demands ingested from the demand-events Kafka topic")
 public class DemandController {

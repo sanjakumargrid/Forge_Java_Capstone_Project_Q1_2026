@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -24,10 +26,7 @@ import java.util.List;
 public class Demand {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "demand_id", unique = true, nullable = false)
+    @Column(name = "demand_id")
     private Long demandId;
 
     @Column(nullable = false)
@@ -88,22 +87,19 @@ public class Demand {
     @Column(name = "previous_status")
     private String previousStatus;
 
-    @Column(name = "target_date")
-    private Instant targetDate;
+    private LocalDate targetDate;
 
     @Column(name = "search_start_at")
-    private Instant searchStartAt;
+    private OffsetDateTime searchStartAt;
 
     @Column(name = "approved_at")
-    private Instant approvedAt;
+    private OffsetDateTime approvedAt;
 
-    /** "createdAt" as reported by the source demand system — distinct from receivedAt below. */
-    @Column(name = "source_created_at")
-    private Instant sourceCreatedAt;
+    /** "createdAt" as reported by the source demand system — distinct from receivedAt below. */@Column(name = "created_at")
+    private OffsetDateTime createdAt;
 
-    @Column(name = "source_updated_at")
-    private Instant sourceUpdatedAt;
-
+    @Column(name = "updated_at")
+    private OffsetDateTime updatedAt;
     @Column(name = "closure_reason")
     private String closureReason;
 
@@ -122,8 +118,9 @@ public class Demand {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    @Version
+    @Column(name = "version")
     private Integer version;
-
     // ── Denormalised display names (from DEMAND_EXTERNAL_OPENED) ───────────────
 
     @Column(name = "account_name")
@@ -146,13 +143,11 @@ public class Demand {
     @Column(name = "work_mode")
     private String workMode;
 
-    private String experience;
+    private Long experience;
 
     private String department;
 
-    @Column(name = "onboarding_date")
-    private String onboardingDate;
-
+    private LocalDate onboardingDate;
     // ── Notification & creator routing (from DEMAND_EXTERNAL_OPENED) ───────────
 
     @Column(name = "recipient_email")
@@ -170,15 +165,70 @@ public class Demand {
     @Column(name = "correlation_id")
     private String correlationId;
 
+    @Column(name = "job_title_id")
+    private Long jobTitleId;
+
+    @Column(name = "req_util_perc")
+    private Integer reqUtilPerc;
+
+    @Column(name = "client_interview")
+    private Boolean clientInterview;
+
+    @Column(name = "bench_hiring")
+    private Boolean benchHiring;
+
+    @Column(name = "fill_type")
+    private String fillType;
+
+    @Column(name = "approval_reminder_sent")
+    private Boolean approvalReminderSent;
+
+    @Column(name = "creator_email")
+    private String creatorEmail;
+
+    @Column(name = "creator_slack_id")
+    private String creatorSlackId;
+
+    @Column(name = "approver_name")
+    private String approverName;
+
     /** When *our* system first ingested this demand — distinct from sourceCreatedAt. */
     @Column(name = "received_at", nullable = false, updatable = false)
     private LocalDateTime receivedAt;
 
     @PrePersist
-    public void prePersist() {
-        this.receivedAt = LocalDateTime.now();
-        if (this.isDeleted == null) {
-            this.isDeleted = false;
+    protected void prePersist() {
+        OffsetDateTime now = OffsetDateTime.now();
+
+        if (createdAt == null) {
+            createdAt = now;
         }
+
+        updatedAt = now;
+
+        if (receivedAt == null) {
+            receivedAt = LocalDateTime.now();
+        }
+
+        if (isDeleted == null) {
+            isDeleted = false;
+        }
+
+        if (benchHiring == null) {
+            benchHiring = false;
+        }
+
+        if (approvalReminderSent == null) {
+            approvalReminderSent = false;
+        }
+
+        if (requiredCount == null) {
+            requiredCount = 1;
+        }
+    }
+
+    @PreUpdate
+    protected void preUpdate() {
+        updatedAt = OffsetDateTime.now();
     }
 }

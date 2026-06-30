@@ -45,12 +45,13 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // Public read-only job posting APIs
-                        .requestMatchers(HttpMethod.GET, "/api/job-postings").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/job-postings/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/job-postings/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/job-postings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/job-postings/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/job-postings/public/**").permitAll()
 
                         // Public read-only demand APIs
-                        .requestMatchers(HttpMethod.GET, "/api/demands/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/demands/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/demands/by-demand-id/**").permitAll()
 
                         // Public read-only analytics APIs
                         .requestMatchers(HttpMethod.GET, "/api/analytics/**").permitAll()

@@ -8,6 +8,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 /**
@@ -46,11 +49,11 @@ public class DemandResponse {
     private String status;
     private String priority;
     private String previousStatus;
-    private Instant targetDate;
-    private Instant searchStartAt;
-    private Instant approvedAt;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private LocalDate targetDate;
+    private OffsetDateTime searchStartAt;
+    private OffsetDateTime approvedAt;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime updatedAt;
     private String closureReason;
 
     private Long createdBy;
@@ -70,9 +73,10 @@ public class DemandResponse {
 
     // ── External-posting specifics (from DEMAND_EXTERNAL_OPENED) ───────────────
     private String workMode;
-    private String experience;
+    private Long experience;
+    private LocalDate onboardingDate;
     private String department;
-    private String onboardingDate;
+
 
     // ── Notification & creator routing (from DEMAND_EXTERNAL_OPENED) ───────────
     private String recipientEmail;
@@ -113,24 +117,24 @@ public class DemandResponse {
                 .targetDate(d.getTargetDate())
                 .searchStartAt(d.getSearchStartAt())
                 .approvedAt(d.getApprovedAt())
-                .createdAt(d.getSourceCreatedAt())
-                .updatedAt(d.getSourceUpdatedAt())
+                .createdAt(d.getCreatedAt())
+                .updatedAt(d.getUpdatedAt())
                 .closureReason(d.getClosureReason())
                 .createdBy(d.getCreatedBy())
                 .creatorName(d.getCreatorName() != null ? d.getCreatorName() : "Unassigned")
-                .creatorEmail(d.getRecipientEmail() != null ? d.getRecipientEmail() : "")
+                .creatorEmail(d.getCreatorEmail() != null ? d.getCreatorEmail() : "")
                 .assignedRecruiter(d.getAssignedRecruiter())
                 .assignedRecruiterName(d.getAssignedRecruiterName() != null ? d.getAssignedRecruiterName() : "Unassigned")
                 .assignedRm(d.getAssignedRm())
                 .assignedRmName(d.getAssignedRmName() != null ? d.getAssignedRmName() : "Unassigned")
                 .approvedBy(d.getApprovedBy())
-                .approverName(d.getApprovedBy() != null ? "Unassigned" : null)
+                .approverName(d.getApproverName() != null ? d.getApproverName() : "Unassigned")
                 .isDeleted(Boolean.TRUE.equals(d.getIsDeleted()))
                 .version(d.getVersion() != null ? d.getVersion() : 1)
                 .workMode(d.getWorkMode())
                 .experience(d.getExperience())
-                .department(d.getDepartment())
                 .onboardingDate(d.getOnboardingDate())
+                .department(d.getDepartment())
                 .recipientEmail(d.getRecipientEmail())
                 .recipientSlackId(d.getRecipientSlackId())
                 .raisedBy(d.getRaisedBy())
@@ -140,16 +144,30 @@ public class DemandResponse {
                 .build();
     }
 
-    private static String computeSlaStatus(Instant targetDate, String status) {
-        if ("CLOSED".equals(status) || "FILLED_INTERNAL".equals(status) || "FILLED_EXTERNAL".equals(status)) {
+    private static String computeSlaStatus(LocalDate targetDate, String status) {
+        if ("CLOSED".equals(status)
+                || "FILLED_INTERNAL".equals(status)
+                || "FILLED_EXTERNAL".equals(status)) {
             return "on_track";
         }
+
         if (targetDate == null) {
             return "on_track";
         }
-        long daysRemaining = Duration.between(Instant.now(), targetDate).toDays();
-        if (daysRemaining < 0) return "overdue";
-        if (daysRemaining <= 7) return "at_risk";
+
+        long daysRemaining = Duration.between(
+                Instant.now(),
+                targetDate.atStartOfDay().toInstant(ZoneOffset.UTC)
+        ).toDays();
+
+        if (daysRemaining < 0) {
+            return "overdue";
+        }
+
+        if (daysRemaining <= 7) {
+            return "at_risk";
+        }
+
         return "on_track";
     }
 }
