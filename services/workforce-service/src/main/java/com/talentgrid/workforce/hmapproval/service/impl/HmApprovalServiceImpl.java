@@ -81,7 +81,23 @@ public class HmApprovalServiceImpl implements HmApprovalService {
                     .build();
         }
 
-        // 3. Accept this nomination
+        // 3. Pre-accept guard — verify engineer doesn't already have 2 ACCEPTED demand assignments
+        //    (PENDING_REVIEW on this demand is fine; we check ACCEPTED on *other* demands only)
+        long acceptedOnOtherDemands = internalMatchRepository
+                .findByEmployee_IdAndIsDeletedFalse(match.getEmployee().getId())
+                .stream()
+                .filter(m -> MatchStatus.ACCEPTED.equals(m.getMatchStatus())
+                          && !match.getDemandId().equals(m.getDemandId()))
+                .count();
+        if (acceptedOnOtherDemands >= 2) {
+            log.warn("Cannot accept matchId={}: engineer {} is already ACCEPTED on {} other demands",
+                    matchId, match.getEmployee().getId(), acceptedOnOtherDemands);
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Cannot accept: engineer is already committed to 2 other demands. " +
+                    "Maximum active demand limit of 2 reached.");
+        }
+
+        // 4. Accept this nomination
         LocalDateTime now = LocalDateTime.now();
         match.setMatchStatus(MatchStatus.ACCEPTED);
         match.setApprovalReasonByHm(request.getReason());
@@ -105,16 +121,19 @@ public class HmApprovalServiceImpl implements HmApprovalService {
         });
         internalMatchRepository.saveAll(otherPending);
 
-        // 5. Transition demand → FILLED_INTERNAL
+        // 5. Transition demand → FILLED
         try {
             rmgService.updateDemandStatus(
                     match.getDemandId(),
-                    "FILLED_INTERNAL",
-                    "FILLED_INTERNAL",
+                    "FILLED",
+                    "FILLED",
                     "Demand filled internally via HM acceptance of matchId=" + matchId
             );
         } catch (Exception ex) {
-            log.warn("Could not transition demand {} to FILLED_INTERNAL: {}", match.getDemandId(), ex.getMessage());
+            log.error("Failed to transition demand {} to FILLED after HM acceptance of matchId={}: {}",
+                    match.getDemandId(), matchId, ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                    "Match accepted but demand status could not be updated: " + ex.getMessage(), ex);
         }
 
         // 6. Kafka: publish accepted event

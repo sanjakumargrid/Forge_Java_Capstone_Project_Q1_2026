@@ -23,7 +23,7 @@ public interface HmApprovalService {
      *       without making any changes.</li>
      *   <li>If {@code request.confirmed == true}: accepts this nomination, auto-rejects all other
      *       PENDING_REVIEW nominations for the same demand, and transitions the demand to
-     *       FILLED_INTERNAL.</li>
+     *       FILLED.</li>
      * </ul>
      */
     HmReviewOutcomeResponse acceptNomination(Long matchId, HmAcceptRequest request);

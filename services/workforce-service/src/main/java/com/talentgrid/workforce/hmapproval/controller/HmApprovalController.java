@@ -32,11 +32,8 @@ public class HmApprovalController {
     private final HmApprovalService hmApprovalService;
 
     @GetMapping("/demand/{demandId}")
-    @PreAuthorize("hasAuthority('HM_NOMINATION_VIEW')")
-    @Operation(
-            summary = "List nominations pending HM review",
-            description = "Returns all engineers nominated by RMG that are in PENDING_REVIEW status for the given demand."
-    )
+    @PreAuthorize("hasAuthority('DEMAND_HM_NOMINATION_DECIDE')")
+    @Operation(summary = "List nominations pending HM review", description = "Returns all engineers nominated by RMG that are in PENDING_REVIEW status for the given demand.")
     public ResponseEntity<List<HmNominatedEngineerResponse>> getPendingNominations(
             @PathVariable Long demandId) {
         log.info("HM fetching pending nominations for demandId={}", demandId);
@@ -44,15 +41,12 @@ public class HmApprovalController {
     }
 
     @PostMapping("/{matchId}/accept")
-    @PreAuthorize("hasAuthority('HM_NOMINATION_REVIEW')")
-    @Operation(
-            summary = "Accept a nominated engineer",
-            description = "HM accepts one engineer for the demand. " +
-                          "Send confirmed=false first to get a confirmation prompt (accidental-click guard). " +
-                          "Send confirmed=true to complete the acceptance. " +
-                          "All other PENDING_REVIEW nominations for the same demand are auto-rejected. " +
-                          "Mandatory written reason must be at least 20 characters."
-    )
+    @PreAuthorize("hasAuthority('DEMAND_HM_NOMINATION_DECIDE')")
+    @Operation(summary = "Accept a nominated engineer", description = "HM accepts one engineer for the demand. " +
+            "Send confirmed=false first to get a confirmation prompt (accidental-click guard). " +
+            "Send confirmed=true to complete the acceptance. " +
+            "All other PENDING_REVIEW nominations for the same demand are auto-rejected. " +
+            "Mandatory written reason must be at least 20 characters.")
     public ResponseEntity<HmReviewOutcomeResponse> acceptNomination(
             @PathVariable Long matchId,
             @Valid @RequestBody HmAcceptRequest request) {
@@ -61,12 +55,10 @@ public class HmApprovalController {
     }
 
     @PostMapping("/{matchId}/reject")
-    @PreAuthorize("hasAuthority('HM_NOMINATION_REVIEW')")
-    @Operation(
-            summary = "Reject a nominated engineer",
-            description = "HM manually rejects a specific nomination with a mandatory written reason (≥ 20 characters). " +
-                          "The demand status is not changed — it stays INTERNAL_SEARCH until an acceptance happens."
-    )
+    @PreAuthorize("hasAuthority('DEMAND_HM_NOMINATION_DECIDE')")
+    @Operation(summary = "Reject a nominated engineer", description = "HM manually rejects a specific nomination with a mandatory written reason (≥ 20 characters). "
+            +
+            "The demand status is not changed — it stays INTERNAL_SEARCH until an acceptance happens.")
     public ResponseEntity<HmReviewOutcomeResponse> rejectNomination(
             @PathVariable Long matchId,
             @Valid @RequestBody HmRejectRequest request) {
@@ -76,13 +68,11 @@ public class HmApprovalController {
 
     @GetMapping("/demand/{demandId}/hiring-type")
     @PreAuthorize("hasAuthority('DEMAND_HM_NOMINATION_DECIDE')")
-    @Operation(
-            summary = "Determine hiring type for a demand",
-            description = "Looks up the role of the user who approved the demand. " +
-                          "Returns INTERNAL if the approver is a RESOURCE_MANAGER, " +
-                          "EXTERNAL if the approver is a RECRUITER, " +
-                          "or UNKNOWN if the role cannot be determined."
-    )
+    @Operation(summary = "Determine hiring type for a demand", description = "Looks up the role of the user who approved the demand. "
+            +
+            "Returns INTERNAL if the approver is a RESOURCE_MANAGER, " +
+            "EXTERNAL if the approver is a RECRUITER, " +
+            "or UNKNOWN if the role cannot be determined.")
     public ResponseEntity<HiringTypeResponse> getHiringType(
             @PathVariable Long demandId) {
         log.info("Resolving hiring type for demandId={}", demandId);

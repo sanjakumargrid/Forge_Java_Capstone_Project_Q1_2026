@@ -6,6 +6,7 @@ public enum DemandTransitionStatus {
     APPROVED,
     INTERNAL_SEARCH,
     OPEN_EXTERNAL,
+    FILLED,
     FILLED_PARTIALLY,
     FILLED_INTERNAL,
     FILLED_EXTERNAL,
