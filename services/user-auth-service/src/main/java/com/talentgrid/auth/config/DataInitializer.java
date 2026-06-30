@@ -33,8 +33,6 @@ import java.util.Set;
 
 /**
  * Seeds scopes and roles for local/dev. Align scope names with
- * {@code talentgrid-api-gateway-service} {@code rbac-rules.yml} and downstream
- * {@code @PreAuthorize}.
  * {@code talentgrid-api-gateway-service} {@code rbac-rules.yml} and downstream {@code @PreAuthorize}.
  */
 @Slf4j
@@ -58,9 +56,8 @@ public class DataInitializer implements CommandLineRunner {
         Map<String, Scope> scopesByName = seedAllScopes();
 
         Role adminRole = upsertRole("ADMIN");
-        addScopes(adminRole,
-                ScopeCatalog.allScopeNames().stream().map(scopesByName::get).toArray(Scope[]::new));
-        addScopes(adminRole, ScopeCatalog.allScopeNames().stream().map(scopesByName::get).toArray(Scope[]::new));
+        addScopes(adminRole, scopes(scopesByName,
+                ScopeCatalog.allScopeNames().toArray(String[]::new)));
 
         Role portfolioManagerRole = upsertRole("PORTFOLIO_MANAGER");
         addScopes(portfolioManagerRole, scopes(scopesByName,
@@ -112,14 +109,6 @@ public class DataInitializer implements CommandLineRunner {
                 "APPLICATION_VIEW", "ENGINEER_SELF_UPDATE", "WORKFORCE_AI_UPSKILL_VIEW",
                 "WORKFORCE_PROFILE_VIEW", "WORKFORCE_PROFILE_UPDATE"));
 
-        seedDefaultUsers(adminRole, portfolioManagerRole, hiringManagerRole, resourceManagerRole);
-        seedReferenceData();
-    }
-        addScopes(employeeRole, scopes(scopesByName,
-                "DEMAND_VIEW", "SCORECARD_VIEW", "SCORECARD_CREATE", "SCORECARD_DELETE",
-                "APPLICATION_VIEW", "ENGINEER_SELF_UPDATE", "WORKFORCE_AI_UPSKILL_VIEW",
-                "WORKFORCE_PROFILE_VIEW", "WORKFORCE_PROFILE_UPDATE"));
-
         seedDefaultUsers(adminRole, portfolioManagerRole, hiringManagerRole, resourceManagerRole,
                 recruiterRole, taManagerRole, employeeRole);
         seedReferenceData();
@@ -127,24 +116,11 @@ public class DataInitializer implements CommandLineRunner {
 
     private Map<String, Scope> seedAllScopes() {
         Map<String, Scope> scopesByName = new HashMap<>();
-        ScopeCatalog.allScopes()
-                .forEach((name, description) -> scopesByName.put(name, upsertScope(name, description)));
-        return scopesByName;
-    }
-    private Map<String, Scope> seedAllScopes() {
-        Map<String, Scope> scopesByName = new HashMap<>();
         ScopeCatalog.allScopes().forEach((name, description) ->
                 scopesByName.put(name, upsertScope(name, description)));
         return scopesByName;
     }
 
-    private Scope[] scopes(Map<String, Scope> scopesByName, String... names) {
-        return java.util.Arrays.stream(names).map(scopesByName::get).toArray(Scope[]::new);
-    }
-
-    private void seedDefaultUsers(Role adminRole, Role portfolioManagerRole,
-                                  Role hiringManagerRole, Role resourceManagerRole) {
-        if (!userRepository.existsByEmail("admin@griddynamics.com")) {
     private Scope[] scopes(Map<String, Scope> scopesByName, String... names) {
         return java.util.Arrays.stream(names).map(scopesByName::get).toArray(Scope[]::new);
     }
@@ -196,10 +172,7 @@ public class DataInitializer implements CommandLineRunner {
                     .build());
             log.info("Default resource manager user created.");
         }
-    }
 
-    private void seedReferenceData() {
-        Account account;
         if (!userRepository.existsByEmail("recruiter@griddynamics.com")) {
             userRepository.save(User.builder()
                     .username("Recruiter-User")

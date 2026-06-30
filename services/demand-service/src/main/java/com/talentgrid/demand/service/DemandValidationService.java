@@ -119,18 +119,14 @@ public class DemandValidationService {
     public void validateUpdate(DemandRequest request, String demandStatus) {
         List<String> errors = new ArrayList<>();
 
-        if (request.getReasonForEdit() == null || request.getReasonForEdit().isBlank()) {
-            errors.add("reasonForEdit is required for demand updates");
-        } else if (request.getReasonForEdit().length() > 1000) {
-            errors.add("reasonForEdit must not exceed 1000 characters");
-        }
-
         if (!"DRAFT".equals(demandStatus)) {
             if (request.getReasonForEdit() == null || request.getReasonForEdit().isBlank()) {
                 errors.add("reasonForEdit is required for demand updates");
             } else if (request.getReasonForEdit().length() > 1000) {
                 errors.add("reasonForEdit must not exceed 1000 characters");
             }
+        } else if (request.getReasonForEdit() != null && request.getReasonForEdit().length() > 1000) {
+            errors.add("reasonForEdit must not exceed 1000 characters");
         }
 
         if (request.getTitle() != null) {

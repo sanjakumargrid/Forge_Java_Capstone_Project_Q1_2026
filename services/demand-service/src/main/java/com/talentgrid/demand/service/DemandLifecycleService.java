@@ -257,7 +257,6 @@ public class DemandLifecycleService {
 
         demand.setStatus(DemandStatus.APPROVED);
         writeHistory(demand, fromStatus, DemandStatus.APPROVED, null, comments);
-        eventProducer.publishApproved(demand);
     }
 
     /**

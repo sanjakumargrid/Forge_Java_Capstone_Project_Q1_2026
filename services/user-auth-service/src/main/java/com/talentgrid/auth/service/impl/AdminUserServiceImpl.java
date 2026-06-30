@@ -18,8 +18,6 @@ import com.talentgrid.auth.repository.UserAccountAssignmentRepository;
 import com.talentgrid.auth.service.RefreshTokenService;
 import com.talentgrid.auth.service.interfaces.AdminUserService;
 import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
-import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
-import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.auth.kafka.AuthUserEventPublisher;
 import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.kafka.events.auth.UserCreatedPayload;
@@ -177,7 +175,6 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         // 6. Hard-delete user
         userRepository.delete(user);
-        userSecurityRefreshService.refreshUser(savedUser);
 
         log.info("User {} hard-deleted and assignments/sessions cleaned up.", user.getEmail());
     }

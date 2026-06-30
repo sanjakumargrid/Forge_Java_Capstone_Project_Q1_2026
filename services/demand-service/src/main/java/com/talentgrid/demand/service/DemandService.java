@@ -13,7 +13,6 @@ import com.talentgrid.demand.mapper.DemandMapper;
 import com.talentgrid.demand.repository.DemandRepository;
 import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
 import com.talentgrid.demand.repository.DemandSkillRepository;
-import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
 import com.talentgrid.demand.util.SecurityUtils;
 import com.talentgrid.demand.client.UserAuthServiceClient;
 import com.talentgrid.audit.client.AuditLogClient;
@@ -82,26 +81,6 @@ public class DemandService {
             DemandStatus.ON_HOLD);
 
     /**
-     * Statuses at or past APPROVED where a subset of fields become locked
-     * (Role Title, Client Account, Business Unit, Project, Priority,
-     * Seniority Level, Employment Type, Department).
-     */
-    private static final Set<DemandStatus> POST_APPROVAL_STATUSES = EnumSet.of(
-            DemandStatus.APPROVED,
-            DemandStatus.INTERNAL_SEARCH,
-            DemandStatus.OPEN_EXTERNAL,
-            DemandStatus.ON_HOLD);
-
-    /** Statuses that allow any form of field editing. */
-    private static final Set<DemandStatus> EDITABLE_STATUSES = EnumSet.of(
-            DemandStatus.DRAFT,
-            DemandStatus.PENDING_APPROVAL,
-            DemandStatus.APPROVED,
-            DemandStatus.INTERNAL_SEARCH,
-            DemandStatus.OPEN_EXTERNAL,
-            DemandStatus.ON_HOLD);
-
-    /**
      * Statuses at or past {@code INTERNAL_SEARCH} where eight core fields are
      * locked (Role Title, Client Account, Business Unit, Project, Priority,
      * Seniority Level, Employment Type, Department).
@@ -118,7 +97,6 @@ public class DemandService {
     private final DemandRepository demandRepository;
     private final DemandStatusHistoryRepository demandStatusHistoryRepository;
     private final DemandSkillRepository demandSkillRepository;
-    private final DemandStatusHistoryRepository demandStatusHistoryRepository;
     private final DemandMapper demandMapper;
     private final DemandValidationService validationService;
     private final AuditLogClient auditLogClient;
@@ -228,10 +206,6 @@ public class DemandService {
     @Transactional
     public DemandResponse updateDemand(Long id, DemandRequest request) {
         Demand demand = findActiveOrThrow(id);
-        requireEditableState(demand);
-        assertLockedFieldsNotModified(request, demand);
-
-        Map<String, Object> beforeState = snapshotDemand(demand);
         rejectTerminalEdit(demand);
         validationService.validateUpdate(request, demand.getStatus().name());
         requireEditableState(demand);
@@ -495,113 +469,6 @@ public class DemandService {
     }
 
     /**
-     * Asserts the demand is in an editable status for field updates.
-     * Editing is allowed for: DRAFT, PENDING_APPROVAL, APPROVED,
-     * INTERNAL_SEARCH, OPEN_EXTERNAL, ON_HOLD.
-     * Throws {@link InvalidDemandStateException} for FILLED or CLOSED.
-     */
-    private void requireEditableState(Demand demand) {
-        if (!EDITABLE_STATUSES.contains(demand.getStatus())) {
-            throw new InvalidDemandStateException(
-                    String.format("Cannot update demand (id=%d): editing is not allowed in status %s. " +
-                            "Allowed statuses: DRAFT, PENDING_APPROVAL, APPROVED, INTERNAL_SEARCH, OPEN_EXTERNAL, ON_HOLD.",
-                            demand.getDemandId(), demand.getStatus()));
-        }
-    }
-
-    /**
-     * Validates that no locked fields are included in the request when the demand
-     * has already reached or passed {@code APPROVED} status.
-
-     *
-     * <p>Locked fields: Role Title ({@code jobTitleId/title}), Client Account
-     * ({@code accountId}), Business Unit ({@code businessUnit}), Project
-     * ({@code projectId}), Priority ({@code priority}), Seniority Level
-     * ({@code level}), Employment Type ({@code employmentType}),
-     * Department ({@code department}).
-     */
-    private void assertLockedFieldsNotModified(DemandRequest request, Demand demand) {
-        if (!POST_APPROVAL_STATUSES.contains(demand.getStatus())) {
-            return;
-        }
-        List<String> violations = new ArrayList<>();
-        if (request.getJobTitleId() != null || request.getTitle() != null) {
-            violations.add("Role Title (jobTitleId/title)");
-        }
-        if (request.getAccountId() != null) {
-            violations.add("Client Account (accountId)");
-        }
-        if (request.getBusinessUnit() != null) {
-            violations.add("Business Unit (businessUnit)");
-        }
-        if (request.getProjectId() != null) {
-            violations.add("Project Name (projectId)");
-        }
-        if (request.getPriority() != null) {
-            violations.add("Priority");
-        }
-        if (request.getLevel() != null) {
-            violations.add("Seniority Level (level)");
-        }
-        if (request.getEmploymentType() != null) {
-            violations.add("Employment Type");
-        }
-        if (request.getDepartment() != null) {
-            violations.add("Department");
-        }
-        if (!violations.isEmpty()) {
-            throw new InvalidDemandStateException(
-                    String.format("Cannot modify locked field(s) for demand (id=%d) in status %s: %s.",
-                            demand.getDemandId(), demand.getStatus(), String.join(", ", violations)));
-        }
-    }
-
-    /**
-     * Writes a {@link DemandStatusHistory} record to capture an edit event
-     * (non-status-change) with the caller's reason. The {@code fromStatus} and
-     * {@code toStatus} are both set to the current demand status to distinguish
-     * these records from true lifecycle transitions.
-     */
-    private void persistEditHistory(Demand demand, String reasonForEdit) {
-        DemandStatusHistory history = new DemandStatusHistory();
-        history.setDemand(demand);
-        history.setFromStatus(demand.getStatus());
-        history.setToStatus(demand.getStatus());
-        history.setChangedBy(SecurityUtils.getCurrentUserId());
-        history.setComments(reasonForEdit);
-        demandStatusHistoryRepository.save(history);
-    }
-
-    /**
-     * Builds a lightweight before/after snapshot of the auditable scalar fields
-     * of a demand. Used to populate {@code beforeState}/{@code afterState} in the
-     * audit log payload so reviewers can see exactly what changed.
-     */
-    private Map<String, Object> snapshotDemand(Demand demand) {
-        Map<String, Object> snap = new java.util.LinkedHashMap<>();
-        snap.put("title",          demand.getTitle());
-        snap.put("status",         demand.getStatus() != null ? demand.getStatus().name() : null);
-        snap.put("priority",       demand.getPriority() != null ? demand.getPriority().name() : null);
-        snap.put("level",          demand.getLevel() != null ? demand.getLevel().name() : null);
-        snap.put("employmentType", demand.getEmploymentType() != null ? demand.getEmploymentType().name() : null);
-        snap.put("workMode",       demand.getWorkMode() != null ? demand.getWorkMode().name() : null);
-        snap.put("location",       demand.getLocation());
-        snap.put("businessUnit",   demand.getBusinessUnit());
-        snap.put("department",     demand.getDepartment());
-        snap.put("accountId",      demand.getAccountId());
-        snap.put("accountName",    demand.getAccountName());
-        snap.put("projectId",      demand.getProjectId());
-        snap.put("projectName",    demand.getProjectName());
-        snap.put("budget",         demand.getBudget());
-        snap.put("reqUtilPerc",    demand.getReqUtilPerc());
-        snap.put("experience",     demand.getExperience());
-        snap.put("targetDate",     demand.getTargetDate() != null ? demand.getTargetDate().toString() : null);
-        snap.put("searchStartAt",  demand.getSearchStartAt() != null ? demand.getSearchStartAt().toString() : null);
-        snap.put("onboardingDate", demand.getOnboardingDate() != null ? demand.getOnboardingDate().toString() : null);
-        return snap;
-    }
-
-    /**
      * Replaces all skill associations for the given demand with the supplied lists.
      *
      * <p><strong>Semantics (PATCH-friendly):</strong>
@@ -645,59 +512,24 @@ public class DemandService {
      * entity references are still tracked.
      */
     private void syncDemandSkills(Demand demand, List<Long> requestMandatory, List<Long> requestOptional) {
-        // Determine the final desired state for each category.
-        // null → not sent by client → keep the existing skills for that category.
-        // non-null (even empty) → client wants full replacement for that category.
         List<Long> mandatoryIds = requestMandatory != null
                 ? requestMandatory
                 : extractSkillIds(demand.getDemandSkills(), true);
 
-        List<Long> optionalIds = requestOptional != null
-                ? requestOptional
-                : extractSkillIds(demand.getDemandSkills(), false);
-        // null → not sent by client → keep existing skills for that category
-        List<Long> mandatoryIds = requestMandatory != null
-                ? requestMandatory
-                : extractSkillIds(demand.getDemandSkills(), true);
         List<Long> optionalIds = requestOptional != null
                 ? requestOptional
                 : extractSkillIds(demand.getDemandSkills(), false);
 
         validationService.validateSkillLists(mandatoryIds, optionalIds);
 
-        // Clear the managed collection so Hibernate schedules orphan-removal DELETEs.
         if (demand.getDemandSkills() != null) {
             demand.getDemandSkills().clear();
         } else {
             demand.setDemandSkills(new ArrayList<>());
         }
 
-        // Flush DELETEs to the DB now, before any new INSERT — prevents unique-constraint
-        // violations when the same skill ID appears in the replacement list.
-        demandRepository.saveAndFlush(demand);
-
-        // Rebuild the in-memory collection with the new desired state.
-        List<DemandSkill> newSkills = createDemandSkills(demand, mandatoryIds, optionalIds);
-        demand.getDemandSkills().addAll(newSkills);
-        // Step 1: Detach the existing DemandSkill entities from the managed collection
-        // BEFORE issuing the bulk delete. This must happen first so Hibernate's
-        // orphanRemoval/cascade tracking loses its reference to these entities.
-        // If we clear AFTER the bulk delete, Hibernate still holds stale managed
-        // references and tries to issue a second DELETE at flush time, which fails
-        // with ObjectOptimisticLockingFailureException because the rows are already gone.
-        if (demand.getDemandSkills() != null) {
-            demand.getDemandSkills().clear();
-        } else {
-            demand.setDemandSkills(new ArrayList<>());
-        }
-
-        // Step 2: Bulk-delete all existing demand_skills rows via explicit JPQL.
-        // Because the collection is already cleared above, Hibernate will not issue
-        // any additional orphan-removal DELETEs for these rows at flush time.
         demandSkillRepository.deleteByDemandDemandId(demand.getDemandId());
 
-        // Step 3: Build new DemandSkill entities and add them into the now-empty
-        // managed collection. Hibernate will cascade-INSERT these when the demand is saved.
         List<DemandSkill> newSkills = createDemandSkills(demand, mandatoryIds, optionalIds);
         demand.getDemandSkills().addAll(newSkills);
     }
@@ -852,5 +684,4 @@ public class DemandService {
         }
         return response;
     }
-}
 }

@@ -1,3 +1,5 @@
+package com.talentgrid.demand;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -8,7 +10,7 @@ public class TestJson {
         String json = "{\n" +
                 "  \"title\": \"Senior Java and Springboot Developer\",\n" +
                 "  \"description\": \"Looking for a backend developer with strong Spring Boot and microservices experience.\",\n" +
-                "  \"level\": \"T3_SENIOR\",\n" +
+                "  \"level\": \"T3\",\n" +
                 "  \"location\": \"Bangalore\",\n" +
                 "  \"accountId\": 2053,\n" +
                 "  \"projectId\": 9063,\n" +
