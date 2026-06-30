@@ -14,6 +14,11 @@ import lombok.*;
 public class Interviewer {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "interviewer_id")
+    private Long interviewer_id;
+
+
     @Column(name = "employee_id")
     private Long employeeId;
 

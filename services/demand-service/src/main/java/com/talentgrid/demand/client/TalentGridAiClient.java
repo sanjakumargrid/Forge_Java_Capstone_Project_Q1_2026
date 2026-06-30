@@ -8,12 +8,12 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "talentgrid-ai-client", url = "${ai.service.base-url:http://localhost:8084}")
+@FeignClient(name = "talentgrid-ai-client", url = "${ai.service.base-url:http://localhost:8090}")
 public interface TalentGridAiClient {
 
-    @PostMapping("/api/t4/v1/ai/llm/complete")
+    @PostMapping("/api/v1/ai/llm/complete")
     AiLlmCompleteResponse complete(@RequestBody AiLlmCompleteRequest request);
 
-    @PostMapping("/api/t4/v1/ai/llm/embed")
+    @PostMapping("/api/v1/ai/llm/embed")
     AiEmbedResponse embed(@RequestBody AiEmbedRequest request);
 }

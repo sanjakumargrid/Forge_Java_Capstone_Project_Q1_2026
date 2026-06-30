@@ -4,7 +4,6 @@ import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.entity.DemandStatusHistory;
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
-import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.dto.response.DemandStatusHistoryResponse;
@@ -112,7 +111,7 @@ public class DemandMapper {
         response.setDemandId(demand.getDemandId());
         response.setTitle(demand.getTitle());
         response.setDescription(demand.getDescription());
-        response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
+        response.setLevel(demand.getLevel());
         response.setEmploymentType(enumName(demand.getEmploymentType()));
         response.setLocation(demand.getLocation());
         response.setAccountId(demand.getAccountId());
@@ -185,7 +184,7 @@ public class DemandMapper {
         response.setAccountName(demand.getAccountName());
         response.setProjectId(demand.getProjectId());
         response.setProjectName(demand.getProjectName());
-        response.setLevel(demand.getLevel() != null ? demand.getLevel().getGrade() : null);
+        response.setLevel(demand.getLevel());
         response.setEmploymentType(enumName(demand.getEmploymentType()));
         response.setLocation(demand.getLocation());
         response.setStatus(enumName(demand.getStatus()));

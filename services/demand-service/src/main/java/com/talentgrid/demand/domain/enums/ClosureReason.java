@@ -24,6 +24,9 @@ public enum ClosureReason {
     WITHDRAWN,
     /** System auto-close immediately after FILLED. */
     AUTO_CLOSED_AFTER_FILL,
+
+    HM_CLOSED,
+
     /** Generic terminal reason. */
     OTHER
 }

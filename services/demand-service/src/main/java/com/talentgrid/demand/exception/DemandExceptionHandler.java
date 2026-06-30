@@ -15,6 +15,10 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import com.talentgrid.demand.ai.AllAiProvidersFailedException;
 import com.talentgrid.demand.dto.response.ErrorResponse;
 
+import java.sql.SQLException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Global exception handler for the demand service.
  * Returns structured JSON error responses with status, message, and timestamp.
@@ -23,6 +27,11 @@ import com.talentgrid.demand.dto.response.ErrorResponse;
 public class DemandExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(DemandExceptionHandler.class);
+
+    private static final Pattern NOT_NULL_COLUMN =
+            Pattern.compile("null value in column \"([^\"]+)\" of relation \"([^\"]+)\"");
+    private static final Pattern CONSTRAINT_NAME =
+            Pattern.compile("constraint \"([^\"]+)\"");
 
     @ExceptionHandler(DemandNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(DemandNotFoundException ex) {
@@ -92,11 +101,8 @@ public class DemandExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        log.warn("Data integrity violation: {}", ex.getMessage());
-        String message = "Invalid data: duplicate or conflicting values supplied";
-        if (ex.getMessage() != null && ex.getMessage().contains("uq_demand_skill")) {
-            message = "Duplicate skill association for this demand; each skill can appear only once";
-        }
+        String message = resolveDataIntegrityMessage(ex);
+        log.warn("Data integrity violation: {}", message, ex);
         return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
@@ -106,7 +112,74 @@ public class DemandExceptionHandler {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred: " + ex.getClass().getName() + " - " + ex.getMessage());
     }
 
-    // ─── Private helper ─────────────────────────────────────────────────────────
+    // ─── Private helpers ────────────────────────────────────────────────────────
+
+    private String resolveDataIntegrityMessage(DataIntegrityViolationException ex) {
+        String rawMessage = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : ex.getMessage();
+
+        if (rawMessage != null && rawMessage.contains("uq_demand_skill")) {
+            return "Duplicate skill association for this demand; each skill can appear only once";
+        }
+
+        SQLException sqlException = findSqlException(ex);
+        if (sqlException != null) {
+            return mapSqlExceptionMessage(sqlException);
+        }
+
+        return rawMessage != null
+                ? "Database constraint violation: " + rawMessage
+                : "Database constraint violation";
+    }
+
+    private String mapSqlExceptionMessage(SQLException sqlException) {
+        String sqlState = sqlException.getSQLState();
+        String message = sqlException.getMessage() != null ? sqlException.getMessage() : "";
+        String constraintSuffix = formatConstraintSuffix(message);
+
+        if ("23502".equals(sqlState)) {
+            Matcher matcher = NOT_NULL_COLUMN.matcher(message);
+            if (matcher.find()) {
+                return String.format(
+                        "Required value missing for column '%s' on table '%s'%s",
+                        matcher.group(1),
+                        matcher.group(2),
+                        constraintSuffix);
+            }
+            return "Required value missing for a mandatory database column" + constraintSuffix;
+        }
+
+        if ("23505".equals(sqlState)) {
+            return "Duplicate or conflicting values supplied" + constraintSuffix;
+        }
+
+        if ("23503".equals(sqlState)) {
+            return "Referenced record does not exist or cannot be removed due to existing references"
+                    + constraintSuffix;
+        }
+
+        return "Database constraint violation (SQL state " + sqlState + "): " + message;
+    }
+
+    private static String formatConstraintSuffix(String message) {
+        Matcher matcher = CONSTRAINT_NAME.matcher(message);
+        if (matcher.find()) {
+            return " (constraint: " + matcher.group(1) + ")";
+        }
+        return "";
+    }
+
+    private static SQLException findSqlException(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof SQLException sqlException) {
+                return sqlException;
+            }
+            current = current.getCause();
+        }
+        return null;
+    }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message) {
         ErrorResponse body = new ErrorResponse(status.value(), status.getReasonPhrase(), message);

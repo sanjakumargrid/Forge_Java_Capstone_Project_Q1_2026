@@ -4,7 +4,6 @@ import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.FillType;
-import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.dto.response.DemandPipelineResponse;
 import com.talentgrid.demand.exception.DemandNotFoundException;
 import com.talentgrid.demand.mapper.DemandMapper;
@@ -117,7 +116,7 @@ class DemandQueryServicePipelineTest {
         demand.setIsFilled(isFilled);
         demand.setFillType(fillType);
         demand.setIsDeleted(false);
-        demand.setLevel(SeniorityLevel.T2_MID);
+        demand.setLevel("T2");
         demand.setPriority(DemandPriority.HIGH);
         demand.setLocation("Remote");
         demand.setBusinessUnit("Platform");

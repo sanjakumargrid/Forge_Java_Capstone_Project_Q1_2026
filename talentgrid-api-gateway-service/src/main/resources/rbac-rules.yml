@@ -103,6 +103,8 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW, DEMAND_CREATE, DEMAND_UPDATE, USER_VIEW]
 
+
+
     # --- User-account assignments (admin only) ---
     - path: "/api/v1/assignments/**"
       methods: [GET, POST, PUT, DELETE]
@@ -157,6 +159,10 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
+    - path: "/api/v1/demands/**/edit-history"
+      methods: [GET]
+      allowed-scopes: [DEMAND_VIEW]
+
     - path: "/api/v1/demands/**/skills"
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
@@ -180,6 +186,10 @@ rbac:
     - path: "/api/v1/lookups/skills"
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
+
+    - path: "/api/v1/lookups/seniority-levels"
+      methods: [ GET ]
+      allowed-scopes: [ DEMAND_VIEW ]
 
     - path: "/api/v1/demands/**/nominations"
       methods: [POST]

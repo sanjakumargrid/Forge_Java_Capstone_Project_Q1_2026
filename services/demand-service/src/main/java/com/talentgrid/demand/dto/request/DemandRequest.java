@@ -1,7 +1,6 @@
 package com.talentgrid.demand.dto.request;
 
 import com.talentgrid.demand.domain.enums.DemandPriority;
-import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
 import com.talentgrid.demand.domain.enums.WorkMode;
 
@@ -40,7 +39,7 @@ public class DemandRequest {
     @NotBlank(message = "Description is required.")
     @Size(min = 250, max = 2000, message = "Description must be between 250 and 2000 characters.")
     private String description;
-    private SeniorityLevel level;
+    private String level;
     private String location;
     private Long accountId;
     private Long projectId;

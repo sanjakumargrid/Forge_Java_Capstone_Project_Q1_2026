@@ -25,6 +25,7 @@ public class DemandResponse {
     private String title;
     private String description;
     private String level;
+    private String levelDisplayName;
     private String employmentType;
     private String location;
     private Long accountId;

@@ -1,6 +1,7 @@
 package com.talentgrid.demand.service;
 
 import com.talentgrid.demand.dto.request.DemandRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,10 @@ import java.util.Set;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DemandValidationService {
+
+    private final SeniorityLevelLookupService seniorityLevelLookupService;
 
     /**
      * Validates a create demand request. All mandatory fields must be present.
@@ -44,6 +48,12 @@ public class DemandValidationService {
 
         if (request.getLevel() == null) {
             errors.add("level (seniority level) is required");
+        } else {
+            try {
+                seniorityLevelLookupService.resolveByGrade(request.getLevel());
+            } catch (IllegalArgumentException e) {
+                errors.add(e.getMessage());
+            }
         }
 
         if (request.getPriority() == null) {
@@ -100,17 +110,27 @@ public class DemandValidationService {
     /**
      * Validates an update demand request. Only non-null fields are validated.
      * {@code reasonForEdit} is always required on every update.
+     * {@code reasonForEdit} is required for all updates except when the demand is in DRAFT status.
      *
      * @param request the update request to validate
+     * @param demandStatus the current demand status (to determine if reasonForEdit is required)
      * @throws IllegalArgumentException if validation fails
      */
-    public void validateUpdate(DemandRequest request) {
+    public void validateUpdate(DemandRequest request, String demandStatus) {
         List<String> errors = new ArrayList<>();
 
         if (request.getReasonForEdit() == null || request.getReasonForEdit().isBlank()) {
             errors.add("reasonForEdit is required for demand updates");
         } else if (request.getReasonForEdit().length() > 1000) {
             errors.add("reasonForEdit must not exceed 1000 characters");
+        }
+
+        if (!"DRAFT".equals(demandStatus)) {
+            if (request.getReasonForEdit() == null || request.getReasonForEdit().isBlank()) {
+                errors.add("reasonForEdit is required for demand updates");
+            } else if (request.getReasonForEdit().length() > 1000) {
+                errors.add("reasonForEdit must not exceed 1000 characters");
+            }
         }
 
         if (request.getTitle() != null) {
@@ -153,6 +173,22 @@ public class DemandValidationService {
                 errors.add("department must not be blank");
             } else if (request.getDepartment().length() > 150) {
                 errors.add("department must not exceed 150 characters");
+            }
+        }
+
+        if (request.getDepartment() != null) {
+            if (request.getDepartment().isBlank()) {
+                errors.add("department must not be blank");
+            } else if (request.getDepartment().length() > 150) {
+                errors.add("department must not exceed 150 characters");
+            }
+        }
+
+        if (request.getLevel() != null) {
+            try {
+                seniorityLevelLookupService.resolveByGrade(request.getLevel());
+            } catch (IllegalArgumentException e) {
+                errors.add(e.getMessage());
             }
         }
 

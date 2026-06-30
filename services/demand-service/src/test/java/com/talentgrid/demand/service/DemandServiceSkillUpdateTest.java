@@ -10,6 +10,7 @@ import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
 import com.talentgrid.demand.mapper.DemandMapper;
 import com.talentgrid.demand.repository.DemandRepository;
+import com.talentgrid.demand.repository.DemandSkillRepository;
 import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
 import com.talentgrid.shared.auth.security.JwtPrincipal;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -39,8 +41,9 @@ class DemandServiceSkillUpdateTest {
 
     @Mock private DemandRepository demandRepository;
     @Mock private DemandStatusHistoryRepository demandStatusHistoryRepository;
+    @Mock private DemandSkillRepository demandSkillRepository;
     @Mock private DemandMapper demandMapper;
-    @Spy private DemandValidationService validationService = new DemandValidationService();
+    @Mock private SeniorityLevelLookupService seniorityLevelLookupService;
     @Mock private AuditLogClient auditLogClient;
     @Mock private UserAuthServiceClient userAuthServiceClient;
     @Mock private JobTitleLookupService jobTitleLookupService;
@@ -53,6 +56,9 @@ class DemandServiceSkillUpdateTest {
 
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(
+                demandService, "validationService", spy(new DemandValidationService(seniorityLevelLookupService)));
+
         JwtPrincipal principal = JwtPrincipal.builder().userId(99L).email("test@example.com").build();
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(principal, null, java.util.List.of()));

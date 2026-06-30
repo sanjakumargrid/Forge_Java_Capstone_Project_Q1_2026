@@ -318,7 +318,7 @@ public class DemandEventProducer {
                 .demandId(demand.getDemandId())
                 .title(demand.getTitle())
                 .status(demand.getStatus() != null ? demand.getStatus().name() : null)
-                .level(demand.getLevel() != null ? demand.getLevel().name() : null)
+                .level(demand.getLevel())
                 .mandatorySkills(demand.getDemandSkills() != null ? demand.getDemandSkills().stream()
                         .filter(ds -> Boolean.TRUE.equals(ds.getIsMandatory()))
                         .map(ds -> ds.getSkill().getSkillName())

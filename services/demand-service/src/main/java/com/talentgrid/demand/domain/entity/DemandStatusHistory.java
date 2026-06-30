@@ -48,6 +48,9 @@ public class DemandStatusHistory {
         if (this.changedAt == null) {
             this.changedAt = OffsetDateTime.now();
         }
+        if (this.comments == null) {
+            this.comments = "";
+        }
     }
 
     // ─── Getters & Setters ──────────────────────────────────────────────────────

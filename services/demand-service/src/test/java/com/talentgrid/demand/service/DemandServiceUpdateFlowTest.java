@@ -4,6 +4,8 @@ import com.talentgrid.audit.client.AuditLogClient;
 import com.talentgrid.audit.dto.AuditAction;
 import com.talentgrid.audit.dto.AuditLogPayload;
 import com.talentgrid.demand.client.UserAuthServiceClient;
+import com.talentgrid.demand.client.dto.AccountDto;
+import com.talentgrid.demand.client.dto.ProjectDto;
 import com.talentgrid.demand.domain.entity.Demand;
 import com.talentgrid.demand.domain.entity.DemandStatusHistory;
 import com.talentgrid.demand.domain.enums.DemandPriority;
@@ -11,9 +13,9 @@ import com.talentgrid.demand.domain.enums.DemandStatus;
 import com.talentgrid.demand.domain.enums.WorkMode;
 import com.talentgrid.demand.dto.request.DemandRequest;
 import com.talentgrid.demand.dto.response.DemandResponse;
-import com.talentgrid.demand.exception.InvalidDemandStateException;
 import com.talentgrid.demand.mapper.DemandMapper;
 import com.talentgrid.demand.repository.DemandRepository;
+import com.talentgrid.demand.repository.DemandSkillRepository;
 import com.talentgrid.demand.repository.DemandStatusHistoryRepository;
 import com.talentgrid.shared.auth.security.JwtPrincipal;
 import org.junit.jupiter.api.AfterEach;
@@ -29,6 +31,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -41,8 +44,9 @@ class DemandServiceUpdateFlowTest {
 
     @Mock private DemandRepository demandRepository;
     @Mock private DemandStatusHistoryRepository demandStatusHistoryRepository;
+    @Mock private DemandSkillRepository demandSkillRepository;
     @Spy private DemandMapper demandMapper = new DemandMapper();
-    @Spy private DemandValidationService validationService = new DemandValidationService();
+    @Mock private SeniorityLevelLookupService seniorityLevelLookupService;
     @Mock private AuditLogClient auditLogClient;
     @Mock private UserAuthServiceClient userAuthServiceClient;
     @Mock private JobTitleLookupService jobTitleLookupService;
@@ -51,10 +55,14 @@ class DemandServiceUpdateFlowTest {
     @InjectMocks
     private DemandService demandService;
 
+    private DemandValidationService validationService;
     private Demand demand;
 
     @BeforeEach
     void setUp() {
+        validationService = spy(new DemandValidationService(seniorityLevelLookupService));
+        ReflectionTestUtils.setField(demandService, "validationService", validationService);
+
         JwtPrincipal principal = JwtPrincipal.builder().userId(42L).email("hm@example.com").build();
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(principal, null, java.util.List.of()));
@@ -83,7 +91,37 @@ class DemandServiceUpdateFlowTest {
         request.setLocation("Bangalore");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(request));
+                () -> validationService.validateUpdate(request, "PENDING_APPROVAL"));
+        assertTrue(ex.getMessage().contains("reasonForEdit is required"));
+    }
+
+    @Test
+    void validateUpdate_draftWithoutReasonForEdit_allowed() {
+        DemandRequest request = new DemandRequest();
+        request.setLocation("Bangalore");
+
+        assertDoesNotThrow(() -> validationService.validateUpdate(request, "DRAFT"));
+    }
+
+    @Test
+    void updateDemand_draftWithoutReason_skipsEditHistory() {
+        demand.setStatus(DemandStatus.DRAFT);
+        DemandRequest request = new DemandRequest();
+        request.setLocation("Bangalore");
+
+        demandService.updateDemand(7L, request);
+
+        verify(demandRepository).save(any(Demand.class));
+        verify(demandStatusHistoryRepository, never()).save(any(DemandStatusHistory.class));
+    }
+
+    @Test
+    void validateUpdate_approvedWithoutReasonForEdit_rejected() {
+        DemandRequest request = new DemandRequest();
+        request.setLocation("Bangalore");
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> validationService.validateUpdate(request, "APPROVED"));
         assertTrue(ex.getMessage().contains("reasonForEdit is required"));
     }
 
@@ -93,7 +131,7 @@ class DemandServiceUpdateFlowTest {
         request.setReasonForEdit("   ");
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(request));
+                () -> validationService.validateUpdate(request, "PENDING_APPROVAL"));
         assertTrue(ex.getMessage().contains("reasonForEdit is required"));
     }
 
@@ -103,7 +141,7 @@ class DemandServiceUpdateFlowTest {
         request.setReasonForEdit("x".repeat(1001));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(request));
+                () -> validationService.validateUpdate(request, "PENDING_APPROVAL"));
         assertTrue(ex.getMessage().contains("reasonForEdit must not exceed 1000 characters"));
     }
 
@@ -114,9 +152,9 @@ class DemandServiceUpdateFlowTest {
         DemandRequest request = updateRequest("Budget revision");
         request.setBudget(java.math.BigDecimal.valueOf(200000));
 
-        InvalidDemandStateException ex = assertThrows(InvalidDemandStateException.class,
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> demandService.updateDemand(7L, request));
-        assertTrue(ex.getMessage().contains("editing is not allowed"));
+        assertTrue(ex.getMessage().contains("Cannot edit a demand in " + status + " status"));
         verify(demandRepository, never()).save(any());
     }
 
@@ -126,14 +164,20 @@ class DemandServiceUpdateFlowTest {
     })
     void updateDemand_editableStatuses_allowed(DemandStatus status) {
         demand.setStatus(status);
-        DemandRequest request = updateRequest("Location change");
+        DemandRequest request = status == DemandStatus.DRAFT
+                ? new DemandRequest()
+                : updateRequest("Editable status update");
         request.setLocation("Hyderabad");
 
         DemandResponse response = demandService.updateDemand(7L, request);
 
         assertNotNull(response);
         verify(demandRepository).save(any(Demand.class));
-        verify(demandStatusHistoryRepository).save(any(DemandStatusHistory.class));
+        if (status == DemandStatus.DRAFT) {
+            verify(demandStatusHistoryRepository, never()).save(any(DemandStatusHistory.class));
+        } else {
+            verify(demandStatusHistoryRepository).save(any(DemandStatusHistory.class));
+        }
     }
 
     @Test
@@ -147,23 +191,34 @@ class DemandServiceUpdateFlowTest {
         assertEquals(DemandPriority.HIGH, demand.getPriority());
     }
 
+    @Test
+    void updateDemand_approved_canChangePriority() {
+        demand.setStatus(DemandStatus.APPROVED);
+        DemandRequest request = updateRequest("Priority bump after approval");
+        request.setPriority(DemandPriority.HIGH);
+
+        demandService.updateDemand(7L, request);
+
+        assertEquals(DemandPriority.HIGH, demand.getPriority());
+    }
+
     @ParameterizedTest
-    @EnumSource(value = DemandStatus.class, names = {"APPROVED", "INTERNAL_SEARCH", "OPEN_EXTERNAL", "ON_HOLD"})
-    void updateDemand_postApproval_lockedFieldRejected(DemandStatus status) {
+    @EnumSource(value = DemandStatus.class, names = {"INTERNAL_SEARCH", "OPEN_EXTERNAL", "ON_HOLD"})
+    void updateDemand_partialEditLock_lockedFieldRejected(DemandStatus status) {
         demand.setStatus(status);
         DemandRequest request = updateRequest("Attempt to change priority");
         request.setPriority(DemandPriority.CRITICAL);
 
-        InvalidDemandStateException ex = assertThrows(InvalidDemandStateException.class,
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> demandService.updateDemand(7L, request));
         assertTrue(ex.getMessage().contains("locked field"));
-        assertTrue(ex.getMessage().contains("Priority"));
+        assertTrue(ex.getMessage().contains("priority"));
         verify(demandRepository, never()).save(any());
     }
 
     @ParameterizedTest
-    @EnumSource(value = DemandStatus.class, names = {"APPROVED", "INTERNAL_SEARCH", "OPEN_EXTERNAL", "ON_HOLD"})
-    void updateDemand_postApproval_allowedFieldsPersisted(DemandStatus status) {
+    @EnumSource(value = DemandStatus.class, names = {"INTERNAL_SEARCH", "OPEN_EXTERNAL", "ON_HOLD"})
+    void updateDemand_partialEditLock_otherFieldsPersisted(DemandStatus status) {
         demand.setStatus(status);
         DemandRequest request = updateRequest("Adjust search timeline and budget");
         request.setLocation("Pune");
@@ -171,7 +226,7 @@ class DemandServiceUpdateFlowTest {
         request.setBudget(java.math.BigDecimal.valueOf(175000));
         request.setReqUtilPerc(90);
         request.setExperience(8L);
-        request.setDescription("Updated job description after approval");
+        request.setDescription("Updated job description during search");
 
         demandService.updateDemand(7L, request);
 
@@ -180,7 +235,7 @@ class DemandServiceUpdateFlowTest {
         assertEquals(java.math.BigDecimal.valueOf(175000), demand.getBudget());
         assertEquals(90, demand.getReqUtilPerc());
         assertEquals(8L, demand.getExperience());
-        assertEquals("Updated job description after approval", demand.getDescription());
+        assertEquals("Updated job description during search", demand.getDescription());
     }
 
     @Test
@@ -231,6 +286,31 @@ class DemandServiceUpdateFlowTest {
         assertEquals(7L, savedCaptor.getValue().getDemandId());
         assertEquals(7L, response.getDemandId());
         assertEquals("Mumbai", response.getLocation());
+    }
+
+    @Test
+    void updateDemand_newProjectId_resolvesProjectAndAccountNames() {
+        demand.setProjectId(10L);
+        demand.setProjectName("Old Project");
+        demand.setAccountId(100L);
+        demand.setAccountName("Old Account");
+
+        DemandRequest request = updateRequest("Reassign to different project");
+        request.setProjectId(20L);
+
+        when(userAuthServiceClient.getProjectById(20L)).thenReturn(
+                ProjectDto.builder().id(20L).name("New Project").accountId(200L).build());
+        when(userAuthServiceClient.getAccountById(200L)).thenReturn(
+                AccountDto.builder().id(200L).name("New Account").build());
+
+        demandService.updateDemand(7L, request);
+
+        assertEquals(20L, demand.getProjectId());
+        assertEquals("New Project", demand.getProjectName());
+        assertEquals(200L, demand.getAccountId());
+        assertEquals("New Account", demand.getAccountName());
+        verify(userAuthServiceClient).getProjectById(20L);
+        verify(userAuthServiceClient).getAccountById(200L);
     }
 
     private static DemandRequest updateRequest(String reason) {

@@ -1,0 +1,16 @@
+UPDATE demands SET level = 'IC0' WHERE level = 'IC0';
+UPDATE demands SET level = 'T0'  WHERE level = 'T0_INTERN';
+UPDATE demands SET level = 'T1'  WHERE level = 'T1_JUNIOR';
+UPDATE demands SET level = 'T2'  WHERE level = 'T2_MID';
+UPDATE demands SET level = 'T3'  WHERE level = 'T3_SENIOR';
+UPDATE demands SET level = 'T4'  WHERE level = 'T4_STAFF';
+UPDATE demands SET level = 'T5'  WHERE level = 'T5_SENIOR_STAFF';
+UPDATE demands SET level = 'T6'  WHERE level = 'T6_PRINCIPAL';
+UPDATE demands SET level = 'T7'  WHERE level = 'T7_DISTINGUISHED';
+UPDATE demands SET level = 'D0'  WHERE level = 'D0_ASSOCIATE';
+UPDATE demands SET level = 'D1'  WHERE level = 'D1_SENIOR_ASSOCIATE';
+UPDATE demands SET level = 'D2'  WHERE level = 'D2_MID';
+UPDATE demands SET level = 'D3'  WHERE level = 'D3_SENIOR';
+UPDATE demands SET level = 'D4'  WHERE level = 'D4_PRINCIPAL';
+UPDATE demands SET level = 'D5'  WHERE level = 'D5_DIRECTOR';
+UPDATE demands SET level = 'D6'  WHERE level = 'D6_SENIOR_DIRECTOR';

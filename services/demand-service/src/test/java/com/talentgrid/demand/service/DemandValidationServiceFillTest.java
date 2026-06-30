@@ -1,16 +1,19 @@
 package com.talentgrid.demand.service;
 
 import com.talentgrid.demand.domain.entity.Demand;
+import com.talentgrid.demand.domain.entity.SeniorityLevelEntity;
 import com.talentgrid.demand.domain.enums.*;
 import com.talentgrid.demand.dto.request.DemandRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DemandValidationService} — verifying that
@@ -18,12 +21,19 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class DemandValidationServiceFillTest {
 
+    @Mock
+    private SeniorityLevelLookupService seniorityLevelLookupService;
+
     @InjectMocks
     private DemandValidationService validationService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        SeniorityLevelEntity level = new SeniorityLevelEntity();
+        level.setGrade("T2");
+        level.setDisplayName("Mid-Level Engineer");
+        when(seniorityLevelLookupService.resolveByGrade("T2")).thenReturn(level);
     }
 
     // ─── validateCreate ───────────────────────────────────────────────────────
@@ -93,7 +103,7 @@ class DemandValidationServiceFillTest {
     @Test
     void validateUpdate_requiresReasonForEdit() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(new DemandRequest()));
+                () -> validationService.validateUpdate(new DemandRequest(), "PENDING_APPROVAL"));
         assertTrue(ex.getMessage().contains("reasonForEdit"));
     }
 
@@ -103,7 +113,7 @@ class DemandValidationServiceFillTest {
         DemandRequest request = validUpdateRequest();
         request.setLocation("Berlin");
 
-        assertDoesNotThrow(() -> validationService.validateUpdate(request),
+        assertDoesNotThrow(() -> validationService.validateUpdate(request, "DRAFT"),
                 "Update validation must not require requiredCount");
     }
 
@@ -113,7 +123,7 @@ class DemandValidationServiceFillTest {
         request.setBudget(BigDecimal.valueOf(-500));
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(request));
+                () -> validationService.validateUpdate(request, "DRAFT"));
         assertTrue(ex.getMessage().contains("budget"));
     }
 
@@ -124,7 +134,7 @@ class DemandValidationServiceFillTest {
         request.setOptionalSkillIds(java.util.List.of());
 
         assertThrows(IllegalArgumentException.class,
-                () -> validationService.validateUpdate(request));
+                () -> validationService.validateUpdate(request, "DRAFT"));
     }
 
     @Test
@@ -167,7 +177,7 @@ class DemandValidationServiceFillTest {
 
     private DemandRequest validCreateRequest() {
         DemandRequest req = new DemandRequest();
-        req.setLevel(SeniorityLevel.T2_MID);
+        req.setLevel("T2");
         req.setPriority(DemandPriority.MEDIUM);
         req.setLocation("Remote");
         req.setBusinessUnit("Engineering");

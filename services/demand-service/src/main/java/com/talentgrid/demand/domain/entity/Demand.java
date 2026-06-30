@@ -2,7 +2,6 @@ package com.talentgrid.demand.domain.entity;
 
 import com.talentgrid.demand.domain.enums.DemandPriority;
 import com.talentgrid.demand.domain.enums.DemandStatus;
-import com.talentgrid.demand.domain.enums.SeniorityLevel;
 import com.talentgrid.demand.domain.enums.EmploymentType;
 import com.talentgrid.demand.domain.enums.FillType;
 import com.talentgrid.demand.domain.enums.WorkMode;
@@ -46,9 +45,8 @@ public class Demand {
     @Column(name = "description", columnDefinition = "TEXT", nullable = false)
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "level", nullable = false)
-    private SeniorityLevel level;
+    @Column(name = "level", nullable = false, length = 10)
+    private String level;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "employment_type", nullable = false)
@@ -279,11 +277,11 @@ public class Demand {
         this.description = description;
     }
 
-    public SeniorityLevel getLevel() {
+    public String getLevel() {
         return level;
     }
 
-    public void setLevel(SeniorityLevel level) {
+    public void setLevel(String level) {
         this.level = level;
     }
 

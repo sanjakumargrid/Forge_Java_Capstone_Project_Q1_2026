@@ -1,8 +1,10 @@
 package com.talentgrid.demand.config;
 
 import com.talentgrid.demand.domain.entity.JobTitle;
+import com.talentgrid.demand.domain.entity.SeniorityLevelEntity;
 import com.talentgrid.demand.domain.entity.Skill;
 import com.talentgrid.demand.repository.JobTitleRepository;
+import com.talentgrid.demand.repository.SeniorityLevelRepository;
 import com.talentgrid.demand.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ public class SkillDataInitializer implements CommandLineRunner {
 
     private final SkillRepository skillRepository;
     private final JobTitleRepository jobTitleRepository;
+    private final SeniorityLevelRepository seniorityLevelRepository;
 
     @Override
     @Transactional
@@ -761,6 +764,62 @@ public class SkillDataInitializer implements CommandLineRunner {
                         createJobTitle(20L, "Site Reliability Engineer")));
                 log.info("Initial job titles seeded.");
             }
+
+            if (seniorityLevelRepository.count() == 0) {
+                log.info("No seniority levels found. Seeding...");
+                seniorityLevelRepository.saveAll(List.of(
+                        createLevel("IC0", "Intern"),
+                        createLevel("T0", "Engineer Intern"),
+                        createLevel("T1", "Junior Engineer"),
+                        createLevel("T2", "Mid-Level Engineer"),
+                        createLevel("T3", "Senior Engineer"),
+                        createLevel("T4", "Staff Engineer"),
+                        createLevel("T5", "Lead / Staff Engineer / Senior Staff Engineer"),
+                        createLevel("T6", "Principal Engineer"),
+                        createLevel("T7", "Distinguished / Architect"),
+                        createLevel("D0", "Associate Delivery Manager / Technical Project Manager"),
+                        createLevel("D1", "Senior Associate Delivery Manager / Technical Project Manager"),
+                        createLevel("D2", "Delivery Manager"),
+                        createLevel("D3", "Senior Delivery Manager"),
+                        createLevel("D4", "Principal Delivery Manager"),
+                        createLevel("D5", "Delivery Director"),
+                        createLevel("D6", "Senior Delivery Director")
+                ));
+                log.info("Seniority levels seeded.");
+            }
+        } catch (Exception ex) {
+            log.error("=================================================");
+            log.error("SkillDataInitializer FAILED — the 'skills' or 'job_titles' table may not exist yet.");
+            log.error("Fix: ensure the pgvector extension is installed and the schema has been created.");
+            log.error("Run on your PostgreSQL DB:  CREATE EXTENSION IF NOT EXISTS vector;");
+            log.error("Then restart the service. Underlying error: {}", ex.getMessage());
+            log.error("=================================================");
+            throw ex; // re-throw so the boot failure is still explicit
+            if (jobTitleRepository.count() == 0) {
+                log.info("No job titles found. Seeding initial job titles...");
+                jobTitleRepository.saveAll(List.of(
+                        createJobTitle(1L, "Software Engineer"),
+                        createJobTitle(2L, "Senior Software Engineer"),
+                        createJobTitle(3L, "Lead Software Engineer"),
+                        createJobTitle(4L, "Staff Engineer"),
+                        createJobTitle(5L, "Principal Engineer"),
+                        createJobTitle(6L, "Engineering Manager"),
+                        createJobTitle(7L, "Technical Architect"),
+                        createJobTitle(8L, "Backend Engineer"),
+                        createJobTitle(9L, "Frontend Engineer"),
+                        createJobTitle(10L, "Full Stack Engineer"),
+                        createJobTitle(11L, "DevOps Engineer"),
+                        createJobTitle(12L, "Cloud Engineer"),
+                        createJobTitle(13L, "Data Engineer"),
+                        createJobTitle(14L, "QA Engineer"),
+                        createJobTitle(15L, "SDET"),
+                        createJobTitle(16L, "Data Scientist"),
+                        createJobTitle(17L, "Cybersecurity Engineer"),
+                        createJobTitle(18L, "Platform Engineer"),
+                        createJobTitle(19L, "Technical Project Manager"),
+                        createJobTitle(20L, "Site Reliability Engineer")));
+                log.info("Initial job titles seeded.");
+            }
         } catch (Exception ex) {
             log.error("=================================================");
             log.error("SkillDataInitializer FAILED — the 'skills' or 'job_titles' table may not exist yet.");
@@ -784,5 +843,12 @@ public class SkillDataInitializer implements CommandLineRunner {
         // jobTitle.setJobTitleId(id); // ID is auto-generated by IDENTITY
         jobTitle.setTitleName(name);
         return jobTitle;
+    }
+
+    private SeniorityLevelEntity createLevel(String grade, String displayName) {
+        SeniorityLevelEntity entity = new SeniorityLevelEntity();
+        entity.setGrade(grade);
+        entity.setDisplayName(displayName);
+        return entity;
     }
 }

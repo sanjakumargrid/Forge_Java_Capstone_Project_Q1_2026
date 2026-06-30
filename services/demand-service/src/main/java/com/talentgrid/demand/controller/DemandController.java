@@ -164,4 +164,17 @@ public class DemandController {
         demandService.deleteDemand(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Retrieves the edit history for a specific demand.
+     * Returns a list of edit entries (reason, who, when) for auditing purposes.
+     *
+     * @param id the demand ID
+     * @return list of edit history entries
+     */
+    @GetMapping("/{id:\\d+}/edit-history")
+    @PreAuthorize("hasAuthority('ROLE_SYSTEM') or hasAuthority('SYSTEM') or (hasAuthority('DEMAND_VIEW') and @demandSecurity.canView(#id))")
+    public ResponseEntity<List<?>> getEditHistory(@PathVariable Long id) {
+        return ResponseEntity.ok(demandService.getEditHistory(id));
+    }
 }

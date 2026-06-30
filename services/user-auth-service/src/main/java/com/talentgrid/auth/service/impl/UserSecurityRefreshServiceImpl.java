@@ -28,6 +28,7 @@ public class UserSecurityRefreshServiceImpl implements UserSecurityRefreshServic
     public User refreshUser(User user) {
         Long currentVersion = user.getAuthVersion();
         user.setAuthVersion(currentVersion == null ? 1L : currentVersion + 1);
+        user.setAuthVersion(user.getAuthVersion() + 1);
         User savedUser = userRepository.save(user);
         userSecurityCacheService.cacheUser(savedUser);
         publishUpdate(savedUser);

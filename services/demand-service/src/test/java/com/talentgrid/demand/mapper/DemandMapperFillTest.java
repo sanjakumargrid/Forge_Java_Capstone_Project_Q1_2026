@@ -146,7 +146,7 @@ class DemandMapperFillTest {
 
     private DemandRequest minimalRequest() {
         DemandRequest req = new DemandRequest();
-        req.setLevel(SeniorityLevel.T2_MID);
+        req.setLevel("T2");
         req.setPriority(DemandPriority.MEDIUM);
         req.setLocation("Remote");
         req.setBusinessUnit("Engineering");
@@ -162,7 +162,7 @@ class DemandMapperFillTest {
         demand.setIsFilled(isFilled);
         demand.setFillType(fillType);
         demand.setIsDeleted(false);
-        demand.setLevel(SeniorityLevel.T3_SENIOR);
+        demand.setLevel("T3");
         demand.setPriority(DemandPriority.HIGH);
         demand.setLocation("Remote");
         demand.setBusinessUnit("Engineering");

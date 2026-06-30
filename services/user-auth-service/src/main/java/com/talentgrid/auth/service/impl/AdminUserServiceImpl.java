@@ -6,9 +6,7 @@ import com.talentgrid.auth.dto.request.AdminPatchUserRequest;
 import com.talentgrid.auth.dto.request.ChangeRoleRequest;
 import com.talentgrid.auth.dto.response.AdminUserResponse;
 import com.talentgrid.auth.entity.Role;
-import com.talentgrid.auth.entity.Scope;
 import com.talentgrid.auth.entity.User;
-import com.talentgrid.auth.kafka.AuthUserEventPublisher;
 import com.talentgrid.auth.kafka.UserCreatedEventPublisher;
 import com.talentgrid.auth.mapper.UserMapper;
 import com.talentgrid.auth.entity.Project;
@@ -23,13 +21,13 @@ import com.talentgrid.auth.service.interfaces.UserSecurityCacheService;
 import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.auth.kafka.AuthUserEventPublisher;
+import com.talentgrid.auth.service.interfaces.UserSecurityRefreshService;
 import com.talentgrid.kafka.events.auth.UserCreatedPayload;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.talentgrid.kafka.events.auth.AuthUserPayload;
 
 import java.util.HashSet;
 import java.util.List;
@@ -179,7 +177,8 @@ public class AdminUserServiceImpl implements AdminUserService {
 
         // 6. Hard-delete user
         userRepository.delete(user);
-        
+        userSecurityRefreshService.refreshUser(savedUser);
+
         log.info("User {} hard-deleted and assignments/sessions cleaned up.", user.getEmail());
     }
 
