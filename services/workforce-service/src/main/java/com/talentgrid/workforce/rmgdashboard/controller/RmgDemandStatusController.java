@@ -1,10 +1,7 @@
 package com.talentgrid.workforce.rmgdashboard.controller;
 
 import com.talentgrid.workforce.rmgdashboard.dto.DemandDto;
-import com.talentgrid.workforce.rmgdashboard.dto.DemandSearchRequest;
-import com.talentgrid.workforce.rmgdashboard.dto.DemandSearchResponse;
 import com.talentgrid.workforce.rmgdashboard.dto.StatusUpdateRequest;
-import com.talentgrid.workforce.rmgdashboard.service.DemandSearchService;
 import com.talentgrid.workforce.rmgdashboard.service.RmgService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,23 +31,6 @@ import java.util.List;
 public class RmgDemandStatusController {
 
     private final RmgService rmgService;
-    private final DemandSearchService demandSearchService;
-
-    @GetMapping("/demands/search")
-    @PreAuthorize("hasAnyAuthority('WORKFORCE_BENCH_SEARCH', 'WORKFORCE_NOMINATION_VIEW')")
-    @Operation(
-            summary = "Search demands for resource management",
-            description = "Applies multi-criteria AND filtering on demandId, title, skill, location, level, status, priority, "
-                    + "accountName, businessUnit, employmentType, assignedRm, and targetDate range. "
-                    + "All parameters are optional; omitting a parameter disables that filter. "
-                    + "Results are ranked by targetDate ascending, then priority (CRITICAL first)."
-    )
-    public ResponseEntity<DemandSearchResponse> searchDemands(DemandSearchRequest request) {
-        log.info("Received demand search request: demandId={}, title={}, skill={}, location={}, level={}, status={}, priority={}",
-                request.getDemandId(), request.getTitle(), request.getSkill(), request.getLocation(), request.getLevel(),
-                request.getStatus() != null ? request.getStatus() : request.getStatuses(), request.getPriority());
-        return ResponseEntity.ok(demandSearchService.search(request));
-    }
 
     @GetMapping("/demands")
     @PreAuthorize("hasAnyAuthority('WORKFORCE_BENCH_SEARCH', 'WORKFORCE_NOMINATION_VIEW')")
@@ -101,5 +81,4 @@ public class RmgDemandStatusController {
         );
         return ResponseEntity.ok(response);
     }
-    
 }

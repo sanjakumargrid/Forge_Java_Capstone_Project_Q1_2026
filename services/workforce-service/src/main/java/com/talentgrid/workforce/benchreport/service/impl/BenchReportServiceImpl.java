@@ -7,14 +7,16 @@ import com.talentgrid.workforce.benchreport.dto.BenchWindowPage;
 import com.talentgrid.workforce.benchreport.repository.BenchReportRepository;
 import com.talentgrid.workforce.benchreport.service.BenchReportService;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
+import jakarta.annotation.PostConstruct;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,14 +24,20 @@ import java.util.stream.Collectors;
 public class BenchReportServiceImpl implements BenchReportService {
 
     private final BenchReportRepository benchReportRepository;
+    private final AtomicReference<BenchReportResponse> cachedReport = new AtomicReference<>(new BenchReportResponse());
 
     public BenchReportServiceImpl(BenchReportRepository benchReportRepository) {
         this.benchReportRepository = benchReportRepository;
     }
 
+    @PostConstruct
+    public void init() {
+        refreshBenchReport();
+    }
+
     @Override
     public BenchReportResponse getBenchReport() {
-        return buildBenchReport(LocalDate.now());
+        return cachedReport.get();
     }
 
     @Override
@@ -41,34 +49,12 @@ public class BenchReportServiceImpl implements BenchReportService {
             throw new IllegalArgumentException("size must be > 0");
         }
 
-        BenchReportResponse report = buildBenchReport(LocalDate.now());
+        BenchReportResponse report = cachedReport.get();
         BenchReportPageResponse response = new BenchReportPageResponse();
         response.setRefreshedAt(report.getRefreshedAt());
         response.setUnder30Days(paginateWindow(report.getUnder30Days(), page, size));
         response.setThirtyToSixtyDays(paginateWindow(report.getThirtyToSixtyDays(), page, size));
         response.setSixtyToNinetyDays(paginateWindow(report.getSixtyToNinetyDays(), page, size));
-        return response;
-    }
-
-    /**
-     * Kept for backward compatibility. Report is built live from the database on each request.
-     */
-    @Override
-    public void refreshBenchReport() {
-        // no-op: caching removed so every API call reflects current internal_employees data
-    }
-
-    BenchReportResponse buildBenchReport(LocalDate today) {
-        LocalDate ninetyDaysOut = today.plusDays(90);
-
-        List<InternalEmployee> employees = benchReportRepository
-                .findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(today, ninetyDaysOut);
-
-        BenchReportResponse response = new BenchReportResponse();
-        response.setRefreshedAt(Instant.now());
-        response.setUnder30Days(groupEmployeesWithinRange(employees, today, today.plusDays(30)));
-        response.setThirtyToSixtyDays(groupEmployeesWithinRange(employees, today.plusDays(31), today.plusDays(60)));
-        response.setSixtyToNinetyDays(groupEmployeesWithinRange(employees, today.plusDays(61), ninetyDaysOut));
         return response;
     }
 
@@ -88,6 +74,25 @@ public class BenchReportServiceImpl implements BenchReportService {
         );
     }
 
+    @Override
+    @Scheduled(cron = "0 0 6 * * *", zone = "UTC")
+    public void refreshBenchReport() {
+        LocalDate today = LocalDate.now();
+        LocalDate ninetyDays = today.plusDays(90);
+
+        List<InternalEmployee> employees = benchReportRepository
+                .findByAvailabilityDateBetweenAndIsDeletedFalseOrderByAvailabilityDateAsc(today, ninetyDays);
+
+        BenchReportResponse response = new BenchReportResponse();
+        response.setRefreshedAt(Instant.now());
+
+        response.setUnder30Days(groupEmployeesWithinRange(employees, today, today.plusDays(30)));
+        response.setThirtyToSixtyDays(groupEmployeesWithinRange(employees, today.plusDays(31), today.plusDays(60)));
+        response.setSixtyToNinetyDays(groupEmployeesWithinRange(employees, today.plusDays(61), ninetyDays));
+
+        cachedReport.set(response);
+    }
+
     private List<BenchEmployeeDto> groupEmployeesWithinRange(
             List<InternalEmployee> employees,
             LocalDate start,
@@ -97,9 +102,6 @@ public class BenchReportServiceImpl implements BenchReportService {
                 .filter(employee -> employee.getAvailabilityDate() != null)
                 .filter(employee -> !employee.getAvailabilityDate().isBefore(start))
                 .filter(employee -> !employee.getAvailabilityDate().isAfter(end))
-                .sorted(Comparator
-                        .comparing(InternalEmployee::getAvailabilityDate)
-                        .thenComparing(InternalEmployee::getName, Comparator.nullsLast(String::compareToIgnoreCase)))
                 .map(this::mapToBenchEmployeeDto)
                 .collect(Collectors.toList());
     }

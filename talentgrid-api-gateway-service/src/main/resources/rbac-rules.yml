@@ -523,10 +523,6 @@ rbac:
       methods: [ PATCH ]
       allowed-scopes: [ WORKFORCE_PROFILE_UPDATE ]
 
-    - path: "/api/v1/engineer-profile/engineers/analytics"
-      methods: [ GET ]
-      allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
-
     - path: "/api/v1/engineer-profile/engineers"
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_PROFILE_VIEW ]
@@ -704,10 +700,6 @@ rbac:
 
     # --- RMG Demand Management ---
     - path: "/api/v1/rmg/demands"
-      methods: [ GET ]
-      allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
-
-    - path: "/api/v1/rmg/demands/search"
       methods: [ GET ]
       allowed-scopes: [ WORKFORCE_BENCH_SEARCH, WORKFORCE_NOMINATION_VIEW ]
 

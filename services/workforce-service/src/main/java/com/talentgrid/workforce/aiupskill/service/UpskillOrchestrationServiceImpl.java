@@ -76,17 +76,22 @@ public class UpskillOrchestrationServiceImpl implements UpskillOrchestrationServ
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        // Step B: Fetch the engineer profile directly by employeeId
-        Long empIdLong;
-        try {
-            empIdLong = Long.valueOf(employeeId);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid employee ID format: " + employeeId);
+        // Step B: Fetch the engineer profile directly by employeeId or email
+        InternalEmployeeResponse targetEmployee;
+        if (employeeId != null && employeeId.contains("@")) {
+            targetEmployee = internalEmployeeService.getEmployeeByEmail(employeeId);
+        } else {
+            Long empIdLong;
+            try {
+                empIdLong = Long.valueOf(employeeId);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Invalid employee ID format: " + employeeId);
+            }
+            targetEmployee = internalEmployeeService.getEmployeeDetailsById(empIdLong);
         }
 
-        InternalEmployeeResponse targetEmployee = internalEmployeeService.getEmployeeDetailsById(empIdLong);
         if (targetEmployee == null) {
-            throw new RuntimeException("Employee profile not found for ID: " + employeeId);
+            throw new RuntimeException("Employee profile not found for ID/Email: " + employeeId);
         }
 
         Set<String> engineerSkillsLower = targetEmployee.getSkills() != null

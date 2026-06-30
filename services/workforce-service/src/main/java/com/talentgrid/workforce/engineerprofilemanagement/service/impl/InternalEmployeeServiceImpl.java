@@ -4,7 +4,6 @@ import com.talentgrid.workforce.engineerprofilemanagement.dto.EmployeeProfileUpd
 import com.talentgrid.workforce.engineerprofilemanagement.dto.InternalEmployeeResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.SkillCatalogEntryDto;
 import com.talentgrid.workforce.engineerprofilemanagement.dto.UpdateEngineerProfileRequest;
-import com.talentgrid.workforce.engineerprofilemanagement.dto.WorkforceAnalyticsResponse;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.InternalEmployee;
 import com.talentgrid.workforce.engineerprofilemanagement.entity.SkillCatalogEntry;
 import com.talentgrid.workforce.engineerprofilemanagement.enums.HrisSyncStatus;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,21 +89,6 @@ public class InternalEmployeeServiceImpl implements InternalEmployeeService {
                 org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("id").ascending());
         return repository.findByIsDeletedFalse(pageable)
                 .map(this::mapToResponse);
-    }
-
-    @Override
-    public WorkforceAnalyticsResponse getWorkforceAnalytics() {
-        LocalDate today = LocalDate.now();
-        LocalDate ninetyDays = today.plusDays(90);
-
-        return WorkforceAnalyticsResponse.builder()
-                .totalWorkforce(repository.countByIsDeletedFalse())
-                .under30Days(repository.countByAvailabilityDateBetweenAndIsDeletedFalse(today, today.plusDays(30)))
-                .thirtyToSixtyDays(repository.countByAvailabilityDateBetweenAndIsDeletedFalse(
-                        today.plusDays(31), today.plusDays(60)))
-                .sixtyToNinetyDays(repository.countByAvailabilityDateBetweenAndIsDeletedFalse(
-                        today.plusDays(61), ninetyDays))
-                .build();
     }
 
     @Override
