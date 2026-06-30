@@ -8,13 +8,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/rmg-search")
-@Tag(name = "RMG Search", description = "Resource Management Group search — find bench employees by id, name, email, skills, level, contract type, availability, and location")
+@Tag(name = "RMG Search", description = "Resource Management Group search — find bench employees by skill, availability, location, seniority, and contract type")
 public class RmgSearchController {
 
     private final RmgSearchService rmgSearchService;
@@ -25,18 +24,13 @@ public class RmgSearchController {
 
     @Operation(
             summary = "Search bench employees for resource management",
-            description = "Applies multi-criteria AND filtering on employeeId, name, email, skills (OR within skills), "
-                    + "level, contractType, availabilityDate range, and location. All filter parameters are optional; "
-                    + "omitting a filter disables it. Repeat the skills query parameter for multiple values "
-                    + "(e.g. skills=Java&skills=Python). Results are ranked by availabilityDate ascending "
-                    + "(earliest available first) and paginated (defaults: page=0, size=10)."
+            description = "Applies multi-criteria AND filtering on skill, availabilityDate range, location, seniority, "
+                    + "and contractType. All parameters are optional; omitting a parameter disables that filter. "
+                    + "Results are ranked by availabilityDate ascending (earliest available first)."
     )
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('WORKFORCE_BENCH_SEARCH')")
-    public ResponseEntity<RmgSearchResponse> search(
-            RmgSearchRequest request,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(rmgSearchService.search(request, page, size));
+    public ResponseEntity<RmgSearchResponse> search(RmgSearchRequest request) {
+        return ResponseEntity.ok(rmgSearchService.search(request));
     }
 }
