@@ -290,6 +290,14 @@ rbac:
       methods: [GET]
       allowed-scopes: [APPLICATION_VIEW]
 
+    - path: "/api/v1/applications/candidates/by-demand/**"
+      methods: [ GET ]
+      allowed-scopes: [ GETTING DEMAND AND CANDIDATE ]
+
+    - path: "/api/v1/applications/by-demand/**"
+      methods: [ GET ]
+      allowed-scopes: [ GETTING DEMAND ]
+
     - path: "/api/v1/applications/**/stage"
       methods: [PATCH]
       allowed-scopes: [APPLICATION_UPDATE]

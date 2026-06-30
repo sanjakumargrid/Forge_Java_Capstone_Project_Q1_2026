@@ -75,6 +75,15 @@ public class ApplicationController {
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
+    @GetMapping("/by-demand/{demandId}")
+    public List<ApplicationDto> getApplicationsByDemand(
+            @PathVariable Long demandId,
+            @RequestParam(required = false) String stage
+    ) {
+        return applicationService.getApplicationsByDemand(demandId, stage);
+    }
+
+    @PreAuthorize("hasAuthority('APPLICATION_VIEW')")
     @GetMapping("/by-candidate-and-demand")
     public List<ApplicationDto> getApplicationsByCandidateAndDemand(
             @RequestParam Long candidateId,

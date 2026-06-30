@@ -280,6 +280,33 @@ public class ApplicationService {
         return toDtoWithCandidate(getApplicationEntity(applicationId));
     }
 
+    public List<ApplicationDto> getApplicationsByDemand(
+            Long demandId,
+            String stage
+    ) {
+        if (demandId == null) {
+            throw new BusinessException(
+                    HttpStatus.BAD_REQUEST,
+                    "Demand id is required"
+            );
+        }
+
+        List<Application> applications;
+
+        if (stage != null && !stage.isBlank()) {
+            applications = applicationRepository.findByDemandIdAndCurrentStage(
+                    demandId,
+                    parseStage(stage)
+            );
+        } else {
+            applications = applicationRepository.findByDemandId(demandId);
+        }
+
+        return applications.stream()
+                .map(this::toDtoWithCandidate)
+                .collect(Collectors.toList());
+    }
+
     public List<ApplicationDto> getApplicationsByCandidateAndDemand(
             Long candidateId,
             Long demandId

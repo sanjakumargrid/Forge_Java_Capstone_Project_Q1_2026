@@ -22,6 +22,11 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             Long demandId
     );
 
+    List<Application> findByDemandIdAndCurrentStage(
+            Long demandId,
+            Stage currentStage
+    );
+
     Optional<Application> findFirstByCandidateIdAndJobPostingIdAndDemandId(
             Long candidateId,
             Long jobPostingId,

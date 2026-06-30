@@ -18,7 +18,6 @@ public class Interviewer {
     @Column(name = "interviewer_id")
     private Long interviewer_id;
 
-
     @Column(name = "employee_id")
     private Long employeeId;
 
