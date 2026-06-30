@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.talentgrid.jobposting.event.DemandEvent;
 import com.talentgrid.jobposting.event.PortalConfirmationEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -64,35 +63,8 @@ public class KafkaConfig {
                 .configure(JsonParser.Feature.ALLOW_TRAILING_COMMA, true);
     }
 
-    @Bean
-    public ConsumerFactory<String, DemandEvent> demandConsumerFactory(ObjectMapper demandEventObjectMapper) {
-        JsonDeserializer<DemandEvent> jsonDeserializer =
-                new JsonDeserializer<>(DemandEvent.class, demandEventObjectMapper, false);
-        jsonDeserializer.addTrustedPackages("*");
 
-        // Wrap in ErrorHandlingDeserializer so a single bad record can't poison
-        // the partition — it surfaces as a null value the consumer already guards.
-        ErrorHandlingDeserializer<DemandEvent> valueDeserializer =
-                new ErrorHandlingDeserializer<>(jsonDeserializer);
 
-        Map<String, Object> config = new HashMap<>();
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ConsumerConfig.GROUP_ID_CONFIG, "job-posting-group");
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-
-        return new DefaultKafkaConsumerFactory<>(
-                config, new StringDeserializer(), valueDeserializer);
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DemandEvent> kafkaListenerContainerFactory(
-            ConsumerFactory<String, DemandEvent> demandConsumerFactory) {
-        ConcurrentKafkaListenerContainerFactory<String, DemandEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(demandConsumerFactory);
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-        return factory;
-    }
 
     // ── Portal Confirmation Consumer ──────────────────────────────────────────
     // Separate factory so the demand-events consumer factory is left untouched.

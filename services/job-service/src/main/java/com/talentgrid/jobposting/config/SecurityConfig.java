@@ -47,7 +47,7 @@ public class SecurityConfig {
                         // Public read-only job posting APIs
                         .requestMatchers(HttpMethod.GET, "/api/v1/job-postings").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/job-postings/*").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/job-postings/public/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/job-postings/public/live").permitAll()
 
                         // Public read-only demand APIs
                         .requestMatchers(HttpMethod.GET, "/api/v1/demands/**").permitAll()

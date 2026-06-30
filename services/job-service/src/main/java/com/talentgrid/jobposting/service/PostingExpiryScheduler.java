@@ -22,7 +22,7 @@ public class PostingExpiryScheduler {
     private final JobPostingRepository jobPostingRepository;
     private final SseEmitterService sseEmitterService;
     private final PortalEventProducer portalEventProducer;
-    private final NotificationService notificationService;
+
 
     private static final List<JobStatus> ACTIVE_STATUSES =
             List.of(JobStatus.READY_TO_PUBLISH, JobStatus.LIVE);
@@ -54,14 +54,7 @@ public class PostingExpiryScheduler {
             // Notify external portal service via Kafka
             portalEventProducer.unpublishJob(jp);
 
-            // Notify the recruiter
-            notificationService.send(
-                    jp.getRecruiterId(), jp.getRecruiterEmail(), jp.getId(),
-                    "POSTING_EXPIRED", "Job Posting Auto-Closed",
-                    String.format(
-                            "'%s' has been automatically closed — the application deadline (%s) has passed.",
-                            jp.getTitle(), jp.getApplicationDeadline())
-            );
+
         }
 
         log.info("Auto-expired {} postings", expired.size());

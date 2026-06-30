@@ -8,7 +8,7 @@ rbac:
     - "/api/v1/careers/**"
     - "/api/v1/branding"
     - "/api/v1/health/**"
-    - "/api/v1/jobs/public/**"
+    - "/api/v1/job-postings/public/**"
     - "/api/v1/webhooks/docusign"
     - "/api/v1/ai/careers/chat/**"
     - "/api/v1/external-candidates"
@@ -111,6 +111,9 @@ rbac:
       allowed-roles: [ADMIN]
 
     # --- Demands ---
+    - path: "/api/v1/demands"
+      methods: [ POST ]
+      allowed-scopes: [ DEMAND_VIEW, DEMAND_CREATE, DEMAND_UPDATE ]
     - path: "/api/v1/demands/**"
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]

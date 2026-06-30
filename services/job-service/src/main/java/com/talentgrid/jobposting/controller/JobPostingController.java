@@ -39,37 +39,7 @@ public class JobPostingController {
     private final SseEmitterService sseEmitterService;
 
     // ── CRUD ──────────────────────────────────────────────────────────────────
-    private AuthenticatedUser getAuthenticatedUser(
-            AuthenticatedUser user,
-            String authorization) {
 
-        if (user == null
-                && authorization != null
-                && authorization.startsWith("Bearer ")) {
-
-            String token = authorization.substring(7);
-
-            if (token.matches("mock-\\d+")) {
-
-                Long userId = Long.parseLong(token.substring(5));
-
-                user = new AuthenticatedUser(
-                        userId,
-                        "mock" + userId + "@test.com",
-                        List.of("RECRUITER"));
-
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                user.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
-        }
-
-        return user;
-    }
 
     /** Creates a new job posting in DRAFT status. */
     @PostMapping
@@ -132,36 +102,8 @@ public class JobPostingController {
     @PostMapping("/submit")
     public ResponseEntity<JobPostingResponse> createAndSubmit(
             @Valid @RequestBody CreateJobPostingRequest req,
-            @RequestHeader(value = "Authorization", required = false) String authorization,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
-
-        // Support Bearer mock-3
-        if (user == null
-                && authorization != null
-                && authorization.startsWith("Bearer ")) {
-
-            String token = authorization.substring(7);
-
-            if ("mock-3".equals(token)) {
-
-                user = new AuthenticatedUser(
-                        3L,
-                        "mock3@test.com",
-                        List.of("RECRUITER")
-                );
-
-
-                        UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                user,
-                                null,
-                                user.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            }
-        }
-
         JobPostingResponse created = jobPostingService.create(req, user);
 
         return ResponseEntity.ok(
@@ -192,13 +134,8 @@ public class JobPostingController {
     @PostMapping("/{id}/approve")
     public ResponseEntity<JobPostingResponse> approve(
             @PathVariable Long id,
-            @RequestHeader(value = "Authorization", required = false)
-            String authorization,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
-
-        user = getAuthenticatedUser(user, authorization);
-
         return ResponseEntity.ok(jobPostingService.approve(id, user));
     }
 
