@@ -206,7 +206,7 @@ Same private library Team 4 uses (`com.gridynamics.forge:forge-ai-guardrail:2.0.
 | Team | What we need |
 |---|---|
 | CH-T1 | `demand-events` Kafka topic, JWT-issuing auth service |
-| BL-T4 | `ai-service` JD generation + chatbot endpoints (`/api/t4/v1/ai/jd/generate`, `/api/t4/v1/chatbot/chat`) |
+| BL-T4 | `ai-service` JD generation + chatbot endpoints (`/api/v1/ai/jd/generate`, `/api/t4/v1/chatbot/chat`) |
 | CH-T2 | Candidate/application intake API (not yet integrated) |
 
 ### We PROVIDE to other teams

@@ -40,12 +40,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 || path.startsWith("/webjars")
 
                 // Public job posting read APIs only
-                || (isGet && path.equals("/api/job-postings"))
-                || (isGet && path.matches("^/api/job-postings/\\d+$"))
-                || (isGet && path.startsWith("/api/job-postings/public"))
+                || (isGet && path.equals("/api/v1/job-postings"))
+                || (isGet && path.matches("^/api/v1/job-postings/\\d+$"))
+                || (isGet && path.startsWith("/api/v1/job-postings/public"))
 
                 // Public only for GET
-                || (isGet && path.startsWith("/api/demands"))
+                || (isGet && path.startsWith("/api/v1/demands"))
                 || (isGet && path.startsWith("/api/analytics"));
     }
 

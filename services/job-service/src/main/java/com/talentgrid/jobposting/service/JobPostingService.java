@@ -31,7 +31,7 @@ public class JobPostingService {
 
     private final JobPostingRepository jobPostingRepository;
     private final JobPostingApprovalRepository approvalRepository;
-    private final NotificationService notificationService;
+
     private final PortalEventProducer portalEventProducer;
     private final SseEmitterService sseEmitterService;
 
@@ -119,9 +119,6 @@ public class JobPostingService {
 
         recordApproval(jp.getId(), ApprovalAction.SUBMITTED, null, actor.getUserId(), actor.getEmail());
 
-        notificationService.send(HM_USER_ID, HM_USER_EMAIL, jp.getId(),
-                "APPROVAL_REQUESTED", "New Job Posting Requires Approval",
-                String.format("'%s' submitted by %s awaits your approval.", jp.getTitle(), actor.getEmail()));
 
         return JobPostingResponse.from(jp);
     }
@@ -145,9 +142,6 @@ public class JobPostingService {
 
         recordApproval(jp.getId(), ApprovalAction.APPROVED, null, actor.getUserId(), actor.getEmail());
 
-        notificationService.send(jp.getRecruiterId(), jp.getRecruiterEmail(), jp.getId(),
-                "POSTING_APPROVED", "Job Posting Approved",
-                String.format("'%s' has been approved and is being sent to the career portal.", jp.getTitle()));
 
         portalEventProducer.publishJob(jp);
 
@@ -173,10 +167,6 @@ public class JobPostingService {
 
         recordApproval(jp.getId(), ApprovalAction.DECLINED, req.getReason(), actor.getUserId(), actor.getEmail());
 
-        notificationService.send(jp.getRecruiterId(), jp.getRecruiterEmail(), jp.getId(),
-                "POSTING_DECLINED", "Job Posting Declined",
-                String.format("'%s' was declined. Reason: %s", jp.getTitle(), req.getReason()));
-
         return JobPostingResponse.from(jp);
     }
 
@@ -197,9 +187,6 @@ public class JobPostingService {
 
         recordApproval(jp.getId(), ApprovalAction.PUBLISHED, null, actor.getUserId(), actor.getEmail());
 
-        notificationService.send(actor.getUserId(), actor.getEmail(), jp.getId(),
-                "POSTING_PUBLISHED", "Job Posting is Now Live",
-                String.format("'%s' is now live on the careers portal.", jp.getTitle()));
 
         return JobPostingResponse.from(jp);
     }
@@ -218,9 +205,6 @@ public class JobPostingService {
         jp.setChannels(withPortalPending(jp.getChannels()));
         jobPostingRepository.save(jp);
 
-        notificationService.send(jp.getRecruiterId(), jp.getRecruiterEmail(), jp.getId(),
-                "POSTING_CLOSED", "Job Posting Closed",
-                String.format("'%s' is being removed from the career portal.", jp.getTitle()));
 
         portalEventProducer.unpublishJob(jp);
 

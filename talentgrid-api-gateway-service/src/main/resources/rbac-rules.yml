@@ -8,7 +8,7 @@ rbac:
     - "/api/v1/careers/**"
     - "/api/v1/branding"
     - "/api/v1/health/**"
-    - "/api/v1/jobs/public/**"
+    - "/api/v1/job-postings/public/**"
     - "/api/v1/webhooks/docusign"
     - "/api/v1/ai/careers/chat/**"
     - "/api/v1/external-candidates"
@@ -112,6 +112,9 @@ rbac:
 
     # --- Demands ---
     - path: "/api/v1/demands"
+      methods: [ POST ]
+      allowed-scopes: [ DEMAND_VIEW, DEMAND_CREATE, DEMAND_UPDATE ]
+    - path: "/api/v1/demands/**"
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
@@ -119,7 +122,7 @@ rbac:
       methods: [GET]
       allowed-scopes: [DEMAND_VIEW]
 
-    - path: "/api/v1/demands"
+    - path: "/api/v1/demands/*"
       methods: [POST]
       allowed-scopes: [DEMAND_CREATE]
 
@@ -448,6 +451,9 @@ rbac:
     - path: "/api/v1/job-postings/from-demand/**"
       methods: [POST]
       allowed-scopes: [JOB_POSTING_CREATE]
+    - path: "/api/v1/job-postings/submit"
+      methods: [ POST ]
+      allowed-scopes: [ JOB_POSTING_CREATE ]
 
     - path: "/api/v1/job-postings/*"
       methods: [GET]

@@ -23,7 +23,7 @@ public class JobPostingClient {
     public JobPostingDto getJobPosting(Long jobPostingId) {
         try {
             return webClient.get()
-                    .uri("/api/job-postings/{id}", jobPostingId)
+                    .uri("/api/v1/job-postings/{id}", jobPostingId)
                     .retrieve()
                     .bodyToMono(JobPostingDto.class)
                     .block();
@@ -48,7 +48,7 @@ public class JobPostingClient {
     public JobPostingDto getJobPostingByDemandId(Long demandId) {
         try {
             return webClient.get()
-                    .uri("/api/job-postings/by-demand/{demandId}", demandId)
+                    .uri("/api/v1/job-postings/by-demand/{demandId}", demandId)
                     .retrieve()
                     .bodyToMono(JobPostingDto.class)
                     .block();
