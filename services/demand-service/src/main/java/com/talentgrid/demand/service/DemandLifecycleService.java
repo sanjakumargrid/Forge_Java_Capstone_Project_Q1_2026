@@ -505,6 +505,27 @@ public class DemandLifecycleService {
             return;
         }
 
+        if (targetStatus == DemandStatus.CLOSED && from == DemandStatus.PENDING_APPROVAL) {
+            boolean isOwnerHm = SecurityUtils.isHiringManager()
+                    && SecurityUtils.getCurrentUserId().equals(demand.getCreatedBy());
+            boolean isPm = SecurityUtils.isPortfolioManager();
+
+            if (!isOwnerHm && !isPm) {
+                throw new AccessDeniedException(
+                        "Only the demand owner (HM) or a Portfolio Manager may close a demand pending approval.");
+            }
+            if (isOwnerHm && closureReason != ClosureReason.HM_CLOSED) {
+                throw new AccessDeniedException(
+                        "HM closing a pending demand requires closureReason=HM_CLOSED.");
+            }
+            if (isPm && closureReason != ClosureReason.PM_REJECTED
+                    && closureReason != ClosureReason.SLA_APPROVAL_BREACH) {
+                throw new AccessDeniedException(
+                        "PM closing a pending demand requires closureReason=PM_REJECTED or SLA_APPROVAL_BREACH.");
+            }
+            return;
+        }
+
         if (from == DemandStatus.INTERNAL_SEARCH
                 && (targetStatus == DemandStatus.ON_HOLD || targetStatus == DemandStatus.OPEN_EXTERNAL)) {
             if (!SecurityUtils.isResourceManager()) {

@@ -125,9 +125,10 @@ public class TransitionValidator {
             }
             case PENDING_APPROVAL -> {
                 if (closureReason != ClosureReason.PM_REJECTED
-                        && closureReason != ClosureReason.SLA_APPROVAL_BREACH) {
+                        && closureReason != ClosureReason.SLA_APPROVAL_BREACH
+                        && closureReason != ClosureReason.HM_CLOSED) {
                     throw new IllegalDemandTransitionException(
-                            "Transition from PENDING_APPROVAL to CLOSED requires closureReason=PM_REJECTED or SLA_APPROVAL_BREACH.");
+                            "Transition from PENDING_APPROVAL to CLOSED requires closureReason=PM_REJECTED, SLA_APPROVAL_BREACH, or HM_CLOSED.");
                 }
             }
             case ON_HOLD -> {

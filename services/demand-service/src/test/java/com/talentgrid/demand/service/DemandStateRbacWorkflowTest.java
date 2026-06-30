@@ -533,6 +533,90 @@ public class DemandStateRbacWorkflowTest {
         });
     }
 
+    // ─── PENDING_APPROVAL → CLOSED tests ─────────────────────────────────────
+
+    @Test
+    void pendingApprovalToClosed_ownerHmWithHmClosed_succeeds() {
+        // HM who created the demand closes it with HM_CLOSED → 200, status=CLOSED
+        Demand demand = createDemand(20L, DemandStatus.PENDING_APPROVAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(20L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(10L, "HIRING_MANAGER"); // userId 10 is the creator
+        DemandResponse response = lifecycleService.transitionStatus(20L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.CLOSED)
+                .closureReason(ClosureReason.HM_CLOSED)
+                .build());
+
+        assertEquals("CLOSED", response.getStatus());
+    }
+
+    @Test
+    void pendingApprovalToClosed_nonOwnerHm_throwsAccessDenied() {
+        // HM who did NOT create the demand → 403
+        Demand demand = createDemand(21L, DemandStatus.PENDING_APPROVAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(21L)).thenReturn(Optional.of(demand));
+
+        login(99L, "HIRING_MANAGER"); // userId 99 ≠ createdBy 10
+        assertThrows(AccessDeniedException.class, () ->
+                lifecycleService.transitionStatus(21L, StatusTransitionRequest.builder()
+                        .targetStatus(DemandStatus.CLOSED)
+                        .closureReason(ClosureReason.HM_CLOSED)
+                        .build()));
+    }
+
+    @Test
+    void pendingApprovalToClosed_ownerHmWithWrongReason_throwsAccessDenied() {
+        // Owner HM uses OTHER instead of HM_CLOSED → RBAC blocks it before TransitionValidator
+        Demand demand = createDemand(22L, DemandStatus.PENDING_APPROVAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(22L)).thenReturn(Optional.of(demand));
+
+        login(10L, "HIRING_MANAGER");
+        assertThrows(AccessDeniedException.class, () ->
+                lifecycleService.transitionStatus(22L, StatusTransitionRequest.builder()
+                        .targetStatus(DemandStatus.CLOSED)
+                        .closureReason(ClosureReason.OTHER)
+                        .build()));
+    }
+
+    @Test
+    void pendingApprovalToClosed_pmWithPmRejected_succeeds() {
+        // Regression: PM closes PENDING_APPROVAL with PM_REJECTED → still works
+        Demand demand = createDemand(23L, DemandStatus.PENDING_APPROVAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(23L)).thenReturn(Optional.of(demand));
+        when(demandRepository.save(any(Demand.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(demandMapper.toResponse(any(Demand.class))).thenAnswer(inv -> {
+            Demand saved = inv.getArgument(0);
+            return DemandResponse.builder().demandId(saved.getDemandId()).status(saved.getStatus().name()).build();
+        });
+
+        login(20L, "PORTFOLIO_MANAGER");
+        DemandResponse response = lifecycleService.transitionStatus(23L, StatusTransitionRequest.builder()
+                .targetStatus(DemandStatus.CLOSED)
+                .closureReason(ClosureReason.PM_REJECTED)
+                .build());
+
+        assertEquals("CLOSED", response.getStatus());
+    }
+
+    @Test
+    void pendingApprovalToClosed_recruiter_throwsAccessDenied() {
+        // Recruiter has no path → falls through to the final throw → 403
+        Demand demand = createDemand(24L, DemandStatus.PENDING_APPROVAL, 10L);
+        when(demandRepository.findByDemandIdAndIsDeletedFalse(24L)).thenReturn(Optional.of(demand));
+
+        login(50L, "RECRUITER");
+        assertThrows(AccessDeniedException.class, () ->
+                lifecycleService.transitionStatus(24L, StatusTransitionRequest.builder()
+                        .targetStatus(DemandStatus.CLOSED)
+                        .closureReason(ClosureReason.PM_REJECTED)
+                        .build()));
+    }
+
     @Test
     void adminStillBlockedByIllegalStateMachineTransition() {
         Demand demand = createDemand(13L, DemandStatus.CLOSED, 10L);
