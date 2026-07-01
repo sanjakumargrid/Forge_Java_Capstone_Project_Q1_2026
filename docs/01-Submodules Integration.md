@@ -130,17 +130,9 @@ curl -i http://localhost:8080/actuator/health
 
 `Screenshot: <ATTACH_SCREENSHOT_HERE>`
 
-## 16. GitHub/MR link
-`GitHub/MR Link: <PASTE_LINK_HERE>`
 
-## 17. Troubleshooting
+
+## 16. Troubleshooting
 - "Connection refused" from the gateway usually means the target service isn't running on the port configured in `.env`.
 - If Kafka events aren't consumed, verify `KAFKA_BOOTSTRAP_SERVERS` matches the broker's advertised listener (`localhost:9092` for host processes).
 
-## 18. Mentor review checklist
-- [ ] Dependency table matches actual gateway routes
-- [ ] Kafka vs. HTTP integration style correctly attributed per service
-- [ ] Failure-handling gaps (no DLQ, no circuit breaker) called out honestly
-
----
-Back to: [00 Overview](00-module-8-overview.md) · Next: [02 Microservices Course Proof](02-microservices-course-proof.md)
