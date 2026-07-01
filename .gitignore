@@ -125,3 +125,18 @@ HELP.md
 *~
 *.bak
 *.tmp
+# Maven build output
+target/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
